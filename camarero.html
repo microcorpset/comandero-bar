@@ -610,7 +610,6 @@ window.verCuenta = async () => {
       <div class="ticket-linea">
         <span>${l.qty}× ${l.nombre}</span>
         <span style="font-family:var(--mono)">${(l.precio * l.qty).toFixed(2)} €</span>
-        ${l.nota ? `<span class="ticket-nota">↳ ${l.nota}</span>` : ''}
       </div>`).join('')}
     <div class="ticket-total"><span>Total</span><span>${total.toFixed(2)} €</span></div>
     ${pie}

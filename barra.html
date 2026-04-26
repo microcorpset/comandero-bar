@@ -75,6 +75,12 @@
   .mesa-card.nueva .dot { display: block; }
   .card-mesa-name { font-family: var(--mono); font-size: 14px; font-weight: 500; color: var(--accent); flex: 1; }
   .card-time { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+  .btn-imprimir {
+    background: none; border: 1px solid var(--border); border-radius: 6px;
+    color: var(--muted); font-size: 14px; padding: 3px 7px; cursor: pointer;
+    transition: border-color .15s, color .15s; flex-shrink: 0;
+  }
+  .btn-imprimir:active { border-color: var(--accent); color: var(--accent); }
 
   /* Línea de pedido */
   .linea-row {
@@ -159,26 +165,43 @@ printTrack.parentElement.addEventListener('click', () => {
   updateToggleUI();
 });
 
+// ── Impresión via iframe oculto (sin ventanas emergentes) ─────────────────────
+const iframePrint = document.createElement('iframe');
+iframePrint.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;border:none';
+document.body.appendChild(iframePrint);
+
 function imprimirComanda(mesaNombre, lineas) {
-  const ventana = window.open('', '_blank', 'width=320,height=600');
-  if (!ventana) return;
   const fecha = new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
   const rows = lineas.map(l => `
-    <div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid #eee;font-size:14px">
-      <span style="font-weight:bold;min-width:20px">${l.qty}×</span>
-      <span style="flex:1">${l.nombre}${l.nota ? '<br><span style="font-size:11px;color:#888">↳ ' + l.nota + '</span>' : ''}</span>
-    </div>`).join('');
-  ventana.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
-    <title>Comanda</title>
-    <style>body{font-family:monospace;padding:12px;max-width:300px}
-    h2{font-size:16px;margin-bottom:4px} p{font-size:12px;color:#888;margin-bottom:12px}</style>
-    </head><body>
-    <h2>${ROL === 'cocina' ? 'COCINA' : 'BARRA'} — Mesa ${mesaNombre}</h2>
-    <p>${fecha}</p>
-    ${rows}
-    <script>window.onload=()=>{window.print();window.close()}<\/script>
-    </body></html>`);
-  ventana.document.close();
+    <tr>
+      <td style="padding:4px 6px 4px 0;font-weight:bold;vertical-align:top">${l.qty}×</td>
+      <td style="padding:4px 0;vertical-align:top">
+        ${l.nombre}
+        ${l.nota ? `<br><span style="font-size:11px;color:#555">↳ ${l.nota}</span>` : ''}
+      </td>
+    </tr>`).join('');
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { font-family: monospace; font-size: 13px; padding: 8px; width: 100%; }
+      h2 { font-size: 15px; font-weight: bold; margin-bottom: 2px; }
+      .sub { font-size: 11px; color: #666; margin-bottom: 10px; }
+      table { width: 100%; border-collapse: collapse; }
+      tr { border-bottom: 1px solid #ddd; }
+      tr:last-child { border-bottom: none; }
+      @media print { body { padding: 0; } }
+    </style></head><body>
+    <h2>${ROL === 'cocina' ? '🍳 COCINA' : '🍺 BARRA'} — Mesa ${mesaNombre}</h2>
+    <div class="sub">${fecha}</div>
+    <table>${rows}</table>
+    </body></html>`;
+
+  iframePrint.srcdoc = html;
+  iframePrint.onload = () => {
+    try { iframePrint.contentWindow.focus(); iframePrint.contentWindow.print(); }
+    catch(e) { console.warn('Error impresión iframe:', e); }
+  };
 }
 
 function tick() {
@@ -296,8 +319,12 @@ function crearCard(mesaId, lineas) {
   header.innerHTML = `
     <span class="dot"></span>
     <span class="card-mesa-name">Mesa ${nombre}</span>
-    <span class="card-time">${masViejo ? tiempoRelativo(masViejo) : ''}</span>`;
-  header.addEventListener('click', () => marcarVista(mesaId, lineas));
+    <span class="card-time">${masViejo ? tiempoRelativo(masViejo) : ''}</span>
+    <button class="btn-imprimir" onclick="imprimirMesa('${mesaId}')" title="Imprimir comanda">🖨</button>`;
+  header.addEventListener('click', e => {
+    if (e.target.closest('.btn-imprimir')) return;
+    marcarVista(mesaId, lineas);
+  });
   card.appendChild(header);
 
   Object.entries(lineas)
@@ -368,6 +395,14 @@ function tiempoRelativo(ts) {
   if (diff === 1) return 'hace 1 min';
   return `hace ${diff} min`;
 }
+
+// Imprimir manualmente una mesa concreta
+window.imprimirMesa = mesaId => {
+  const lineas = Object.values(pedidosPorMesa[mesaId] || {}).filter(l => l.estado === 'pendiente');
+  if (!lineas.length) return;
+  const nombre = mesasData[mesaId]?.nombre || mesaId;
+  imprimirComanda(nombre, lineas);
+};
 </script>
 </body>
 </html>
