@@ -163,6 +163,42 @@
     border-radius: 6px; transition: all .15s;
   }
   .nav-link:hover { color: var(--text); border-color: var(--text); }
+
+  /* VENTAS */
+  .filtros-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 1.5rem; }
+  .filtro-grupo { display: flex; flex-direction: column; gap: 4px; }
+  .filtro-label { font-size: 11px; color: var(--muted); letter-spacing: .04em; }
+  .resumen-ventas {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px; margin-bottom: 1.5rem;
+  }
+  .stat-box {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 1rem; text-align: center;
+  }
+  .stat-box-num { font-family: var(--mono); font-size: 26px; font-weight: 500; color: var(--accent); }
+  .stat-box-lbl { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .ticket-hist {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; margin-bottom: 8px; overflow: hidden;
+  }
+  .ticket-hist-hdr {
+    display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+    background: var(--surface2); cursor: pointer; user-select: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .ticket-hist-hdr:hover { background: var(--border); }
+  .ticket-hist-mesa { font-family: var(--mono); font-size: 13px; font-weight: 500; flex: 1; }
+  .ticket-hist-total { font-family: var(--mono); font-size: 13px; color: var(--accent); }
+  .ticket-hist-hora { font-size: 11px; color: var(--muted); }
+  .ticket-hist-body { display: none; padding: 10px 14px; }
+  .ticket-hist.open .ticket-hist-body { display: block; }
+  .ticket-hist-linea {
+    display: flex; justify-content: space-between; font-size: 13px;
+    padding: 4px 0; border-bottom: 1px solid var(--border);
+  }
+  .ticket-hist-linea:last-child { border-bottom: none; }
+  .ventas-empty { padding: 3rem 1rem; text-align: center; font-family: var(--mono); font-size: 13px; color: var(--muted); }
 </style>
 </head>
 <body>
@@ -183,6 +219,7 @@
     <div class="topbar-logo">// admin</div>
     <button class="tab-btn active" onclick="showTab('mesas',this)">Mesas</button>
     <button class="tab-btn" onclick="showTab('carta',this)">Carta</button>
+    <button class="tab-btn" onclick="showTab('ventas',this)">Ventas</button>
     <button class="tab-btn" onclick="showTab('local',this)">Local</button>
     <button class="tab-btn" onclick="showTab('enlaces',this)">Accesos</button>
     <div class="spacer"></div>
@@ -199,6 +236,56 @@
           <input type="text" id="nueva-mesa" placeholder="Nombre (ej: 4, Terraza 1, Barra)" style="flex:1" />
           <button class="btn btn-success" onclick="addMesa()">+ Añadir</button>
         </div>
+      </div>
+    </div>
+
+    <!-- VENTAS -->
+    <div class="section" id="sec-ventas">
+      <h2>Ventas</h2>
+      <div class="card">
+        <div class="filtros-row">
+          <div class="filtro-grupo">
+            <span class="filtro-label">Fecha inicio</span>
+            <input type="date" id="filtro-fecha-ini" />
+          </div>
+          <div class="filtro-grupo">
+            <span class="filtro-label">Fecha fin</span>
+            <input type="date" id="filtro-fecha-fin" />
+          </div>
+          <div class="filtro-grupo">
+            <span class="filtro-label">Hora inicio</span>
+            <input type="time" id="filtro-hora-ini" value="00:00" />
+          </div>
+          <div class="filtro-grupo">
+            <span class="filtro-label">Hora fin</span>
+            <input type="time" id="filtro-hora-fin" value="23:59" />
+          </div>
+          <button class="btn btn-accent" style="align-self:flex-end" onclick="aplicarFiltros()">Filtrar</button>
+          <button class="btn" style="align-self:flex-end" onclick="resetFiltros()">Hoy</button>
+        </div>
+      </div>
+
+      <div class="resumen-ventas">
+        <div class="stat-box">
+          <div class="stat-box-num" id="stat-mesas">—</div>
+          <div class="stat-box-lbl">Mesas cerradas</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-num" id="stat-total">—</div>
+          <div class="stat-box-lbl">Total vendido</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-num" id="stat-media">—</div>
+          <div class="stat-box-lbl">Ticket medio</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-num" id="stat-lineas">—</div>
+          <div class="stat-box-lbl">Artículos servidos</div>
+        </div>
+      </div>
+
+      <div id="ventas-lista">
+        <div class="ventas-empty">Selecciona un rango de fechas y pulsa Filtrar</div>
       </div>
     </div>
 
@@ -579,8 +666,92 @@ window.guardarPin = (rol) => {
   toast('PIN de ' + rol + ' actualizado');
 };
 
+// ─── VENTAS ──────────────────────────────────────────────────────────────────
+function initFiltrosFecha() {
+  const hoy = new Date().toISOString().split('T')[0];
+  document.getElementById('filtro-fecha-ini').value = hoy;
+  document.getElementById('filtro-fecha-fin').value = hoy;
+}
+
+window.resetFiltros = () => {
+  initFiltrosFecha();
+  document.getElementById('filtro-hora-ini').value = '00:00';
+  document.getElementById('filtro-hora-fin').value = '23:59';
+  aplicarFiltros();
+};
+
+window.aplicarFiltros = async () => {
+  const fechaIni  = document.getElementById('filtro-fecha-ini').value;
+  const fechaFin  = document.getElementById('filtro-fecha-fin').value;
+  const horaIni   = document.getElementById('filtro-hora-ini').value || '00:00';
+  const horaFin   = document.getElementById('filtro-hora-fin').value || '23:59';
+
+  if (!fechaIni || !fechaFin) { toast('Selecciona las fechas'); return; }
+
+  const tsIni = new Date(`${fechaIni}T${horaIni}:00`).getTime();
+  const tsFin = new Date(`${fechaFin}T${horaFin}:59`).getTime();
+
+  const snap = await get(ref(db, 'historial'));
+  const data = snap.val() || {};
+
+  const tickets = Object.entries(data)
+    .map(([id, t]) => ({ id, ...t }))
+    .filter(t => t.ts >= tsIni && t.ts <= tsFin)
+    .sort((a, b) => b.ts - a.ts);
+
+  renderVentas(tickets);
+};
+
+function renderVentas(tickets) {
+  const lista = document.getElementById('ventas-lista');
+
+  if (!tickets.length) {
+    lista.innerHTML = '<div class="ventas-empty">Sin ventas en ese período</div>';
+    document.getElementById('stat-mesas').textContent = '0';
+    document.getElementById('stat-total').textContent = '0,00 €';
+    document.getElementById('stat-media').textContent = '—';
+    document.getElementById('stat-lineas').textContent = '0';
+    return;
+  }
+
+  const totalGeneral  = tickets.reduce((s, t) => s + (t.total || 0), 0);
+  const totalLineas   = tickets.reduce((s, t) => s + (t.lineas?.length || 0), 0);
+  const media         = totalGeneral / tickets.length;
+
+  document.getElementById('stat-mesas').textContent  = tickets.length;
+  document.getElementById('stat-total').textContent  = totalGeneral.toFixed(2).replace('.', ',') + ' €';
+  document.getElementById('stat-media').textContent  = media.toFixed(2).replace('.', ',') + ' €';
+  document.getElementById('stat-lineas').textContent = totalLineas;
+
+  lista.innerHTML = '';
+  tickets.forEach(t => {
+    const hora = new Date(t.ts).toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
+    const div = document.createElement('div');
+    div.className = 'ticket-hist';
+    div.innerHTML = `
+      <div class="ticket-hist-hdr" onclick="this.parentElement.classList.toggle('open')">
+        <span class="ticket-hist-mesa">Mesa ${t.mesa}</span>
+        <span class="ticket-hist-hora">${hora}</span>
+        <span class="ticket-hist-total">${(t.total||0).toFixed(2).replace('.',',')} €</span>
+        <span style="color:var(--muted);font-size:12px">▾</span>
+      </div>
+      <div class="ticket-hist-body">
+        ${(t.lineas || []).map(l => `
+          <div class="ticket-hist-linea">
+            <span>${l.qty}× ${l.nombre}</span>
+            <span style="font-family:var(--mono)">${(l.precio * l.qty).toFixed(2)} €</span>
+          </div>`).join('')}
+        <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-weight:500;margin-top:8px;padding-top:8px;border-top:2px solid var(--border)">
+          <span>Total</span><span>${(t.total||0).toFixed(2).replace('.',',')} €</span>
+        </div>
+      </div>`;
+    lista.appendChild(div);
+  });
+}
+
 // ─── INIT ────────────────────────────────────────────────────────────────────
 function init() {
+  initFiltrosFecha();
   onValue(ref(db, 'mesas'), snap => renderMesas(snap.val()));
   onValue(ref(db, 'categorias'), snap => {
     categoriasData = snap.val() || {};

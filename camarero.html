@@ -954,6 +954,29 @@ window.cerrarMesa = async () => {
     buttons: [
       { label: 'Cancelar' },
       { label: 'Cerrar mesa', style: 'danger', action: async () => {
+        // Guardar historial antes de borrar
+        const snap = await get(ref(db, 'pedidos/' + mesaId));
+        const pedidos = snap.val() || {};
+        const agrupado = {};
+        Object.values(pedidos).forEach(l => {
+          const k = l.nombre + (l.nota ? '|' + l.nota : '');
+          if (!agrupado[k]) agrupado[k] = { nombre: l.nombre, precio: Number(l.precio), qty: 0, nota: l.nota || '' };
+          agrupado[k].qty += l.qty;
+        });
+        const lineas = Object.values(agrupado);
+        const total  = lineas.reduce((s, l) => s + l.precio * l.qty, 0);
+        if (lineas.length > 0) {
+          const ahora = new Date();
+          const registro = {
+            mesa: mesaNombre,
+            ts: ahora.getTime(),
+            fecha: ahora.toLocaleDateString('es-ES'),
+            hora: ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+            total: Math.round(total * 100) / 100,
+            lineas
+          };
+          await push(ref(db, 'historial'), registro);
+        }
         await remove(ref(db, 'pedidos/' + mesaId));
         await set(ref(db, 'mesas/' + mesaId + '/estado'), 'libre');
         mesaId = null; mesaNombre = null; carrito = {};
