@@ -34,7 +34,6 @@
   }
   .spacer { flex: 1; }
 
-  /* MESAS */
   #view-mesas { padding: 1rem; }
   .mesas-title {
     font-family: var(--mono); font-size: 11px; color: var(--muted);
@@ -53,18 +52,17 @@
   .mesa-estado { font-size: 11px; color: var(--muted); }
   .mesa-btn.ocupada .mesa-estado { color: var(--accent2); }
 
-  /* CARTA */
+  /* CARTA — sin position fixed en bottom-bar por ahora para descartar */
   #view-carta { display: none; }
-  .carta-body { padding: 0 0 110px; }
+  .carta-body { padding: 0 0 120px; }
   .cat-header {
     padding: 10px 1rem 6px; font-family: var(--mono); font-size: 11px;
     color: var(--muted); letter-spacing: .08em; text-transform: uppercase;
-    background: var(--bg); position: sticky; top: 52px; z-index: 5;
-    border-bottom: 1px solid var(--border);
+    background: var(--bg); border-bottom: 1px solid var(--border);
   }
   .art-row {
     display: flex; align-items: center; gap: 10px;
-    padding: 10px 1rem; background: var(--surface);
+    padding: 12px 1rem; background: var(--surface);
     border-bottom: 1px solid var(--border); user-select: none;
   }
   .art-nombre { flex: 1; font-size: 15px; }
@@ -87,7 +85,6 @@
   }
   .qty-num.has-qty { color: var(--accent2); font-weight: 700; }
 
-  /* BARRA INFERIOR */
   .bottom-bar {
     position: fixed; bottom: 0; left: 0; right: 0;
     background: var(--surface); border-top: 1px solid var(--border);
@@ -102,57 +99,37 @@
   .btn-back  { background: none; color: var(--text); }
   .btn-back:active { background: var(--surface2); }
   .btn-cuenta { background: none; color: var(--accent2); border-color: var(--accent2); }
-  .btn-enviar {
-    background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 500;
-  }
+  .btn-enviar { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 500; }
   .btn-enviar:disabled { opacity: .3; cursor: default; }
-  .btn-enviar:not(:disabled):active { opacity: .75; }
   .resumen-info { flex: 1; min-width: 0; }
   .resumen-lineas { font-family: var(--mono); font-size: 12px; color: var(--muted); }
   .resumen-total  { font-family: var(--mono); font-size: 17px; font-weight: 500; }
 
-  .loading {
-    padding: 3rem 1rem; text-align: center;
-    font-family: var(--mono); font-size: 13px; color: var(--muted);
+  .loading { padding: 3rem 1rem; text-align: center; font-family: var(--mono); font-size: 13px; color: var(--muted); }
+
+  /* DEBUG LATERAL pequeño */
+  #dbg {
+    position: fixed; bottom: 80px; right: 8px;
+    background: rgba(0,0,0,.8); color: #e8ff5a;
+    font: 10px monospace; padding: 6px 8px; border-radius: 6px;
+    z-index: 999; max-width: 220px; word-break: break-all;
   }
 
-  /* TICKET */
   #view-ticket { display: none; padding: 1rem; }
-  .ticket-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 12px; padding: 1.5rem; max-width: 380px; margin: 0 auto;
-  }
-  .ticket-header {
-    text-align: center; margin-bottom: 1rem;
-    border-bottom: 1px dashed var(--border); padding-bottom: 1rem;
-  }
+  .ticket-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; max-width: 380px; margin: 0 auto; }
+  .ticket-header { text-align: center; margin-bottom: 1rem; border-bottom: 1px dashed var(--border); padding-bottom: 1rem; }
   .ticket-mesa { font-family: var(--mono); font-size: 22px; font-weight: 500; }
   .ticket-fecha { font-size: 12px; color: var(--muted); margin-top: 4px; }
-  .ticket-linea {
-    display: flex; justify-content: space-between;
-    padding: 6px 0; font-size: 14px; border-bottom: 1px solid var(--border);
-  }
+  .ticket-linea { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; border-bottom: 1px solid var(--border); }
   .ticket-linea:last-of-type { border-bottom: none; }
-  .ticket-total {
-    display: flex; justify-content: space-between;
-    font-family: var(--mono); font-size: 18px; font-weight: 500;
-    margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--accent);
-  }
-  .btn-print {
-    width: 100%; margin-top: 1rem; background: var(--accent); color: #fff;
-    border: none; border-radius: 8px; padding: 12px;
-    font-family: var(--mono); font-size: 14px; cursor: pointer;
-  }
-  .btn-cerrar {
-    width: 100%; margin-top: .5rem; background: none; color: var(--danger);
-    border: 1px solid var(--danger); border-radius: 8px; padding: 10px;
-    font-family: var(--mono); font-size: 13px; cursor: pointer;
-  }
+  .ticket-total { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 18px; font-weight: 500; margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--accent); }
+  .btn-print { width: 100%; margin-top: 1rem; background: var(--accent); color: #fff; border: none; border-radius: 8px; padding: 12px; font-family: var(--mono); font-size: 14px; cursor: pointer; }
+  .btn-cerrar { width: 100%; margin-top: .5rem; background: none; color: var(--danger); border: 1px solid var(--danger); border-radius: 8px; padding: 10px; font-family: var(--mono); font-size: 13px; cursor: pointer; }
 
   @media print {
     body > *:not(#view-ticket) { display: none !important; }
     #view-ticket { display: block !important; }
-    .btn-print, .btn-cerrar, .btn-back-ticket { display: none !important; }
+    .btn-print, .btn-cerrar { display: none !important; }
   }
 </style>
 </head>
@@ -164,21 +141,13 @@
   <div class="spacer"></div>
 </div>
 
-<!-- MESAS -->
 <div id="view-mesas">
-  <div style="padding:1rem 1rem .5rem">
-    <div class="mesas-title">Selecciona una mesa</div>
-  </div>
-  <div class="mesas-grid" id="mesas-grid" style="padding:0 1rem">
-    <div class="loading">Cargando…</div>
-  </div>
+  <div style="padding:1rem 1rem .5rem"><div class="mesas-title">Selecciona una mesa</div></div>
+  <div class="mesas-grid" id="mesas-grid" style="padding:0 1rem"><div class="loading">Cargando…</div></div>
 </div>
 
-<!-- CARTA -->
 <div id="view-carta">
-  <div class="carta-body" id="carta-body">
-    <div class="loading">Cargando carta…</div>
-  </div>
+  <div class="carta-body" id="carta-body"><div class="loading">Cargando carta…</div></div>
   <div class="bottom-bar">
     <button class="btn btn-back" onclick="volverMesas()">← Mesas</button>
     <div class="resumen-info">
@@ -190,21 +159,24 @@
   </div>
 </div>
 
-<!-- TICKET -->
 <div id="view-ticket">
   <div style="display:flex;gap:10px;margin-bottom:1rem;align-items:center;padding:1rem 1rem 0">
-    <button class="btn btn-back btn-back-ticket" onclick="show('carta')">← Volver</button>
+    <button class="btn btn-back" onclick="show('carta')">← Volver</button>
     <span style="font-family:var(--mono);font-size:13px;color:var(--muted)">Cuenta</span>
   </div>
-  <div style="padding:0 1rem">
-    <div class="ticket-card" id="ticket-card"></div>
-  </div>
+  <div style="padding:0 1rem"><div class="ticket-card" id="ticket-card"></div></div>
 </div>
+
+<!-- debug mini -->
+<div id="dbg">init...</div>
 
 <script type="module">
 import { db } from './firebase.js';
 import { ref, onValue, push, set, remove, get }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const dbg = document.getElementById('dbg');
+function d(msg) { dbg.innerHTML = msg; console.log(msg); }
 
 let mesaId = null, mesaNombre = null;
 let carrito = {};
@@ -215,26 +187,23 @@ onValue(ref(db, 'mesas'), snap => {
   mesasData = snap.val() || {};
   renderMesas();
 });
-
 onValue(ref(db, 'categorias'), snap => {
   categoriasData = snap.val() || {};
   catsReady = true;
+  d('cats:' + Object.keys(categoriasData).length + ' cartaR:' + cartaReady);
   if (cartaReady && mesaId) renderCarta();
 });
-
 onValue(ref(db, 'carta'), snap => {
   cartaData = snap.val() || {};
   cartaReady = true;
+  d('carta:' + Object.keys(cartaData).length + ' catsR:' + catsReady);
   if (catsReady && mesaId) renderCarta();
 });
 
 function renderMesas() {
   const grid = document.getElementById('mesas-grid');
   const entries = Object.entries(mesasData);
-  if (!entries.length) {
-    grid.innerHTML = '<div class="loading">Sin mesas. Añade desde el panel admin.</div>';
-    return;
-  }
+  if (!entries.length) { grid.innerHTML = '<div class="loading">Sin mesas.</div>'; return; }
   grid.innerHTML = '';
   entries
     .sort(([,a],[,b]) => a.nombre.localeCompare(b.nombre, 'es', {numeric: true}))
@@ -242,25 +211,28 @@ function renderMesas() {
       const ocupada = m.estado === 'ocupada';
       const div = document.createElement('div');
       div.className = 'mesa-btn' + (ocupada ? ' ocupada' : '');
-      div.innerHTML = `
-        <span class="mesa-nombre">${m.nombre}</span>
-        <span class="mesa-estado">${ocupada ? 'ocupada' : 'libre'}</span>`;
+      div.innerHTML = `<span class="mesa-nombre">${m.nombre}</span><span class="mesa-estado">${ocupada ? 'ocupada' : 'libre'}</span>`;
       div.addEventListener('click', () => abrirMesa(id, m.nombre, ocupada));
       grid.appendChild(div);
     });
 }
 
 function abrirMesa(id, nombre, ocupada) {
-  mesaId = id;
-  mesaNombre = nombre;
-  carrito = {};
-  const badge = document.getElementById('topbar-mesa');
-  badge.textContent = 'Mesa ' + nombre;
-  badge.style.display = '';
+  mesaId = id; mesaNombre = nombre; carrito = {};
+  document.getElementById('topbar-mesa').textContent = 'Mesa ' + nombre;
+  document.getElementById('topbar-mesa').style.display = '';
   document.getElementById('btn-cuenta').style.display = ocupada ? '' : 'none';
+
+  // Mostrar vista carta PRIMERO
   show('carta');
-  if (cartaReady && catsReady) renderCarta();
-  else document.getElementById('carta-body').innerHTML = '<div class="loading">Cargando carta…</div>';
+
+  d('abrirMesa:' + nombre + ' cR=' + cartaReady + ' csR=' + catsReady);
+
+  if (cartaReady && catsReady) {
+    renderCarta();
+  } else {
+    document.getElementById('carta-body').innerHTML = '<div class="loading">Cargando carta…</div>';
+  }
 }
 
 window.volverMesas = () => {
@@ -271,23 +243,27 @@ window.volverMesas = () => {
 
 function renderCarta() {
   const body = document.getElementById('carta-body');
-  const cats = Object.entries(categoriasData)
-    .sort(([,a],[,b]) => a.nombre.localeCompare(b.nombre, 'es'));
-  if (!cats.length) {
-    body.innerHTML = '<div class="loading">Sin categorías en la carta.</div>';
-    return;
-  }
+  d('renderCarta: view-carta display=' + document.getElementById('view-carta').style.display);
+
+  const cats = Object.entries(categoriasData).sort(([,a],[,b]) => a.nombre.localeCompare(b.nombre, 'es'));
+  if (!cats.length) { body.innerHTML = '<div class="loading">Sin categorías.</div>'; return; }
+
   body.innerHTML = '';
+  let totalArts = 0;
+
   cats.forEach(([catId, cat]) => {
     const arts = Object.entries(cartaData)
       .filter(([,a]) => a.catId === catId)
       .sort(([,a],[,b]) => a.nombre.localeCompare(b.nombre, 'es'));
     if (!arts.length) return;
+
     const header = document.createElement('div');
     header.className = 'cat-header';
     header.textContent = cat.nombre;
     body.appendChild(header);
+
     arts.forEach(([artId, art]) => {
+      totalArts++;
       const row = document.createElement('div');
       row.className = 'art-row';
       row.innerHTML = `
@@ -301,11 +277,15 @@ function renderCarta() {
       body.appendChild(row);
     });
   });
+
+  d('renderCarta OK: ' + totalArts + ' arts. body.children=' + body.children.length);
+
   body.onclick = e => {
     const btn = e.target.closest('[data-d]');
     if (!btn) return;
     cambiarQty(btn.dataset.id, parseInt(btn.dataset.d));
   };
+
   updateQtyDisplay();
   updateBtns();
 }
@@ -331,10 +311,8 @@ function updateQtyDisplay() {
   });
   const n = Object.keys(carrito).length;
   const total = Object.values(carrito).reduce((s, {art, qty}) => s + Number(art.precio) * qty, 0);
-  document.getElementById('res-lineas').textContent =
-    n ? `${n} artículo${n > 1 ? 's' : ''}` : 'Sin artículos';
-  document.getElementById('res-total').textContent =
-    total.toFixed(2).replace('.', ',') + ' €';
+  document.getElementById('res-lineas').textContent = n ? `${n} artículo${n > 1 ? 's' : ''}` : 'Sin artículos';
+  document.getElementById('res-total').textContent = total.toFixed(2).replace('.', ',') + ' €';
 }
 
 function updateBtns() {
@@ -344,8 +322,7 @@ function updateBtns() {
 window.enviarPedido = async () => {
   if (!mesaId || !Object.keys(carrito).length) return;
   const btn = document.getElementById('btn-enviar');
-  btn.disabled = true;
-  btn.textContent = '…';
+  btn.disabled = true; btn.textContent = '…';
   await set(ref(db, 'mesas/' + mesaId + '/estado'), 'ocupada');
   document.getElementById('btn-cuenta').style.display = '';
   for (const [artId, {art, qty}] of Object.entries(carrito)) {
@@ -356,8 +333,7 @@ window.enviarPedido = async () => {
   }
   carrito = {};
   updateQtyDisplay();
-  btn.textContent = '✓ Enviado';
-  btn.disabled = false;
+  btn.textContent = '✓ Enviado'; btn.disabled = false;
   setTimeout(() => { btn.textContent = 'Enviar'; updateBtns(); }, 1800);
 };
 
@@ -382,10 +358,7 @@ window.verCuenta = async () => {
         <span>${l.qty}× ${l.nombre}</span>
         <span style="font-family:var(--mono)">${(l.precio * l.qty).toFixed(2)} €</span>
       </div>`).join('')}
-    <div class="ticket-total">
-      <span>Total</span>
-      <span>${total.toFixed(2)} €</span>
-    </div>
+    <div class="ticket-total"><span>Total</span><span>${total.toFixed(2)} €</span></div>
     <button class="btn-print" onclick="window.print()">Imprimir ticket</button>
     <button class="btn-cerrar" onclick="cerrarMesa()">Cerrar mesa y limpiar</button>
   `;
@@ -393,7 +366,7 @@ window.verCuenta = async () => {
 };
 
 window.cerrarMesa = async () => {
-  if (!confirm('¿Cerrar mesa ' + mesaNombre + '? Se borrarán todos los pedidos.')) return;
+  if (!confirm('¿Cerrar mesa ' + mesaNombre + '?')) return;
   await remove(ref(db, 'pedidos/' + mesaId));
   await set(ref(db, 'mesas/' + mesaId + '/estado'), 'libre');
   mesaId = null; mesaNombre = null; carrito = {};
@@ -402,9 +375,13 @@ window.cerrarMesa = async () => {
 };
 
 window.show = v => {
-  document.getElementById('view-mesas').style.display  = v === 'mesas'  ? '' : 'none';
-  document.getElementById('view-carta').style.display  = v === 'carta'  ? '' : 'none';
-  document.getElementById('view-ticket').style.display = v === 'ticket' ? '' : 'none';
+  const vm = document.getElementById('view-mesas');
+  const vc = document.getElementById('view-carta');
+  const vt = document.getElementById('view-ticket');
+  vm.style.display = v === 'mesas'  ? 'block' : 'none';
+  vc.style.display = v === 'carta'  ? 'block' : 'none';
+  vt.style.display = v === 'ticket' ? 'block' : 'none';
+  d('show(' + v + ') vc.display=' + vc.style.display);
 };
 </script>
 </body>
