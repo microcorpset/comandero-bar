@@ -524,63 +524,58 @@ function renderDrawer() {
     const wrap = document.createElement('div');
     wrap.className = 'ri-wrap';
 
-    // Fila principal con qty control
     const main = document.createElement('div');
     main.className = 'ri-main';
     main.innerHTML = `
       <span class="ri-nombre">${art.nombre}</span>
       <div class="ri-qty-ctrl">
-        <button class="ri-qty-btn" data-rid="${artId}" data-rd="-1">−</button>
-        <span class="ri-qty-num">${qty}</span>
-        <button class="ri-qty-btn" data-rid="${artId}" data-rd="1">+</button>
+        <button class="ri-qty-btn" onclick="drawerCambiarQty('${artId}',-1)">−</button>
+        <span class="ri-qty-num" id="dqty-${artId}">${qty}</span>
+        <button class="ri-qty-btn" onclick="drawerCambiarQty('${artId}',1)">+</button>
       </div>
-      <span class="ri-precio">${(Number(art.precio) * qty).toFixed(2)} €</span>`;
+      <span class="ri-precio" id="dprecio-${artId}">${(Number(art.precio) * qty).toFixed(2)} €</span>`;
     wrap.appendChild(main);
 
-    // Nota editable en drawer
     const notaRow = document.createElement('div');
     notaRow.className = 'ri-nota-row';
     notaRow.innerHTML = `
       <span class="ri-nota-label">Nota:</span>
       <input class="ri-nota-input" type="text"
         placeholder="ej: poco hecho, sin cebolla…"
-        value="${nota || ''}"
-        data-rnota="${artId}" />`;
+        value="${(nota || '').replace(/"/g, '&quot;')}"
+        oninput="drawerNota('${artId}', this.value)" />`;
     wrap.appendChild(notaRow);
 
     body.appendChild(wrap);
   });
-
-  // Qty +/- en drawer
-  body.addEventListener('click', e => {
-    const btn = e.target.closest('[data-rd]');
-    if (!btn) return;
-    const artId = btn.dataset.rid;
-    const delta = parseInt(btn.dataset.rd);
-    cambiarQty(artId, delta);
-    // sincronizar qty display en carta también
-    const notaInput = document.getElementById('nota-' + artId);
-    if (notaInput && carrito[artId]) notaInput.value = carrito[artId].nota || '';
-  }, { once: false });
-
-  // Nota en drawer → sincroniza con carrito y carta
-  body.addEventListener('input', e => {
-    const input = e.target.closest('[data-rnota]');
-    if (!input) return;
-    const artId = input.dataset.rnota;
-    if (carrito[artId]) {
-      carrito[artId].nota = input.value.trim();
-      // sincronizar campo nota en la carta si existe
-      const cartaInput = document.getElementById('nota-' + artId);
-      if (cartaInput) cartaInput.value = input.value;
-    }
-  });
 }
+
+// Cambiar qty desde el drawer sin re-renderizar todo
+window.drawerCambiarQty = (artId, delta) => {
+  cambiarQty(artId, delta);
+  // Actualizar solo los números del drawer sin re-renderizar
+  const qtyEl    = document.getElementById('dqty-' + artId);
+  const precioEl = document.getElementById('dprecio-' + artId);
+  if (carrito[artId]) {
+    if (qtyEl)    qtyEl.textContent = carrito[artId].qty;
+    if (precioEl) precioEl.textContent = (Number(carrito[artId].art.precio) * carrito[artId].qty).toFixed(2) + ' €';
+  } else {
+    // Se quedó a 0, re-renderizar para quitar la fila
+    renderDrawer();
+  }
+};
+
+window.drawerNota = (artId, valor) => {
+  if (carrito[artId]) {
+    carrito[artId].nota = valor.trim();
+    const cartaInput = document.getElementById('nota-' + artId);
+    if (cartaInput) cartaInput.value = valor;
+  }
+};
 
 // ── Enviar ────────────────────────────────────────────────────────────────────
 // ── Generar y descargar PDF de comanda ────────────────────────────────────────
 async function generarPDFComanda(nombreMesa, lineas, configLocal) {
-  // Cargar jsPDF dinámicamente
   if (!window.jspdf) {
     await new Promise((resolve, reject) => {
       const s = document.createElement('script');
@@ -591,84 +586,94 @@ async function generarPDFComanda(nombreMesa, lineas, configLocal) {
   }
 
   const { jsPDF } = window.jspdf;
-  // Ancho de ticket térmico 80mm ≈ 226pt, alto auto
-  const doc = new jsPDF({ unit: 'mm', format: [80, 200], orientation: 'portrait' });
+  const ANCHO_MM = 80;
+  const MARGEN   = 4;
+  const ANCHO    = ANCHO_MM - MARGEN * 2;
+  const lineH    = 5.5;
 
-  const ancho = 76; // margen 2mm cada lado
-  let y = 5;
-  const lineH = 5;
+  // Primero calculamos la altura necesaria con un doc temporal
+  function calcularAltura() {
+    let y = MARGEN;
+    if (configLocal?.nombre) {
+      y += lineH; // nombre local
+      if (configLocal.direccion) y += lineH;
+      y += 5; // separador
+    }
+    y += lineH;     // mesa
+    y += lineH;     // fecha/hora
+    y += 4;         // separador
+    lineas.forEach(l => {
+      y += lineH;   // artículo
+      if (l.nota) y += lineH;
+      y += 3;       // línea separadora
+    });
+    y += MARGEN;
+    return y;
+  }
 
-  doc.setFont('courier', 'normal');
+  const alturaDoc = calcularAltura();
+  const doc = new jsPDF({ unit: 'mm', format: [ANCHO_MM, alturaDoc], orientation: 'portrait' });
+
+  let y = MARGEN;
 
   // Cabecera local
   if (configLocal?.nombre) {
-    doc.setFontSize(11); doc.setFont('courier', 'bold');
-    doc.text(configLocal.nombre, ancho / 2, y, { align: 'center' }); y += lineH;
+    doc.setFontSize(10); doc.setFont('courier', 'bold');
+    doc.text(configLocal.nombre, ANCHO_MM / 2, y, { align: 'center' }); y += lineH;
     if (configLocal.direccion) {
-      doc.setFontSize(8); doc.setFont('courier', 'normal');
-      doc.text(configLocal.direccion, ancho / 2, y, { align: 'center' }); y += lineH - 1;
+      doc.setFontSize(7); doc.setFont('courier', 'normal');
+      doc.text(configLocal.direccion, ANCHO_MM / 2, y, { align: 'center' }); y += lineH;
     }
-    y += 2;
-    doc.setDrawColor(180); doc.line(2, y, ancho, y); y += 3;
+    doc.setDrawColor(160); doc.line(MARGEN, y, ANCHO_MM - MARGEN, y); y += 3;
   }
 
   // Mesa y hora
-  const hora = new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
-  const fecha = new Date().toLocaleDateString('es-ES');
+  const ahora = new Date();
+  const hora  = ahora.toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+  const fecha = ahora.toLocaleDateString('es-ES');
   doc.setFontSize(12); doc.setFont('courier', 'bold');
-  doc.text(`Mesa ${nombreMesa}`, 2, y); y += lineH;
-  doc.setFontSize(8); doc.setFont('courier', 'normal');
-  doc.text(`${fecha}  ${hora}`, 2, y); y += lineH + 1;
-  doc.setDrawColor(180); doc.line(2, y, ancho, y); y += 3;
+  doc.text(`Mesa ${nombreMesa}`, MARGEN, y); y += lineH;
+  doc.setFontSize(7); doc.setFont('courier', 'normal');
+  doc.text(`${fecha}  ${hora}`, MARGEN, y); y += lineH;
+  doc.setDrawColor(160); doc.line(MARGEN, y, ANCHO_MM - MARGEN, y); y += 3;
 
-  // Líneas
+  // Líneas de pedido
   doc.setFontSize(10);
   lineas.forEach(l => {
-    doc.setFont('courier', 'bold');
-    const qty = `${l.qty}x`;
-    const precio = `${(l.precio * l.qty).toFixed(2)}EUR`;
-    const nombreTxt = l.nombre;
+    const precioStr = `${(l.precio * l.qty).toFixed(2)}e`;
+    const qtyStr    = `${l.qty}x `;
 
-    doc.text(qty, 2, y);
+    doc.setFont('courier', 'bold');
+    doc.text(qtyStr, MARGEN, y);
     doc.setFont('courier', 'normal');
-    // Nombre truncado para que quepa con el precio
-    const maxNombre = ancho - 16;
-    const nombreFit = doc.splitTextToSize(nombreTxt, maxNombre);
-    doc.text(nombreFit[0], 10, y);
-    doc.text(precio, ancho, y, { align: 'right' });
+
+    // nombre: ancho disponible restando qty y precio
+    const anchoNombre = ANCHO - doc.getTextWidth(qtyStr) - doc.getTextWidth(precioStr) - 2;
+    const partes = doc.splitTextToSize(l.nombre, anchoNombre);
+    doc.text(partes[0], MARGEN + doc.getTextWidth(qtyStr), y);
+    doc.text(precioStr, ANCHO_MM - MARGEN, y, { align: 'right' });
     y += lineH;
 
-    // Líneas extra si el nombre es largo
-    if (nombreFit.length > 1) {
-      nombreFit.slice(1).forEach(linea => {
-        doc.text(linea, 10, y); y += lineH;
-      });
+    // Si el nombre no cabe en una línea
+    if (partes.length > 1) {
+      doc.setFontSize(8);
+      partes.slice(1).forEach(p => { doc.text(p, MARGEN + 6, y); y += lineH - 1; });
+      doc.setFontSize(10);
     }
 
     // Nota
     if (l.nota) {
-      doc.setFontSize(8); doc.setFont('courier', 'italic');
-      doc.setTextColor(100);
-      doc.text(`  \u21b3 ${l.nota}`, 10, y); y += lineH - 1;
-      doc.setFontSize(10); doc.setFont('courier', 'normal');
-      doc.setTextColor(0);
+      doc.setFontSize(8); doc.setFont('courier', 'italic'); doc.setTextColor(80);
+      doc.text(`  \u21b3 ${l.nota}`, MARGEN + 4, y); y += lineH - 1;
+      doc.setFontSize(10); doc.setFont('courier', 'normal'); doc.setTextColor(0);
     }
 
-    doc.setDrawColor(220); doc.line(2, y, ancho, y); y += 2;
+    doc.setDrawColor(200); doc.line(MARGEN, y, ANCHO_MM - MARGEN, y); y += 2;
   });
 
-  // Ajustar altura real del documento
-  const docFinal = new jsPDF({ unit: 'mm', format: [80, y + 8], orientation: 'portrait' });
-  docFinal.setFont('courier', 'normal');
-  // Re-renderizar en doc con altura correcta
-  // (copiamos el contenido al nuevo doc con el tamaño exacto)
-  doc.internal.pageSize.height = y + 8;
-
-  // Nombre del archivo: comanda-mesa3-2134.pdf
-  const horaSlug = hora.replace(':', '');
-  const nombreArchivo = `comanda-mesa${nombreMesa}-${horaSlug}.pdf`;
-
-  doc.save(nombreArchivo);
+  // Nombre único: mesa + hora con segundos + ms
+  const ts = `${ahora.getHours().toString().padStart(2,'0')}${ahora.getMinutes().toString().padStart(2,'0')}${ahora.getSeconds().toString().padStart(2,'0')}`;
+  doc.save(`comanda-mesa${nombreMesa}-${ts}.pdf`);
 }
 
 // ── Enviar ────────────────────────────────────────────────────────────────────
