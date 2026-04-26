@@ -866,21 +866,17 @@ onValue(ref(db, 'config/quota/lineas'), snap => {
 });
 
 function renderQuotaBadge() {
-  let badge = document.getElementById('quota-badge');
+  const badge = document.getElementById('quota-badge');
   if (!badge) return;
-  if (quotaActual === null) { badge.style.display = 'none'; return; }
+  if (quotaActual === null || quotaActual === -1) {
+    badge.style.display = 'none'; return;
+  }
   if (quotaActual <= 0) {
-    badge.style.display = '';
+    badge.style.cssText = 'display:inline-flex;background:rgba(229,53,53,.12);color:#e53535;border-color:rgba(229,53,53,.3)';
     badge.textContent = '⚠ Sin líneas';
-    badge.style.background = 'rgba(229,53,53,.12)';
-    badge.style.color = '#e53535';
-    badge.style.borderColor = 'rgba(229,53,53,.3)';
   } else if (quotaActual <= 200) {
-    badge.style.display = '';
-    badge.textContent = quotaActual + ' líneas restantes';
-    badge.style.background = 'rgba(229,150,53,.12)';
-    badge.style.color = '#e57a35';
-    badge.style.borderColor = 'rgba(229,150,53,.3)';
+    badge.style.cssText = 'display:inline-flex;background:rgba(229,150,53,.12);color:#e57a35;border-color:rgba(229,150,53,.3)';
+    badge.textContent = '⚠ ' + quotaActual + ' líneas restantes';
   } else {
     badge.style.display = 'none';
   }
