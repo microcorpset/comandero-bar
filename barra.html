@@ -113,9 +113,58 @@
   }
   .btn-servido:active { background: var(--border); }
   .btn-servido.hecho { border-color: rgba(90,255,154,.25); color: #5aff9a; background: rgba(90,255,154,.08); cursor: default; }
+
+  /* ── PIN SCREEN ── */
+  #pin-screen {
+    position:fixed;inset:0;background:#111;z-index:200;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .pin-box {
+    background:var(--surface);border:1px solid var(--border);
+    border-radius:16px;padding:2rem 1.5rem;width:280px;
+    display:flex;flex-direction:column;align-items:center;gap:1.25rem;
+  }
+  .pin-title{font-family:var(--mono);font-size:15px;font-weight:500;color:var(--accent)}
+  .pin-sub{font-size:13px;color:var(--muted);text-align:center;margin-top:-.5rem}
+  .pin-dots{display:flex;gap:10px}
+  .pin-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border);background:transparent;transition:background .15s,border-color .15s}
+  .pin-dot.filled{background:var(--accent);border-color:var(--accent)}
+  .pin-dot.error{background:#ff5a5a;border-color:#ff5a5a}
+  .pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%}
+  .pin-key{height:52px;border-radius:10px;border:1px solid var(--border);background:var(--surface2);font-family:var(--mono);font-size:18px;font-weight:500;color:var(--text);cursor:pointer;transition:background .1s,transform .1s;display:flex;align-items:center;justify-content:center}
+  .pin-key:active{background:var(--border);transform:scale(.95)}
+  .pin-key.del{font-size:14px;color:var(--muted)}
+  .pin-key.empty{border:none;background:none;cursor:default}
+  .pin-error-msg{font-family:var(--mono);font-size:12px;color:#ff5a5a;display:none}
 </style>
 </head>
 <body>
+
+<div id="pin-screen">
+  <div class="pin-box">
+    <div class="pin-title" id="pin-rol-title">Barra</div>
+    <div class="pin-sub">Introduce el PIN para acceder</div>
+    <div class="pin-dots">
+      <div class="pin-dot" id="pd0"></div><div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div><div class="pin-dot" id="pd3"></div>
+    </div>
+    <div class="pin-error-msg" id="pin-error">PIN incorrecto</div>
+    <div class="pin-pad">
+      <button class="pin-key" onclick="pinKey('1')">1</button>
+      <button class="pin-key" onclick="pinKey('2')">2</button>
+      <button class="pin-key" onclick="pinKey('3')">3</button>
+      <button class="pin-key" onclick="pinKey('4')">4</button>
+      <button class="pin-key" onclick="pinKey('5')">5</button>
+      <button class="pin-key" onclick="pinKey('6')">6</button>
+      <button class="pin-key" onclick="pinKey('7')">7</button>
+      <button class="pin-key" onclick="pinKey('8')">8</button>
+      <button class="pin-key" onclick="pinKey('9')">9</button>
+      <button class="pin-key empty"></button>
+      <button class="pin-key" onclick="pinKey('0')">0</button>
+      <button class="pin-key del" onclick="pinDel()">⌫</button>
+    </div>
+  </div>
+</div>
 
 <div class="topbar">
   <span class="topbar-title" id="topbar-title">Barra</span>
@@ -143,6 +192,48 @@ import { ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.12
 const escocina = location.pathname.includes('cocina') || location.search.includes('rol=cocina');
 const ROL = escocina ? 'cocina' : 'barra';
 const PRINT_KEY = 'autoimp_' + ROL;
+const PIN_SESSION = 'auth_' + ROL;
+let PIN_CORRECTO = '1234';
+
+get(ref(db, 'config/pins/' + ROL)).then(s => { if (s.val()) PIN_CORRECTO = s.val(); }).catch(()=>{});
+
+// ── PIN ───────────────────────────────────────────────────────────────────────
+let pinBuffer = '';
+if (sessionStorage.getItem(PIN_SESSION) === '1') {
+  document.getElementById('pin-screen').style.display = 'none';
+}
+if (ROL === 'cocina') {
+  const t = document.getElementById('pin-rol-title');
+  if (t) t.textContent = 'Cocina';
+}
+window.pinKey = d => {
+  if (pinBuffer.length >= 4) return;
+  pinBuffer += d;
+  updatePinDots();
+  if (pinBuffer.length === 4) verificarPin();
+};
+window.pinDel = () => {
+  pinBuffer = pinBuffer.slice(0,-1);
+  updatePinDots(false);
+  document.getElementById('pin-error').style.display = 'none';
+};
+function updatePinDots(error) {
+  for (let i=0;i<4;i++) {
+    const d = document.getElementById('pd'+i);
+    if(d) d.className='pin-dot'+(i<pinBuffer.length?(error?' error':' filled'):'');
+  }
+}
+function verificarPin() {
+  if (pinBuffer === PIN_CORRECTO) {
+    sessionStorage.setItem(PIN_SESSION, '1');
+    document.getElementById('pin-screen').style.display = 'none';
+  } else {
+    updatePinDots(true);
+    document.getElementById('pin-error').style.display = 'block';
+    setTimeout(() => { pinBuffer=''; updatePinDots(false); document.getElementById('pin-error').style.display='none'; }, 900);
+  }
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 if (ROL === 'cocina') {
   document.documentElement.classList.add('rol-cocina');

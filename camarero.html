@@ -15,6 +15,68 @@
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; overflow-x: hidden; }
 
+  /* ── PIN SCREEN ── */
+  #pin-screen {
+    position: fixed; inset: 0; background: var(--bg); z-index: 200;
+    display: flex; align-items: center; justify-content: center; flex-direction: column;
+  }
+  .pin-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 2rem 1.5rem; width: 280px;
+    display: flex; flex-direction: column; align-items: center; gap: 1.25rem;
+  }
+  .pin-title { font-family: var(--mono); font-size: 15px; font-weight: 500; color: var(--text); }
+  .pin-sub { font-size: 13px; color: var(--muted); text-align: center; margin-top: -.5rem; }
+  .pin-dots { display: flex; gap: 10px; }
+  .pin-dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    border: 2px solid var(--border); background: transparent;
+    transition: background .15s, border-color .15s;
+  }
+  .pin-dot.filled { background: var(--accent); border-color: var(--accent); }
+  .pin-dot.error  { background: var(--danger); border-color: var(--danger); }
+  .pin-pad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; }
+  .pin-key {
+    height: 52px; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--surface2); font-family: var(--mono); font-size: 18px;
+    font-weight: 500; color: var(--text); cursor: pointer;
+    transition: background .1s, transform .1s; display: flex;
+    align-items: center; justify-content: center;
+  }
+  .pin-key:active { background: var(--border); transform: scale(.95); }
+  .pin-key.del { font-size: 14px; color: var(--muted); }
+  .pin-key.empty { border: none; background: none; cursor: default; }
+  .pin-error-msg { font-family: var(--mono); font-size: 12px; color: var(--danger); display: none; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.45); z-index: 100;
+    align-items: center; justify-content: center; padding: 1rem;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 1.75rem 1.5rem; width: 100%; max-width: 320px;
+    display: flex; flex-direction: column; gap: 1rem;
+    box-shadow: 0 20px 60px rgba(0,0,0,.15);
+    animation: modal-in .18s ease;
+  }
+  @keyframes modal-in { from { opacity:0; transform: scale(.95) translateY(8px); } to { opacity:1; transform: none; } }
+  .modal-title { font-family: var(--mono); font-size: 15px; font-weight: 500; }
+  .modal-body { font-size: 14px; color: var(--muted); line-height: 1.5; }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+  .modal-btn {
+    padding: 9px 18px; border-radius: 8px; font-family: var(--mono);
+    font-size: 13px; cursor: pointer; border: 1px solid var(--border);
+    background: var(--surface2); color: var(--text); transition: background .15s;
+  }
+  .modal-btn:hover { background: var(--border); }
+  .modal-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .modal-btn.primary:hover { opacity: .85; }
+  .modal-btn.danger { background: var(--danger); color: #fff; border-color: var(--danger); }
+  .modal-btn.danger:hover { opacity: .85; }
+
   /* TOPBAR */
   .topbar {
     background: var(--surface); border-bottom: 1px solid var(--border);
@@ -47,7 +109,11 @@
   }
   .toggle-track.on .toggle-thumb { left: 16px; }
 
-  /* MESAS */
+  .quota-badge {
+    display: none; font-family: var(--mono); font-size: 11px;
+    padding: 3px 10px; border-radius: 20px; border: 1px solid;
+    white-space: nowrap; flex-shrink: 0;
+  }
   #view-mesas { padding: 1rem; }
   .mesas-title { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; margin-bottom: .75rem; }
   .mesas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px,1fr)); gap: 10px; }
@@ -224,6 +290,44 @@
 </head>
 <body>
 
+<!-- PIN SCREEN -->
+<div id="pin-screen">
+  <div class="pin-box">
+    <div class="pin-title">Comandero</div>
+    <div class="pin-sub">Introduce el PIN para acceder</div>
+    <div class="pin-dots">
+      <div class="pin-dot" id="pd0"></div>
+      <div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div>
+      <div class="pin-dot" id="pd3"></div>
+    </div>
+    <div class="pin-error-msg" id="pin-error">PIN incorrecto</div>
+    <div class="pin-pad">
+      <button class="pin-key" onclick="pinKey('1')">1</button>
+      <button class="pin-key" onclick="pinKey('2')">2</button>
+      <button class="pin-key" onclick="pinKey('3')">3</button>
+      <button class="pin-key" onclick="pinKey('4')">4</button>
+      <button class="pin-key" onclick="pinKey('5')">5</button>
+      <button class="pin-key" onclick="pinKey('6')">6</button>
+      <button class="pin-key" onclick="pinKey('7')">7</button>
+      <button class="pin-key" onclick="pinKey('8')">8</button>
+      <button class="pin-key" onclick="pinKey('9')">9</button>
+      <button class="pin-key empty"></button>
+      <button class="pin-key" onclick="pinKey('0')">0</button>
+      <button class="pin-key del" onclick="pinDel()">⌫</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-box" id="modal-box">
+    <div class="modal-title" id="modal-title"></div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-actions" id="modal-actions"></div>
+  </div>
+</div>
+
 <div class="topbar">
   <span class="topbar-title">Camarero</span>
   <span class="mesa-badge" id="topbar-mesa"></span>
@@ -232,6 +336,7 @@
     <div class="toggle-track" id="print-track"><div class="toggle-thumb"></div></div>
     <span>PDF</span>
   </label>
+  <span class="quota-badge" id="quota-badge"></span>
   <button class="btn-carrito" id="btn-carrito" onclick="abrirDrawer()">
     🧾 <span id="carrito-label">0</span>
     <span class="carrito-count" id="carrito-count">0</span>
@@ -291,7 +396,70 @@ let mesasData = {}, cartaData = {}, categoriasData = {};
 let cartaReady = false, catsReady = false;
 let configLocal = {};
 
-// ── Toggle impresión PDF ───────────────────────────────────────────────────────
+// ── PIN ───────────────────────────────────────────────────────────────────────
+const PIN_SESSION = 'cam_auth';
+let PIN_CORRECTO = '1234';
+let pinBuffer = '';
+
+// Cargar PIN desde Firebase (actualizable desde el admin)
+get(ref(db, 'config/pins/camarero')).then(s => { if (s.val()) PIN_CORRECTO = s.val(); }).catch(()=>{});
+
+if (sessionStorage.getItem(PIN_SESSION) === '1') {
+  document.getElementById('pin-screen').style.display = 'none';
+}
+
+window.pinKey = d => {
+  if (pinBuffer.length >= 4) return;
+  pinBuffer += d; updatePinDots();
+  if (pinBuffer.length === 4) verificarPin();
+};
+window.pinDel = () => {
+  pinBuffer = pinBuffer.slice(0,-1); updatePinDots(false);
+  document.getElementById('pin-error').style.display = 'none';
+};
+function updatePinDots(error) {
+  for (let i=0;i<4;i++) {
+    const dot = document.getElementById('pd'+i);
+    dot.className = 'pin-dot'+(i<pinBuffer.length?(error?' error':' filled'):'');
+  }
+}
+function verificarPin() {
+  if (pinBuffer === PIN_CORRECTO) {
+    sessionStorage.setItem(PIN_SESSION,'1');
+    document.getElementById('pin-screen').style.display = 'none';
+  } else {
+    updatePinDots(true);
+    document.getElementById('pin-error').style.display = 'block';
+    setTimeout(() => { pinBuffer=''; updatePinDots(false); document.getElementById('pin-error').style.display='none'; }, 900);
+  }
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function showModal({ title, body, buttons }) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').textContent = body;
+  const acts = document.getElementById('modal-actions');
+  acts.innerHTML = '';
+  buttons.forEach(b => {
+    const btn = document.createElement('button');
+    btn.className = 'modal-btn' + (b.style ? ' ' + b.style : '');
+    btn.textContent = b.label;
+    btn.onclick = () => {
+      document.getElementById('modal-overlay').classList.remove('open');
+      if (b.action) b.action();
+    };
+    acts.appendChild(btn);
+  });
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+// Cerrar modal al hacer clic en el overlay (fuera del box)
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-overlay'))
+    document.getElementById('modal-overlay').classList.remove('open');
+});
+
+
 const PRINT_KEY = 'camarero_pdf';
 let autoPDF = localStorage.getItem(PRINT_KEY) === 'true';
 const printTrack = document.getElementById('print-track');
@@ -689,9 +857,62 @@ async function generarPDFComanda(nombreMesa, lineas, configLocal) {
   doc.save(`comanda-mesa${nombreMesa}-${ts}.pdf`);
 }
 
+// ── CUOTA ─────────────────────────────────────────────────────────────────────
+let quotaActual = null; // null = aún no cargado
+
+onValue(ref(db, 'config/quota/lineas'), snap => {
+  quotaActual = snap.val() ?? null;
+  renderQuotaBadge();
+});
+
+function renderQuotaBadge() {
+  let badge = document.getElementById('quota-badge');
+  if (!badge) return;
+  if (quotaActual === null) { badge.style.display = 'none'; return; }
+  if (quotaActual <= 0) {
+    badge.style.display = '';
+    badge.textContent = '⚠ Sin líneas';
+    badge.style.background = 'rgba(229,53,53,.12)';
+    badge.style.color = '#e53535';
+    badge.style.borderColor = 'rgba(229,53,53,.3)';
+  } else if (quotaActual <= 200) {
+    badge.style.display = '';
+    badge.textContent = quotaActual + ' líneas restantes';
+    badge.style.background = 'rgba(229,150,53,.12)';
+    badge.style.color = '#e57a35';
+    badge.style.borderColor = 'rgba(229,150,53,.3)';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
 // ── Enviar ────────────────────────────────────────────────────────────────────
 window.enviarPedido = async () => {
   if (!mesaId || !Object.keys(carrito).length) return;
+
+  // Contar líneas del carrito (cada artículo = 1 línea)
+  const nLineas = Object.keys(carrito).length;
+
+  // Comprobar cuota si está activada
+  if (quotaActual !== null) {
+    if (quotaActual <= 0) {
+      showModal({
+        title: 'Límite de pedidos alcanzado',
+        body: 'Se han agotado las líneas de pedido incluidas en el plan. Contacta con el administrador para ampliar el servicio.',
+        buttons: [{ label: 'Entendido', style: 'primary' }]
+      });
+      return;
+    }
+    if (quotaActual < nLineas) {
+      showModal({
+        title: 'Líneas insuficientes',
+        body: `Quedan ${quotaActual} líneas disponibles y el pedido tiene ${nLineas}. Reduce el pedido o contacta con el administrador.`,
+        buttons: [{ label: 'Entendido', style: 'primary' }]
+      });
+      return;
+    }
+  }
+
   const btn1 = document.getElementById('btn-enviar');
   const btn2 = document.getElementById('btn-enviar-drawer');
   btn1.disabled = true; btn1.textContent = '…';
@@ -708,6 +929,20 @@ window.enviarPedido = async () => {
       nota: nota || '', ts: Date.now()
     });
     lineasImprimir.push({ nombre: art.nombre, precio: Number(art.precio), qty, nota: nota || '' });
+  }
+
+  // Descontar líneas de la cuota
+  if (quotaActual !== null) {
+    await set(ref(db, 'config/quota/lineas'), quotaActual - nLineas);
+    // Aviso si queda poco después de enviar
+    const restante = quotaActual - nLineas;
+    if (restante > 0 && restante <= 100) {
+      setTimeout(() => showModal({
+        title: 'Pocas líneas restantes',
+        body: `Quedan ${restante} líneas de pedido disponibles. Contacta con el administrador para ampliar antes de quedarte sin servicio.`,
+        buttons: [{ label: 'Entendido' }]
+      }), 800);
+    }
   }
 
   // Generar y descargar PDF solo si el toggle está activo
@@ -769,12 +1004,20 @@ window.verCuenta = async () => {
 };
 
 window.cerrarMesa = async () => {
-  if (!confirm('¿Cerrar mesa ' + mesaNombre + '?')) return;
-  await remove(ref(db, 'pedidos/' + mesaId));
-  await set(ref(db, 'mesas/' + mesaId + '/estado'), 'libre');
-  mesaId = null; mesaNombre = null; carrito = {};
-  document.getElementById('topbar-mesa').style.display = 'none';
-  show('mesas');
+  showModal({
+    title: 'Cerrar mesa ' + mesaNombre,
+    body: 'Se borrarán todos los pedidos de esta mesa. ¿Continuar?',
+    buttons: [
+      { label: 'Cancelar' },
+      { label: 'Cerrar mesa', style: 'danger', action: async () => {
+        await remove(ref(db, 'pedidos/' + mesaId));
+        await set(ref(db, 'mesas/' + mesaId + '/estado'), 'libre');
+        mesaId = null; mesaNombre = null; carrito = {};
+        document.getElementById('topbar-mesa').style.display = 'none';
+        show('mesas');
+      }}
+    ]
+  });
 };
 
 window.show = v => {

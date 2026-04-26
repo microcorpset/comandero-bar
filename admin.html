@@ -282,6 +282,35 @@
         </div>
       </div>
       <div class="card" style="margin-top:1rem">
+        <h3>Líneas de pedido disponibles</h3>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:1rem">Cuando llegue a 0 el sistema bloqueará el envío de nuevos pedidos. Contacta con el administrador para ampliar.</p>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <span style="font-size:13px;color:var(--muted)">Restantes:</span>
+          <span id="quota-display" style="font-family:var(--mono);font-size:28px;font-weight:500">—</span>
+        </div>
+      </div>
+      <div class="card" style="margin-top:1rem">
+        <h3>PINes de acceso</h3>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:1rem">Cada pantalla pide su PIN al abrir. Por defecto todos son <code style="font-family:var(--mono);background:var(--surface2);padding:1px 5px;border-radius:4px">1234</code></p>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="form-row" style="align-items:center">
+            <label style="font-size:13px;min-width:100px">Camarero</label>
+            <input type="text" id="pin-camarero" placeholder="PIN (4 dígitos)" maxlength="4" pattern="[0-9]*" inputmode="numeric" style="width:140px;flex:none" />
+            <button class="btn btn-success btn-sm" onclick="guardarPin('camarero')">Guardar</button>
+          </div>
+          <div class="form-row" style="align-items:center">
+            <label style="font-size:13px;min-width:100px">Barra</label>
+            <input type="text" id="pin-barra" placeholder="PIN (4 dígitos)" maxlength="4" pattern="[0-9]*" inputmode="numeric" style="width:140px;flex:none" />
+            <button class="btn btn-success btn-sm" onclick="guardarPin('barra')">Guardar</button>
+          </div>
+          <div class="form-row" style="align-items:center">
+            <label style="font-size:13px;min-width:100px">Cocina</label>
+            <input type="text" id="pin-cocina" placeholder="PIN (4 dígitos)" maxlength="4" pattern="[0-9]*" inputmode="numeric" style="width:140px;flex:none" />
+            <button class="btn btn-success btn-sm" onclick="guardarPin('cocina')">Guardar</button>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:1rem">
         <h3>Cambiar contraseña admin</h3>
         <div class="form-row">
           <input type="password" id="new-pwd" placeholder="Nueva contraseña" style="flex:1" />
@@ -457,6 +486,13 @@ function updateCatSelect() {
   });
 }
 
+window.guardarPin = (rol) => {
+  const val = document.getElementById('pin-' + rol).value.trim();
+  if (!/^\d{4}$/.test(val)) { toast('El PIN debe tener exactamente 4 dígitos'); return; }
+  set(ref(db, 'config/pins/' + rol), val);
+  toast('PIN de ' + rol + ' actualizado');
+};
+
 // ─── INIT ────────────────────────────────────────────────────────────────────
 function init() {
   onValue(ref(db, 'mesas'), snap => renderMesas(snap.val()));
@@ -469,7 +505,6 @@ function init() {
     cartaData = snap.val() || {};
     renderCarta();
   });
-  // Cargar datos del local
   onValue(ref(db, 'config/local'), snap => {
     const d = snap.val() || {};
     document.getElementById('local-nombre').value    = d.nombre    || '';
@@ -477,6 +512,17 @@ function init() {
     document.getElementById('local-telefono').value  = d.telefono  || '';
     document.getElementById('local-cif').value       = d.cif       || '';
     document.getElementById('local-footer').value    = d.footer    || '';
+  });
+  // Cuota en tiempo real
+  onValue(ref(db, 'config/quota/lineas'), snap => {
+    const val = snap.val();
+    const el = document.getElementById('quota-display');
+    if (!el) return;
+    if (val === null)  { el.textContent = 'Sin configurar'; el.style.color = 'var(--muted)'; }
+    else if (val === -1) { el.textContent = '∞ Sin límite'; el.style.color = 'var(--success)'; }
+    else if (val <= 0)   { el.textContent = '0 — BLOQUEADO'; el.style.color = 'var(--danger)'; }
+    else if (val <= 200) { el.textContent = val; el.style.color = '#e57a35'; }
+    else                 { el.textContent = val; el.style.color = 'var(--accent)'; }
   });
 }
 
