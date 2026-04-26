@@ -749,97 +749,53 @@ window.drawerNota = (artId, valor) => {
 };
 
 // ── Enviar ────────────────────────────────────────────────────────────────────
-// ── Generar y descargar PDF de comanda ────────────────────────────────────────
-async function generarPDFComanda(nombreMesa, lineas, configLocal) {
-  if (!window.jspdf) {
-    await new Promise((resolve, reject) => {
-      const s = document.createElement('script');
-      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
-      s.onload = resolve; s.onerror = reject;
-      document.head.appendChild(s);
-    });
-  }
+// ── Generar e imprimir comanda via iframe (igual que barra/cocina) ────────────
+const iframeComanda = document.createElement('iframe');
+iframeComanda.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;border:none';
+document.body.appendChild(iframeComanda);
 
-  const { jsPDF } = window.jspdf;
-  const ANCHO = 80;
-  const M = 4; // margen
-  const LH = 5.5; // line height mm
-
-  // Dibuja el contenido en un doc y devuelve la Y final
-  function dibujar(doc) {
-    let y = M;
-    doc.setFont('courier', 'normal');
-
-    // Cabecera local
-    if (configLocal?.nombre) {
-      doc.setFontSize(10); doc.setFont('courier', 'bold');
-      doc.text(configLocal.nombre, ANCHO / 2, y, { align: 'center' }); y += LH;
-      if (configLocal.direccion) {
-        doc.setFontSize(7); doc.setFont('courier', 'normal');
-        doc.text(configLocal.direccion, ANCHO / 2, y, { align: 'center' }); y += LH;
-      }
-      doc.setDrawColor(180); doc.line(M, y, ANCHO - M, y); y += 3;
-    }
-
-    // Mesa y fecha
-    const ahora = new Date();
-    const hora  = ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    const fecha = ahora.toLocaleDateString('es-ES');
-    doc.setFontSize(12); doc.setFont('courier', 'bold');
-    doc.text(`Mesa ${nombreMesa}`, M, y); y += LH;
-    doc.setFontSize(7); doc.setFont('courier', 'normal');
-    doc.text(`${fecha}  ${hora}`, M, y); y += LH;
-    doc.setDrawColor(160); doc.line(M, y, ANCHO - M, y); y += 3;
-
-    // Artículos
-    doc.setFontSize(10);
-    lineas.forEach(l => {
-      const precioStr = `${(l.precio * l.qty).toFixed(2)}e`;
-      const qtyStr    = `${l.qty}x `;
-
-      doc.setFont('courier', 'bold');
-      const wQty = doc.getTextWidth(qtyStr);
-      doc.text(qtyStr, M, y);
-
-      doc.setFont('courier', 'normal');
-      const wPrecio = doc.getTextWidth(precioStr);
-      const wNombre = (ANCHO - M * 2) - wQty - wPrecio - 2;
-      const partes  = doc.splitTextToSize(l.nombre, wNombre);
-
-      doc.text(partes[0], M + wQty, y);
-      doc.text(precioStr, ANCHO - M, y, { align: 'right' });
-      y += LH;
-
-      if (partes.length > 1) {
-        doc.setFontSize(8);
-        partes.slice(1).forEach(p => { doc.text(p, M + wQty, y); y += LH - 1; });
-        doc.setFontSize(10);
-      }
-
-      if (l.nota) {
-        doc.setFontSize(8); doc.setFont('courier', 'italic'); doc.setTextColor(80);
-        doc.text(`  \u21b3 ${l.nota}`, M + 4, y);
-        doc.setFontSize(10); doc.setFont('courier', 'normal'); doc.setTextColor(0);
-        y += LH - 1;
-      }
-
-      doc.setDrawColor(200); doc.line(M, y, ANCHO - M, y); y += 2.5;
-    });
-
-    return y + M; // altura total usada
-  }
-
-  // 1ª pasada: doc temporal grande para medir la altura real
-  const docMedida = new jsPDF({ unit: 'mm', format: [ANCHO, 500], orientation: 'portrait' });
-  const alturaReal = dibujar(docMedida);
-
-  // 2ª pasada: doc con altura exacta
-  const doc = new jsPDF({ unit: 'mm', format: [ANCHO, alturaReal], orientation: 'portrait' });
-  dibujar(doc);
-
+function generarPDFComanda(nombreMesa, lineas, configLocal) {
   const ahora = new Date();
-  const ts = `${String(ahora.getHours()).padStart(2,'0')}${String(ahora.getMinutes()).padStart(2,'0')}${String(ahora.getSeconds()).padStart(2,'0')}`;
-  doc.save(`comanda-mesa${nombreMesa}-${ts}.pdf`);
+  const hora  = ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  const fecha = ahora.toLocaleDateString('es-ES');
+
+  const cabecera = configLocal?.nombre ? `
+    <div class="local">${configLocal.nombre}${configLocal.direccion ? `<br><span>${configLocal.direccion}</span>` : ''}</div>` : '';
+
+  const rows = lineas.map(l => `
+    <tr>
+      <td class="qty">${l.qty}×</td>
+      <td class="nombre">${l.nombre}${l.nota ? `<br><span class="nota">↳ ${l.nota}</span>` : ''}</td>
+      <td class="precio">${(l.precio * l.qty).toFixed(2)}€</td>
+    </tr>`).join('');
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: monospace; font-size: 13px; width: 72mm; padding: 4mm; }
+    .local { font-size: 11px; color: #555; border-bottom: 1px dashed #ccc;
+             padding-bottom: 5px; margin-bottom: 8px; }
+    .local span { font-size: 10px; }
+    h2 { font-size: 15px; font-weight: bold; margin-bottom: 2px; }
+    .sub { font-size: 10px; color: #777; margin-bottom: 10px; }
+    table { width: 100%; border-collapse: collapse; }
+    tr { border-bottom: 1px solid #eee; }
+    tr:last-child { border-bottom: none; }
+    td { padding: 4px 2px; vertical-align: top; }
+    .qty { font-weight: bold; white-space: nowrap; padding-right: 5px; }
+    .nombre { flex: 1; }
+    .precio { text-align: right; white-space: nowrap; padding-left: 5px; }
+    .nota { font-size: 10px; color: #666; font-style: italic; }
+    @media print { body { width: 100%; padding: 0; } }
+  </style></head><body>
+  ${cabecera}
+  <h2>Mesa ${nombreMesa}</h2>
+  <div class="sub">${fecha} · ${hora}</div>
+  <table>${rows}</table>
+  <script>window.onload = () => { window.print(); }<\/script>
+  </body></html>`;
+
+  iframeComanda.srcdoc = html;
 }
 
 // ── CUOTA ─────────────────────────────────────────────────────────────────────
