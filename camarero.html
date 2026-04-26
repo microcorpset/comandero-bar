@@ -14,7 +14,6 @@
     --accent: #1a1a1a;
     --accent2: #3d7aff;
     --danger: #e53535;
-    --success: #1a8a45;
     --text: #1a1a1a;
     --muted: #888;
     --mono: 'DM Mono', monospace;
@@ -23,7 +22,6 @@
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; overflow-x: hidden; }
 
-  /* ── TOPBAR ── */
   .topbar {
     background: var(--surface); border-bottom: 1px solid var(--border);
     padding: 0 1rem; height: 52px; display: flex; align-items: center; gap: 10px;
@@ -32,21 +30,16 @@
   .topbar-title { font-family: var(--mono); font-size: 15px; font-weight: 500; }
   .mesa-badge {
     background: var(--accent); color: #fff; font-family: var(--mono);
-    font-size: 13px; padding: 3px 10px; border-radius: 20px;
+    font-size: 13px; padding: 3px 10px; border-radius: 20px; display: none;
   }
   .spacer { flex: 1; }
-  .btn-enviar {
-    background: var(--accent); color: #fff; border: none; border-radius: 8px;
-    padding: 8px 18px; font-family: var(--mono); font-size: 13px; font-weight: 500;
-    cursor: pointer; transition: opacity .15s;
-  }
-  .btn-enviar:disabled { opacity: .35; cursor: default; }
-  .btn-enviar:not(:disabled):active { opacity: .75; }
 
-  /* ── MESAS ── */
+  /* MESAS */
   #view-mesas { padding: 1rem; }
-  .mesas-title { font-family: var(--mono); font-size: 11px; color: var(--muted);
-    letter-spacing: .08em; text-transform: uppercase; margin-bottom: .75rem; }
+  .mesas-title {
+    font-family: var(--mono); font-size: 11px; color: var(--muted);
+    letter-spacing: .08em; text-transform: uppercase; margin-bottom: .75rem;
+  }
   .mesas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px,1fr)); gap: 10px; }
   .mesa-btn {
     aspect-ratio: 1; background: var(--surface); border: 1.5px solid var(--border);
@@ -60,17 +53,15 @@
   .mesa-estado { font-size: 11px; color: var(--muted); }
   .mesa-btn.ocupada .mesa-estado { color: var(--accent2); }
 
-  /* ── CARTA ── */
+  /* CARTA */
   #view-carta { display: none; }
-  .carta-body { padding: 0 0 100px; }
-
+  .carta-body { padding: 0 0 110px; }
   .cat-header {
     padding: 10px 1rem 6px; font-family: var(--mono); font-size: 11px;
     color: var(--muted); letter-spacing: .08em; text-transform: uppercase;
     background: var(--bg); position: sticky; top: 52px; z-index: 5;
     border-bottom: 1px solid var(--border);
   }
-
   .art-row {
     display: flex; align-items: center; gap: 10px;
     padding: 10px 1rem; background: var(--surface);
@@ -78,85 +69,99 @@
   }
   .art-nombre { flex: 1; font-size: 15px; }
   .art-precio { font-family: var(--mono); font-size: 13px; color: var(--muted); }
-  .qty-ctrl { display: flex; align-items: center; gap: 0; }
+  .qty-ctrl { display: flex; align-items: center; }
   .qty-btn {
-    width: 34px; height: 34px; border: 1px solid var(--border); background: var(--surface2);
-    font-size: 20px; line-height: 1; cursor: pointer; transition: background .1s;
-    display: flex; align-items: center; justify-content: center; color: var(--text);
-    border-radius: 0;
+    width: 36px; height: 36px; border: 1px solid var(--border);
+    background: var(--surface2); font-size: 22px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text); transition: background .1s; flex-shrink: 0;
   }
   .qty-btn:first-child { border-radius: 8px 0 0 8px; }
   .qty-btn:last-child  { border-radius: 0 8px 8px 0; }
   .qty-btn:active { background: var(--border); }
   .qty-num {
-    width: 34px; height: 34px; display: flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
     font-family: var(--mono); font-size: 15px; font-weight: 500;
     border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
-    background: var(--surface);
+    background: var(--surface); flex-shrink: 0;
   }
   .qty-num.has-qty { color: var(--accent2); font-weight: 700; }
 
-  /* ── RESUMEN FLOTANTE ── */
-  .resumen-bar {
+  /* BARRA INFERIOR */
+  .bottom-bar {
     position: fixed; bottom: 0; left: 0; right: 0;
     background: var(--surface); border-top: 1px solid var(--border);
-    padding: .75rem 1rem; display: flex; align-items: center; gap: 12px;
+    padding: .75rem 1rem; display: flex; align-items: center; gap: 10px;
     z-index: 30;
   }
-  .resumen-info { flex: 1; }
-  .resumen-lineas { font-family: var(--mono); font-size: 13px; color: var(--muted); }
-  .resumen-total { font-family: var(--mono); font-size: 17px; font-weight: 500; }
-  .btn-back {
-    background: none; border: 1px solid var(--border); border-radius: 8px;
-    padding: 8px 14px; font-family: var(--mono); font-size: 13px; cursor: pointer;
-    color: var(--text); transition: background .15s;
+  .btn {
+    border-radius: 8px; padding: 9px 16px; font-family: var(--mono);
+    font-size: 13px; cursor: pointer; transition: opacity .15s, background .15s;
+    white-space: nowrap; border: 1px solid var(--border);
   }
+  .btn-back  { background: none; color: var(--text); }
   .btn-back:active { background: var(--surface2); }
+  .btn-cuenta { background: none; color: var(--accent2); border-color: var(--accent2); }
+  .btn-enviar {
+    background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 500;
+  }
+  .btn-enviar:disabled { opacity: .3; cursor: default; }
+  .btn-enviar:not(:disabled):active { opacity: .75; }
+  .resumen-info { flex: 1; min-width: 0; }
+  .resumen-lineas { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .resumen-total  { font-family: var(--mono); font-size: 17px; font-weight: 500; }
 
-  /* ── TICKET ── */
+  .loading {
+    padding: 3rem 1rem; text-align: center;
+    font-family: var(--mono); font-size: 13px; color: var(--muted);
+  }
+
+  /* TICKET */
   #view-ticket { display: none; padding: 1rem; }
   .ticket-card {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: 12px; padding: 1.5rem; max-width: 380px; margin: 0 auto;
   }
-  .ticket-header { text-align: center; margin-bottom: 1rem; border-bottom: 1px dashed var(--border); padding-bottom: 1rem; }
+  .ticket-header {
+    text-align: center; margin-bottom: 1rem;
+    border-bottom: 1px dashed var(--border); padding-bottom: 1rem;
+  }
   .ticket-mesa { font-family: var(--mono); font-size: 22px; font-weight: 500; }
   .ticket-fecha { font-size: 12px; color: var(--muted); margin-top: 4px; }
   .ticket-linea {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 5px 0; font-size: 14px; border-bottom: 1px solid var(--border);
+    display: flex; justify-content: space-between;
+    padding: 6px 0; font-size: 14px; border-bottom: 1px solid var(--border);
   }
   .ticket-linea:last-of-type { border-bottom: none; }
   .ticket-total {
-    display: flex; justify-content: space-between; font-family: var(--mono);
-    font-size: 18px; font-weight: 500; margin-top: 1rem;
-    padding-top: 1rem; border-top: 2px solid var(--accent);
+    display: flex; justify-content: space-between;
+    font-family: var(--mono); font-size: 18px; font-weight: 500;
+    margin-top: 1rem; padding-top: 1rem; border-top: 2px solid var(--accent);
   }
   .btn-print {
     width: 100%; margin-top: 1rem; background: var(--accent); color: #fff;
-    border: none; border-radius: 8px; padding: 12px; font-family: var(--mono);
-    font-size: 14px; cursor: pointer;
+    border: none; border-radius: 8px; padding: 12px;
+    font-family: var(--mono); font-size: 14px; cursor: pointer;
   }
-  .btn-cerrar-mesa {
+  .btn-cerrar {
     width: 100%; margin-top: .5rem; background: none; color: var(--danger);
     border: 1px solid var(--danger); border-radius: 8px; padding: 10px;
     font-family: var(--mono); font-size: 13px; cursor: pointer;
   }
 
   @media print {
-    body * { display: none; }
-    #view-ticket, #view-ticket * { display: block !important; }
-    .btn-print, .btn-cerrar-mesa, .btn-back-ticket { display: none !important; }
+    body > *:not(#view-ticket) { display: none !important; }
+    #view-ticket { display: block !important; }
+    .btn-print, .btn-cerrar, .btn-back-ticket { display: none !important; }
   }
 </style>
 </head>
 <body>
 
-<div class="topbar" id="topbar">
+<div class="topbar">
   <span class="topbar-title">Camarero</span>
-  <span class="mesa-badge" id="topbar-mesa" style="display:none"></span>
+  <span class="mesa-badge" id="topbar-mesa"></span>
   <div class="spacer"></div>
-  <button class="btn-enviar" id="btn-enviar" disabled onclick="enviarPedido()">Enviar pedido</button>
 </div>
 
 <!-- MESAS -->
@@ -164,127 +169,176 @@
   <div style="padding:1rem 1rem .5rem">
     <div class="mesas-title">Selecciona una mesa</div>
   </div>
-  <div class="mesas-grid" id="mesas-grid" style="padding:0 1rem"></div>
+  <div class="mesas-grid" id="mesas-grid" style="padding:0 1rem">
+    <div class="loading">Cargando…</div>
+  </div>
 </div>
 
 <!-- CARTA -->
 <div id="view-carta">
-  <div class="carta-body" id="carta-body"></div>
-  <div class="resumen-bar">
-    <button class="btn-back" onclick="volverMesas()">← Mesas</button>
+  <div class="carta-body" id="carta-body">
+    <div class="loading">Cargando carta…</div>
+  </div>
+  <div class="bottom-bar">
+    <button class="btn btn-back" onclick="volverMesas()">← Mesas</button>
     <div class="resumen-info">
       <div class="resumen-lineas" id="res-lineas">Sin artículos</div>
       <div class="resumen-total" id="res-total">0,00 €</div>
     </div>
-    <button class="btn-enviar" id="btn-enviar2" disabled onclick="enviarPedido()">Enviar</button>
+    <button class="btn btn-cuenta" id="btn-cuenta" onclick="verCuenta()" style="display:none">Cuenta</button>
+    <button class="btn btn-enviar" id="btn-enviar" disabled onclick="enviarPedido()">Enviar</button>
   </div>
 </div>
 
-<!-- TICKET / CUENTA -->
+<!-- TICKET -->
 <div id="view-ticket">
-  <div style="display:flex;gap:10px;margin-bottom:1rem;align-items:center">
-    <button class="btn-back btn-back-ticket" onclick="volverCarta()">← Volver</button>
+  <div style="display:flex;gap:10px;margin-bottom:1rem;align-items:center;padding:1rem 1rem 0">
+    <button class="btn btn-back btn-back-ticket" onclick="show('carta')">← Volver</button>
     <span style="font-family:var(--mono);font-size:13px;color:var(--muted)">Cuenta</span>
   </div>
-  <div class="ticket-card" id="ticket-card"></div>
+  <div style="padding:0 1rem">
+    <div class="ticket-card" id="ticket-card"></div>
+  </div>
 </div>
 
 <script type="module">
 import { db } from './firebase.js';
-import {
-  ref, onValue, push, set, remove, get, serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { ref, onValue, push, set, remove, get }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
+// ── Estado ────────────────────────────────────────────────────────────────────
 let mesaId = null, mesaNombre = null;
-let carrito = {}; // artId → { art, qty }
-let cartaData = {}, categoriasData = {}, mesasData = {};
-let pedidoActualId = null;
+let carrito = {};
+let mesasData = {}, cartaData = {}, categoriasData = {};
+let cartaReady = false, catsReady = false;
 
-// ─── CARGA DATOS ─────────────────────────────────────────────────────────────
-onValue(ref(db, 'mesas'), snap => { mesasData = snap.val() || {}; renderMesas(); });
-onValue(ref(db, 'categorias'), snap => { categoriasData = snap.val() || {}; });
-onValue(ref(db, 'carta'), snap => { cartaData = snap.val() || {}; });
+// ── Listeners Firebase ────────────────────────────────────────────────────────
+onValue(ref(db, 'mesas'), snap => {
+  mesasData = snap.val() || {};
+  renderMesas();
+});
 
-// ─── MESAS ───────────────────────────────────────────────────────────────────
+onValue(ref(db, 'categorias'), snap => {
+  categoriasData = snap.val() || {};
+  catsReady = true;
+  if (cartaReady && mesaId) renderCarta();
+});
+
+onValue(ref(db, 'carta'), snap => {
+  cartaData = snap.val() || {};
+  cartaReady = true;
+  if (catsReady && mesaId) renderCarta();
+});
+
+// ── Mesas ─────────────────────────────────────────────────────────────────────
 function renderMesas() {
   const grid = document.getElementById('mesas-grid');
+  const entries = Object.entries(mesasData);
+
+  if (!entries.length) {
+    grid.innerHTML = '<div class="loading">Sin mesas. Añade desde el panel admin.</div>';
+    return;
+  }
+
   grid.innerHTML = '';
-  Object.entries(mesasData).sort(([,a],[,b]) => a.nombre.localeCompare(b.nombre, 'es', {numeric:true}))
+  entries
+    .sort(([,a],[,b]) => a.nombre.localeCompare(b.nombre, 'es', {numeric: true}))
     .forEach(([id, m]) => {
-      const btn = document.createElement('div');
       const ocupada = m.estado === 'ocupada';
-      btn.className = 'mesa-btn' + (ocupada ? ' ocupada' : '');
-      btn.innerHTML = `
+      const div = document.createElement('div');
+      div.className = 'mesa-btn' + (ocupada ? ' ocupada' : '');
+      div.innerHTML = `
         <span class="mesa-nombre">${m.nombre}</span>
         <span class="mesa-estado">${ocupada ? 'ocupada' : 'libre'}</span>`;
-      btn.onclick = () => abrirMesa(id, m.nombre);
-      grid.appendChild(btn);
+      div.addEventListener('click', () => abrirMesa(id, m.nombre, ocupada));
+      grid.appendChild(div);
     });
 }
 
-function abrirMesa(id, nombre) {
-  mesaId = id; mesaNombre = nombre;
+function abrirMesa(id, nombre, ocupada) {
+  mesaId = id;
+  mesaNombre = nombre;
   carrito = {};
-  document.getElementById('topbar-mesa').textContent = 'Mesa ' + nombre;
-  document.getElementById('topbar-mesa').style.display = '';
-  renderCarta();
+
+  const badge = document.getElementById('topbar-mesa');
+  badge.textContent = 'Mesa ' + nombre;
+  badge.style.display = '';
+
+  document.getElementById('btn-cuenta').style.display = ocupada ? '' : 'none';
   show('carta');
+
+  if (cartaReady && catsReady) {
+    renderCarta();
+  } else {
+    document.getElementById('carta-body').innerHTML = '<div class="loading">Cargando carta…</div>';
+  }
 }
 
 window.volverMesas = () => {
   mesaId = null; mesaNombre = null; carrito = {};
   document.getElementById('topbar-mesa').style.display = 'none';
   show('mesas');
-  updateBtns();
 };
 
-window.volverCarta = () => { show('carta'); };
-
-// ─── CARTA ───────────────────────────────────────────────────────────────────
+// ── Carta ─────────────────────────────────────────────────────────────────────
 function renderCarta() {
   const body = document.getElementById('carta-body');
+  const cats = Object.entries(categoriasData)
+    .sort(([,a],[,b]) => a.nombre.localeCompare(b.nombre, 'es'));
+
+  if (!cats.length) {
+    body.innerHTML = '<div class="loading">Sin categorías en la carta.</div>';
+    return;
+  }
+
   body.innerHTML = '';
-  const cats = Object.entries(categoriasData).sort(([,a],[,b]) => a.nombre.localeCompare(b.nombre));
+
   cats.forEach(([catId, cat]) => {
     const arts = Object.entries(cartaData)
       .filter(([,a]) => a.catId === catId)
-      .sort(([,a],[,b]) => a.nombre.localeCompare(b.nombre));
+      .sort(([,a],[,b]) => a.nombre.localeCompare(b.nombre, 'es'));
+
     if (!arts.length) return;
+
     const header = document.createElement('div');
     header.className = 'cat-header';
     header.textContent = cat.nombre;
     body.appendChild(header);
-    arts.forEach(([id, art]) => {
+
+    arts.forEach(([artId, art]) => {
       const row = document.createElement('div');
       row.className = 'art-row';
       row.innerHTML = `
         <span class="art-nombre">${art.nombre}</span>
-        <span class="art-precio">${art.precio.toFixed(2)} €</span>
+        <span class="art-precio">${Number(art.precio).toFixed(2)} €</span>
         <div class="qty-ctrl">
-          <button class="qty-btn" data-id="${id}" data-d="-1">−</button>
-          <span class="qty-num" id="qty-${id}">0</span>
-          <button class="qty-btn" data-id="${id}" data-d="1">+</button>
+          <button class="qty-btn" data-id="${artId}" data-d="-1">−</button>
+          <span class="qty-num" id="qty-${artId}">0</span>
+          <button class="qty-btn" data-id="${artId}" data-d="1">+</button>
         </div>`;
       body.appendChild(row);
     });
   });
-  body.addEventListener('click', e => {
+
+  // Event delegation: un solo listener para todos los botones +/-
+  body.onclick = e => {
     const btn = e.target.closest('[data-d]');
     if (!btn) return;
-    const id = btn.dataset.id;
-    const delta = parseInt(btn.dataset.d);
-    cambiarQty(id, delta);
-  });
+    cambiarQty(btn.dataset.id, parseInt(btn.dataset.d));
+  };
+
   updateQtyDisplay();
+  updateBtns();
 }
 
-function cambiarQty(id, delta) {
-  const art = cartaData[id];
+// ── Carrito ───────────────────────────────────────────────────────────────────
+function cambiarQty(artId, delta) {
+  const art = cartaData[artId];
   if (!art) return;
-  const prev = carrito[id]?.qty || 0;
+  const prev = carrito[artId]?.qty || 0;
   const next = Math.max(0, prev + delta);
-  if (next === 0) delete carrito[id];
-  else carrito[id] = { art, qty: next };
+  if (next === 0) delete carrito[artId];
+  else carrito[artId] = { art, qty: next };
   updateQtyDisplay();
   updateBtns();
 }
@@ -297,127 +351,92 @@ function updateQtyDisplay() {
     el.textContent = q;
     el.className = 'qty-num' + (q > 0 ? ' has-qty' : '');
   });
-  // resumen
-  const lineas = Object.values(carrito).length;
-  const total  = Object.values(carrito).reduce((s, {art,qty}) => s + art.precio * qty, 0);
-  document.getElementById('res-lineas').textContent = lineas ? `${lineas} artículo${lineas>1?'s':''}` : 'Sin artículos';
-  document.getElementById('res-total').textContent = total.toFixed(2).replace('.',',') + ' €';
+  const n = Object.keys(carrito).length;
+  const total = Object.values(carrito).reduce((s, {art, qty}) => s + Number(art.precio) * qty, 0);
+  document.getElementById('res-lineas').textContent =
+    n ? `${n} artículo${n > 1 ? 's' : ''}` : 'Sin artículos';
+  document.getElementById('res-total').textContent =
+    total.toFixed(2).replace('.', ',') + ' €';
 }
 
 function updateBtns() {
-  const tiene = Object.keys(carrito).length > 0;
-  ['btn-enviar','btn-enviar2'].forEach(id => {
-    const b = document.getElementById(id);
-    if (b) b.disabled = !tiene;
-  });
+  document.getElementById('btn-enviar').disabled = Object.keys(carrito).length === 0;
 }
 
-// ─── ENVIAR PEDIDO ───────────────────────────────────────────────────────────
+// ── Enviar ────────────────────────────────────────────────────────────────────
 window.enviarPedido = async () => {
   if (!mesaId || !Object.keys(carrito).length) return;
+  const btn = document.getElementById('btn-enviar');
+  btn.disabled = true;
+  btn.textContent = '…';
 
-  // Marcar mesa como ocupada
   await set(ref(db, 'mesas/' + mesaId + '/estado'), 'ocupada');
+  document.getElementById('btn-cuenta').style.display = '';
 
-  // Crear líneas de pedido bajo mesas/{mesaId}/pedido/
-  const pedidoRef = ref(db, 'pedidos/' + mesaId);
-  const lineas = Object.entries(carrito).map(([artId, {art, qty}]) => ({
-    artId, nombre: art.nombre, precio: art.precio, qty,
-    destino: art.destino, estado: 'pendiente',
-    ts: Date.now()
-  }));
-  for (const linea of lineas) {
-    await push(pedidoRef, linea);
+  for (const [artId, {art, qty}] of Object.entries(carrito)) {
+    await push(ref(db, 'pedidos/' + mesaId), {
+      artId, nombre: art.nombre, precio: Number(art.precio),
+      qty, destino: art.destino, estado: 'pendiente', ts: Date.now()
+    });
   }
 
   carrito = {};
   updateQtyDisplay();
-  updateBtns();
-
-  // Feedback visual rápido
-  const btn = document.getElementById('btn-enviar');
   btn.textContent = '✓ Enviado';
-  setTimeout(() => { btn.textContent = 'Enviar pedido'; }, 1500);
+  btn.disabled = false;
+  setTimeout(() => { btn.textContent = 'Enviar'; updateBtns(); }, 1800);
 };
 
-// ─── TICKET ──────────────────────────────────────────────────────────────────
-window.verTicket = async (id, nombre) => {
-  mesaId = id; mesaNombre = nombre;
-  const snap = await get(ref(db, 'pedidos/' + id));
+// ── Cuenta / Ticket ───────────────────────────────────────────────────────────
+window.verCuenta = async () => {
+  if (!mesaId) return;
+  const snap = await get(ref(db, 'pedidos/' + mesaId));
   const pedidos = snap.val() || {};
-  const lineas = Object.entries(pedidos).map(([,l]) => l);
-  // Agrupar por artículo
-  const agrupado = {};
-  lineas.forEach(l => {
-    const k = l.nombre;
-    if (!agrupado[k]) agrupado[k] = { nombre: l.nombre, precio: l.precio, qty: 0 };
-    agrupado[k].qty += l.qty;
-  });
-  const total = Object.values(agrupado).reduce((s, l) => s + l.precio * l.qty, 0);
-  const fecha = new Date().toLocaleString('es-ES', {dateStyle:'short', timeStyle:'short'});
 
-  const card = document.getElementById('ticket-card');
-  card.innerHTML = `
+  const agrupado = {};
+  Object.values(pedidos).forEach(l => {
+    if (!agrupado[l.nombre]) agrupado[l.nombre] = { nombre: l.nombre, precio: Number(l.precio), qty: 0 };
+    agrupado[l.nombre].qty += l.qty;
+  });
+
+  const total = Object.values(agrupado).reduce((s, l) => s + l.precio * l.qty, 0);
+  const fecha = new Date().toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
+
+  document.getElementById('ticket-card').innerHTML = `
     <div class="ticket-header">
-      <div class="ticket-mesa">Mesa ${nombre}</div>
+      <div class="ticket-mesa">Mesa ${mesaNombre}</div>
       <div class="ticket-fecha">${fecha}</div>
     </div>
     ${Object.values(agrupado).map(l => `
       <div class="ticket-linea">
         <span>${l.qty}× ${l.nombre}</span>
-        <span style="font-family:var(--mono)">${(l.precio*l.qty).toFixed(2)} €</span>
+        <span style="font-family:var(--mono)">${(l.precio * l.qty).toFixed(2)} €</span>
       </div>`).join('')}
     <div class="ticket-total">
       <span>Total</span>
       <span>${total.toFixed(2)} €</span>
     </div>
     <button class="btn-print" onclick="window.print()">Imprimir ticket</button>
-    <button class="btn-cerrar-mesa" onclick="cerrarMesa()">Cerrar mesa y limpiar</button>
+    <button class="btn-cerrar" onclick="cerrarMesa()">Cerrar mesa y limpiar</button>
   `;
   show('ticket');
 };
 
 window.cerrarMesa = async () => {
-  if (!mesaId) return;
   if (!confirm('¿Cerrar mesa ' + mesaNombre + '? Se borrarán todos los pedidos.')) return;
   await remove(ref(db, 'pedidos/' + mesaId));
   await set(ref(db, 'mesas/' + mesaId + '/estado'), 'libre');
-  mesaId = null; mesaNombre = null;
+  mesaId = null; mesaNombre = null; carrito = {};
+  document.getElementById('topbar-mesa').style.display = 'none';
   show('mesas');
 };
 
-// Botón ticket en la mesa (doble tap)
-window.abrirTicket = verTicket;
-
-// ─── VISTAS ──────────────────────────────────────────────────────────────────
-function show(v) {
-  document.getElementById('view-mesas').style.display = v==='mesas' ? '' : 'none';
-  document.getElementById('view-carta').style.display  = v==='carta'  ? '' : 'none';
-  document.getElementById('view-ticket').style.display = v==='ticket' ? '' : 'none';
-
-  const envBtn = document.getElementById('btn-enviar');
-  envBtn.style.display = (v === 'carta') ? '' : 'none';
-  if (v !== 'carta') envBtn.disabled = true;
-  updateBtns();
-}
-
-// Añadir botón ticket a las mesas ocupadas
-const origRenderMesas = renderMesas;
-function renderMesasConTicket() {
-  origRenderMesas();
-  Object.entries(mesasData).forEach(([id, m]) => {
-    if (m.estado === 'ocupada') {
-      // Añadir botón cuenta en la carta cuando se abre
-    }
-  });
-}
-
-// Cuenta visible desde la carta
-const ticketBarBtn = document.createElement('button');
-ticketBarBtn.textContent = 'Cuenta';
-ticketBarBtn.style.cssText = 'background:none;border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-family:var(--mono);font-size:13px;cursor:pointer;color:var(--text)';
-ticketBarBtn.onclick = () => { if (mesaId) verTicket(mesaId, mesaNombre); };
-document.querySelector('.resumen-bar').appendChild(ticketBarBtn);
+// ── Vistas ────────────────────────────────────────────────────────────────────
+window.show = v => {
+  document.getElementById('view-mesas').style.display  = v === 'mesas'  ? '' : 'none';
+  document.getElementById('view-carta').style.display  = v === 'carta'  ? '' : 'none';
+  document.getElementById('view-ticket').style.display = v === 'ticket' ? '' : 'none';
+};
 </script>
 </body>
 </html>
