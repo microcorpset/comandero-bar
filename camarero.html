@@ -116,16 +116,6 @@
     font-family: var(--mono); font-size: 13px; color: var(--muted);
   }
 
-  /* DEBUG */
-  #debug-box {
-    position: fixed; top: 60px; right: 8px; left: 8px;
-    background: #1a1a1a; color: #e8ff5a;
-    font-family: monospace; font-size: 11px;
-    padding: 8px 12px; border-radius: 8px; z-index: 999;
-    max-height: 180px; overflow-y: auto;
-    display: none;
-  }
-
   /* TICKET */
   #view-ticket { display: none; padding: 1rem; }
   .ticket-card {
@@ -174,9 +164,6 @@
   <div class="spacer"></div>
 </div>
 
-<!-- DEBUG BOX (visible en pantalla además de consola) -->
-<div id="debug-box"></div>
-
 <!-- MESAS -->
 <div id="view-mesas">
   <div style="padding:1rem 1rem .5rem">
@@ -219,54 +206,35 @@ import { db } from './firebase.js';
 import { ref, onValue, push, set, remove, get }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-// ── Debug helper ──────────────────────────────────────────────────────────────
-const debugBox = document.getElementById('debug-box');
-function log(msg) {
-  console.log(msg);
-  debugBox.style.display = 'block';
-  debugBox.innerHTML += msg + '<br>';
-  debugBox.scrollTop = debugBox.scrollHeight;
-}
-
-// ── Estado ────────────────────────────────────────────────────────────────────
 let mesaId = null, mesaNombre = null;
 let carrito = {};
 let mesasData = {}, cartaData = {}, categoriasData = {};
 let cartaReady = false, catsReady = false;
 
-// ── Listeners Firebase ────────────────────────────────────────────────────────
-log('⏳ Conectando a Firebase...');
-
 onValue(ref(db, 'mesas'), snap => {
   mesasData = snap.val() || {};
-  log('✅ Mesas recibidas: ' + Object.keys(mesasData).length);
   renderMesas();
 });
 
 onValue(ref(db, 'categorias'), snap => {
   categoriasData = snap.val() || {};
   catsReady = true;
-  log('✅ Categorías recibidas: ' + Object.keys(categoriasData).length + ' → ' + JSON.stringify(Object.keys(categoriasData)));
   if (cartaReady && mesaId) renderCarta();
 });
 
 onValue(ref(db, 'carta'), snap => {
   cartaData = snap.val() || {};
   cartaReady = true;
-  log('✅ Carta recibida: ' + Object.keys(cartaData).length + ' artículos');
   if (catsReady && mesaId) renderCarta();
 });
 
-// ── Mesas ─────────────────────────────────────────────────────────────────────
 function renderMesas() {
   const grid = document.getElementById('mesas-grid');
   const entries = Object.entries(mesasData);
-
   if (!entries.length) {
     grid.innerHTML = '<div class="loading">Sin mesas. Añade desde el panel admin.</div>';
     return;
   }
-
   grid.innerHTML = '';
   entries
     .sort(([,a],[,b]) => a.nombre.localeCompare(b.nombre, 'es', {numeric: true}))
@@ -286,22 +254,13 @@ function abrirMesa(id, nombre, ocupada) {
   mesaId = id;
   mesaNombre = nombre;
   carrito = {};
-  log('👆 Mesa seleccionada: ' + nombre + ' | cartaReady=' + cartaReady + ' catsReady=' + catsReady);
-
   const badge = document.getElementById('topbar-mesa');
   badge.textContent = 'Mesa ' + nombre;
   badge.style.display = '';
-
   document.getElementById('btn-cuenta').style.display = ocupada ? '' : 'none';
   show('carta');
-
-  if (cartaReady && catsReady) {
-    log('🍽️ Renderizando carta...');
-    renderCarta();
-  } else {
-    log('⚠️ Datos no listos aún, esperando onValue...');
-    document.getElementById('carta-body').innerHTML = '<div class="loading">Cargando carta…</div>';
-  }
+  if (cartaReady && catsReady) renderCarta();
+  else document.getElementById('carta-body').innerHTML = '<div class="loading">Cargando carta…</div>';
 }
 
 window.volverMesas = () => {
@@ -310,35 +269,24 @@ window.volverMesas = () => {
   show('mesas');
 };
 
-// ── Carta ─────────────────────────────────────────────────────────────────────
 function renderCarta() {
   const body = document.getElementById('carta-body');
   const cats = Object.entries(categoriasData)
     .sort(([,a],[,b]) => a.nombre.localeCompare(b.nombre, 'es'));
-
-  log('🍽️ renderCarta: ' + cats.length + ' cats, ' + Object.keys(cartaData).length + ' arts');
-
   if (!cats.length) {
     body.innerHTML = '<div class="loading">Sin categorías en la carta.</div>';
     return;
   }
-
   body.innerHTML = '';
-
   cats.forEach(([catId, cat]) => {
     const arts = Object.entries(cartaData)
       .filter(([,a]) => a.catId === catId)
       .sort(([,a],[,b]) => a.nombre.localeCompare(b.nombre, 'es'));
-
-    log('  Cat ' + catId + ' (' + cat.nombre + '): ' + arts.length + ' arts');
-
     if (!arts.length) return;
-
     const header = document.createElement('div');
     header.className = 'cat-header';
     header.textContent = cat.nombre;
     body.appendChild(header);
-
     arts.forEach(([artId, art]) => {
       const row = document.createElement('div');
       row.className = 'art-row';
@@ -353,18 +301,15 @@ function renderCarta() {
       body.appendChild(row);
     });
   });
-
   body.onclick = e => {
     const btn = e.target.closest('[data-d]');
     if (!btn) return;
     cambiarQty(btn.dataset.id, parseInt(btn.dataset.d));
   };
-
   updateQtyDisplay();
   updateBtns();
 }
 
-// ── Carrito ───────────────────────────────────────────────────────────────────
 function cambiarQty(artId, delta) {
   const art = cartaData[artId];
   if (!art) return;
@@ -396,23 +341,19 @@ function updateBtns() {
   document.getElementById('btn-enviar').disabled = Object.keys(carrito).length === 0;
 }
 
-// ── Enviar ────────────────────────────────────────────────────────────────────
 window.enviarPedido = async () => {
   if (!mesaId || !Object.keys(carrito).length) return;
   const btn = document.getElementById('btn-enviar');
   btn.disabled = true;
   btn.textContent = '…';
-
   await set(ref(db, 'mesas/' + mesaId + '/estado'), 'ocupada');
   document.getElementById('btn-cuenta').style.display = '';
-
   for (const [artId, {art, qty}] of Object.entries(carrito)) {
     await push(ref(db, 'pedidos/' + mesaId), {
       artId, nombre: art.nombre, precio: Number(art.precio),
       qty, destino: art.destino, estado: 'pendiente', ts: Date.now()
     });
   }
-
   carrito = {};
   updateQtyDisplay();
   btn.textContent = '✓ Enviado';
@@ -420,21 +361,17 @@ window.enviarPedido = async () => {
   setTimeout(() => { btn.textContent = 'Enviar'; updateBtns(); }, 1800);
 };
 
-// ── Cuenta / Ticket ───────────────────────────────────────────────────────────
 window.verCuenta = async () => {
   if (!mesaId) return;
   const snap = await get(ref(db, 'pedidos/' + mesaId));
   const pedidos = snap.val() || {};
-
   const agrupado = {};
   Object.values(pedidos).forEach(l => {
     if (!agrupado[l.nombre]) agrupado[l.nombre] = { nombre: l.nombre, precio: Number(l.precio), qty: 0 };
     agrupado[l.nombre].qty += l.qty;
   });
-
   const total = Object.values(agrupado).reduce((s, l) => s + l.precio * l.qty, 0);
   const fecha = new Date().toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
-
   document.getElementById('ticket-card').innerHTML = `
     <div class="ticket-header">
       <div class="ticket-mesa">Mesa ${mesaNombre}</div>
@@ -464,7 +401,6 @@ window.cerrarMesa = async () => {
   show('mesas');
 };
 
-// ── Vistas ────────────────────────────────────────────────────────────────────
 window.show = v => {
   document.getElementById('view-mesas').style.display  = v === 'mesas'  ? '' : 'none';
   document.getElementById('view-carta').style.display  = v === 'carta'  ? '' : 'none';
