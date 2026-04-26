@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin · Comandero</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --surface: #1a1a1a;
+    --surface2: #242424;
+    --border: #2e2e2e;
+    --accent: #e8ff5a;
+    --accent-dim: rgba(232,255,90,0.12);
+    --danger: #ff5a5a;
+    --danger-dim: rgba(255,90,90,0.1);
+    --success: #5aff9a;
+    --text: #f0f0f0;
+    --muted: #666;
+    --mono: 'DM Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; }
+
+  /* LOGIN */
+  #login-screen {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; flex-direction: column; gap: 1.5rem;
+  }
+  .login-box {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 2.5rem; width: 320px; display: flex;
+    flex-direction: column; gap: 1rem;
+  }
+  .login-logo { font-family: var(--mono); font-size: 22px; color: var(--accent); letter-spacing: -1px; }
+  .login-box input {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+    padding: 10px 14px; color: var(--text); font-size: 15px; width: 100%;
+    font-family: var(--mono); outline: none; transition: border .2s;
+  }
+  .login-box input:focus { border-color: var(--accent); }
+  .btn-accent {
+    background: var(--accent); color: #0f0f0f; border: none; border-radius: 8px;
+    padding: 11px 20px; font-family: var(--mono); font-size: 14px; font-weight: 500;
+    cursor: pointer; transition: opacity .15s; width: 100%;
+  }
+  .btn-accent:hover { opacity: .85; }
+  .login-error { color: var(--danger); font-size: 13px; display: none; }
+
+  /* LAYOUT */
+  #app { display: none; }
+  .topbar {
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 2rem; display: flex; align-items: center; gap: 1.5rem; height: 56px;
+    position: sticky; top: 0; z-index: 10;
+  }
+  .topbar-logo { font-family: var(--mono); color: var(--accent); font-size: 16px; letter-spacing: -0.5px; }
+  .tab-btn {
+    background: none; border: none; color: var(--muted); font-family: var(--sans);
+    font-size: 14px; cursor: pointer; padding: 6px 12px; border-radius: 6px;
+    transition: background .15s, color .15s;
+  }
+  .tab-btn:hover { color: var(--text); background: var(--surface2); }
+  .tab-btn.active { color: var(--accent); background: var(--accent-dim); }
+  .spacer { flex: 1; }
+  .tag-version { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+
+  .main { padding: 2rem; max-width: 860px; margin: 0 auto; }
+  .section { display: none; }
+  .section.active { display: block; }
+
+  h2 { font-size: 20px; font-weight: 500; margin-bottom: 1.5rem; color: var(--text); }
+  h3 { font-size: 14px; font-weight: 500; color: var(--muted); letter-spacing: .05em; text-transform: uppercase; margin-bottom: 1rem; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1rem;
+  }
+  .row-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 0; border-bottom: 1px solid var(--border);
+  }
+  .row-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .row-label { flex: 1; font-size: 14px; }
+  .row-sub { font-size: 12px; color: var(--muted); font-family: var(--mono); }
+
+  input[type="text"], input[type="number"], input[type="password"], select {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 12px; color: var(--text); font-size: 14px;
+    font-family: var(--sans); outline: none; transition: border .2s;
+  }
+  input:focus, select:focus { border-color: var(--accent); }
+  select { background-image: none; }
+
+  .btn {
+    background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+    padding: 8px 14px; color: var(--text); font-size: 13px; cursor: pointer;
+    font-family: var(--sans); transition: background .15s, border .15s;
+  }
+  .btn:hover { background: var(--border); }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+  .btn-danger { border-color: var(--danger-dim); color: var(--danger); }
+  .btn-danger:hover { background: var(--danger-dim); }
+  .btn-success { border-color: rgba(90,255,154,.2); color: var(--success); }
+  .btn-success:hover { background: rgba(90,255,154,.1); }
+
+  .form-row { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .form-row input, .form-row select { flex: 1; min-width: 120px; }
+
+  .destino-btns { display: flex; gap: 6px; }
+  .dest-btn {
+    padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--surface2); color: var(--muted); font-size: 12px;
+    cursor: pointer; font-family: var(--mono); transition: all .15s;
+  }
+  .dest-btn.active-barra   { background: rgba(232,255,90,.15); border-color: var(--accent); color: var(--accent); }
+  .dest-btn.active-cocina  { background: rgba(90,154,255,.15); border-color: #5a9aff; color: #5a9aff; }
+  .dest-btn.active-ambos   { background: rgba(90,255,154,.15); border-color: var(--success); color: var(--success); }
+
+  .badge-dest {
+    font-family: var(--mono); font-size: 11px; padding: 2px 8px;
+    border-radius: 20px; letter-spacing: .03em;
+  }
+  .bd-barra  { background: var(--accent-dim); color: var(--accent); }
+  .bd-cocina { background: rgba(90,154,255,.12); color: #5a9aff; }
+  .bd-ambos  { background: rgba(90,255,154,.12); color: var(--success); }
+
+  .precio { font-family: var(--mono); font-size: 13px; color: var(--muted); min-width: 55px; text-align: right; }
+  .categoria-header {
+    font-family: var(--mono); font-size: 11px; color: var(--accent);
+    letter-spacing: .08em; text-transform: uppercase;
+    padding: 8px 0 4px; margin-top: 6px; border-bottom: 1px solid var(--accent-dim);
+    margin-bottom: 4px;
+  }
+
+  .mesas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px,1fr)); gap: 10px; }
+  .mesa-chip {
+    aspect-ratio: 1; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; display: flex; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 16px; cursor: pointer;
+    transition: background .15s, border .15s; position: relative;
+  }
+  .mesa-chip:hover { border-color: var(--danger); }
+  .mesa-chip .del { position: absolute; top: 4px; right: 6px; font-size: 14px; color: var(--danger); display: none; }
+  .mesa-chip:hover .del { display: block; }
+
+  .add-row { display: flex; gap: 10px; margin-top: 1rem; }
+
+  .toast {
+    position: fixed; bottom: 2rem; right: 2rem; background: var(--accent); color: #0f0f0f;
+    font-family: var(--mono); font-size: 13px; padding: 10px 18px; border-radius: 8px;
+    opacity: 0; transform: translateY(8px); transition: all .25s; pointer-events: none;
+    z-index: 100;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  .nav-links { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+  .nav-link {
+    font-family: var(--mono); font-size: 12px; color: var(--muted);
+    text-decoration: none; padding: 5px 12px; border: 1px solid var(--border);
+    border-radius: 6px; transition: all .15s;
+  }
+  .nav-link:hover { color: var(--text); border-color: var(--text); }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">// admin</div>
+    <input type="password" id="pwd-input" placeholder="Contraseña" />
+    <div class="login-error" id="login-error">Contraseña incorrecta</div>
+    <button class="btn-accent" onclick="checkLogin()">Entrar</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-logo">// admin</div>
+    <button class="tab-btn active" onclick="showTab('mesas',this)">Mesas</button>
+    <button class="tab-btn" onclick="showTab('carta',this)">Carta</button>
+    <button class="tab-btn" onclick="showTab('enlaces',this)">Accesos</button>
+    <div class="spacer"></div>
+    <span class="tag-version">comandero v1</span>
+  </div>
+
+  <div class="main">
+    <!-- MESAS -->
+    <div class="section active" id="sec-mesas">
+      <h2>Mesas</h2>
+      <div class="card">
+        <div class="mesas-grid" id="mesas-grid"></div>
+        <div class="add-row">
+          <input type="text" id="nueva-mesa" placeholder="Nombre (ej: 4, Terraza 1, Barra)" style="flex:1" />
+          <button class="btn btn-success" onclick="addMesa()">+ Añadir</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARTA -->
+    <div class="section" id="sec-carta">
+      <h2>Carta</h2>
+
+      <!-- Nueva categoría -->
+      <div class="card" style="margin-bottom:1.5rem">
+        <h3>Nueva categoría</h3>
+        <div class="form-row">
+          <input type="text" id="cat-nombre" placeholder="Nombre de categoría (ej: Cervezas)" style="flex:1" />
+          <button class="btn btn-success" onclick="addCategoria()">+ Categoría</button>
+        </div>
+      </div>
+
+      <!-- Nuevo artículo -->
+      <div class="card" style="margin-bottom:1.5rem">
+        <h3>Nuevo artículo</h3>
+        <div class="form-row">
+          <input type="text" id="art-nombre" placeholder="Nombre del artículo" style="flex:2" />
+          <input type="number" id="art-precio" placeholder="Precio €" step="0.1" min="0" style="width:100px;flex:none" />
+        </div>
+        <div class="form-row" style="align-items:center;gap:14px">
+          <select id="art-cat" style="flex:1"><option value="">— Categoría —</option></select>
+          <div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:6px">Destino</div>
+            <div class="destino-btns">
+              <button class="dest-btn active-barra" id="db-barra" onclick="setDest('barra')">Barra</button>
+              <button class="dest-btn" id="db-cocina" onclick="setDest('cocina')">Cocina</button>
+              <button class="dest-btn" id="db-ambos" onclick="setDest('ambos')">Ambos</button>
+            </div>
+          </div>
+          <button class="btn btn-success" onclick="addArticulo()">+ Artículo</button>
+        </div>
+      </div>
+
+      <!-- Lista carta -->
+      <div class="card">
+        <h3>Artículos en carta</h3>
+        <div id="carta-lista"></div>
+      </div>
+    </div>
+
+    <!-- ACCESOS -->
+    <div class="section" id="sec-enlaces">
+      <h2>Accesos rápidos</h2>
+      <div class="card">
+        <p style="color:var(--muted);font-size:14px;margin-bottom:1.5rem">Comparte estos enlaces con tu equipo</p>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div class="row-item">
+            <span class="row-label">Camarero / Tomar nota</span>
+            <a class="nav-link" href="camarero.html">camarero.html ↗</a>
+          </div>
+          <div class="row-item">
+            <span class="row-label">Pantalla barra</span>
+            <a class="nav-link" href="barra.html">barra.html ↗</a>
+          </div>
+          <div class="row-item">
+            <span class="row-label">Pantalla cocina</span>
+            <a class="nav-link" href="cocina.html">cocina.html ↗</a>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:1rem">
+        <h3>Cambiar contraseña admin</h3>
+        <div class="form-row">
+          <input type="password" id="new-pwd" placeholder="Nueva contraseña" style="flex:1" />
+          <button class="btn" onclick="changePwd()">Guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { db } from './firebase.js';
+import {
+  ref, set, push, remove, onValue, get
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+// ─── CONTRASEÑA ──────────────────────────────────────────────────────────────
+const ADMIN_PWD_KEY = 'admin_pwd';
+
+window.checkLogin = () => {
+  const pwd = document.getElementById('pwd-input').value;
+  const stored = localStorage.getItem(ADMIN_PWD_KEY) || 'admin1234';
+  if (pwd === stored) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    init();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+  }
+};
+
+document.getElementById('pwd-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') window.checkLogin();
+});
+
+window.changePwd = () => {
+  const v = document.getElementById('new-pwd').value.trim();
+  if (!v) return;
+  localStorage.setItem(ADMIN_PWD_KEY, v);
+  toast('Contraseña actualizada');
+};
+
+// ─── TABS ────────────────────────────────────────────────────────────────────
+window.showTab = (name, btn) => {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + name).classList.add('active');
+  btn.classList.add('active');
+};
+
+// ─── TOAST ───────────────────────────────────────────────────────────────────
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ─── MESAS ───────────────────────────────────────────────────────────────────
+function renderMesas(mesas) {
+  const grid = document.getElementById('mesas-grid');
+  grid.innerHTML = '';
+  Object.entries(mesas || {}).forEach(([id, m]) => {
+    const chip = document.createElement('div');
+    chip.className = 'mesa-chip';
+    chip.innerHTML = `<span>${m.nombre}</span><span class="del" onclick="delMesa('${id}')">×</span>`;
+    grid.appendChild(chip);
+  });
+}
+
+window.addMesa = async () => {
+  const nombre = document.getElementById('nueva-mesa').value.trim();
+  if (!nombre) return;
+  await push(ref(db, 'mesas'), { nombre, estado: 'libre' });
+  document.getElementById('nueva-mesa').value = '';
+  toast('Mesa añadida');
+};
+
+window.delMesa = async id => {
+  if (!confirm('¿Eliminar esta mesa?')) return;
+  await remove(ref(db, 'mesas/' + id));
+  toast('Mesa eliminada');
+};
+
+// ─── CARTA ───────────────────────────────────────────────────────────────────
+let destino = 'barra';
+let cartaData = {};
+let categoriasData = {};
+
+window.setDest = d => {
+  destino = d;
+  document.querySelectorAll('.dest-btn').forEach(b => {
+    b.className = 'dest-btn';
+    if (b.id === 'db-' + d) b.classList.add('active-' + d);
+  });
+};
+
+window.addCategoria = async () => {
+  const nombre = document.getElementById('cat-nombre').value.trim();
+  if (!nombre) return;
+  await push(ref(db, 'categorias'), { nombre });
+  document.getElementById('cat-nombre').value = '';
+  toast('Categoría añadida');
+};
+
+window.addArticulo = async () => {
+  const nombre = document.getElementById('art-nombre').value.trim();
+  const precio = parseFloat(document.getElementById('art-precio').value);
+  const catId  = document.getElementById('art-cat').value;
+  if (!nombre || isNaN(precio) || !catId) { toast('Rellena todos los campos'); return; }
+  await push(ref(db, 'carta'), { nombre, precio, destino, catId });
+  document.getElementById('art-nombre').value = '';
+  document.getElementById('art-precio').value = '';
+  toast('Artículo añadido');
+};
+
+window.delArticulo = async id => {
+  await remove(ref(db, 'carta/' + id));
+  toast('Artículo eliminado');
+};
+
+window.toggleDestino = async (id, actual) => {
+  const orden = ['barra','cocina','ambos'];
+  const next = orden[(orden.indexOf(actual) + 1) % 3];
+  await set(ref(db, 'carta/' + id + '/destino'), next);
+};
+
+function renderCarta() {
+  const lista = document.getElementById('carta-lista');
+  if (!Object.keys(categoriasData).length) {
+    lista.innerHTML = '<p style="color:var(--muted);font-size:13px">Sin categorías aún</p>';
+    return;
+  }
+  lista.innerHTML = '';
+  Object.entries(categoriasData).forEach(([catId, cat]) => {
+    const arts = Object.entries(cartaData).filter(([,a]) => a.catId === catId);
+    const catEl = document.createElement('div');
+    catEl.innerHTML = `<div class="categoria-header">${cat.nombre}
+      <button class="btn btn-sm btn-danger" style="float:right;margin-top:-2px"
+        onclick="delCat('${catId}')">× eliminar</button></div>`;
+    arts.forEach(([id, a]) => {
+      const row = document.createElement('div');
+      row.className = 'row-item';
+      row.innerHTML = `
+        <span class="row-label">${a.nombre}</span>
+        <span class="precio">${a.precio.toFixed(2)} €</span>
+        <span class="badge-dest bd-${a.destino}" style="cursor:pointer"
+          onclick="toggleDestino('${id}','${a.destino}')">${a.destino}</span>
+        <button class="btn btn-sm btn-danger" onclick="delArticulo('${id}')">×</button>
+      `;
+      catEl.appendChild(row);
+    });
+    lista.appendChild(catEl);
+  });
+}
+
+window.delCat = async id => {
+  if (!confirm('¿Eliminar categoría y sus artículos?')) return;
+  const snaps = await get(ref(db, 'carta'));
+  const arts = snaps.val() || {};
+  const dels = Object.entries(arts).filter(([,a]) => a.catId === id).map(([aid]) =>
+    remove(ref(db, 'carta/' + aid)));
+  await Promise.all([...dels, remove(ref(db, 'categorias/' + id))]);
+  toast('Categoría eliminada');
+};
+
+function updateCatSelect() {
+  const sel = document.getElementById('art-cat');
+  sel.innerHTML = '<option value="">— Categoría —</option>';
+  Object.entries(categoriasData).forEach(([id, c]) => {
+    sel.innerHTML += `<option value="${id}">${c.nombre}</option>`;
+  });
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+function init() {
+  onValue(ref(db, 'mesas'), snap => renderMesas(snap.val()));
+  onValue(ref(db, 'categorias'), snap => {
+    categoriasData = snap.val() || {};
+    updateCatSelect();
+    renderCarta();
+  });
+  onValue(ref(db, 'carta'), snap => {
+    cartaData = snap.val() || {};
+    renderCarta();
+  });
+}
+</script>
+</body>
+</html>
