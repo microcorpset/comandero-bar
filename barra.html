@@ -6,31 +6,15 @@
 <title id="page-title">Barra · Comandero</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  /* ── VARIABLES POR ROL (se sobrescriben desde JS) ── */
   :root {
-    --accent:    #e8ff5a;
-    --accent-dim: rgba(232,255,90,0.13);
-    --accent-text: #1a1a1a;
-    --bg: #111;
-    --surface: #1a1a1a;
-    --surface2: #232323;
-    --border: #2c2c2c;
-    --text: #f0f0f0;
-    --muted: #555;
-    --sans: 'DM Sans', sans-serif;
-    --mono: 'DM Mono', monospace;
+    --accent: #e8ff5a; --accent-dim: rgba(232,255,90,0.13); --accent-text: #1a1a1a;
+    --bg: #111; --surface: #1a1a1a; --surface2: #232323; --border: #2c2c2c;
+    --text: #f0f0f0; --muted: #555; --sans: 'DM Sans', sans-serif; --mono: 'DM Mono', monospace;
   }
-  /* COCINA override se aplica vía JS añadiendo clase al :root */
-  .rol-cocina {
-    --accent: #5af0ff;
-    --accent-dim: rgba(90,240,255,0.12);
-    --accent-text: #001f24;
-  }
-
+  .rol-cocina { --accent: #5af0ff; --accent-dim: rgba(90,240,255,0.12); --accent-text: #001f24; }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; }
 
-  /* ── TOPBAR ── */
   .topbar {
     background: var(--surface); border-bottom: 1px solid var(--border);
     padding: 0 1rem; height: 54px; display: flex; align-items: center; gap: 12px;
@@ -41,23 +25,14 @@
   .badge-nuevos {
     background: var(--accent-dim); color: var(--accent);
     font-family: var(--mono); font-size: 12px; padding: 4px 12px;
-    border-radius: 20px; border: 1px solid var(--accent);
-    display: none;
+    border-radius: 20px; border: 1px solid var(--accent); display: none;
   }
   .clock { font-family: var(--mono); font-size: 13px; color: var(--muted); }
 
-  /* ── ALERTA NUEVA ── */
-  @keyframes flash-bg {
-    0%,100% { background: var(--bg); }
-    50%      { background: var(--accent-dim); }
-  }
-  @keyframes pulse-dot {
-    0%,100% { opacity: 1; transform: scale(1); }
-    50%      { opacity: .3; transform: scale(.7); }
-  }
+  @keyframes flash-bg { 0%,100%{background:var(--bg)} 50%{background:var(--accent-dim)} }
+  @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.3;transform:scale(.7)} }
   body.hay-nuevos { animation: flash-bg 1.4s ease-in-out infinite; }
 
-  /* ── GRID PEDIDOS ── */
   .pedidos-grid {
     padding: 1rem;
     display: grid;
@@ -65,72 +40,57 @@
     gap: 12px;
     align-items: start;
   }
-  .empty-state {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    min-height: 50vh; gap: 12px; color: var(--muted);
-  }
-  .empty-icon {
-    width: 56px; height: 56px; border: 2px solid var(--border);
-    border-radius: 12px; display: flex; align-items: center; justify-content: center;
-    font-size: 24px;
-  }
+  .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 50vh; gap: 12px; color: var(--muted); }
+  .empty-icon { width: 56px; height: 56px; border: 2px solid var(--border); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; }
   .empty-text { font-family: var(--mono); font-size: 14px; }
 
-  /* ── TARJETA MESA ── */
   .mesa-card {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: 14px; overflow: hidden;
-    transition: border-color .3s;
+    border-radius: 14px; overflow: hidden; transition: border-color .3s;
   }
   .mesa-card.nueva { border-color: var(--accent); animation: flash-bg 1.4s ease-in-out infinite; }
-  .mesa-card.nueva:hover { animation-play-state: paused; }
 
   .card-header {
     display: flex; align-items: center; gap: 8px;
     padding: 10px 14px; background: var(--surface2);
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--border); cursor: pointer;
   }
-  .dot {
-    width: 8px; height: 8px; border-radius: 50%; background: var(--accent);
-    flex-shrink: 0; animation: pulse-dot 1s ease-in-out infinite;
-    display: none;
-  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; animation: pulse-dot 1s ease-in-out infinite; display: none; }
   .mesa-card.nueva .dot { display: block; }
   .card-mesa-name { font-family: var(--mono); font-size: 14px; font-weight: 500; color: var(--accent); flex: 1; }
   .card-time { font-family: var(--mono); font-size: 11px; color: var(--muted); }
 
-  /* ── LÍNEAS ── */
+  /* Línea de pedido */
   .linea-row {
-    display: flex; align-items: center; gap: 8px;
     padding: 10px 14px; border-bottom: 1px solid var(--border);
     transition: opacity .25s;
   }
   .linea-row:last-child { border-bottom: none; }
   .linea-row.servida { opacity: .35; }
+
+  .linea-main { display: flex; align-items: center; gap: 8px; }
   .linea-qty { font-family: var(--mono); font-size: 16px; font-weight: 500; min-width: 24px; color: var(--accent); }
   .linea-row.servida .linea-qty { color: var(--muted); }
   .linea-nombre { flex: 1; font-size: 15px; }
-  .linea-nota { font-size: 12px; color: var(--muted); font-style: italic; }
+
+  /* Nota visible bajo el nombre */
+  .linea-nota {
+    margin-top: 4px; margin-left: 32px;
+    font-size: 12px; color: var(--accent); font-family: var(--mono);
+    background: var(--accent-dim); border-left: 2px solid var(--accent);
+    padding: 3px 8px; border-radius: 0 4px 4px 0;
+    display: inline-block;
+  }
+  .linea-row.servida .linea-nota { color: var(--muted); background: transparent; border-color: var(--border); }
 
   .btn-servido {
     font-family: var(--mono); font-size: 12px; padding: 6px 12px;
     border-radius: 8px; border: 1px solid var(--border);
     background: var(--surface2); color: var(--muted);
-    cursor: pointer; white-space: nowrap; transition: all .15s;
+    cursor: pointer; white-space: nowrap; transition: all .15s; flex-shrink: 0;
   }
   .btn-servido:active { background: var(--border); }
-  .btn-servido.hecho {
-    border-color: rgba(90,255,154,.25); color: #5aff9a;
-    background: rgba(90,255,154,.08); cursor: default;
-  }
-
-  /* Sonido visual */
-  @keyframes ring {
-    0%   { box-shadow: 0 0 0 0 var(--accent); }
-    70%  { box-shadow: 0 0 0 12px transparent; }
-    100% { box-shadow: 0 0 0 0 transparent; }
-  }
-  .mesa-card.nueva { animation: flash-bg 1.4s ease-in-out infinite, ring 1.4s ease-out infinite; }
+  .btn-servido.hecho { border-color: rgba(90,255,154,.25); color: #5aff9a; background: rgba(90,255,154,.08); cursor: default; }
 </style>
 </head>
 <body>
@@ -147,16 +107,13 @@
     <div class="empty-icon">—</div>
     <span class="empty-text">Sin pedidos pendientes</span>
   </div>
-  <div class="pedidos-grid" id="pedidos-grid"></div>
+  <div class="pedidos-grid" id="pedidos-grid" style="display:none"></div>
 </div>
 
 <script type="module">
 import { db } from './firebase.js';
-import {
-  ref, onValue, set, get
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-// ─── ROL: barra o cocina según URL ────────────────────────────────────────────
 const escocina = location.pathname.includes('cocina') || location.search.includes('rol=cocina');
 const ROL = escocina ? 'cocina' : 'barra';
 
@@ -166,14 +123,13 @@ if (ROL === 'cocina') {
   document.title = 'Cocina · Comandero';
 }
 
-// ─── RELOJ ────────────────────────────────────────────────────────────────────
 function tick() {
   document.getElementById('clock').textContent =
     new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
 }
 tick(); setInterval(tick, 10000);
 
-// ─── AUDIO beep Web Audio API ─────────────────────────────────────────────────
+// Audio beep
 let audioCtx;
 function beep() {
   try {
@@ -189,49 +145,42 @@ function beep() {
   } catch(e) {}
 }
 
-// ─── ESTADO LOCAL ────────────────────────────────────────────────────────────
 let mesasData = {};
-let pedidosPorMesa = {}; // mesaId → { lineaId → linea }
+let pedidosPorMesa = {};
 let vistos = new Set(JSON.parse(localStorage.getItem('vistos_' + ROL) || '[]'));
 let nuevosActivos = new Set();
+let primeraVez = true;
 
-function saveVistos() {
-  localStorage.setItem('vistos_' + ROL, JSON.stringify([...vistos]));
-}
+function saveVistos() { localStorage.setItem('vistos_' + ROL, JSON.stringify([...vistos])); }
 
-// ─── ESCUCHA MESAS ────────────────────────────────────────────────────────────
 onValue(ref(db, 'mesas'), snap => { mesasData = snap.val() || {}; });
 
-// ─── ESCUCHA PEDIDOS ─────────────────────────────────────────────────────────
 onValue(ref(db, 'pedidos'), snap => {
-  const allPedidos = snap.val() || {};
+  const all = snap.val() || {};
   pedidosPorMesa = {};
-
-  Object.entries(allPedidos).forEach(([mesaId, lineas]) => {
-    const miasLineas = Object.entries(lineas).filter(([,l]) =>
-      l.destino === ROL || l.destino === 'ambos'
-    );
-    if (miasLineas.length) pedidosPorMesa[mesaId] = Object.fromEntries(miasLineas);
+  Object.entries(all).forEach(([mesaId, lineas]) => {
+    const mias = Object.entries(lineas).filter(([,l]) => l.destino === ROL || l.destino === 'ambos');
+    if (mias.length) pedidosPorMesa[mesaId] = Object.fromEntries(mias);
   });
-
   detectarNuevos();
   renderPedidos();
+  if (!primeraVez && nuevosActivos.size > 0) beep();
+  primeraVez = false;
 });
 
 function detectarNuevos() {
   nuevosActivos.clear();
   Object.entries(pedidosPorMesa).forEach(([mesaId, lineas]) => {
     Object.keys(lineas).forEach(lineaId => {
-      const key = mesaId + '/' + lineaId;
-      if (!vistos.has(key) && lineas[lineaId].estado === 'pendiente') {
+      if (!vistos.has(mesaId + '/' + lineaId) && lineas[lineaId].estado === 'pendiente') {
         nuevosActivos.add(mesaId);
       }
     });
   });
-  const hayNuevos = nuevosActivos.size > 0;
-  document.body.classList.toggle('hay-nuevos', hayNuevos);
+  const hay = nuevosActivos.size > 0;
+  document.body.classList.toggle('hay-nuevos', hay);
   const badge = document.getElementById('badge-nuevos');
-  if (hayNuevos) {
+  if (hay) {
     badge.style.display = '';
     badge.textContent = nuevosActivos.size + (nuevosActivos.size === 1 ? ' nueva mesa' : ' mesas nuevas');
   } else {
@@ -239,7 +188,6 @@ function detectarNuevos() {
   }
 }
 
-// ─── RENDER ───────────────────────────────────────────────────────────────────
 function renderPedidos() {
   const grid = document.getElementById('pedidos-grid');
   const empty = document.getElementById('empty-state');
@@ -256,58 +204,53 @@ function renderPedidos() {
   grid.style.display = '';
   grid.innerHTML = '';
 
-  // Ordenar: nuevas primero, luego por tiempo
   mesasConPendientes
-    .sort(([aId], [bId]) => {
-      const aN = nuevosActivos.has(aId) ? 0 : 1;
-      const bN = nuevosActivos.has(bId) ? 0 : 1;
-      return aN - bN;
-    })
-    .forEach(([mesaId, lineas]) => {
-      const card = crearCard(mesaId, lineas);
-      grid.appendChild(card);
-    });
+    .sort(([aId],[bId]) => (nuevosActivos.has(aId) ? 0 : 1) - (nuevosActivos.has(bId) ? 0 : 1))
+    .forEach(([mesaId, lineas]) => grid.appendChild(crearCard(mesaId, lineas)));
 }
 
 function crearCard(mesaId, lineas) {
   const card = document.createElement('div');
-  const esNueva = nuevosActivos.has(mesaId);
-  card.className = 'mesa-card' + (esNueva ? ' nueva' : '');
+  card.className = 'mesa-card' + (nuevosActivos.has(mesaId) ? ' nueva' : '');
   card.id = 'card-' + mesaId;
 
-  const mesaNombre = mesasData[mesaId]?.nombre || mesaId;
+  const nombre = mesasData[mesaId]?.nombre || mesaId;
   const tiempos = Object.values(lineas).map(l => l.ts).filter(Boolean);
   const masViejo = tiempos.length ? Math.min(...tiempos) : null;
-  const tiempoStr = masViejo ? tiempoRelativo(masViejo) : '';
 
-  card.innerHTML = `
-    <div class="card-header">
-      <span class="dot"></span>
-      <span class="card-mesa-name">Mesa ${mesaNombre}</span>
-      <span class="card-time">${tiempoStr}</span>
-    </div>
-  `;
-
-  // Al tocar la tarjeta, marcar como vista
-  card.querySelector('.card-header').addEventListener('click', () => marcarVista(mesaId, lineas));
+  const header = document.createElement('div');
+  header.className = 'card-header';
+  header.innerHTML = `
+    <span class="dot"></span>
+    <span class="card-mesa-name">Mesa ${nombre}</span>
+    <span class="card-time">${masViejo ? tiempoRelativo(masViejo) : ''}</span>`;
+  header.addEventListener('click', () => marcarVista(mesaId, lineas));
+  card.appendChild(header);
 
   Object.entries(lineas)
     .filter(([,l]) => l.estado === 'pendiente')
     .sort(([,a],[,b]) => (a.ts||0) - (b.ts||0))
     .forEach(([lineaId, l]) => {
-      const key = mesaId + '/' + lineaId;
-      const servida = l.estado === 'servido';
       const row = document.createElement('div');
-      row.className = 'linea-row' + (servida ? ' servida' : '');
+      row.className = 'linea-row';
       row.id = 'linea-' + lineaId;
-      row.innerHTML = `
+
+      const main = document.createElement('div');
+      main.className = 'linea-main';
+      main.innerHTML = `
         <span class="linea-qty">${l.qty}</span>
         <span class="linea-nombre">${l.nombre}</span>
-        <button class="${servida ? 'btn-servido hecho' : 'btn-servido'}"
-          onclick="marcarServido('${mesaId}','${lineaId}',this)">
-          ${servida ? '✓ Servido' : 'Servido'}
-        </button>
-      `;
+        <button class="btn-servido" onclick="marcarServido('${mesaId}','${lineaId}',this)">Servido</button>`;
+      row.appendChild(main);
+
+      // Nota si existe
+      if (l.nota && l.nota.trim()) {
+        const nota = document.createElement('div');
+        nota.className = 'linea-nota';
+        nota.textContent = '↳ ' + l.nota;
+        row.appendChild(nota);
+      }
+
       card.appendChild(row);
     });
 
@@ -315,26 +258,23 @@ function crearCard(mesaId, lineas) {
 }
 
 function marcarVista(mesaId, lineas) {
-  Object.keys(lineas).forEach(lineaId => {
-    vistos.add(mesaId + '/' + lineaId);
-  });
+  Object.keys(lineas).forEach(lid => vistos.add(mesaId + '/' + lid));
   saveVistos();
   const card = document.getElementById('card-' + mesaId);
-  if (card) { card.classList.remove('nueva'); }
+  if (card) card.classList.remove('nueva');
   nuevosActivos.delete(mesaId);
   detectarNuevos();
 }
 
 window.marcarServido = async (mesaId, lineaId, btn) => {
-  btn.disabled = true;
-  btn.textContent = '…';
+  if (btn.classList.contains('hecho')) return;
+  btn.disabled = true; btn.textContent = '…';
   await set(ref(db, `pedidos/${mesaId}/${lineaId}/estado`), 'servido');
   vistos.add(mesaId + '/' + lineaId);
   saveVistos();
-  btn.className = 'btn-servido hecho';
-  btn.textContent = '✓ Servido';
+  btn.className = 'btn-servido hecho'; btn.textContent = '✓ Servido'; btn.disabled = false;
   btn.closest('.linea-row').classList.add('servida');
-  // ¿quedan pendientes en esta mesa?
+
   const snap = await get(ref(db, 'pedidos/' + mesaId));
   const lineas = snap.val() || {};
   const quedanMias = Object.values(lineas).filter(l =>
@@ -345,18 +285,10 @@ window.marcarServido = async (mesaId, lineaId, btn) => {
     if (card) card.classList.remove('nueva');
     nuevosActivos.delete(mesaId);
     detectarNuevos();
-    setTimeout(() => { renderPedidos(); }, 800);
+    setTimeout(() => renderPedidos(), 800);
   }
 };
 
-// ─── BEEP cuando llega nuevo pedido ──────────────────────────────────────────
-let primeraVez = true;
-onValue(ref(db, 'pedidos'), () => {
-  if (primeraVez) { primeraVez = false; return; }
-  if (nuevosActivos.size > 0) beep();
-});
-
-// ─── TIEMPO RELATIVO ─────────────────────────────────────────────────────────
 function tiempoRelativo(ts) {
   const diff = Math.floor((Date.now() - ts) / 60000);
   if (diff < 1) return 'ahora';
