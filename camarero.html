@@ -199,8 +199,10 @@
   .btn-cerrar { width: 100%; margin-top: .5rem; background: none; color: var(--danger); border: 1px solid var(--danger); border-radius: 8px; padding: 10px; font-family: var(--mono); font-size: 13px; cursor: pointer; }
 
   @media print {
-    body > *:not(#view-ticket) { display: none !important; }
+    body > * { display: none !important; }
     #view-ticket { display: block !important; }
+    #view-ticket > div:first-child { display: none !important; }
+    .ticket-card { border: none !important; border-radius: 0 !important; padding: 0 !important; max-width: 100% !important; }
     .btn-print, .btn-cerrar { display: none !important; }
   }
 </style>
@@ -257,6 +259,8 @@
     <button class="btn-enviar-drawer" id="btn-enviar-drawer" disabled onclick="enviarPedido()">Enviar pedido</button>
   </div>
 </div>
+
+<iframe id="iframe-print" style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;border:none"></iframe>
 
 <script type="module">
 import { db } from './firebase.js';
@@ -546,6 +550,49 @@ function renderDrawer() {
 }
 
 // ── Enviar ────────────────────────────────────────────────────────────────────
+// ── Impresión comanda via iframe ───────────────────────────────────────────────
+function imprimirComanda(nombreMesa, lineas, configLocal) {
+  const fecha = new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
+  const rows = lineas.map(l => `
+    <tr>
+      <td style="padding:4px 6px 4px 0;font-weight:bold;vertical-align:top;white-space:nowrap">${l.qty}×</td>
+      <td style="padding:4px 0;vertical-align:top">
+        ${l.nombre}
+        ${l.nota ? `<br><span style="font-size:11px;color:#555">↳ ${l.nota}</span>` : ''}
+      </td>
+      <td style="padding:4px 0 4px 8px;text-align:right;vertical-align:top;white-space:nowrap">${(l.precio*l.qty).toFixed(2)}€</td>
+    </tr>`).join('');
+
+  const localHeader = configLocal?.nombre
+    ? `<div style="font-weight:bold;font-size:14px">${configLocal.nombre}</div>
+       ${configLocal.direccion ? `<div>${configLocal.direccion}</div>` : ''}` : '';
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{font-family:monospace;font-size:13px;padding:8px;width:100%}
+      .local{font-size:11px;color:#666;margin-bottom:8px;border-bottom:1px dashed #ccc;padding-bottom:6px}
+      h2{font-size:15px;font-weight:bold;margin-bottom:2px}
+      .sub{font-size:11px;color:#666;margin-bottom:10px}
+      table{width:100%;border-collapse:collapse}
+      tr{border-bottom:1px solid #eee}
+      tr:last-child{border-bottom:none}
+    </style></head><body>
+    ${localHeader ? `<div class="local">${localHeader}</div>` : ''}
+    <h2>Mesa ${nombreMesa}</h2>
+    <div class="sub">${fecha}</div>
+    <table>${rows}</table>
+    </body></html>`;
+
+  const iframe = document.getElementById('iframe-print');
+  iframe.srcdoc = html;
+  iframe.onload = () => {
+    try { iframe.contentWindow.focus(); iframe.contentWindow.print(); }
+    catch(e) {}
+  };
+}
+
+// ── Enviar ────────────────────────────────────────────────────────────────────
 window.enviarPedido = async () => {
   if (!mesaId || !Object.keys(carrito).length) return;
   const btn1 = document.getElementById('btn-enviar');
@@ -556,13 +603,18 @@ window.enviarPedido = async () => {
   await set(ref(db, 'mesas/' + mesaId + '/estado'), 'ocupada');
   document.getElementById('btn-cuenta').style.display = '';
 
+  const lineasImprimir = [];
   for (const [artId, {art, qty, nota}] of Object.entries(carrito)) {
     await push(ref(db, 'pedidos/' + mesaId), {
       artId, nombre: art.nombre, precio: Number(art.precio),
       qty, destino: art.destino, estado: 'pendiente',
       nota: nota || '', ts: Date.now()
     });
+    lineasImprimir.push({ nombre: art.nombre, precio: Number(art.precio), qty, nota: nota || '' });
   }
+
+  // Imprimir comanda automáticamente
+  imprimirComanda(mesaNombre, lineasImprimir, configLocal);
 
   carrito = {};
   cerrarDrawer();
