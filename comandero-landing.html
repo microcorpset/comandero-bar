@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Comandero Digital · JON GLEZ</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#C9A84C;--gold2:#E8D5A3;--rust:#C45C26;--sage:#5A7A50;
+  --charcoal:#1C1C1A;--ink:#0D0D0B;--cream:#F5F0E8;--paper:#FAF8F4;--paper2:#F0EDE4;
+  --border:#E0D8C8;--warm:#7A6E60;
+  --ff-display:'Cormorant Garamond',Georgia,serif;
+  --ff-body:'Outfit',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--ff-body);background:var(--paper);color:var(--ink);overflow-x:hidden}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;transition:background .3s,box-shadow .3s}
+nav.scrolled{background:rgba(250,248,244,.95);backdrop-filter:blur(12px);box-shadow:0 1px 0 var(--border)}
+.nav-brand{font-family:var(--ff-display);font-size:1.3rem;font-weight:700;color:var(--ink);text-decoration:none}
+.nav-brand span{color:var(--gold)}
+.nav-cta{background:var(--ink);color:var(--cream);border:none;border-radius:50px;padding:.6rem 1.4rem;font-family:var(--ff-body);font-size:.85rem;font-weight:500;cursor:pointer;transition:background .2s;text-decoration:none;display:inline-block}
+.nav-cta:hover{background:#3A3830}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;background:var(--charcoal);position:relative;overflow:hidden;padding:6rem 2rem 4rem}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 30% 50%,rgba(201,168,76,.1),transparent 65%),radial-gradient(ellipse 50% 70% at 85% 80%,rgba(90,122,80,.07),transparent 60%)}
+.hero-wrap{max-width:1100px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;position:relative;z-index:1}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:.5rem;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.25);border-radius:20px;padding:.35rem .9rem;font-size:.75rem;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;font-weight:500;margin-bottom:1.5rem}
+.hero-title{font-family:var(--ff-display);font-size:clamp(2.6rem,5vw,4.2rem);font-weight:700;color:#FAF8F4;line-height:1.08;letter-spacing:-.01em;margin-bottom:1.2rem}
+.hero-title em{color:var(--gold);font-style:italic}
+.hero-sub{font-size:1.05rem;color:rgba(250,248,244,.55);line-height:1.7;margin-bottom:2rem;max-width:440px}
+.hero-actions{display:flex;gap:.9rem;flex-wrap:wrap}
+.btn-primary{background:var(--gold);color:var(--charcoal);border:none;border-radius:50px;padding:.85rem 2rem;font-family:var(--ff-body);font-size:.95rem;font-weight:600;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block}
+.btn-primary:hover{background:var(--gold2);transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:rgba(250,248,244,.7);border:1px solid rgba(250,248,244,.2);border-radius:50px;padding:.85rem 1.8rem;font-family:var(--ff-body);font-size:.95rem;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block}
+.btn-ghost:hover{border-color:rgba(250,248,244,.5);color:#FAF8F4}
+.hero-price-tag{display:flex;align-items:baseline;gap:.3rem;margin-top:1.5rem}
+.hero-price-num{font-family:var(--ff-display);font-size:2rem;font-weight:700;color:var(--gold)}
+.hero-price-label{font-size:.8rem;color:rgba(250,248,244,.4);letter-spacing:.04em}
+
+/* HERO MOCKUPS */
+.hero-screens{display:flex;gap:1rem;align-items:flex-end;justify-content:center;flex-wrap:wrap}
+
+/* ── Pantallitas mini ── */
+.scr-phone{background:#1C1C1A;border:1px solid #3A3830;border-radius:18px;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,.5),0 0 0 1px rgba(201,168,76,.08)}
+.scr-notch{height:14px;display:flex;align-items:center;justify-content:center;background:#1C1C1A}
+.scr-notch-bar{width:50px;height:4px;background:#2A2A28;border-radius:2px}
+.scr-body{padding:10px;font-family:'Outfit',sans-serif}
+
+/* camarero screen */
+.c-topbar{background:#f7f5f0;padding:6px 8px;display:flex;align-items:center;gap:6px;border-bottom:1px solid #e0ddd6;margin:-10px -10px 8px}
+.c-topbar-title{font-family:'DM Mono',monospace;font-size:8px;font-weight:500;color:#1a1a1a;flex:1}
+.c-mesa-badge{background:#1a1a1a;color:#fff;font-size:6px;padding:2px 6px;border-radius:10px;font-family:monospace}
+.c-btn-carrito{background:none;border:1px solid #3d7aff;border-radius:5px;padding:2px 6px;font-size:6px;color:#3d7aff;font-family:monospace}
+.c-cat{padding:5px 8px 3px;font-size:6px;color:#999;text-transform:uppercase;letter-spacing:.08em;font-weight:500;background:#f7f5f0;border-bottom:1px solid #e0ddd6;display:flex;align-items:center;gap:4px}
+.c-cat-count{background:rgba(61,122,255,.1);color:#3d7aff;font-size:5px;padding:1px 4px;border-radius:8px}
+.c-art{display:flex;align-items:center;gap:5px;padding:6px 8px;background:#fff;border-bottom:1px solid #f0ede6}
+.c-art-name{flex:1;font-size:7.5px;color:#1a1a1a}
+.c-art-price{font-size:6.5px;color:#999;font-family:monospace}
+.c-qty-ctrl{display:flex;align-items:center}
+.c-qty-btn{width:16px;height:16px;background:#f0ede6;border:1px solid #e0ddd6;display:flex;align-items:center;justify-content:center;font-size:11px;color:#1a1a1a;line-height:1}
+.c-qty-btn:first-child{border-radius:4px 0 0 4px}
+.c-qty-btn:last-child{border-radius:0 4px 4px 0}
+.c-qty-num{width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#3d7aff;border-top:1px solid #e0ddd6;border-bottom:1px solid #e0ddd6;background:#fff}
+.c-nota{padding:2px 8px 5px 24px;display:flex;align-items:center;gap:4px;background:#fff}
+.c-nota-lbl{font-size:5.5px;color:#999}
+.c-nota-inp{flex:1;background:#f7f5f0;border:1px solid #e0ddd6;border-radius:4px;padding:2px 4px;font-size:6px;color:#888;font-style:italic}
+.c-bottom{padding:6px 8px;background:#fff;border-top:1px solid #e0ddd6;display:flex;align-items:center;gap:5px;margin:8px -10px -10px}
+.c-bottom-info{flex:1}
+.c-bottom-sub{font-size:5.5px;color:#999;font-family:monospace}
+.c-bottom-total{font-size:9px;font-weight:500;color:#1a1a1a;font-family:monospace}
+.c-btn-env{background:#1a1a1a;color:#fff;border-radius:5px;padding:4px 8px;font-size:6.5px;font-family:monospace;font-weight:500}
+
+/* barra/cocina screen */
+.b-topbar{background:#1a1a1a;padding:6px 8px;display:flex;align-items:center;gap:5px;border-bottom:1px solid #2c2c2c}
+.b-title{font-family:monospace;font-size:9px;color:#e8ff5a;flex:1}
+.b-badge{background:rgba(232,255,90,.13);color:#e8ff5a;font-size:5.5px;padding:2px 6px;border-radius:10px;border:1px solid #e8ff5a}
+.b-card{background:#1a1a1a;border:1px solid #2c2c2c;border-radius:8px;margin:6px 0;overflow:hidden}
+.b-card.nueva{border-color:#e8ff5a;animation:flash-mini 1.4s ease-in-out infinite}
+@keyframes flash-mini{0%,100%{background:#111}50%{background:rgba(232,255,90,.08)}}
+.b-card-hdr{background:#232323;padding:5px 8px;display:flex;align-items:center;gap:5px;border-bottom:1px solid #2c2c2c}
+.b-dot{width:5px;height:5px;border-radius:50%;background:#e8ff5a;animation:pulse-mini 1s ease-in-out infinite}
+@keyframes pulse-mini{0%,100%{opacity:1}50%{opacity:.2}}
+.b-mesa{font-family:monospace;font-size:8px;font-weight:500;color:#e8ff5a;flex:1}
+.b-time{font-size:6px;color:#555;font-family:monospace}
+.b-linea{display:flex;align-items:center;gap:5px;padding:5px 8px;border-bottom:1px solid #2c2c2c}
+.b-qty{font-size:9px;font-weight:500;color:#e8ff5a;min-width:14px;font-family:monospace}
+.b-nombre{flex:1;font-size:7.5px;color:#f0f0f0}
+.b-nota{margin:0 8px 5px 21px;font-size:6px;color:#e8ff5a;background:rgba(232,255,90,.08);border-left:2px solid #e8ff5a;padding:2px 5px;border-radius:0 3px 3px 0;font-family:monospace}
+.b-btn-serv{font-size:5.5px;padding:3px 6px;border-radius:5px;border:1px solid #2c2c2c;background:#232323;color:#555;font-family:monospace}
+.b-btn-serv.ok{border-color:rgba(90,255,154,.25);color:#5aff9a;background:rgba(90,255,154,.08)}
+
+/* cocina override — cian */
+.b-title.cocina{color:#5af0ff}
+.b-badge.cocina{background:rgba(90,240,255,.12);color:#5af0ff;border-color:#5af0ff}
+.b-card.nueva.cocina{border-color:#5af0ff}
+.b-dot.cocina{background:#5af0ff}
+.b-qty.cocina{color:#5af0ff}
+.b-mesa.cocina{color:#5af0ff}
+.b-nota.cocina{color:#5af0ff;background:rgba(90,240,255,.08);border-color:#5af0ff}
+
+/* admin screen */
+.adm-topbar{background:#1a1a1a;padding:5px 8px;display:flex;align-items:center;gap:5px;border-bottom:1px solid #2c2c2c}
+.adm-logo{font-family:monospace;font-size:8px;color:#e8ff5a}
+.adm-tab{font-size:6px;padding:2px 6px;border-radius:4px;border:none;cursor:default;font-family:sans-serif}
+.adm-tab.active{background:rgba(232,255,90,.12);color:#e8ff5a}
+.adm-tab.off{background:none;color:#555}
+.adm-body{padding:8px}
+.adm-section{font-size:5.5px;color:#555;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;font-family:monospace}
+.adm-mesas{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin-bottom:8px}
+.adm-mesa{background:#232323;border:1px solid #2c2c2c;border-radius:5px;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-family:monospace;font-size:8px;color:#f0f0f0}
+.adm-mesa.ocupada{border-color:#3d7aff;background:rgba(61,122,255,.06);color:#3d7aff}
+.adm-art{display:flex;align-items:center;gap:4px;padding:4px 5px;background:#232323;border-radius:5px;margin-bottom:3px}
+.adm-art-name{flex:1;font-size:7px;color:#f0f0f0}
+.adm-art-price{font-size:6px;color:#555;font-family:monospace}
+.adm-dest{font-size:5.5px;padding:1px 5px;border-radius:8px}
+.adm-dest.barra{background:rgba(232,255,90,.12);color:#e8ff5a}
+.adm-dest.cocina{background:rgba(90,154,255,.12);color:#5a9aff}
+.adm-dest.ambos{background:rgba(90,255,154,.12);color:#5aff9a}
+
+/* ticket screen */
+.tkt-body{background:#faf8f4;padding:10px;font-family:monospace}
+.tkt-local{text-align:center;margin-bottom:6px;padding-bottom:6px;border-bottom:1px dashed #e0ddd6}
+.tkt-local-name{font-size:9px;font-weight:700;color:#1a1a1a}
+.tkt-local-addr{font-size:6px;color:#888;margin-top:1px}
+.tkt-mesa{font-size:11px;font-weight:500;color:#1a1a1a;text-align:center;margin-bottom:2px}
+.tkt-fecha{font-size:6px;color:#999;text-align:center;margin-bottom:6px}
+.tkt-linea{display:flex;justify-content:space-between;padding:3px 0;font-size:7px;border-bottom:1px solid #f0ede6;color:#1a1a1a}
+.tkt-total{display:flex;justify-content:space-between;font-size:9px;font-weight:700;margin-top:5px;padding-top:5px;border-top:2px solid #1a1a1a}
+.tkt-footer{text-align:center;font-size:6px;color:#999;margin-top:6px;padding-top:6px;border-top:1px dashed #e0ddd6;font-style:italic}
+
+/* WRAP */
+.wrap{max-width:1060px;margin:0 auto;padding:0 1.5rem;position:relative;z-index:1}
+.section-label{display:inline-block;font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);font-weight:500;margin-bottom:1rem}
+.section-title{font-family:var(--ff-display);font-size:clamp(2rem,4vw,3rem);font-weight:700;color:var(--ink);line-height:1.1;margin-bottom:1.2rem}
+.section-title em{color:var(--gold);font-style:italic}
+.section-sub{font-size:1rem;color:var(--warm);line-height:1.7;max-width:520px;margin-bottom:3rem}
+
+/* PROBLEM */
+.problem{padding:5rem 0;background:var(--paper2)}
+.problem-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.2rem}
+.problem-card{background:var(--paper);border:1px solid var(--border);border-radius:12px;padding:1.5rem}
+.problem-icon{font-size:1.8rem;margin-bottom:.8rem}
+.problem-title{font-family:var(--ff-display);font-size:1.1rem;font-weight:600;margin-bottom:.4rem}
+.problem-desc{font-size:.85rem;color:var(--warm);line-height:1.6}
+
+/* HOW */
+.how{padding:5rem 0}
+.flows{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}
+.flow-side{display:flex;flex-direction:column;gap:0}
+.flow-title{font-family:var(--ff-display);font-size:1.4rem;font-weight:600;margin-bottom:1.5rem;display:flex;align-items:center;gap:.6rem}
+.flow-step{display:flex;gap:1rem;padding:1rem 0;position:relative}
+.flow-step:not(:last-child)::after{content:'';position:absolute;left:18px;top:44px;bottom:-4px;width:1px;background:var(--border)}
+.step-dot{width:36px;height:36px;border-radius:50%;background:var(--charcoal);color:var(--gold);display:flex;align-items:center;justify-content:center;font-family:var(--ff-display);font-size:1rem;font-weight:700;flex-shrink:0}
+.flow-step.active .step-dot{background:var(--gold);color:var(--charcoal)}
+.step-content{padding-top:.35rem}
+.step-title{font-weight:500;font-size:.92rem;color:var(--ink);margin-bottom:.2rem}
+.step-desc{font-size:.82rem;color:var(--warm);line-height:1.55}
+@media(max-width:750px){.flows{grid-template-columns:1fr}}
+
+/* SCREENS */
+.screens{padding:4rem 0 5rem;background:var(--paper2)}
+.scr-card{background:var(--paper);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.scr-card-lbl{padding:.7rem 1rem;border-bottom:1px solid var(--border);font-size:.75rem;font-weight:500;color:var(--ink);display:flex;align-items:center;gap:.5rem}
+.scr-card-body{padding:1.5rem 1rem;display:flex;justify-content:center;background:var(--paper2)}
+
+/* FEATURES */
+.features{padding:5rem 0}
+.feats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem}
+.feat-card{background:var(--paper2);border:1px solid var(--border);border-radius:12px;padding:1.5rem}
+.feat-icon{font-size:1.5rem;margin-bottom:.8rem}
+.feat-title{font-family:var(--ff-display);font-size:1.05rem;font-weight:600;margin-bottom:.4rem}
+.feat-desc{font-size:.84rem;color:var(--warm);line-height:1.6}
+
+/* PRICING */
+.pricing{padding:5rem 0;background:var(--paper2)}
+.pricing-card{max-width:560px;margin:0 auto;background:var(--charcoal);border-radius:20px;padding:2.5rem;position:relative;overflow:hidden}
+.pricing-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(201,168,76,.12),transparent 70%);pointer-events:none}
+.pricing-price{display:flex;align-items:baseline;gap:.2rem;margin-bottom:.5rem}
+.pricing-currency{font-size:1.5rem;font-weight:500;color:var(--gold)}
+.pricing-num{font-family:var(--ff-display);font-size:5rem;font-weight:700;color:#FAF8F4;line-height:1;letter-spacing:-.03em}
+.pricing-note{font-size:.82rem;color:rgba(250,248,244,.4);margin-bottom:2rem}
+.pricing-feats{display:flex;flex-direction:column;gap:.6rem;margin-bottom:2rem}
+.pricing-feat{display:flex;align-items:flex-start;gap:.6rem;font-size:.85rem;color:rgba(250,248,244,.8);line-height:1.5}
+.pricing-feat::before{content:'✓';color:var(--gold);font-weight:600;flex-shrink:0;margin-top:.05rem}
+.pricing-divider{border:none;border-top:1px solid rgba(250,248,244,.1);margin-bottom:2rem}
+.btn-pricing{width:100%;background:var(--gold);color:var(--charcoal);border:none;border-radius:50px;padding:1rem;font-family:var(--ff-body);font-size:1rem;font-weight:600;cursor:pointer;transition:all .2s;margin-bottom:1rem}
+.btn-pricing:hover{background:var(--gold2);transform:translateY(-1px)}
+.pricing-compat{text-align:center;font-size:.78rem;color:rgba(250,248,244,.35)}
+
+/* PACK */
+.pack-banner{max-width:560px;margin:1.5rem auto 0;background:rgba(90,122,80,.12);border:1px solid rgba(90,122,80,.3);border-radius:12px;padding:1.2rem 1.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+.pack-text{flex:1;font-size:.88rem;color:var(--warm);line-height:1.5}
+.pack-text strong{color:var(--ink)}
+.pack-price{font-family:var(--ff-display);font-size:1.8rem;font-weight:700;color:var(--sage);white-space:nowrap}
+.pack-sub{font-size:.72rem;color:var(--warm)}
+
+/* FAQ */
+.faq{padding:4rem 0 5rem;background:var(--paper2)}
+.faq-list{margin-top:2.5rem;display:flex;flex-direction:column;gap:0}
+.faq-item{border-top:1px solid var(--border);padding:1.2rem 0}
+.faq-item:last-child{border-bottom:1px solid var(--border)}
+.faq-q{font-family:var(--ff-display);font-size:1.05rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:1rem;user-select:none}
+.faq-q::after{content:'+';font-size:1.3rem;color:var(--gold);flex-shrink:0;transition:transform .2s;font-family:var(--ff-body);font-weight:300}
+.faq-item.open .faq-q::after{transform:rotate(45deg)}
+.faq-a{display:none;font-size:.86rem;color:var(--warm);line-height:1.7;padding-top:.7rem;max-width:680px}
+.faq-item.open .faq-a{display:block}
+
+/* CTA BOTTOM */
+.cta-bottom{padding:5rem 0;background:var(--charcoal);text-align:center;position:relative;overflow:hidden}
+.cta-bottom::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 50% 50%,rgba(201,168,76,.1),transparent 65%);pointer-events:none}
+.cta-bottom .section-label{color:var(--gold)}
+.cta-bottom .section-title{color:#FAF8F4}
+.cta-bottom .section-sub{color:rgba(250,248,244,.5);max-width:460px;margin:0 auto 2rem}
+
+/* FOOTER */
+footer{background:var(--ink);color:rgba(250,248,244,.4);padding:2rem 1.5rem;text-align:center;font-size:.8rem}
+footer a{color:var(--gold2);text-decoration:none}
+footer a:hover{text-decoration:underline}
+.footer-name{font-family:var(--ff-display);font-size:1.4rem;color:#FAF8F4;margin-bottom:.5rem}
+
+@media(max-width:900px){
+  .hero-wrap{grid-template-columns:1fr;gap:3rem}
+  .hero-screens{order:-1}
+}
+@media(max-width:600px){
+  .hero{padding:5rem 1rem 3rem}
+  .wrap{padding:0 1rem}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-brand">JON <span>GLEZ</span></a>
+  <a href="#pricing" class="nav-cta">Lo quiero · 90€</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-wrap">
+    <div class="hero-content">
+      <div class="hero-eyebrow">🧾 Comandero Digital para Hostelería</div>
+      <h1 class="hero-title">Las comandas,<br>de la mesa <em>a la cocina</em><br>en un segundo</h1>
+      <p class="hero-sub">El camarero toma nota desde el móvil. El pedido llega al instante a barra y cocina, cada uno ve solo lo suyo. Sin papel, sin gritos, sin errores. Funciona en cualquier dispositivo con navegador.</p>
+      <div class="hero-actions">
+        <a href="#how" class="btn-primary">Ver cómo funciona</a>
+        <a href="#pricing" class="btn-ghost">Ver precio →</a>
+      </div>
+      <div class="hero-price-tag">
+        <span class="hero-price-num">90€</span>
+        <span class="hero-price-label">· pago único · sin cuota mensual</span>
+      </div>
+    </div>
+
+    <!-- HERO MOCKUPS -->
+    <div class="hero-screens">
+      <!-- Camarero -->
+      <div style="position:relative">
+        <div class="scr-phone" style="width:165px">
+          <div class="scr-notch"><div class="scr-notch-bar"></div></div>
+          <div class="scr-body" style="padding:0">
+            <div class="c-topbar">
+              <span class="c-topbar-title">Camarero</span>
+              <span class="c-mesa-badge">Mesa 3</span>
+              <span class="c-btn-carrito">🧾 18,50€ <span style="background:#3d7aff;color:#fff;border-radius:8px;padding:0 3px;font-size:5px">3</span></span>
+            </div>
+            <div class="c-cat">Cervezas <span class="c-cat-count">2</span> <span style="margin-left:auto;font-size:8px;color:#aaa">▾</span></div>
+            <div class="c-art">
+              <span class="c-art-name">Cerveza caña</span>
+              <span class="c-art-price">1,80€</span>
+              <div class="c-qty-ctrl">
+                <div class="c-qty-btn">−</div>
+                <div class="c-qty-num">2</div>
+                <div class="c-qty-btn">+</div>
+              </div>
+            </div>
+            <div class="c-art">
+              <span class="c-art-name">Tónica</span>
+              <span class="c-art-price">2,50€</span>
+              <div class="c-qty-ctrl">
+                <div class="c-qty-btn">−</div>
+                <div class="c-qty-num">0</div>
+                <div class="c-qty-btn">+</div>
+              </div>
+            </div>
+            <div class="c-cat" style="margin-top:2px">Tapas <span style="margin-left:auto;font-size:8px;color:#aaa">▾</span></div>
+            <div class="c-art">
+              <span class="c-art-name">Entrecot</span>
+              <span class="c-art-price">14,00€</span>
+              <div class="c-qty-ctrl">
+                <div class="c-qty-btn">−</div>
+                <div class="c-qty-num">1</div>
+                <div class="c-qty-btn">+</div>
+              </div>
+            </div>
+            <div class="c-nota">
+              <span class="c-nota-lbl">Nota:</span>
+              <span class="c-nota-inp">poco hecho, sin sal</span>
+            </div>
+            <div class="c-bottom">
+              <div class="c-bottom-info">
+                <div class="c-bottom-sub">2 artículos</div>
+                <div class="c-bottom-total">18,50 €</div>
+              </div>
+              <div class="c-btn-env">Enviar</div>
+            </div>
+          </div>
+        </div>
+        <div style="position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);background:rgba(61,122,255,.15);border:1px solid rgba(61,122,255,.4);border-radius:20px;padding:.22rem .7rem;font-size:.62rem;color:#3d7aff;white-space:nowrap;font-weight:500;font-family:'Outfit',sans-serif">📋 Camarero</div>
+      </div>
+
+      <!-- Barra -->
+      <div style="position:relative">
+        <div class="scr-phone" style="width:160px">
+          <div class="scr-notch"><div class="scr-notch-bar"></div></div>
+          <div class="scr-body" style="padding:0">
+            <div class="b-topbar">
+              <span class="b-title">Barra</span>
+              <span class="b-badge">1 nueva</span>
+              <span style="font-size:6px;color:#555;font-family:monospace">21:34</span>
+            </div>
+            <div style="padding:6px">
+              <div class="b-card nueva">
+                <div class="b-card-hdr">
+                  <div class="b-dot"></div>
+                  <span class="b-mesa">Mesa 3</span>
+                  <span class="b-time">ahora</span>
+                </div>
+                <div class="b-linea">
+                  <span class="b-qty">2×</span>
+                  <span class="b-nombre">Cerveza caña</span>
+                  <span class="b-btn-serv">Servido</span>
+                </div>
+                <div class="b-linea">
+                  <span class="b-qty">1×</span>
+                  <span class="b-nombre">Agua sin gas</span>
+                  <span class="b-btn-serv">Servido</span>
+                </div>
+              </div>
+              <div class="b-card" style="opacity:.4">
+                <div class="b-card-hdr">
+                  <span class="b-mesa">Mesa 1</span>
+                  <span class="b-time">hace 8 min</span>
+                </div>
+                <div class="b-linea">
+                  <span class="b-qty">3×</span>
+                  <span class="b-nombre">Vino tinto copa</span>
+                  <span class="b-btn-serv ok">✓ Servido</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);background:rgba(232,255,90,.1);border:1px solid rgba(232,255,90,.4);border-radius:20px;padding:.22rem .7rem;font-size:.62rem;color:#c9a84c;white-space:nowrap;font-weight:500;font-family:'Outfit',sans-serif">🍺 Barra</div>
+      </div>
+
+      <!-- Cocina -->
+      <div style="position:relative">
+        <div class="scr-phone" style="width:155px">
+          <div class="scr-notch"><div class="scr-notch-bar"></div></div>
+          <div class="scr-body" style="padding:0">
+            <div class="b-topbar">
+              <span class="b-title cocina">Cocina</span>
+              <span class="b-badge cocina">1 nueva</span>
+            </div>
+            <div style="padding:6px">
+              <div class="b-card nueva cocina">
+                <div class="b-card-hdr">
+                  <div class="b-dot cocina"></div>
+                  <span class="b-mesa cocina">Mesa 3</span>
+                  <span class="b-time">ahora</span>
+                </div>
+                <div class="b-linea">
+                  <span class="b-qty cocina">1×</span>
+                  <span class="b-nombre">Entrecot</span>
+                  <span class="b-btn-serv">Servido</span>
+                </div>
+                <div class="b-nota cocina">↳ poco hecho, sin sal</div>
+                <div class="b-linea">
+                  <span class="b-qty cocina">2×</span>
+                  <span class="b-nombre">Croquetas</span>
+                  <span class="b-btn-serv">Servido</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);background:rgba(90,240,255,.1);border:1px solid rgba(90,240,255,.4);border-radius:20px;padding:.22rem .7rem;font-size:.62rem;color:#5af0ff;white-space:nowrap;font-weight:500;font-family:'Outfit',sans-serif">🍳 Cocina</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="problem">
+  <div class="wrap">
+    <span class="section-label">El problema</span>
+    <h2 class="section-title">Lo que cuesta<br>sin un sistema</h2>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="problem-icon">📢</div>
+        <div class="problem-title">Gritos y malentendidos</div>
+        <div class="problem-desc">El camarero grita la comanda por encima del ruido. La cocina entiende otra cosa. El cliente recibe un plato distinto al que pidió.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">📝</div>
+        <div class="problem-title">Papel que se pierde</div>
+        <div class="problem-desc">Comandas escritas a mano que se mojan, se pierden o son ilegibles. Cada vez que cambia el camarero, hay que explicarlo todo otra vez.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">🔄</div>
+        <div class="problem-title">Platos que se confunden</div>
+        <div class="problem-desc">La barra no sabe qué está servido y qué no. Se llevan bebidas que ya están en la mesa, o se olvidan las que faltan.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">🕐</div>
+        <div class="problem-title">Tiempo perdido</div>
+        <div class="problem-desc">El camarero va y viene entre la cocina y las mesas para confirmar pedidos. Tiempo que podría dedicar a los clientes.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="wrap">
+    <span class="section-label">¿Cómo funciona?</span>
+    <h2 class="section-title">Tres flujos,<br>una solución</h2>
+    <p class="section-sub">El camarero toma nota. La cocina y la barra reciben. Cada uno ve exactamente lo que necesita, en tiempo real.</p>
+    <div class="flows">
+      <div class="flow-side">
+        <div class="flow-title">📋 El camarero</div>
+        <div class="flow-step active">
+          <div class="step-dot">1</div>
+          <div class="step-content">
+            <div class="step-title">Elige la mesa y abre la carta</div>
+            <div class="step-desc">Ve todas las mesas de un vistazo. Las ocupadas aparecen marcadas en azul. Al tocar una abre la carta completa organizada por categorías colapsables.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-dot">2</div>
+          <div class="step-content">
+            <div class="step-title">Añade platos con + y − y escribe notas</div>
+            <div class="step-desc">Toca el + del artículo para añadirlo. Aparece un campo de nota para escribir "poco hecho", "sin cebolla", "para el niño"… Se puede repasar todo en el resumen antes de enviar.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-dot">3</div>
+          <div class="step-content">
+            <div class="step-title">Pulsa Enviar — llega al instante</div>
+            <div class="step-desc">Con un toque el pedido llega a barra y cocina. El sistema separa automáticamente lo que va a cada sitio. Se genera un PDF de comanda descargado al móvil.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-dot">4</div>
+          <div class="step-content">
+            <div class="step-title">Saca el ticket y cierra la mesa</div>
+            <div class="step-desc">Cuando el cliente pide la cuenta, el camarero genera el ticket con el nombre del local, todos los platos y el total. Imprime o muestra en pantalla. Al cerrar la mesa queda libre.</div>
+          </div>
+        </div>
+      </div>
+      <div class="flow-side">
+        <div class="flow-title">🍺 Barra &amp; 🍳 Cocina</div>
+        <div class="flow-step active">
+          <div class="step-dot">1</div>
+          <div class="step-content">
+            <div class="step-title">Pantalla siempre abierta, sin hacer nada</div>
+            <div class="step-desc">Barra tiene su pantalla. Cocina tiene la suya. Cada una solo ve los pedidos que le corresponden según el destino configurado en la carta.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-dot">2</div>
+          <div class="step-content">
+            <div class="step-title">Alerta luminosa y sonora al llegar</div>
+            <div class="step-desc">Cuando llega un pedido nuevo, la pantalla parpadea y suena un beep. La tarjeta de la mesa sigue parpadeando hasta que alguien la toca para confirmar que lo han visto.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-dot">3</div>
+          <div class="step-content">
+            <div class="step-title">Marcan cada línea como servida</div>
+            <div class="step-desc">Con un toque en "Servido" cada línea se atenúa. Cuando todo está servido la tarjeta desaparece del grid. Las notas del camarero aparecen resaltadas bajo cada artículo.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-dot">4</div>
+          <div class="step-content">
+            <div class="step-title">El admin configura todo desde el panel</div>
+            <div class="step-desc">Mesas, carta, destino de cada artículo (barra/cocina/ambos) y datos del local para el ticket. Todo editable en el momento, sin tocar ningún archivo.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SCREEN MOCKUPS -->
+<section class="screens">
+  <div class="wrap">
+    <span class="section-label">Las pantallas reales</span>
+    <h2 class="section-title">Lo que ve<br>cada persona</h2>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.2rem;margin-bottom:1.2rem">
+
+      <!-- Camarero carta -->
+      <div class="scr-card">
+        <div class="scr-card-lbl"><div style="width:8px;height:8px;border-radius:50%;background:#3d7aff"></div> Camarero · carta</div>
+        <div class="scr-card-body">
+          <div class="scr-phone" style="width:185px">
+            <div class="scr-notch"><div class="scr-notch-bar"></div></div>
+            <div class="scr-body" style="padding:0">
+              <div class="c-topbar">
+                <span class="c-topbar-title">Camarero</span>
+                <span class="c-mesa-badge">Mesa 5</span>
+                <span class="c-btn-carrito">🧾 12,30€ <span style="background:#3d7aff;color:#fff;border-radius:8px;padding:0 3px;font-size:5px">2</span></span>
+              </div>
+              <div class="c-cat">Cervezas <span class="c-cat-count">1</span> <span style="margin-left:auto;font-size:8px;color:#aaa">▾</span></div>
+              <div class="c-art"><span class="c-art-name">Cerveza caña</span><span class="c-art-price">1,80€</span><div class="c-qty-ctrl"><div class="c-qty-btn">−</div><div class="c-qty-num">1</div><div class="c-qty-btn">+</div></div></div>
+              <div class="c-art"><span class="c-art-name">Cerveza sin alcohol</span><span class="c-art-price">2,00€</span><div class="c-qty-ctrl"><div class="c-qty-btn">−</div><div class="c-qty-num">0</div><div class="c-qty-btn">+</div></div></div>
+              <div class="c-cat" style="margin-top:2px">Raciones <span style="margin-left:auto;font-size:8px;color:#aaa">▸</span></div>
+              <div class="c-cat" style="margin-top:0">Tapas <span class="c-cat-count">1</span> <span style="margin-left:auto;font-size:8px;color:#aaa">▾</span></div>
+              <div class="c-art"><span class="c-art-name">Patatas bravas</span><span class="c-art-price">4,50€</span><div class="c-qty-ctrl"><div class="c-qty-btn">−</div><div class="c-qty-num">2</div><div class="c-qty-btn">+</div></div></div>
+              <div class="c-nota"><span class="c-nota-lbl">Nota:</span><span class="c-nota-inp">salsa aparte</span></div>
+              <div class="c-cat" style="margin-top:0">Vinos <span style="margin-left:auto;font-size:8px;color:#aaa">▸</span></div>
+              <div class="c-bottom"><div class="c-bottom-info"><div class="c-bottom-sub">2 artículos · 3 uds</div><div class="c-bottom-total">12,30 €</div></div><span style="background:none;border:1px solid #e0ddd6;border-radius:5px;padding:3px 7px;font-size:6px;font-family:monospace;color:#3d7aff;margin-right:3px">Cuenta</span><div class="c-btn-env">Enviar</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra -->
+      <div class="scr-card">
+        <div class="scr-card-lbl"><div style="width:8px;height:8px;border-radius:50%;background:#c9a84c"></div> Barra · pedidos</div>
+        <div class="scr-card-body">
+          <div class="scr-phone" style="width:185px">
+            <div class="scr-notch"><div class="scr-notch-bar"></div></div>
+            <div class="scr-body" style="padding:0">
+              <div class="b-topbar">
+                <span class="b-title">Barra</span>
+                <span style="flex:1"></span>
+                <span style="font-size:6px;color:#555;background:rgba(0,0,0,.3);padding:2px 5px;border-radius:4px;font-family:monospace">PDF 🖨</span>
+                <span class="b-badge" style="margin-left:4px">2 nuevas</span>
+              </div>
+              <div style="padding:5px">
+                <div class="b-card nueva">
+                  <div class="b-card-hdr"><div class="b-dot"></div><span class="b-mesa">Mesa 3</span><span class="b-time">ahora</span><span style="font-size:8px;border:1px solid #2c2c2c;border-radius:4px;padding:1px 4px;color:#555;margin-left:3px">🖨</span></div>
+                  <div class="b-linea"><span class="b-qty">2×</span><span class="b-nombre">Cerveza caña</span><span class="b-btn-serv">Servido</span></div>
+                  <div class="b-linea"><span class="b-qty">1×</span><span class="b-nombre">Agua sin gas</span><span class="b-btn-serv">Servido</span></div>
+                </div>
+                <div class="b-card nueva" style="margin-top:4px">
+                  <div class="b-card-hdr"><div class="b-dot"></div><span class="b-mesa">Mesa 7</span><span class="b-time">hace 1 min</span></div>
+                  <div class="b-linea"><span class="b-qty">3×</span><span class="b-nombre">Copa vino tinto</span><span class="b-btn-serv">Servido</span></div>
+                </div>
+                <div class="b-card" style="opacity:.35;margin-top:4px">
+                  <div class="b-card-hdr"><span class="b-mesa">Mesa 1</span><span class="b-time">hace 12 min</span></div>
+                  <div class="b-linea"><span class="b-qty">2×</span><span class="b-nombre">Zumo naranja</span><span class="b-btn-serv ok">✓</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Cocina -->
+      <div class="scr-card">
+        <div class="scr-card-lbl"><div style="width:8px;height:8px;border-radius:50%;background:#5af0ff"></div> Cocina · pedidos</div>
+        <div class="scr-card-body">
+          <div class="scr-phone" style="width:185px">
+            <div class="scr-notch"><div class="scr-notch-bar"></div></div>
+            <div class="scr-body" style="padding:0">
+              <div class="b-topbar"><span class="b-title cocina">Cocina</span><span style="flex:1"></span><span class="b-badge cocina">1 nueva</span></div>
+              <div style="padding:5px">
+                <div class="b-card nueva cocina">
+                  <div class="b-card-hdr"><div class="b-dot cocina"></div><span class="b-mesa cocina">Mesa 3</span><span class="b-time">ahora</span></div>
+                  <div class="b-linea"><span class="b-qty cocina">1×</span><span class="b-nombre">Entrecot</span><span class="b-btn-serv">Servido</span></div>
+                  <div class="b-nota cocina">↳ poco hecho, sin sal</div>
+                  <div class="b-linea"><span class="b-qty cocina">2×</span><span class="b-nombre">Croquetas (6 uds)</span><span class="b-btn-serv">Servido</span></div>
+                  <div class="b-linea"><span class="b-qty cocina">1×</span><span class="b-nombre">Patatas bravas</span><span class="b-btn-serv">Servido</span></div>
+                  <div class="b-nota cocina">↳ salsa aparte</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ticket — fondo claro como en la app real -->
+      <div class="scr-card">
+        <div class="scr-card-lbl"><div style="width:8px;height:8px;border-radius:50%;background:#5A7A50"></div> Camarero · ticket</div>
+        <div class="scr-card-body" style="background:#f0ede4">
+          <!-- Teléfono en modo claro -->
+          <div style="width:185px;background:#f7f5f0;border:1px solid #c8c4bc;border-radius:18px;overflow:hidden;box-shadow:0 20px 40px rgba(0,0,0,.15)">
+            <div style="height:12px;background:#f7f5f0;display:flex;align-items:center;justify-content:center">
+              <div style="width:50px;height:3px;background:#d0cdc8;border-radius:2px"></div>
+            </div>
+            <!-- Topbar claro -->
+            <div style="background:#fff;padding:5px 8px;border-bottom:1px solid #e0ddd6;font-size:6px;color:#888;font-family:monospace;display:flex;gap:5px;align-items:center">
+              <span style="border:1px solid #e0ddd6;border-radius:4px;padding:2px 5px;color:#1a1a1a;background:#f7f5f0">← Volver</span>
+              <span style="color:#888">Cuenta</span>
+            </div>
+            <!-- Ticket body -->
+            <div style="background:#f7f5f0;padding:8px">
+              <!-- Cabecera local -->
+              <div style="text-align:center;margin-bottom:6px;padding-bottom:6px;border-bottom:1px dashed #d0cdc8">
+                <div style="font-size:9px;font-weight:700;color:#1a1a1a;font-family:monospace">La Taberna del Sur</div>
+                <div style="font-size:5.5px;color:#888;margin-top:2px;font-family:monospace">C/ Mayor 12, Sevilla · 644 700 830</div>
+              </div>
+              <!-- Mesa y fecha -->
+              <div style="font-size:11px;font-weight:500;color:#1a1a1a;text-align:center;font-family:monospace;margin-bottom:1px">Mesa 3</div>
+              <div style="font-size:6px;color:#999;text-align:center;font-family:monospace;margin-bottom:6px">26/04/2025  21:47</div>
+              <!-- Líneas -->
+              <div style="display:flex;justify-content:space-between;padding:3px 0;font-size:7px;border-bottom:1px solid #ece9e0;color:#1a1a1a;font-family:monospace"><span>2× Cerveza caña</span><span>3,60€</span></div>
+              <div style="display:flex;justify-content:space-between;padding:3px 0;font-size:7px;border-bottom:1px solid #ece9e0;color:#1a1a1a;font-family:monospace"><span>1× Entrecot</span><span>14,00€</span></div>
+              <div style="display:flex;justify-content:space-between;padding:3px 0;font-size:7px;border-bottom:1px solid #ece9e0;color:#1a1a1a;font-family:monospace"><span>2× Croquetas</span><span>10,00€</span></div>
+              <div style="display:flex;justify-content:space-between;padding:3px 0;font-size:7px;border-bottom:1px solid #ece9e0;color:#1a1a1a;font-family:monospace"><span>1× Agua sin gas</span><span>1,50€</span></div>
+              <div style="display:flex;justify-content:space-between;padding:3px 0;font-size:7px;color:#1a1a1a;font-family:monospace"><span>2× Patatas bravas</span><span>9,00€</span></div>
+              <!-- Total -->
+              <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:700;margin-top:5px;padding-top:5px;border-top:2px solid #1a1a1a;font-family:monospace"><span>Total</span><span>38,10€</span></div>
+              <!-- Footer -->
+              <div style="text-align:center;font-size:6px;color:#999;margin-top:5px;padding-top:5px;border-top:1px dashed #d0cdc8;font-style:italic;font-family:monospace">¡Gracias por su visita!</div>
+              <!-- Botones -->
+              <div style="background:#1a1a1a;color:#fff;border-radius:6px;padding:5px;text-align:center;font-size:7px;font-family:monospace;margin-top:8px;letter-spacing:.03em">Imprimir ticket</div>
+              <div style="border:1px solid #e53535;color:#e53535;border-radius:6px;padding:4px;text-align:center;font-size:6.5px;font-family:monospace;margin-top:4px">Cerrar mesa y limpiar</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Admin pantalla ancha -->
+    <div style="max-width:680px;margin:0 auto">
+      <div class="scr-card">
+        <div class="scr-card-lbl"><div style="width:8px;height:8px;border-radius:50%;background:#C45C26"></div> Panel de administración</div>
+        <div class="scr-card-body" style="padding:1.2rem">
+          <div style="width:100%;max-width:500px;background:#0f0f0f;border-radius:10px;overflow:hidden">
+            <div class="adm-topbar">
+              <span class="adm-logo">// admin</span>
+              <span class="adm-tab active">Mesas</span>
+              <span class="adm-tab off">Carta</span>
+              <span class="adm-tab off">Local</span>
+              <span class="adm-tab off">Accesos</span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;border-bottom:1px solid #2c2c2c">
+              <div class="adm-body" style="border-right:1px solid #2c2c2c">
+                <div class="adm-section">Mesas</div>
+                <div class="adm-mesas">
+                  <div class="adm-mesa ocupada">1</div>
+                  <div class="adm-mesa ocupada">2</div>
+                  <div class="adm-mesa">3</div>
+                  <div class="adm-mesa ocupada">4</div>
+                  <div class="adm-mesa">5</div>
+                  <div class="adm-mesa">6</div>
+                  <div class="adm-mesa ocupada">T1</div>
+                  <div class="adm-mesa">T2</div>
+                </div>
+                <div style="display:flex;gap:5px;margin-top:4px">
+                  <div style="flex:1;background:#1a1a1a;border:1px solid #2c2c2c;border-radius:5px;padding:4px 6px;font-size:7px;color:#555;font-family:monospace">Nombre (ej: Barra)</div>
+                  <div style="background:rgba(90,255,154,.1);border:1px solid rgba(90,255,154,.2);border-radius:5px;padding:4px 7px;font-size:7px;color:#5aff9a;font-family:monospace">+ Añadir</div>
+                </div>
+              </div>
+              <div class="adm-body">
+                <div class="adm-section">Carta</div>
+                <div style="font-size:6px;color:#e8ff5a;font-family:monospace;letter-spacing:.06em;text-transform:uppercase;padding:3px 0 2px;border-bottom:1px solid rgba(232,255,90,.2);margin-bottom:4px">Cervezas</div>
+                <div class="adm-art"><span class="adm-art-name">Cerveza caña</span><span class="adm-art-price">1,80€</span><span class="adm-dest barra">barra</span><span style="color:#ff5a5a;font-size:9px;margin-left:2px">×</span></div>
+                <div class="adm-art"><span class="adm-art-name">Cerveza sin alcohol</span><span class="adm-art-price">2,00€</span><span class="adm-dest barra">barra</span><span style="color:#ff5a5a;font-size:9px;margin-left:2px">×</span></div>
+                <div style="font-size:6px;color:#e8ff5a;font-family:monospace;letter-spacing:.06em;text-transform:uppercase;padding:3px 0 2px;border-bottom:1px solid rgba(232,255,90,.2);margin-bottom:4px;margin-top:4px">Tapas</div>
+                <div class="adm-art"><span class="adm-art-name">Entrecot</span><span class="adm-art-price">14,00€</span><span class="adm-dest cocina">cocina</span><span style="color:#ff5a5a;font-size:9px;margin-left:2px">×</span></div>
+                <div class="adm-art"><span class="adm-art-name">Tabla mixta</span><span class="adm-art-price">12,00€</span><span class="adm-dest ambos">ambos</span><span style="color:#ff5a5a;font-size:9px;margin-left:2px">×</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <div class="wrap">
+    <span class="section-label">Funcionalidades</span>
+    <h2 class="section-title">Todo lo que incluye</h2>
+    <div class="feats-grid">
+      <div class="feat-card"><div class="feat-icon">⚡</div><div class="feat-title">Pedidos en tiempo real</div><div class="feat-desc">Los pedidos llegan a barra y cocina en menos de un segundo. Sin recargar, sin esperar, sin que nadie tenga que hacer nada.</div></div>
+      <div class="feat-card"><div class="feat-icon">📝</div><div class="feat-title">Notas por artículo</div><div class="feat-desc">"Poco hecho", "sin cebolla", "para el niño"… cada artículo tiene su campo de nota que aparece resaltado en barra y cocina.</div></div>
+      <div class="feat-card"><div class="feat-icon">🔔</div><div class="feat-title">Alerta luminosa y sonora</div><div class="feat-desc">Al llegar un pedido nuevo la pantalla parpadea y suena un beep generado sin archivos externos. El destello continúa hasta que alguien lo confirma.</div></div>
+      <div class="feat-card"><div class="feat-icon">🍺🍳</div><div class="feat-title">Barra y cocina separadas</div><div class="feat-desc">Cada artículo se configura como barra, cocina o ambos. Cada pantalla ve solo lo que le toca — sin ruido, sin confusión.</div></div>
+      <div class="feat-card"><div class="feat-icon">🧾</div><div class="feat-title">Ticket profesional</div><div class="feat-desc">Con nombre del local, dirección, CIF y texto del pie de ticket personalizado. Se imprime desde el mismo móvil del camarero.</div></div>
+      <div class="feat-card"><div class="feat-icon">📄</div><div class="feat-title">Comanda en PDF</div><div class="feat-desc">Al enviar el pedido se descarga automáticamente un PDF de comanda en formato ticket de 80mm, compatible con impresoras térmicas.</div></div>
+      <div class="feat-card"><div class="feat-icon">🖨️</div><div class="feat-title">Impresión automática</div><div class="feat-desc">Con un toggle en barra y cocina se activa la autoimpresión. Compatible con RawBT en Android y Printfolder en Windows — sin cuotas.</div></div>
+      <div class="feat-card"><div class="feat-icon">📋</div><div class="feat-title">Carta colapsable</div><div class="feat-desc">Las categorías se pliegan y despliegan. El contador por categoría sigue visible aunque esté colapsada para no perder la cuenta.</div></div>
+      <div class="feat-card"><div class="feat-icon">🛒</div><div class="feat-title">Resumen en el drawer</div><div class="feat-desc">Un panel deslizante muestra todo el pedido actual con cantidad editable y nota por artículo. Se puede modificar antes de enviar sin volver a la carta.</div></div>
+      <div class="feat-card"><div class="feat-icon">⚙️</div><div class="feat-title">Panel admin completo</div><div class="feat-desc">Mesas, carta, categorías, destino por artículo y datos del local — todo editable desde el panel. Contraseña protegida.</div></div>
+      <div class="feat-card"><div class="feat-icon">📱</div><div class="feat-title">Sin app, sin instalación</div><div class="feat-desc">Funciona en cualquier móvil, tablet u ordenador con navegador. El camarero, la barra y la cocina pueden usar dispositivos distintos.</div></div>
+      <div class="feat-card"><div class="feat-icon">💸</div><div class="feat-title">Sin cuota mensual</div><div class="feat-desc">Sin suscripciones, sin contratos. Pagas una vez y el sistema funciona indefinidamente sin ningún coste adicional de infraestructura.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="wrap">
+    <span class="section-label">Precio</span>
+    <h2 class="section-title">Simple y claro</h2>
+    <p class="section-sub">Un único pago, sin letra pequeña. Sin cuotas mensuales, sin contratos.</p>
+    <div class="pricing-card">
+      <div class="pricing-price">
+        <span class="pricing-currency">€</span>
+        <span class="pricing-num">90</span>
+      </div>
+      <div class="pricing-note">pago único · sin cuota mensual · sin contrato</div>
+      <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.25);border-radius:20px;padding:.3rem .9rem;font-size:.75rem;color:var(--gold);margin-bottom:1.5rem">
+        ✦ Incluye hasta <strong style="margin:0 3px">3.000 líneas de pedido al mes</strong> — suficiente para un servicio completo
+      </div>
+      <div class="pricing-feats">
+        <div class="pricing-feat">5 pantallas: camarero, barra, cocina, ticket y panel admin</div>
+        <div class="pricing-feat">Pedidos en tiempo real — barra y cocina los reciben en menos de 1 segundo</div>
+        <div class="pricing-feat">Notas por artículo visibles en barra y cocina</div>
+        <div class="pricing-feat">Carta editable desde el admin con categorías y destino por artículo</div>
+        <div class="pricing-feat">Alerta luminosa y sonora al llegar cada pedido nuevo</div>
+        <div class="pricing-feat">Comanda en PDF descargada automáticamente al enviar</div>
+        <div class="pricing-feat">Ticket del cliente con logo, datos del local y total</div>
+        <div class="pricing-feat">Toggle de impresión automática compatible con RawBT y Printfolder</div>
+        <div class="pricing-feat">Un mes de modificaciones y ajustes incluido</div>
+        <div class="pricing-feat">Compatible con todos los planes de carta digital</div>
+      </div>
+      <hr class="pricing-divider">
+      <button class="btn-pricing" onclick="contactar()">Quiero el comandero →</button>
+      <div class="pricing-compat">¿Ya tienes carta digital conmigo? Se integra sin coste adicional.</div>
+      <p style="font-size:.72rem;color:rgba(250,248,244,.25);text-align:center;margin-top:1rem;line-height:1.6">
+        * El plan incluye hasta 3.000 líneas de pedido al mes (aprox. 300 comandas de 10 artículos).
+        Si tu local supera ese volumen, puedes ampliar el contador por 10 €/mes adicionales.
+        La ampliación se gestiona por WhatsApp — en menos de 24 horas está activa.
+      </p>
+    </div>
+    <div class="pack-banner">
+      <div>
+        <div class="pack-text">🎁 <strong>Pack Carta Dinámica + Comandero</strong><br>Los dos módulos juntos, perfectamente integrados. La carta digital para los clientes y el comandero para el equipo.</div>
+      </div>
+      <div style="text-align:right">
+        <div class="pack-price">150€</div>
+        <div class="pack-sub">en lugar de 170€ · ahorro de 20€</div>
+        <button onclick="contactar('Pack')" style="margin-top:.5rem;background:var(--sage);color:#fff;border:none;border-radius:8px;padding:.5rem 1rem;font-family:var(--ff-body);font-size:.82rem;font-weight:500;cursor:pointer">Quiero el pack →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq">
+  <div class="wrap">
+    <span class="section-label">Preguntas frecuentes</span>
+    <h2 class="section-title">Lo que suelen<br><em>preguntarme</em></h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q">¿Hay algún límite de pedidos al mes?</div>
+        <div class="faq-a">El plan incluye hasta 3.000 líneas de pedido al mes, lo que equivale a unas 300 comandas de 10 artículos — más que suficiente para la mayoría de bares y restaurantes. Si tu local tiene un volumen mayor, avisas y en menos de 24 horas te amplio el contador por 10 €/mes. No hay cortes ni interrupciones del servicio.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">¿Necesito tener carta digital contigo para contratar el comandero?</div>
+        <div class="faq-a">No. El comandero funciona de forma completamente independiente. Puedes contratarlo solo. Eso sí, si tienes o contratas también la carta digital, los integramos para que todo funcione de forma coherente y puedas gestionar la carta y las comandas desde el mismo sistema.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">¿Qué dispositivos necesito?</div>
+        <div class="faq-a">Al menos uno para el camarero (móvil o tablet), uno para barra y uno para cocina. Pueden ser cualquier dispositivo con navegador — Android, iPhone, tablet, ordenador. No importa la marca ni el sistema operativo.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">¿Cuánto tarda en estar listo?</div>
+        <div class="faq-a">Una vez que me dices el nombre del local, las mesas y los artículos de la carta, en menos de 48 horas tienes el sistema funcionando y listo para usar.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">¿Funciona sin internet?</div>
+        <div class="faq-a">No, necesita conexión a internet para que los pedidos lleguen en tiempo real a barra y cocina. En la práctica cualquier bar tiene WiFi — los dispositivos del camarero, barra y cocina se conectan a la misma red.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">¿Puede el camarero añadir platos a una mesa que ya tiene pedido?</div>
+        <div class="faq-a">Sí. La mesa queda marcada como ocupada y el camarero puede volver a abrirla, añadir más platos y enviarlos. Cada envío genera nuevas líneas en barra y cocina. El ticket final suma todo lo consumido durante el servicio.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">¿Cómo funciona la impresión automática?</div>
+        <div class="faq-a">Al enviar el pedido desde el camarero se descarga automáticamente un PDF en el móvil. Para imprirlo automáticamente sin tocar nada puedes usar RawBT en Android (gratuito) o Printfolder en Windows (~15€). Estas apps monitorizan la carpeta de descargas y mandan el PDF a la impresora en cuanto llega.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">¿Cuántas mesas y artículos puedo tener?</div>
+        <div class="faq-a">Sin límite práctico. El sistema aguanta miles de registros sin problema. Para el uso normal de un bar o restaurante nunca vas a notar ninguna limitación.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">¿Tiene coste mensual la infraestructura?</div>
+        <div class="faq-a">No. El sistema está alojado en servidores que no generan ningún coste adicional para el volumen de un bar o restaurante normal. Pagas una vez y listo.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BOTTOM -->
+<section class="cta-bottom">
+  <div class="wrap" style="text-align:center">
+    <span class="section-label">¿Empezamos?</span>
+    <h2 class="section-title" style="color:#FAF8F4">Tu local, sin papel<br>ni malentendidos</h2>
+    <p class="section-sub" style="margin:0 auto 2rem">90€ una sola vez. Listo en 48 horas. Sin cuotas mensuales.</p>
+    <button class="btn-primary" onclick="contactar()">Contactar por WhatsApp →</button>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-name">JON GLEZ · Soluciones Digitales para Hostelería</div>
+  <p style="margin-bottom:1rem">
+    ¿Tienes alguna duda? Escríbeme —
+    <a href="https://wa.me/34644700830?text=Hola,%20me%20interesa%20el%20comandero%20digital">WhatsApp</a> ·
+    <a href="https://t.me/jon_glez">Telegram</a> ·
+    <a href="mailto:jongt23@gmail.com">Email</a>
+  </p>
+  <p style="font-size:.72rem;opacity:.5">© 2025 JON GLEZ · Todos los derechos reservados</p>
+</footer>
+
+<script>
+window.addEventListener('scroll', function() {
+  var nav = document.getElementById('nav');
+  if (window.scrollY > 40) nav.classList.add('scrolled');
+  else nav.classList.remove('scrolled');
+});
+document.querySelectorAll('.faq-q').forEach(function(q) {
+  q.addEventListener('click', function() {
+    var item = this.closest('.faq-item');
+    var wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(function(i){i.classList.remove('open')});
+    if (!wasOpen) item.classList.add('open');
+  });
+});
+document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+  a.addEventListener('click', function(e) {
+    var target = document.querySelector(this.getAttribute('href'));
+    if (target) { e.preventDefault(); target.scrollIntoView({behavior:'smooth'}); }
+  });
+});
+function contactar(plan) {
+  var p = plan || 'Comandero';
+  var msg = 'Hola Jon, me interesa el ' + p + ' digital para mi local. ¿Podemos hablar?';
+  window.open('https://wa.me/34644700830?text=' + encodeURIComponent(msg), '_blank');
+}
+</script>
+</body>
+</html>
