@@ -183,6 +183,7 @@
     <div class="topbar-logo">// admin</div>
     <button class="tab-btn active" onclick="showTab('mesas',this)">Mesas</button>
     <button class="tab-btn" onclick="showTab('carta',this)">Carta</button>
+    <button class="tab-btn" onclick="showTab('local',this)">Local</button>
     <button class="tab-btn" onclick="showTab('enlaces',this)">Accesos</button>
     <div class="spacer"></div>
     <span class="tag-version">comandero v1</span>
@@ -239,6 +240,24 @@
       <div class="card">
         <h3>Artículos en carta</h3>
         <div id="carta-lista"></div>
+      </div>
+    </div>
+
+    <!-- LOCAL -->
+    <div class="section" id="sec-local">
+      <h2>Datos del local</h2>
+      <div class="card">
+        <p style="color:var(--muted);font-size:13px;margin-bottom:1.25rem">Aparecen en la cabecera del ticket</p>
+        <div class="form-row" style="flex-direction:column;gap:10px">
+          <input type="text" id="local-nombre" placeholder="Nombre del local (ej: Bar El Rincón)" />
+          <input type="text" id="local-direccion" placeholder="Dirección (opcional)" />
+          <input type="text" id="local-telefono" placeholder="Teléfono (opcional)" />
+          <input type="text" id="local-cif" placeholder="CIF / NIF (opcional)" />
+          <input type="text" id="local-footer" placeholder="Texto pie de ticket (ej: ¡Gracias por su visita!)" />
+        </div>
+        <div style="margin-top:1rem">
+          <button class="btn btn-success" onclick="guardarLocal()">Guardar datos</button>
+        </div>
       </div>
     </div>
 
@@ -450,7 +469,27 @@ function init() {
     cartaData = snap.val() || {};
     renderCarta();
   });
+  // Cargar datos del local
+  onValue(ref(db, 'config/local'), snap => {
+    const d = snap.val() || {};
+    document.getElementById('local-nombre').value    = d.nombre    || '';
+    document.getElementById('local-direccion').value = d.direccion || '';
+    document.getElementById('local-telefono').value  = d.telefono  || '';
+    document.getElementById('local-cif').value       = d.cif       || '';
+    document.getElementById('local-footer').value    = d.footer    || '';
+  });
 }
+
+window.guardarLocal = async () => {
+  await set(ref(db, 'config/local'), {
+    nombre:    document.getElementById('local-nombre').value.trim(),
+    direccion: document.getElementById('local-direccion').value.trim(),
+    telefono:  document.getElementById('local-telefono').value.trim(),
+    cif:       document.getElementById('local-cif').value.trim(),
+    footer:    document.getElementById('local-footer').value.trim(),
+  });
+  toast('Datos del local guardados');
+};
 </script>
 </body>
 </html>

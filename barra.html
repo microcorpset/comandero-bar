@@ -29,6 +29,22 @@
   }
   .clock { font-family: var(--mono); font-size: 13px; color: var(--muted); }
 
+  /* Toggle impresión */
+  .print-toggle {
+    display: flex; align-items: center; gap: 8px;
+    font-family: var(--mono); font-size: 12px; color: var(--muted); cursor: pointer;
+  }
+  .toggle-track {
+    width: 36px; height: 20px; border-radius: 10px; background: var(--border);
+    position: relative; transition: background .2s; flex-shrink: 0;
+  }
+  .toggle-track.on { background: var(--accent); }
+  .toggle-thumb {
+    width: 16px; height: 16px; border-radius: 50%; background: #fff;
+    position: absolute; top: 2px; left: 2px; transition: left .2s;
+  }
+  .toggle-track.on .toggle-thumb { left: 18px; }
+
   @keyframes flash-bg { 0%,100%{background:var(--bg)} 50%{background:var(--accent-dim)} }
   @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.3;transform:scale(.7)} }
   body.hay-nuevos { animation: flash-bg 1.4s ease-in-out infinite; }
@@ -98,6 +114,10 @@
 <div class="topbar">
   <span class="topbar-title" id="topbar-title">Barra</span>
   <div class="spacer"></div>
+  <label class="print-toggle" title="Imprimir automáticamente al llegar un pedido">
+    <div class="toggle-track" id="print-track"><div class="toggle-thumb"></div></div>
+    <span id="print-label">Auto-imp.</span>
+  </label>
   <span class="badge-nuevos" id="badge-nuevos"></span>
   <span class="clock" id="clock"></span>
 </div>
@@ -116,11 +136,49 @@ import { ref, onValue, set, get } from "https://www.gstatic.com/firebasejs/10.12
 
 const escocina = location.pathname.includes('cocina') || location.search.includes('rol=cocina');
 const ROL = escocina ? 'cocina' : 'barra';
+const PRINT_KEY = 'autoimp_' + ROL;
 
 if (ROL === 'cocina') {
   document.documentElement.classList.add('rol-cocina');
   document.getElementById('topbar-title').textContent = 'Cocina';
   document.title = 'Cocina · Comandero';
+}
+
+// ── Toggle impresión automática ───────────────────────────────────────────────
+let autoImprimir = localStorage.getItem(PRINT_KEY) === 'true';
+const printTrack = document.getElementById('print-track');
+
+function updateToggleUI() {
+  printTrack.classList.toggle('on', autoImprimir);
+}
+updateToggleUI();
+
+printTrack.parentElement.addEventListener('click', () => {
+  autoImprimir = !autoImprimir;
+  localStorage.setItem(PRINT_KEY, autoImprimir);
+  updateToggleUI();
+});
+
+function imprimirComanda(mesaNombre, lineas) {
+  const ventana = window.open('', '_blank', 'width=320,height=600');
+  if (!ventana) return;
+  const fecha = new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
+  const rows = lineas.map(l => `
+    <div style="display:flex;gap:8px;padding:5px 0;border-bottom:1px solid #eee;font-size:14px">
+      <span style="font-weight:bold;min-width:20px">${l.qty}×</span>
+      <span style="flex:1">${l.nombre}${l.nota ? '<br><span style="font-size:11px;color:#888">↳ ' + l.nota + '</span>' : ''}</span>
+    </div>`).join('');
+  ventana.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>Comanda</title>
+    <style>body{font-family:monospace;padding:12px;max-width:300px}
+    h2{font-size:16px;margin-bottom:4px} p{font-size:12px;color:#888;margin-bottom:12px}</style>
+    </head><body>
+    <h2>${ROL === 'cocina' ? 'COCINA' : 'BARRA'} — Mesa ${mesaNombre}</h2>
+    <p>${fecha}</p>
+    ${rows}
+    <script>window.onload=()=>{window.print();window.close()}<\/script>
+    </body></html>`);
+  ventana.document.close();
 }
 
 function tick() {
@@ -162,9 +220,24 @@ onValue(ref(db, 'pedidos'), snap => {
     const mias = Object.entries(lineas).filter(([,l]) => l.destino === ROL || l.destino === 'ambos');
     if (mias.length) pedidosPorMesa[mesaId] = Object.fromEntries(mias);
   });
+
+  const antesNuevos = new Set(nuevosActivos);
   detectarNuevos();
   renderPedidos();
-  if (!primeraVez && nuevosActivos.size > 0) beep();
+
+  if (!primeraVez && nuevosActivos.size > 0) {
+    beep();
+    // Imprimir automáticamente las mesas que son NUEVAS en esta actualización
+    if (autoImprimir) {
+      nuevosActivos.forEach(mesaId => {
+        if (!antesNuevos.has(mesaId)) {
+          const lineas = Object.values(pedidosPorMesa[mesaId] || {}).filter(l => l.estado === 'pendiente');
+          const nombre = mesasData[mesaId]?.nombre || mesaId;
+          imprimirComanda(nombre, lineas);
+        }
+      });
+    }
+  }
   primeraVez = false;
 });
 

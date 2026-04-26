@@ -268,10 +268,12 @@ let mesaId = null, mesaNombre = null;
 let carrito = {};
 let mesasData = {}, cartaData = {}, categoriasData = {};
 let cartaReady = false, catsReady = false;
+let configLocal = {};
 
 onValue(ref(db, 'mesas'), snap => { mesasData = snap.val() || {}; renderMesas(); });
 onValue(ref(db, 'categorias'), snap => { categoriasData = snap.val() || {}; catsReady = true; if (cartaReady && mesaId) renderCarta(); });
 onValue(ref(db, 'carta'), snap => { cartaData = snap.val() || {}; cartaReady = true; if (catsReady && mesaId) renderCarta(); });
+onValue(ref(db, 'config/local'), snap => { configLocal = snap.val() || {}; });
 
 // ── Mesas ─────────────────────────────────────────────────────────────────────
 function renderMesas() {
@@ -584,10 +586,25 @@ window.verCuenta = async () => {
   });
   const total = Object.values(agrupado).reduce((s, l) => s + l.precio * l.qty, 0);
   const fecha = new Date().toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
+
+  const loc = configLocal;
+  const cabecera = `
+    ${loc.nombre    ? `<div style="font-size:18px;font-weight:500;font-family:var(--mono)">${loc.nombre}</div>` : ''}
+    ${loc.direccion ? `<div style="font-size:12px;color:var(--muted);margin-top:2px">${loc.direccion}</div>` : ''}
+    ${loc.telefono  ? `<div style="font-size:12px;color:var(--muted)">${loc.telefono}</div>` : ''}
+    ${loc.cif       ? `<div style="font-size:11px;color:var(--muted)">${loc.cif}</div>` : ''}
+  `;
+  const pie = loc.footer
+    ? `<div style="text-align:center;font-size:12px;color:var(--muted);margin-top:1rem;padding-top:.75rem;border-top:1px dashed var(--border)">${loc.footer}</div>`
+    : '';
+
   document.getElementById('ticket-card').innerHTML = `
     <div class="ticket-header">
-      <div class="ticket-mesa">Mesa ${mesaNombre}</div>
-      <div class="ticket-fecha">${fecha}</div>
+      ${cabecera}
+      <div style="margin-top:${loc.nombre ? '.75rem' : '0'}">
+        <div class="ticket-mesa">Mesa ${mesaNombre}</div>
+        <div class="ticket-fecha">${fecha}</div>
+      </div>
     </div>
     ${Object.values(agrupado).map(l => `
       <div class="ticket-linea">
@@ -596,6 +613,7 @@ window.verCuenta = async () => {
         ${l.nota ? `<span class="ticket-nota">↳ ${l.nota}</span>` : ''}
       </div>`).join('')}
     <div class="ticket-total"><span>Total</span><span>${total.toFixed(2)} €</span></div>
+    ${pie}
     <button class="btn-print" onclick="window.print()">Imprimir ticket</button>
     <button class="btn-cerrar" onclick="cerrarMesa()">Cerrar mesa y limpiar</button>
   `;
