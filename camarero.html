@@ -889,8 +889,8 @@ window.enviarPedido = async () => {
   // Contar líneas del carrito (cada artículo = 1 línea)
   const nLineas = Object.keys(carrito).length;
 
-  // Comprobar cuota si está activada
-  if (quotaActual !== null) {
+  // Comprobar cuota si está activada (−1 = sin límite)
+  if (quotaActual !== null && quotaActual !== -1) {
     if (quotaActual <= 0) {
       showModal({
         title: 'Límite de pedidos alcanzado',
