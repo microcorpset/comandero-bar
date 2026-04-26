@@ -282,6 +282,13 @@
         </div>
       </div>
       <div class="card" style="margin-top:1rem">
+        <h3>Consumo mensual de líneas</h3>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:1rem">Líneas de pedido enviadas cada mes. Se actualiza en tiempo real.</p>
+        <div id="stats-lista" style="display:flex;flex-direction:column;gap:0">
+          <div style="font-size:13px;color:var(--muted)">Cargando…</div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:1rem">
         <h3>Líneas de pedido disponibles</h3>
         <p style="font-size:13px;color:var(--muted);margin-bottom:1rem">Cuando llegue a 0 el sistema bloqueará el envío de nuevos pedidos. Contacta con el administrador para ampliar.</p>
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
@@ -518,11 +525,53 @@ function init() {
     const val = snap.val();
     const el = document.getElementById('quota-display');
     if (!el) return;
-    if (val === null)  { el.textContent = 'Sin configurar'; el.style.color = 'var(--muted)'; }
-    else if (val === -1) { el.textContent = '∞ Sin límite'; el.style.color = 'var(--success)'; }
-    else if (val <= 0)   { el.textContent = '0 — BLOQUEADO'; el.style.color = 'var(--danger)'; }
-    else if (val <= 200) { el.textContent = val; el.style.color = '#e57a35'; }
-    else                 { el.textContent = val; el.style.color = 'var(--accent)'; }
+    if (val === null)   { el.textContent = 'Sin configurar'; el.style.color = 'var(--muted)'; }
+    else if (val === -1){ el.textContent = '∞ Sin límite';   el.style.color = 'var(--success)'; }
+    else if (val <= 0)  { el.textContent = '0 — BLOQUEADO';  el.style.color = 'var(--danger)'; }
+    else if (val <= 200){ el.textContent = val;              el.style.color = '#e57a35'; }
+    else                { el.textContent = val;              el.style.color = 'var(--accent)'; }
+  });
+
+  // Estadísticas de consumo mensual
+  onValue(ref(db, 'config/stats'), snap => {
+    const data = snap.val() || {};
+    const lista = document.getElementById('stats-lista');
+    if (!lista) return;
+    const meses = Object.entries(data)
+      .sort(([a],[b]) => b.localeCompare(a)); // más reciente primero
+
+    if (!meses.length) {
+      lista.innerHTML = '<div style="font-size:13px;color:var(--muted)">Sin datos aún. Se irán registrando con cada pedido enviado.</div>';
+      return;
+    }
+
+    const mesActual = (() => {
+      const n = new Date();
+      return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`;
+    })();
+
+    lista.innerHTML = '';
+    meses.forEach(([mes, datos]) => {
+      const lineas = datos.lineas || 0;
+      const esActual = mes === mesActual;
+      const [anio, num] = mes.split('-');
+      const nombre = new Date(anio, num-1, 1).toLocaleString('es-ES', {month:'long', year:'numeric'});
+      const porcentaje = Math.min(100, Math.round(lineas / 60)); // escala visual ~6000 max
+
+      const row = document.createElement('div');
+      row.style.cssText = 'padding:10px 0;border-bottom:1px solid var(--border)';
+      row.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+          <span style="font-size:13px;font-weight:500;flex:1;text-transform:capitalize">${nombre}</span>
+          ${esActual ? '<span style="font-size:11px;background:var(--accent-dim);color:var(--accent);padding:2px 8px;border-radius:20px;font-family:var(--mono)">en curso</span>' : ''}
+          <span style="font-family:var(--mono);font-size:14px;font-weight:500">${lineas.toLocaleString('es-ES')}</span>
+          <span style="font-size:12px;color:var(--muted)">líneas</span>
+        </div>
+        <div style="height:4px;background:var(--surface2);border-radius:2px;overflow:hidden">
+          <div style="height:100%;width:${porcentaje}%;background:${esActual ? 'var(--accent)' : 'var(--border)'};border-radius:2px;transition:width .4s"></div>
+        </div>`;
+      lista.appendChild(row);
+    });
   });
 }
 

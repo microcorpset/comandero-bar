@@ -928,9 +928,8 @@ window.enviarPedido = async () => {
   }
 
   // Descontar líneas de la cuota
-  if (quotaActual !== null) {
+  if (quotaActual !== null && quotaActual !== -1) {
     await set(ref(db, 'config/quota/lineas'), quotaActual - nLineas);
-    // Aviso si queda poco después de enviar
     const restante = quotaActual - nLineas;
     if (restante > 0 && restante <= 100) {
       setTimeout(() => showModal({
@@ -940,6 +939,14 @@ window.enviarPedido = async () => {
       }), 800);
     }
   }
+
+  // Contador de consumo mensual (siempre, independiente de la cuota)
+  const ahora2 = new Date();
+  const mesKey = `${ahora2.getFullYear()}-${String(ahora2.getMonth()+1).padStart(2,'0')}`;
+  const statsRef = ref(db, 'config/stats/' + mesKey + '/lineas');
+  const statsSnap = await get(statsRef);
+  const consumidoMes = statsSnap.val() || 0;
+  await set(statsRef, consumidoMes + nLineas);
 
   // Generar y descargar PDF solo si el toggle está activo
   if (autoPDF) generarPDFComanda(mesaNombre, lineasImprimir, configLocal);
