@@ -32,6 +32,21 @@
   .btn-carrito.tiene { border-color: var(--accent2); color: var(--accent2); display: flex; }
   .carrito-count { background: var(--accent2); color: #fff; border-radius: 20px; font-size: 11px; padding: 1px 6px; font-weight: 500; }
 
+  .print-toggle {
+    display: flex; align-items: center; gap: 6px; cursor: pointer;
+    font-family: var(--mono); font-size: 11px; color: var(--muted); flex-shrink: 0;
+  }
+  .toggle-track {
+    width: 32px; height: 18px; border-radius: 9px; background: var(--border);
+    position: relative; transition: background .2s; flex-shrink: 0;
+  }
+  .toggle-track.on { background: var(--accent); }
+  .toggle-thumb {
+    width: 14px; height: 14px; border-radius: 50%; background: #fff;
+    position: absolute; top: 2px; left: 2px; transition: left .2s;
+  }
+  .toggle-track.on .toggle-thumb { left: 16px; }
+
   /* MESAS */
   #view-mesas { padding: 1rem; }
   .mesas-title { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; margin-bottom: .75rem; }
@@ -213,6 +228,10 @@
   <span class="topbar-title">Camarero</span>
   <span class="mesa-badge" id="topbar-mesa"></span>
   <div class="spacer"></div>
+  <label class="print-toggle" title="Imprimir comanda al enviar">
+    <div class="toggle-track" id="print-track"><div class="toggle-thumb"></div></div>
+    <span>PDF</span>
+  </label>
   <button class="btn-carrito" id="btn-carrito" onclick="abrirDrawer()">
     🧾 <span id="carrito-label">0</span>
     <span class="carrito-count" id="carrito-count">0</span>
@@ -260,8 +279,6 @@
   </div>
 </div>
 
-<iframe id="iframe-print" style="position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;border:none"></iframe>
-
 <script type="module">
 import { db } from './firebase.js';
 import { ref, onValue, push, set, remove, get }
@@ -273,6 +290,17 @@ let carrito = {};
 let mesasData = {}, cartaData = {}, categoriasData = {};
 let cartaReady = false, catsReady = false;
 let configLocal = {};
+
+// ── Toggle impresión PDF ───────────────────────────────────────────────────────
+const PRINT_KEY = 'camarero_pdf';
+let autoPDF = localStorage.getItem(PRINT_KEY) === 'true';
+const printTrack = document.getElementById('print-track');
+printTrack.classList.toggle('on', autoPDF);
+printTrack.parentElement.addEventListener('click', () => {
+  autoPDF = !autoPDF;
+  localStorage.setItem(PRINT_KEY, autoPDF);
+  printTrack.classList.toggle('on', autoPDF);
+});
 
 onValue(ref(db, 'mesas'), snap => { mesasData = snap.val() || {}; renderMesas(); });
 onValue(ref(db, 'categorias'), snap => { categoriasData = snap.val() || {}; catsReady = true; if (cartaReady && mesaId) renderCarta(); });
@@ -550,46 +578,97 @@ function renderDrawer() {
 }
 
 // ── Enviar ────────────────────────────────────────────────────────────────────
-// ── Impresión comanda via iframe ───────────────────────────────────────────────
-function imprimirComanda(nombreMesa, lineas, configLocal) {
-  const fecha = new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
-  const rows = lineas.map(l => `
-    <tr>
-      <td style="padding:4px 6px 4px 0;font-weight:bold;vertical-align:top;white-space:nowrap">${l.qty}×</td>
-      <td style="padding:4px 0;vertical-align:top">
-        ${l.nombre}
-        ${l.nota ? `<br><span style="font-size:11px;color:#555">↳ ${l.nota}</span>` : ''}
-      </td>
-      <td style="padding:4px 0 4px 8px;text-align:right;vertical-align:top;white-space:nowrap">${(l.precio*l.qty).toFixed(2)}€</td>
-    </tr>`).join('');
+// ── Generar y descargar PDF de comanda ────────────────────────────────────────
+async function generarPDFComanda(nombreMesa, lineas, configLocal) {
+  // Cargar jsPDF dinámicamente
+  if (!window.jspdf) {
+    await new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+      s.onload = resolve; s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
 
-  const localHeader = configLocal?.nombre
-    ? `<div style="font-weight:bold;font-size:14px">${configLocal.nombre}</div>
-       ${configLocal.direccion ? `<div>${configLocal.direccion}</div>` : ''}` : '';
+  const { jsPDF } = window.jspdf;
+  // Ancho de ticket térmico 80mm ≈ 226pt, alto auto
+  const doc = new jsPDF({ unit: 'mm', format: [80, 200], orientation: 'portrait' });
 
-  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
-    <style>
-      *{box-sizing:border-box;margin:0;padding:0}
-      body{font-family:monospace;font-size:13px;padding:8px;width:100%}
-      .local{font-size:11px;color:#666;margin-bottom:8px;border-bottom:1px dashed #ccc;padding-bottom:6px}
-      h2{font-size:15px;font-weight:bold;margin-bottom:2px}
-      .sub{font-size:11px;color:#666;margin-bottom:10px}
-      table{width:100%;border-collapse:collapse}
-      tr{border-bottom:1px solid #eee}
-      tr:last-child{border-bottom:none}
-    </style></head><body>
-    ${localHeader ? `<div class="local">${localHeader}</div>` : ''}
-    <h2>Mesa ${nombreMesa}</h2>
-    <div class="sub">${fecha}</div>
-    <table>${rows}</table>
-    </body></html>`;
+  const ancho = 76; // margen 2mm cada lado
+  let y = 5;
+  const lineH = 5;
 
-  const iframe = document.getElementById('iframe-print');
-  iframe.srcdoc = html;
-  iframe.onload = () => {
-    try { iframe.contentWindow.focus(); iframe.contentWindow.print(); }
-    catch(e) {}
-  };
+  doc.setFont('courier', 'normal');
+
+  // Cabecera local
+  if (configLocal?.nombre) {
+    doc.setFontSize(11); doc.setFont('courier', 'bold');
+    doc.text(configLocal.nombre, ancho / 2, y, { align: 'center' }); y += lineH;
+    if (configLocal.direccion) {
+      doc.setFontSize(8); doc.setFont('courier', 'normal');
+      doc.text(configLocal.direccion, ancho / 2, y, { align: 'center' }); y += lineH - 1;
+    }
+    y += 2;
+    doc.setDrawColor(180); doc.line(2, y, ancho, y); y += 3;
+  }
+
+  // Mesa y hora
+  const hora = new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
+  const fecha = new Date().toLocaleDateString('es-ES');
+  doc.setFontSize(12); doc.setFont('courier', 'bold');
+  doc.text(`Mesa ${nombreMesa}`, 2, y); y += lineH;
+  doc.setFontSize(8); doc.setFont('courier', 'normal');
+  doc.text(`${fecha}  ${hora}`, 2, y); y += lineH + 1;
+  doc.setDrawColor(180); doc.line(2, y, ancho, y); y += 3;
+
+  // Líneas
+  doc.setFontSize(10);
+  lineas.forEach(l => {
+    doc.setFont('courier', 'bold');
+    const qty = `${l.qty}x`;
+    const precio = `${(l.precio * l.qty).toFixed(2)}EUR`;
+    const nombreTxt = l.nombre;
+
+    doc.text(qty, 2, y);
+    doc.setFont('courier', 'normal');
+    // Nombre truncado para que quepa con el precio
+    const maxNombre = ancho - 16;
+    const nombreFit = doc.splitTextToSize(nombreTxt, maxNombre);
+    doc.text(nombreFit[0], 10, y);
+    doc.text(precio, ancho, y, { align: 'right' });
+    y += lineH;
+
+    // Líneas extra si el nombre es largo
+    if (nombreFit.length > 1) {
+      nombreFit.slice(1).forEach(linea => {
+        doc.text(linea, 10, y); y += lineH;
+      });
+    }
+
+    // Nota
+    if (l.nota) {
+      doc.setFontSize(8); doc.setFont('courier', 'italic');
+      doc.setTextColor(100);
+      doc.text(`  \u21b3 ${l.nota}`, 10, y); y += lineH - 1;
+      doc.setFontSize(10); doc.setFont('courier', 'normal');
+      doc.setTextColor(0);
+    }
+
+    doc.setDrawColor(220); doc.line(2, y, ancho, y); y += 2;
+  });
+
+  // Ajustar altura real del documento
+  const docFinal = new jsPDF({ unit: 'mm', format: [80, y + 8], orientation: 'portrait' });
+  docFinal.setFont('courier', 'normal');
+  // Re-renderizar en doc con altura correcta
+  // (copiamos el contenido al nuevo doc con el tamaño exacto)
+  doc.internal.pageSize.height = y + 8;
+
+  // Nombre del archivo: comanda-mesa3-2134.pdf
+  const horaSlug = hora.replace(':', '');
+  const nombreArchivo = `comanda-mesa${nombreMesa}-${horaSlug}.pdf`;
+
+  doc.save(nombreArchivo);
 }
 
 // ── Enviar ────────────────────────────────────────────────────────────────────
@@ -613,8 +692,8 @@ window.enviarPedido = async () => {
     lineasImprimir.push({ nombre: art.nombre, precio: Number(art.precio), qty, nota: nota || '' });
   }
 
-  // Imprimir comanda automáticamente
-  imprimirComanda(mesaNombre, lineasImprimir, configLocal);
+  // Generar y descargar PDF solo si el toggle está activo
+  if (autoPDF) generarPDFComanda(mesaNombre, lineasImprimir, configLocal);
 
   carrito = {};
   cerrarDrawer();
