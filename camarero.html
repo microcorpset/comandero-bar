@@ -281,10 +281,17 @@
 
   @media print {
     body > * { display: none !important; }
-    #view-ticket { display: block !important; }
+    #view-ticket { display: block !important; padding: 0 !important; margin: 0 !important; }
     #view-ticket > div:first-child { display: none !important; }
-    .ticket-card { border: none !important; border-radius: 0 !important; padding: 0 !important; max-width: 100% !important; }
+    #view-ticket > div:last-child { padding: 0 !important; margin: 0 !important; }
+    .ticket-card {
+      border: none !important; border-radius: 0 !important;
+      padding: 0 !important; margin: 0 !important;
+      max-width: 100% !important; box-shadow: none !important;
+      background: transparent !important;
+    }
     .btn-print, .btn-cerrar { display: none !important; }
+    body { margin: 0 !important; padding: 0 !important; background: white !important; }
   }
 </style>
 </head>
@@ -754,106 +761,84 @@ async function generarPDFComanda(nombreMesa, lineas, configLocal) {
   }
 
   const { jsPDF } = window.jspdf;
-  const ANCHO_MM = 80;
-  const MARGEN   = 4;
-  const lineH    = 5.5;
+  const ANCHO = 80;
+  const M = 4; // margen
+  const LH = 5.5; // line height mm
 
-  // Función que dibuja (o solo mide si doc=null) y devuelve la altura total usada
-  function renderTicket(doc, medirSolo) {
-    let y = MARGEN;
-
-    function texto(txt, x, opts) {
-      if (!medirSolo) doc.text(txt, x, y, opts || {});
-    }
-    function linea() {
-      if (!medirSolo) { doc.setDrawColor(180); doc.line(MARGEN, y, ANCHO_MM - MARGEN, y); }
-    }
+  // Dibuja el contenido en un doc y devuelve la Y final
+  function dibujar(doc) {
+    let y = M;
+    doc.setFont('courier', 'normal');
 
     // Cabecera local
     if (configLocal?.nombre) {
-      if (!medirSolo) { doc.setFontSize(10); doc.setFont('courier', 'bold'); }
-      texto(configLocal.nombre, ANCHO_MM / 2, { align: 'center' }); y += lineH;
+      doc.setFontSize(10); doc.setFont('courier', 'bold');
+      doc.text(configLocal.nombre, ANCHO / 2, y, { align: 'center' }); y += LH;
       if (configLocal.direccion) {
-        if (!medirSolo) { doc.setFontSize(7); doc.setFont('courier', 'normal'); }
-        texto(configLocal.direccion, ANCHO_MM / 2, { align: 'center' }); y += lineH;
+        doc.setFontSize(7); doc.setFont('courier', 'normal');
+        doc.text(configLocal.direccion, ANCHO / 2, y, { align: 'center' }); y += LH;
       }
-      linea(); y += 3;
+      doc.setDrawColor(180); doc.line(M, y, ANCHO - M, y); y += 3;
     }
 
-    // Mesa y hora
+    // Mesa y fecha
     const ahora = new Date();
-    const hora  = ahora.toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    const hora  = ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     const fecha = ahora.toLocaleDateString('es-ES');
+    doc.setFontSize(12); doc.setFont('courier', 'bold');
+    doc.text(`Mesa ${nombreMesa}`, M, y); y += LH;
+    doc.setFontSize(7); doc.setFont('courier', 'normal');
+    doc.text(`${fecha}  ${hora}`, M, y); y += LH;
+    doc.setDrawColor(160); doc.line(M, y, ANCHO - M, y); y += 3;
 
-    if (!medirSolo) { doc.setFontSize(12); doc.setFont('courier', 'bold'); }
-    texto(`Mesa ${nombreMesa}`, MARGEN); y += lineH;
-    if (!medirSolo) { doc.setFontSize(7); doc.setFont('courier', 'normal'); }
-    texto(`${fecha}  ${hora}`, MARGEN); y += lineH;
-    linea(); y += 3;
-
-    // Líneas de pedido
-    if (!medirSolo) doc.setFontSize(10);
-
-    // Necesitamos un doc para medir anchos de texto aunque estemos en modo medición
-    const medidor = medirSolo ? new jsPDF({ unit:'mm', format:[ANCHO_MM, 300] }) : doc;
-    medidor.setFontSize(10);
-    medidor.setFont('courier', 'normal');
-
+    // Artículos
+    doc.setFontSize(10);
     lineas.forEach(l => {
       const precioStr = `${(l.precio * l.qty).toFixed(2)}e`;
       const qtyStr    = `${l.qty}x `;
 
-      if (!medirSolo) { doc.setFont('courier', 'bold'); }
-      if (!medirSolo) doc.text(qtyStr, MARGEN, y);
+      doc.setFont('courier', 'bold');
+      const wQty = doc.getTextWidth(qtyStr);
+      doc.text(qtyStr, M, y);
 
-      if (!medirSolo) doc.setFont('courier', 'normal');
-      medidor.setFont('courier', 'bold');
-      const anchoQty    = medidor.getTextWidth(qtyStr);
-      medidor.setFont('courier', 'normal');
-      const anchoPrecio = medidor.getTextWidth(precioStr);
-      const anchoNombre = (ANCHO_MM - MARGEN * 2) - anchoQty - anchoPrecio - 2;
-      const partes = medidor.splitTextToSize(l.nombre, anchoNombre);
+      doc.setFont('courier', 'normal');
+      const wPrecio = doc.getTextWidth(precioStr);
+      const wNombre = (ANCHO - M * 2) - wQty - wPrecio - 2;
+      const partes  = doc.splitTextToSize(l.nombre, wNombre);
 
-      if (!medirSolo) {
-        doc.text(partes[0], MARGEN + anchoQty, y);
-        doc.text(precioStr, ANCHO_MM - MARGEN, y, { align: 'right' });
-      }
-      y += lineH;
+      doc.text(partes[0], M + wQty, y);
+      doc.text(precioStr, ANCHO - M, y, { align: 'right' });
+      y += LH;
 
       if (partes.length > 1) {
-        if (!medirSolo) doc.setFontSize(8);
-        partes.slice(1).forEach(p => {
-          if (!medirSolo) doc.text(p, MARGEN + anchoQty, y);
-          y += lineH - 1;
-        });
-        if (!medirSolo) doc.setFontSize(10);
+        doc.setFontSize(8);
+        partes.slice(1).forEach(p => { doc.text(p, M + wQty, y); y += LH - 1; });
+        doc.setFontSize(10);
       }
 
       if (l.nota) {
-        if (!medirSolo) {
-          doc.setFontSize(8); doc.setFont('courier', 'italic'); doc.setTextColor(80);
-          doc.text(`  \u21b3 ${l.nota}`, MARGEN + 4, y);
-          doc.setFontSize(10); doc.setFont('courier', 'normal'); doc.setTextColor(0);
-        }
-        y += lineH - 1;
+        doc.setFontSize(8); doc.setFont('courier', 'italic'); doc.setTextColor(80);
+        doc.text(`  \u21b3 ${l.nota}`, M + 4, y);
+        doc.setFontSize(10); doc.setFont('courier', 'normal'); doc.setTextColor(0);
+        y += LH - 1;
       }
 
-      linea(); y += 3;
+      doc.setDrawColor(200); doc.line(M, y, ANCHO - M, y); y += 2.5;
     });
 
-    return y + MARGEN;
+    return y + M; // altura total usada
   }
 
-  // 1. Medir altura real
-  const alturaTotal = renderTicket(null, true);
+  // 1ª pasada: doc temporal grande para medir la altura real
+  const docMedida = new jsPDF({ unit: 'mm', format: [ANCHO, 500], orientation: 'portrait' });
+  const alturaReal = dibujar(docMedida);
 
-  // 2. Crear doc con altura exacta y dibujar
-  const doc = new jsPDF({ unit: 'mm', format: [ANCHO_MM, alturaTotal], orientation: 'portrait' });
-  renderTicket(doc, false);
+  // 2ª pasada: doc con altura exacta
+  const doc = new jsPDF({ unit: 'mm', format: [ANCHO, alturaReal], orientation: 'portrait' });
+  dibujar(doc);
 
-  // 3. Guardar con nombre único
   const ahora = new Date();
-  const ts = `${ahora.getHours().toString().padStart(2,'0')}${ahora.getMinutes().toString().padStart(2,'0')}${ahora.getSeconds().toString().padStart(2,'0')}`;
+  const ts = `${String(ahora.getHours()).padStart(2,'0')}${String(ahora.getMinutes()).padStart(2,'0')}${String(ahora.getSeconds()).padStart(2,'0')}`;
   doc.save(`comanda-mesa${nombreMesa}-${ts}.pdf`);
 }
 
