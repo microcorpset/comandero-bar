@@ -1208,6 +1208,7 @@ window.cerrarMesa = async () => {
           const ahora = new Date();
           const registro = {
             mesa: mesaNombre,
+            camarero: camareroActual,
             ts: ahora.getTime(),
             fecha: ahora.toLocaleDateString('es-ES'),
             hora: ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),

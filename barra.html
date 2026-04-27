@@ -335,7 +335,10 @@ function generarTXT(mesaNombre, lineas) {
   const fecha = ahora.toLocaleDateString('es-ES');
   const ts    = `${String(ahora.getHours()).padStart(2,'0')}${String(ahora.getMinutes()).padStart(2,'0')}${String(ahora.getSeconds()).padStart(2,'0')}`;
   const sep   = '--------------------------------';
-  let txt = `${ROL==='cocina'?'COCINA':'BARRA'} — Mesa ${mesaNombre}\n${fecha}  ${hora}\n${sep}\n`;
+  const camarero = lineas[0]?.camarero || '';
+  let txt = `${ROL==='cocina'?'COCINA':'BARRA'} — Mesa ${mesaNombre}\n`;
+  if (camarero) txt += `Camarero: ${camarero}\n`;
+  txt += `${fecha}  ${hora}\n${sep}\n`;
   lineas.forEach(l => {
     const precio = (l.precio*l.qty).toFixed(2)+'EUR';
     const izq    = `${l.qty}x ${l.nombre}`;
@@ -358,6 +361,7 @@ document.body.appendChild(iframePrint);
 
 function imprimirComanda(mesaNombre, lineas) {
   const fecha = new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
+  const camarero = lineas[0]?.camarero || '';
   const rows = lineas.map(l => `
     <tr>
       <td style="padding:4px 6px 4px 0;font-weight:bold;vertical-align:top">${l.qty}×</td>
@@ -379,7 +383,7 @@ function imprimirComanda(mesaNombre, lineas) {
       @media print { body { padding: 0; } }
     </style></head><body>
     <h2>${ROL === 'cocina' ? '🍳 COCINA' : '🍺 BARRA'} — Mesa ${mesaNombre}</h2>
-    <div class="sub">${fecha}</div>
+    <div class="sub">${fecha}${camarero ? ' · ' + camarero : ''}</div>
     <table>${rows}</table>
     </body></html>`;
 
