@@ -335,9 +335,10 @@ function generarTXT(mesaNombre, lineas) {
   const fecha = ahora.toLocaleDateString('es-ES');
   const ts    = `${String(ahora.getHours()).padStart(2,'0')}${String(ahora.getMinutes()).padStart(2,'0')}${String(ahora.getSeconds()).padStart(2,'0')}`;
   const sep   = '--------------------------------';
-  const camarero = lineas[0]?.camarero || '';
+  const camareros = [...new Set(lineas.map(l => l.camarero).filter(Boolean))];
+  const camareroTxt = camareros.join(', ');
   let txt = `${ROL==='cocina'?'COCINA':'BARRA'} — Mesa ${mesaNombre}\n`;
-  if (camarero) txt += `Camarero: ${camarero}\n`;
+  if (camareroTxt) txt += `Camarero: ${camareroTxt}\n`;
   txt += `${fecha}  ${hora}\n${sep}\n`;
   lineas.forEach(l => {
     const precio = (l.precio*l.qty).toFixed(2)+'EUR';
@@ -361,7 +362,7 @@ document.body.appendChild(iframePrint);
 
 function imprimirComanda(mesaNombre, lineas) {
   const fecha = new Date().toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
-  const camarero = lineas[0]?.camarero || '';
+  const camarero = [...new Set(lineas.map(l => l.camarero).filter(Boolean))].join(', ');
   const rows = lineas.map(l => `
     <tr>
       <td style="padding:4px 6px 4px 0;font-weight:bold;vertical-align:top">${l.qty}×</td>
@@ -514,13 +515,16 @@ function crearCard(mesaId, lineas) {
   const tiempos = Object.values(lineas).map(l => l.ts).filter(Boolean);
   const masViejo = tiempos.length ? Math.min(...tiempos) : null;
 
+  const camareros = [...new Set(lineas.map(l => l.camarero).filter(Boolean))];
+  const camareroTxt = camareros.join(', ');
+
   const header = document.createElement('div');
   header.className = 'card-header';
   header.innerHTML = `
     <span class="dot"></span>
     <span class="card-mesa-name">Mesa ${nombre}</span>
     <span class="card-time">${masViejo ? tiempoRelativo(masViejo) : ''}</span>
-    ${lineas[0]?.camarero ? `<span style="font-size:10px;color:var(--muted);font-family:var(--mono)">${lineas[0].camarero}</span>` : ''}
+    ${camareroTxt ? `<span style="font-size:10px;color:var(--muted);font-family:var(--mono)">${camareroTxt}</span>` : ''}
     <button class="btn-imprimir" onclick="imprimirMesa('${mesaId}')" title="Imprimir">🖨</button>`;
   header.addEventListener('click', e => {
     if (e.target.closest('.btn-imprimir')) return;
