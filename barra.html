@@ -198,7 +198,11 @@
   </label>
   <label class="print-toggle" title="Imprimir automáticamente al llegar un pedido">
     <div class="toggle-track" id="print-track"><div class="toggle-thumb"></div></div>
-    <span id="print-label">Auto-imp.</span>
+    <span>🖨</span>
+  </label>
+  <label class="print-toggle" title="Generar TXT para autoimpresión sin diálogo">
+    <div class="toggle-track" id="txt-track"><div class="toggle-thumb"></div></div>
+    <span>TXT</span>
   </label>
   <span class="badge-nuevos" id="badge-nuevos"></span>
   <span class="clock" id="clock"></span>
@@ -303,6 +307,39 @@ printTrack.parentElement.addEventListener('click', () => {
   updateToggleUI();
 });
 
+// ── Toggle TXT ────────────────────────────────────────────────────────────────
+const TXT_KEY = 'txt_' + ROL;
+let autoTXT = localStorage.getItem(TXT_KEY) === 'true';
+const txtTrack = document.getElementById('txt-track');
+if (txtTrack) txtTrack.classList.toggle('on', autoTXT);
+if (txtTrack) txtTrack.parentElement.addEventListener('click', () => {
+  autoTXT = !autoTXT;
+  localStorage.setItem(TXT_KEY, autoTXT);
+  txtTrack.classList.toggle('on', autoTXT);
+});
+
+function generarTXT(mesaNombre, lineas) {
+  const ahora = new Date();
+  const hora  = ahora.toLocaleTimeString('es-ES', {hour:'2-digit', minute:'2-digit'});
+  const fecha = ahora.toLocaleDateString('es-ES');
+  const ts    = `${String(ahora.getHours()).padStart(2,'0')}${String(ahora.getMinutes()).padStart(2,'0')}${String(ahora.getSeconds()).padStart(2,'0')}`;
+  const sep   = '--------------------------------';
+  let txt = `${ROL==='cocina'?'COCINA':'BARRA'} — Mesa ${mesaNombre}\n${fecha}  ${hora}\n${sep}\n`;
+  lineas.forEach(l => {
+    const precio = (l.precio*l.qty).toFixed(2)+'EUR';
+    const izq    = `${l.qty}x ${l.nombre}`;
+    txt += izq+' '.repeat(Math.max(1,32-izq.length-precio.length))+precio+'\n';
+    if (l.nota) txt += `   -> ${l.nota}\n`;
+  });
+  txt += sep+'\n';
+  const blob = new Blob([txt],{type:'text/plain;charset=utf-8'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href=url; a.download=`comanda-${ROL}-mesa${mesaNombre}-${ts}.txt`;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+
 // ── Impresión via iframe oculto (sin ventanas emergentes) ─────────────────────
 const iframePrint = document.createElement('iframe');
 iframePrint.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;border:none';
@@ -395,6 +432,7 @@ onValue(ref(db, 'pedidos'), snap => {
           const lineas = Object.values(pedidosPorMesa[mesaId] || {}).filter(l => l.estado === 'pendiente');
           const nombre = mesasData[mesaId]?.nombre || mesaId;
           imprimirComanda(nombre, lineas);
+          if (autoTXT) generarTXT(nombre, lineas);
         }
       });
     }
@@ -551,7 +589,9 @@ function tiempoRelativo(ts) {
 window.imprimirMesa = mesaId => {
   const lineas = Object.values(pedidosPorMesa[mesaId] || {}).filter(l => l.estado === 'pendiente');
   if (!lineas.length) return;
-  imprimirComanda(mesasData[mesaId]?.nombre || mesaId, lineas);
+  const nombre = mesasData[mesaId]?.nombre || mesaId;
+  imprimirComanda(nombre, lineas);
+  if (autoTXT) generarTXT(nombre, lineas);
 };
 </script>
 </body>
