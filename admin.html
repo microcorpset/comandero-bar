@@ -468,13 +468,63 @@ function toast(msg) {
 function renderMesas(mesas) {
   const grid = document.getElementById('mesas-grid');
   grid.innerHTML = '';
-  Object.entries(mesas || {}).forEach(([id, m]) => {
+  const lista = Object.entries(mesas || {})
+    .sort(([,a],[,b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre,'es',{numeric:true}));
+
+  lista.forEach(([id, m], idx) => {
     const chip = document.createElement('div');
     chip.className = 'mesa-chip';
-    chip.innerHTML = `<span>${m.nombre}</span><span class="del" onclick="delMesa('${id}')">×</span>`;
+    chip.style.cssText = 'flex-direction:column;gap:4px;position:relative;aspect-ratio:unset;padding:8px 6px;min-height:64px';
+    chip.innerHTML = `
+      <span style="font-family:var(--mono);font-size:15px;font-weight:500" id="mesa-nombre-${id}">${m.nombre}</span>
+      <div style="display:flex;gap:3px;margin-top:2px">
+        <button class="btn btn-sm" style="padding:2px 5px;font-size:10px" title="Mover arriba"
+          onclick="moverMesa('${id}',${idx},-1,event)" ${idx===0?'disabled':''}>↑</button>
+        <button class="btn btn-sm" style="padding:2px 5px;font-size:10px" title="Mover abajo"
+          onclick="moverMesa('${id}',${idx},1,event)" ${idx===lista.length-1?'disabled':''}>↓</button>
+        <button class="btn btn-sm" style="padding:2px 5px;font-size:10px" title="Renombrar"
+          onclick="editarMesa('${id}',event)">✏</button>
+        <button class="btn btn-sm btn-danger" style="padding:2px 5px;font-size:10px"
+          onclick="delMesa('${id}',event)">×</button>
+      </div>`;
     grid.appendChild(chip);
   });
 }
+
+window.editarMesa = (id, e) => {
+  e.stopPropagation();
+  const nombreActual = mesasData[id]?.nombre || '';
+  const span = document.getElementById('mesa-nombre-' + id);
+  if (!span) return;
+  const input = document.createElement('input');
+  input.type = 'text'; input.value = nombreActual;
+  input.style.cssText = 'font-family:var(--mono);font-size:13px;background:var(--bg);border:1px solid var(--accent);border-radius:4px;padding:2px 4px;width:100%;color:var(--text)';
+  span.replaceWith(input);
+  input.focus(); input.select();
+  const guardar = async () => {
+    const nuevo = input.value.trim();
+    if (nuevo && nuevo !== nombreActual) {
+      await set(ref(db, 'mesas/' + id + '/nombre'), nuevo);
+      toast('Mesa renombrada');
+    }
+  };
+  input.addEventListener('blur', guardar);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') input.blur(); if (e.key === 'Escape') input.value = nombreActual; });
+};
+
+window.moverMesa = async (id, idx, dir, e) => {
+  e.stopPropagation();
+  const lista = Object.entries(mesasData)
+    .sort(([,a],[,b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre,'es',{numeric:true}));
+  const idxDest = idx + dir;
+  if (idxDest < 0 || idxDest >= lista.length) return;
+  const updates = {};
+  lista.forEach(([mid], i) => { updates['mesas/' + mid + '/orden'] = i; });
+  updates['mesas/' + lista[idx][0] + '/orden'] = idxDest;
+  updates['mesas/' + lista[idxDest][0] + '/orden'] = idx;
+  const { update } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js");
+  await update(ref(db), updates);
+};
 
 window.addMesa = async () => {
   const nombre = document.getElementById('nueva-mesa').value.trim();
@@ -484,7 +534,8 @@ window.addMesa = async () => {
   toast('Mesa añadida');
 };
 
-window.delMesa = async id => {
+window.delMesa = async (id, e) => {
+  if (e) e.stopPropagation();
   if (!confirm('¿Eliminar esta mesa?')) return;
   await remove(ref(db, 'mesas/' + id));
   toast('Mesa eliminada');
@@ -668,9 +719,13 @@ window.guardarPin = (rol) => {
 
 // ─── VENTAS ──────────────────────────────────────────────────────────────────
 function initFiltrosFecha() {
-  const hoy = new Date().toISOString().split('T')[0];
-  document.getElementById('filtro-fecha-ini').value = hoy;
-  document.getElementById('filtro-fecha-fin').value = hoy;
+  const hoy = new Date();
+  const yyyy = hoy.getFullYear();
+  const mm   = String(hoy.getMonth() + 1).padStart(2, '0');
+  const dd   = String(hoy.getDate()).padStart(2, '0');
+  const local = `${yyyy}-${mm}-${dd}`;
+  document.getElementById('filtro-fecha-ini').value = local;
+  document.getElementById('filtro-fecha-fin').value = local;
 }
 
 window.resetFiltros = () => {

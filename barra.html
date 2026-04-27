@@ -113,6 +113,29 @@
   }
   .btn-servido:active { background: var(--border); }
   .btn-servido.hecho { border-color: rgba(90,255,154,.25); color: #5aff9a; background: rgba(90,255,154,.08); cursor: default; }
+  .btn-stock {
+    font-family: var(--mono); font-size: 14px; padding: 5px 10px;
+    border-radius: 8px; border: 1px solid rgba(255,90,90,.3);
+    background: rgba(255,90,90,.08); color: #ff5a5a;
+    cursor: pointer; flex-shrink: 0; transition: all .15s;
+  }
+  .btn-stock:active { background: rgba(255,90,90,.2); }
+
+  /* Wake lock toggle */
+  .wake-toggle {
+    display: flex; align-items: center; gap: 6px; cursor: pointer;
+    font-family: var(--mono); font-size: 11px; color: var(--muted);
+  }
+  .wake-track {
+    width: 32px; height: 18px; border-radius: 9px; background: var(--border);
+    position: relative; transition: background .2s; flex-shrink: 0;
+  }
+  .wake-track.on { background: var(--accent); }
+  .wake-thumb {
+    width: 14px; height: 14px; border-radius: 50%; background: #fff;
+    position: absolute; top: 2px; left: 2px; transition: left .2s;
+  }
+  .wake-track.on .wake-thumb { left: 16px; }
 
   /* ── PIN SCREEN ── */
   #pin-screen {
@@ -169,6 +192,10 @@
 <div class="topbar">
   <span class="topbar-title" id="topbar-title">Barra</span>
   <div class="spacer"></div>
+  <label class="wake-toggle" title="Pantalla siempre encendida">
+    <div class="wake-track" id="wake-track"><div class="wake-thumb"></div></div>
+    <span>☀</span>
+  </label>
   <label class="print-toggle" title="Imprimir automáticamente al llegar un pedido">
     <div class="toggle-track" id="print-track"><div class="toggle-thumb"></div></div>
     <span id="print-label">Auto-imp.</span>
@@ -234,6 +261,26 @@ function verificarPin() {
   }
 }
 // ─────────────────────────────────────────────────────────────────────────────
+
+// ── Wake Lock ──────────────────────────────────────────────────────────────────
+const WAKE_KEY2 = 'wake_' + ROL;
+let wakeLock2 = null;
+let autoWake2 = localStorage.getItem(WAKE_KEY2) === 'true';
+const wakeTrack2 = document.getElementById('wake-track');
+if (wakeTrack2) wakeTrack2.classList.toggle('on', autoWake2);
+async function activarWake2() {
+  try { if ('wakeLock' in navigator) wakeLock2 = await navigator.wakeLock.request('screen'); } catch(e) {}
+}
+if (autoWake2) activarWake2();
+if (wakeTrack2) wakeTrack2.parentElement.addEventListener('click', () => {
+  autoWake2 = !autoWake2;
+  localStorage.setItem(WAKE_KEY2, autoWake2);
+  wakeTrack2.classList.toggle('on', autoWake2);
+  if (autoWake2) activarWake2(); else { if (wakeLock2) { wakeLock2.release(); wakeLock2 = null; } }
+});
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && autoWake2) activarWake2();
+});
 
 if (ROL === 'cocina') {
   document.documentElement.classList.add('rol-cocina');
@@ -431,7 +478,8 @@ function crearCard(mesaId, lineas) {
       main.innerHTML = `
         <span class="linea-qty">${l.qty}</span>
         <span class="linea-nombre">${l.nombre}</span>
-        <button class="btn-servido" onclick="marcarServido('${mesaId}','${lineaId}',this)">Servido</button>`;
+        <button class="btn-servido" onclick="marcarServido('${mesaId}','${lineaId}',this)">Servido</button>
+        <button class="btn-stock" onclick="marcarSinStock('${mesaId}','${lineaId}',this)" title="Sin stock — quitar sin cobrar">✕</button>`;
       row.appendChild(main);
 
       // Nota si existe
@@ -480,6 +528,19 @@ window.marcarServido = async (mesaId, lineaId, btn) => {
   }
 };
 
+window.marcarSinStock = async (mesaId, lineaId, btn) => {
+  if (btn.disabled) return;
+  btn.disabled = true;
+  await set(ref(db, `pedidos/${mesaId}/${lineaId}/estado`), 'cancelado');
+  const row = btn.closest('.linea-row');
+  if (row) { row.style.opacity = '.3'; row.style.textDecoration = 'line-through'; }
+  btn.disabled = false;
+  const snap = await get(ref(db, 'pedidos/' + mesaId));
+  const ls   = snap.val() || {};
+  const quedan = Object.values(ls).filter(l => (l.destino===ROL||l.destino==='ambos') && l.estado==='pendiente');
+  if (!quedan.length) { nuevosActivos.delete(mesaId); detectarNuevos(); setTimeout(() => renderPedidos(), 600); }
+};
+
 function tiempoRelativo(ts) {
   const diff = Math.floor((Date.now() - ts) / 60000);
   if (diff < 1) return 'ahora';
@@ -487,12 +548,10 @@ function tiempoRelativo(ts) {
   return `hace ${diff} min`;
 }
 
-// Imprimir manualmente una mesa concreta
 window.imprimirMesa = mesaId => {
   const lineas = Object.values(pedidosPorMesa[mesaId] || {}).filter(l => l.estado === 'pendiente');
   if (!lineas.length) return;
-  const nombre = mesasData[mesaId]?.nombre || mesaId;
-  imprimirComanda(nombre, lineas);
+  imprimirComanda(mesasData[mesaId]?.nombre || mesaId, lineas);
 };
 </script>
 </body>

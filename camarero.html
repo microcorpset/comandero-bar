@@ -118,16 +118,29 @@
   .mesas-title { font-family: var(--mono); font-size: 11px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; margin-bottom: .75rem; }
   .mesas-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px,1fr)); gap: 10px; }
   .mesa-btn {
-    aspect-ratio: 1; background: var(--surface); border: 1.5px solid var(--border);
+    min-height: 90px; background: var(--surface); border: 1.5px solid var(--border);
     border-radius: 12px; display: flex; flex-direction: column;
     align-items: center; justify-content: center; cursor: pointer;
-    transition: border .15s, background .15s; gap: 4px;
+    transition: border .2s, background .2s; gap: 3px; padding: 8px;
   }
-  .mesa-btn:active { background: var(--surface2); }
-  .mesa-btn.ocupada { border-color: var(--accent2); background: rgba(61,122,255,.06); }
+  .mesa-btn:active { filter: brightness(.96); }
+  .mesa-btn.ocupada       { border-color: var(--accent2); background: rgba(61,122,255,.04); }
+  .mesa-btn.alerta-ok     { border-color: #22c55e; background: rgba(34,197,94,.05); }
+  .mesa-btn.alerta-warn   { border-color: #e5a535; background: rgba(229,165,53,.07); }
+  .mesa-btn.alerta-danger { border-color: var(--danger); background: rgba(229,53,53,.07); }
   .mesa-nombre { font-family: var(--mono); font-size: 18px; font-weight: 500; }
   .mesa-estado { font-size: 11px; color: var(--muted); }
   .mesa-btn.ocupada .mesa-estado { color: var(--accent2); }
+  .mesa-alerta-info { font-size: 10px; display: flex; align-items: center; gap: 2px; color: var(--muted); margin-top: 1px; }
+
+  /* Botón nota */
+  .btn-nota {
+    width: 32px; height: 36px; border: 1px solid var(--border); background: var(--surface2);
+    border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; transition: background .1s, border-color .1s; flex-shrink: 0;
+  }
+  .btn-nota:active { background: var(--border); }
+  .btn-nota.tiene-nota { border-color: var(--accent2); background: rgba(61,122,255,.1); }
 
   /* CARTA */
   #view-carta { display: none; }
@@ -177,19 +190,14 @@
   }
   .qty-num.has-qty { color: var(--accent2); font-weight: 700; background: rgba(61,122,255,.05); }
 
-  /* Nota inline bajo el artículo (aparece cuando qty > 0) */
-  .art-nota-row {
-    padding: 0 1rem 10px; display: none;
+  /* Botón nota */
+  .btn-nota {
+    width: 32px; height: 36px; border: 1px solid var(--border); background: var(--surface2);
+    border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; transition: background .1s, border-color .1s; flex-shrink: 0;
   }
-  .art-nota-row.visible { display: flex; gap: 8px; align-items: center; }
-  .nota-input {
-    flex: 1; background: var(--bg); border: 1px solid var(--border);
-    border-radius: 8px; padding: 6px 10px; font-size: 13px; font-family: var(--sans);
-    color: var(--text); outline: none; transition: border .15s;
-  }
-  .nota-input:focus { border-color: var(--accent2); }
-  .nota-input::placeholder { color: var(--muted); }
-  .nota-label { font-size: 11px; color: var(--muted); white-space: nowrap; }
+  .btn-nota:active { background: var(--border); }
+  .btn-nota.tiene-nota { border-color: var(--accent2); background: rgba(61,122,255,.08); }
 
   /* BARRA INFERIOR */
   .bottom-bar {
@@ -339,9 +347,17 @@
   <span class="topbar-title">Camarero</span>
   <span class="mesa-badge" id="topbar-mesa"></span>
   <div class="spacer"></div>
-  <label class="print-toggle" title="Imprimir comanda al enviar">
+  <label class="print-toggle" title="Pantalla siempre encendida">
+    <div class="toggle-track" id="wake-track"><div class="toggle-thumb"></div></div>
+    <span>☀</span>
+  </label>
+  <label class="print-toggle" title="Generar PDF al enviar">
     <div class="toggle-track" id="print-track"><div class="toggle-thumb"></div></div>
     <span>PDF</span>
+  </label>
+  <label class="print-toggle" title="Generar TXT para autoimpresión">
+    <div class="toggle-track" id="txt-track"><div class="toggle-thumb"></div></div>
+    <span>TXT</span>
   </label>
   <span class="quota-badge" id="quota-badge"></span>
   <button class="btn-carrito" id="btn-carrito" onclick="abrirDrawer()">
@@ -477,27 +493,121 @@ printTrack.parentElement.addEventListener('click', () => {
   printTrack.classList.toggle('on', autoPDF);
 });
 
+// ── Toggle TXT autoimpresión ───────────────────────────────────────────────────
+const TXT_KEY = 'camarero_txt';
+let autoTXT = localStorage.getItem(TXT_KEY) === 'true';
+const txtTrack = document.getElementById('txt-track');
+txtTrack.classList.toggle('on', autoTXT);
+txtTrack.parentElement.addEventListener('click', () => {
+  autoTXT = !autoTXT;
+  localStorage.setItem(TXT_KEY, autoTXT);
+  txtTrack.classList.toggle('on', autoTXT);
+});
+
+// ── Wake Lock ──────────────────────────────────────────────────────────────────
+const WAKE_KEY = 'camarero_wake';
+let wakeLock = null;
+let autoWake = localStorage.getItem(WAKE_KEY) === 'true';
+const wakeTrack = document.getElementById('wake-track');
+wakeTrack.classList.toggle('on', autoWake);
+async function activarWakeLock() {
+  try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch(e) {}
+}
+if (autoWake) activarWakeLock();
+wakeTrack.parentElement.addEventListener('click', () => {
+  autoWake = !autoWake;
+  localStorage.setItem(WAKE_KEY, autoWake);
+  wakeTrack.classList.toggle('on', autoWake);
+  if (autoWake) activarWakeLock(); else { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
+});
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && autoWake) activarWakeLock();
+});
+
+// ── Modal de nota ─────────────────────────────────────────────────────────────
+window.abrirNotaModal = (artId, nombreArt) => {
+  const notaActual = carrito[artId]?.nota || '';
+  showModal({ title: '📝 ' + nombreArt, body: '', buttons: [] });
+  const modalBody = document.getElementById('modal-body');
+  modalBody.innerHTML = '';
+  const inp = document.createElement('input');
+  inp.type = 'text'; inp.value = notaActual;
+  inp.placeholder = 'ej: poco hecho, sin cebolla…';
+  inp.style.cssText = 'width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;font-family:var(--sans);color:var(--text);outline:none';
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') guardarNota(); });
+  modalBody.appendChild(inp);
+  setTimeout(() => inp.focus(), 80);
+  const acts = document.getElementById('modal-actions');
+  acts.innerHTML = '';
+  const btnClear = document.createElement('button');
+  btnClear.className = 'modal-btn'; btnClear.textContent = 'Borrar';
+  btnClear.onclick = () => { inp.value = ''; guardarNota(); };
+  const btnOk = document.createElement('button');
+  btnOk.className = 'modal-btn primary'; btnOk.textContent = 'Guardar';
+  btnOk.onclick = guardarNota;
+  acts.appendChild(btnClear); acts.appendChild(btnOk);
+
+  function guardarNota() {
+    const val = inp.value.trim();
+    if (carrito[artId]) carrito[artId].nota = val;
+    const drawerInp = document.querySelector(`[data-rnota="${artId}"]`);
+    if (drawerInp) drawerInp.value = val;
+    const btn = document.getElementById('btnnota-' + artId);
+    if (btn) btn.classList.toggle('tiene-nota', !!val);
+    document.getElementById('modal-overlay').classList.remove('open');
+    if (document.getElementById('drawer').classList.contains('open')) renderDrawer();
+  }
+};
+
 onValue(ref(db, 'mesas'), snap => { mesasData = snap.val() || {}; renderMesas(); });
 onValue(ref(db, 'categorias'), snap => { categoriasData = snap.val() || {}; catsReady = true; if (cartaReady && mesaId) renderCarta(); });
 onValue(ref(db, 'carta'), snap => { cartaData = snap.val() || {}; cartaReady = true; if (catsReady && mesaId) renderCarta(); });
 onValue(ref(db, 'config/local'), snap => { configLocal = snap.val() || {}; });
+// Escuchar pedidos para colores de mesas
+onValue(ref(db, 'pedidos'), snap => { pedidosData = snap.val() || {}; renderMesas(); });
 
-// ── Mesas ─────────────────────────────────────────────────────────────────────
+// ── Mesas con colores de estado ───────────────────────────────────────────────
+let pedidosData = {};
+
 function renderMesas() {
   const grid = document.getElementById('mesas-grid');
   const entries = Object.entries(mesasData);
   if (!entries.length) { grid.innerHTML = '<div class="loading">Sin mesas.</div>'; return; }
   grid.innerHTML = '';
-  entries.sort(([,a],[,b]) => a.nombre.localeCompare(b.nombre, 'es', {numeric:true}))
+  entries
+    .sort(([,a],[,b]) => (a.orden??999)-(b.orden??999) || a.nombre.localeCompare(b.nombre,'es',{numeric:true}))
     .forEach(([id, m]) => {
       const ocupada = m.estado === 'ocupada';
       const div = document.createElement('div');
-      div.className = 'mesa-btn' + (ocupada ? ' ocupada' : '');
-      div.innerHTML = `<span class="mesa-nombre">${m.nombre}</span><span class="mesa-estado">${ocupada ? 'ocupada' : 'libre'}</span>`;
+
+      // Calcular alerta de tiempo sin servir
+      let claseAlerta = ocupada ? 'ocupada' : 'libre';
+      let alertaInfo = '';
+      if (ocupada && pedidosData[id]) {
+        const lineasPend = Object.values(pedidosData[id]).filter(l => l.estado === 'pendiente');
+        if (lineasPend.length) {
+          const masAntigua = lineasPend.reduce((min, l) => l.ts < min.ts ? l : min, lineasPend[0]);
+          const mins = Math.floor((Date.now() - masAntigua.ts) / 60000);
+          const dest = masAntigua.destino === 'cocina' ? '🍳' : masAntigua.destino === 'barra' ? '🍺' : '🍺🍳';
+          if (mins >= 20)      { claseAlerta = 'alerta-danger'; }
+          else if (mins >= 10) { claseAlerta = 'alerta-warn'; }
+          else if (mins >= 0)  { claseAlerta = 'alerta-ok'; }
+          alertaInfo = `<span class="mesa-alerta-info">${dest} ${mins}m</span>`;
+        }
+      }
+
+      div.className = 'mesa-btn ' + claseAlerta;
+      div.innerHTML = `
+        <span class="mesa-nombre">${m.nombre}</span>
+        <span class="mesa-estado">${ocupada ? 'ocupada' : 'libre'}</span>
+        ${alertaInfo}`;
       div.addEventListener('click', () => abrirMesa(id, m.nombre, ocupada));
       grid.appendChild(div);
     });
 }
+
+// Actualizar colores cada minuto
+setInterval(() => { if (Object.keys(mesasData).length) renderMesas(); }, 60000);
 
 function abrirMesa(id, nombre, ocupada) {
   mesaId = id; mesaNombre = nombre; carrito = {};
@@ -550,7 +660,6 @@ function renderCarta() {
       const wrap = document.createElement('div');
       wrap.className = 'art-row';
 
-      // Fila principal
       const mainRow = document.createElement('div');
       mainRow.className = 'art-main';
       mainRow.innerHTML = `
@@ -560,20 +669,10 @@ function renderCarta() {
           <button class="qty-btn" data-id="${artId}" data-d="-1">−</button>
           <span class="qty-num" id="qty-${artId}">0</span>
           <button class="qty-btn" data-id="${artId}" data-d="1">+</button>
-        </div>`;
+        </div>
+        <button class="btn-nota" id="btnnota-${artId}" title="Añadir nota"
+          onclick="abrirNotaModal('${artId}','${art.nombre.replace(/'/g,"\\'")}')">📝</button>`;
       wrap.appendChild(mainRow);
-
-      // Fila nota (oculta hasta que qty > 0)
-      const notaRow = document.createElement('div');
-      notaRow.className = 'art-nota-row';
-      notaRow.id = 'notarow-' + artId;
-      notaRow.innerHTML = `
-        <span class="nota-label">Nota:</span>
-        <input class="nota-input" id="nota-${artId}" type="text"
-          placeholder="ej: poco hecho, sin cebolla…"
-          oninput="actualizarNota('${artId}', this.value)" />`;
-      wrap.appendChild(notaRow);
-
       itemsDiv.appendChild(wrap);
     });
 
@@ -625,20 +724,10 @@ function updateQtyDisplay() {
     const q = carrito[id]?.qty || 0;
     el.textContent = q;
     el.className = 'qty-num' + (q > 0 ? ' has-qty' : '');
-
-    // mostrar/ocultar fila de nota
-    const notaRow = document.getElementById('notarow-' + id);
-    if (notaRow) {
-      if (q > 0) {
-        notaRow.classList.add('visible');
-        // preservar el texto si ya existe
-        const input = document.getElementById('nota-' + id);
-        if (input && carrito[id]?.nota) input.value = carrito[id].nota;
-      } else {
-        notaRow.classList.remove('visible');
-        const input = document.getElementById('nota-' + id);
-        if (input) input.value = '';
-      }
+    // Actualizar botón nota
+    const btnNota = document.getElementById('btnnota-' + id);
+    if (btnNota) {
+      btnNota.classList.toggle('tiene-nota', !!(carrito[id]?.nota));
     }
   });
 
@@ -798,7 +887,34 @@ function generarPDFComanda(nombreMesa, lineas, configLocal) {
   iframeComanda.srcdoc = html;
 }
 
-// ── CUOTA ─────────────────────────────────────────────────────────────────────
+function generarTXTComanda(nombreMesa, lineas, configLocal) {
+  const ahora = new Date();
+  const hora  = ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  const fecha = ahora.toLocaleDateString('es-ES');
+  const ts    = `${String(ahora.getHours()).padStart(2,'0')}${String(ahora.getMinutes()).padStart(2,'0')}${String(ahora.getSeconds()).padStart(2,'0')}`;
+  const sep   = '--------------------------------';
+  let txt = '';
+  if (configLocal?.nombre)    txt += configLocal.nombre + '\n';
+  if (configLocal?.direccion) txt += configLocal.direccion + '\n';
+  txt += sep + '\n';
+  txt += `Mesa ${nombreMesa}\n`;
+  txt += `${fecha}  ${hora}\n`;
+  txt += sep + '\n';
+  lineas.forEach(l => {
+    const precio  = (l.precio * l.qty).toFixed(2) + 'EUR';
+    const izq     = `${l.qty}x ${l.nombre}`;
+    const nEspacios = Math.max(1, 32 - izq.length - precio.length);
+    txt += izq + ' '.repeat(nEspacios) + precio + '\n';
+    if (l.nota) txt += `   -> ${l.nota}\n`;
+  });
+  txt += sep + '\n';
+  const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = `comanda-mesa${nombreMesa}-${ts}.txt`;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
 let quotaActual = null; // null = aún no cargado
 
 onValue(ref(db, 'config/quota/lineas'), snap => {
@@ -891,6 +1007,7 @@ window.enviarPedido = async () => {
 
   // Generar y descargar PDF solo si el toggle está activo
   if (autoPDF) generarPDFComanda(mesaNombre, lineasImprimir, configLocal);
+  if (autoTXT) generarTXTComanda(mesaNombre, lineasImprimir, configLocal);
 
   carrito = {};
   cerrarDrawer();
@@ -901,50 +1018,68 @@ window.enviarPedido = async () => {
   setTimeout(() => { btn1.textContent = 'Enviar'; updateUI(); }, 1800);
 };
 
-// ── Cuenta ────────────────────────────────────────────────────────────────────
+// ── Cuenta / Ticket editable ──────────────────────────────────────────────────
 window.verCuenta = async () => {
   if (!mesaId) return;
   const snap = await get(ref(db, 'pedidos/' + mesaId));
-  const pedidos = snap.val() || {};
+  renderTicket(snap.val() || {});
+  show('ticket');
+};
+
+function renderTicket(pedidos) {
   const agrupado = {};
-  Object.values(pedidos).forEach(l => {
+  Object.entries(pedidos).forEach(([lid, l]) => {
+    if (l.estado === 'cancelado') return;
     const k = l.nombre + (l.nota ? '|' + l.nota : '');
-    if (!agrupado[k]) agrupado[k] = { nombre: l.nombre, precio: Number(l.precio), qty: 0, nota: l.nota || '' };
+    if (!agrupado[k]) agrupado[k] = { nombre: l.nombre, precio: Number(l.precio), qty: 0, nota: l.nota||'', ids: [] };
     agrupado[k].qty += l.qty;
+    agrupado[k].ids.push(lid);
   });
   const total = Object.values(agrupado).reduce((s, l) => s + l.precio * l.qty, 0);
   const fecha = new Date().toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
-
-  const loc = configLocal;
+  const loc   = configLocal;
   const cabecera = `
     ${loc.nombre    ? `<div style="font-size:18px;font-weight:500;font-family:var(--mono)">${loc.nombre}</div>` : ''}
     ${loc.direccion ? `<div style="font-size:12px;color:var(--muted);margin-top:2px">${loc.direccion}</div>` : ''}
     ${loc.telefono  ? `<div style="font-size:12px;color:var(--muted)">${loc.telefono}</div>` : ''}
-    ${loc.cif       ? `<div style="font-size:11px;color:var(--muted)">${loc.cif}</div>` : ''}
-  `;
+    ${loc.cif       ? `<div style="font-size:11px;color:var(--muted)">${loc.cif}</div>` : ''}`;
   const pie = loc.footer
-    ? `<div style="text-align:center;font-size:12px;color:var(--muted);margin-top:1rem;padding-top:.75rem;border-top:1px dashed var(--border)">${loc.footer}</div>`
-    : '';
+    ? `<div style="text-align:center;font-size:12px;color:var(--muted);margin-top:1rem;padding-top:.75rem;border-top:1px dashed var(--border)">${loc.footer}</div>` : '';
+
+  const idsJSON = key => JSON.stringify(agrupado[key].ids);
 
   document.getElementById('ticket-card').innerHTML = `
     <div class="ticket-header">
       ${cabecera}
-      <div style="margin-top:${loc.nombre ? '.75rem' : '0'}">
+      <div style="margin-top:${loc.nombre?'.75rem':'0'}">
         <div class="ticket-mesa">Mesa ${mesaNombre}</div>
         <div class="ticket-fecha">${fecha}</div>
       </div>
     </div>
-    ${Object.values(agrupado).map(l => `
+    <div style="font-size:11px;color:var(--muted);margin-bottom:.5rem;font-family:var(--mono)">Pulsa × para quitar una línea</div>
+    ${Object.entries(agrupado).map(([k, l]) => `
       <div class="ticket-linea">
-        <span>${l.qty}× ${l.nombre}</span>
-        <span style="font-family:var(--mono)">${(l.precio * l.qty).toFixed(2)} €</span>
+        <div style="flex:1">
+          <div>${l.qty}× ${l.nombre}</div>
+          ${l.nota ? `<div style="font-size:11px;color:var(--muted);font-style:italic">↳ ${l.nota}</div>` : ''}
+        </div>
+        <span style="font-family:var(--mono)">${(l.precio*l.qty).toFixed(2)} €</span>
+        <button onclick="cancelarLineaTicket(${idsJSON(k)})"
+          style="background:none;border:none;color:var(--danger);font-size:20px;cursor:pointer;padding:0 4px;line-height:1;flex-shrink:0" title="Quitar">×</button>
       </div>`).join('')}
     <div class="ticket-total"><span>Total</span><span>${total.toFixed(2)} €</span></div>
     ${pie}
     <button class="btn-print" onclick="window.print()">Imprimir ticket</button>
     <button class="btn-cerrar" onclick="cerrarMesa()">Cerrar mesa y limpiar</button>
   `;
-  show('ticket');
+}
+
+window.cancelarLineaTicket = async (ids) => {
+  for (const lid of ids) {
+    await set(ref(db, `pedidos/${mesaId}/${lid}/estado`), 'cancelado');
+  }
+  const snap = await get(ref(db, 'pedidos/' + mesaId));
+  renderTicket(snap.val() || {});
 };
 
 window.cerrarMesa = async () => {
@@ -959,6 +1094,7 @@ window.cerrarMesa = async () => {
         const pedidos = snap.val() || {};
         const agrupado = {};
         Object.values(pedidos).forEach(l => {
+          if (l.estado === 'cancelado') return; // excluir cancelados
           const k = l.nombre + (l.nota ? '|' + l.nota : '');
           if (!agrupado[k]) agrupado[k] = { nombre: l.nombre, precio: Number(l.precio), qty: 0, nota: l.nota || '' };
           agrupado[k].qty += l.qty;
