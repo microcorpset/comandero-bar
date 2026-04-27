@@ -425,13 +425,25 @@ onValue(ref(db, 'pedidos'), snap => {
 
   if (!primeraVez && nuevosActivos.size > 0) {
     beep();
-    nuevosActivos.forEach(mesaId => {
-      if (!antesNuevos.has(mesaId)) {
-        const lineas = Object.values(pedidosPorMesa[mesaId] || {}).filter(l => l.estado === 'pendiente');
-        const nombre = mesasData[mesaId]?.nombre || mesaId;
-        if (autoImprimir) imprimirComanda(nombre, lineas);
-        if (autoTXT)      generarTXT(nombre, lineas);
-      }
+
+    // Detectar líneas individuales nuevas (no vistas aún y pendientes)
+    // Agrupar por mesa para generar un solo TXT/impresión por envío
+    const lineasNuevasPorMesa = {};
+    Object.entries(pedidosPorMesa).forEach(([mesaId, lineas]) => {
+      Object.entries(lineas).forEach(([lineaId, l]) => {
+        const key = mesaId + '/' + lineaId;
+        if (!vistos.has(key) && l.estado === 'pendiente') {
+          if (!lineasNuevasPorMesa[mesaId]) lineasNuevasPorMesa[mesaId] = [];
+          lineasNuevasPorMesa[mesaId].push(l);
+        }
+      });
+    });
+
+    Object.entries(lineasNuevasPorMesa).forEach(([mesaId, lineas]) => {
+      if (!lineas.length) return;
+      const nombre = mesasData[mesaId]?.nombre || mesaId;
+      if (autoImprimir) imprimirComanda(nombre, lineas);
+      if (autoTXT)      generarTXT(nombre, lineas);
     });
   }
   primeraVez = false;
