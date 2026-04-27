@@ -231,8 +231,9 @@
     <div class="section active" id="sec-mesas">
       <h2>Mesas</h2>
       <div class="card">
-        <div class="mesas-grid" id="mesas-grid"></div>
-        <div class="add-row">
+        <h3>Lista de mesas</h3>
+        <div id="mesas-lista"></div>
+        <div class="add-row" style="margin-top:1rem">
           <input type="text" id="nueva-mesa" placeholder="Nombre (ej: 4, Terraza 1, Barra)" style="flex:1" />
           <button class="btn btn-success" onclick="addMesa()">+ Añadir</button>
         </div>
@@ -466,34 +467,36 @@ function toast(msg) {
 
 // ─── MESAS ───────────────────────────────────────────────────────────────────
 function renderMesas(mesas) {
-  const grid = document.getElementById('mesas-grid');
-  grid.innerHTML = '';
-  const lista = Object.entries(mesas || {})
+  const contenedor = document.getElementById('mesas-lista');
+  if (!contenedor) return;
+  const entries = Object.entries(mesas || {})
     .sort(([,a],[,b]) => (a.orden??999)-(b.orden??999) || a.nombre.localeCompare(b.nombre,'es',{numeric:true}));
 
-  lista.forEach(([id, m], idx) => {
+  if (!entries.length) {
+    contenedor.innerHTML = '<p style="color:var(--muted);font-size:13px;padding:4px 0">Sin mesas aún</p>';
+    return;
+  }
+  contenedor.innerHTML = '';
+  entries.forEach(([id, m], idx) => {
     const row = document.createElement('div');
     row.className = 'row-item';
-    row.style.cssText = 'gap:8px;padding:8px 4px';
     row.innerHTML = `
-      <span class="row-label" style="font-family:var(--mono)">${m.nombre}</span>
+      <span class="row-label" style="font-family:var(--mono);font-size:15px" id="mlbl-${id}">${m.nombre}</span>
       <span class="row-sub">${m.estado||'libre'}</span>
-      <div style="display:flex;gap:4px;margin-left:auto">
-        <button class="btn btn-sm" onclick="moverMesa('${id}',${idx},-1)" ${idx===0?'disabled':''}>↑</button>
-        <button class="btn btn-sm" onclick="moverMesa('${id}',${idx},1)" ${idx===lista.length-1?'disabled':''}>↓</button>
-        <button class="btn btn-sm" onclick="editarMesaInline('${id}','${m.nombre.replace(/'/g,"\\'")}',this)">✏</button>
-        <button class="btn btn-sm btn-danger" onclick="delMesa('${id}')">×</button>
-      </div>`;
-    grid.appendChild(row);
+      <button class="btn btn-sm" onclick="moverMesa('${id}',${idx},-1)" ${idx===0?'disabled':''}>↑</button>
+      <button class="btn btn-sm" onclick="moverMesa('${id}',${idx},1)"  ${idx===entries.length-1?'disabled':''}>↓</button>
+      <button class="btn btn-sm" onclick="editarMesaInline('${id}','${m.nombre.replace(/'/g,"\\'")}')">✏</button>
+      <button class="btn btn-sm btn-danger" onclick="delMesa('${id}')">×</button>`;
+    contenedor.appendChild(row);
   });
 }
 
-window.editarMesaInline = (id, nombreActual, btn) => {
-  const label = btn.closest('.row-item').querySelector('.row-label');
-  label.innerHTML = `<input type="text" value="${nombreActual}"
+window.editarMesaInline = (id, nombreActual) => {
+  const lbl = document.getElementById('mlbl-' + id);
+  if (!lbl) return;
+  lbl.innerHTML = `<input type="text" id="inp-mesa-${id}" value="${nombreActual}"
     style="font-family:var(--mono);font-size:13px;background:var(--bg);border:1px solid var(--accent);
-    border-radius:4px;padding:2px 6px;width:100%;color:var(--text)"
-    id="inp-mesa-${id}" />`;
+    border-radius:4px;padding:3px 8px;width:130px;color:var(--text)" />`;
   const inp = document.getElementById('inp-mesa-' + id);
   inp.focus(); inp.select();
   const guardar = async () => {

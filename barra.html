@@ -425,17 +425,14 @@ onValue(ref(db, 'pedidos'), snap => {
 
   if (!primeraVez && nuevosActivos.size > 0) {
     beep();
-    // Imprimir automáticamente las mesas que son NUEVAS en esta actualización
-    if (autoImprimir) {
-      nuevosActivos.forEach(mesaId => {
-        if (!antesNuevos.has(mesaId)) {
-          const lineas = Object.values(pedidosPorMesa[mesaId] || {}).filter(l => l.estado === 'pendiente');
-          const nombre = mesasData[mesaId]?.nombre || mesaId;
-          imprimirComanda(nombre, lineas);
-          if (autoTXT) generarTXT(nombre, lineas);
-        }
-      });
-    }
+    nuevosActivos.forEach(mesaId => {
+      if (!antesNuevos.has(mesaId)) {
+        const lineas = Object.values(pedidosPorMesa[mesaId] || {}).filter(l => l.estado === 'pendiente');
+        const nombre = mesasData[mesaId]?.nombre || mesaId;
+        if (autoImprimir) imprimirComanda(nombre, lineas);
+        if (autoTXT)      generarTXT(nombre, lineas);
+      }
+    });
   }
   primeraVez = false;
 });
