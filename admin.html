@@ -385,7 +385,17 @@
         </div>
       </div>
       <div class="card" style="margin-top:1rem">
-        <h3>PINes de acceso</h3>
+        <h3>Camareros</h3>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:1rem">Cada camarero tiene su nombre y PIN de 4 dígitos. Su nombre aparece en cada comanda enviada.</p>
+        <div id="usuarios-lista" style="margin-bottom:1rem"></div>
+        <div class="form-row">
+          <input type="text" id="usr-nombre" placeholder="Nombre (ej: María)" style="flex:2" />
+          <input type="text" id="usr-pin" placeholder="PIN 4 dígitos" maxlength="4" inputmode="numeric" style="width:120px;flex:none" />
+          <button class="btn btn-success" onclick="addUsuario()">+ Añadir</button>
+        </div>
+      </div>
+      <div class="card" style="margin-top:1rem">
+        <h3>PINes de acceso barra/cocina</h3>
         <p style="font-size:13px;color:var(--muted);margin-bottom:1rem">Cada pantalla pide su PIN al abrir. Por defecto todos son <code style="font-family:var(--mono);background:var(--surface2);padding:1px 5px;border-radius:4px">1234</code></p>
         <div style="display:flex;flex-direction:column;gap:10px">
           <div class="form-row" style="align-items:center">
@@ -796,6 +806,48 @@ function renderVentas(tickets) {
   });
 }
 
+// ─── USUARIOS ────────────────────────────────────────────────────────────────
+window.addUsuario = async () => {
+  const nombre = document.getElementById('usr-nombre').value.trim();
+  const pin    = document.getElementById('usr-pin').value.trim();
+  if (!nombre) { toast('Introduce un nombre'); return; }
+  if (!/^\d{4}$/.test(pin)) { toast('El PIN debe tener 4 dígitos'); return; }
+  // Comprobar PIN duplicado
+  const snap = await get(ref(db, 'config/usuarios'));
+  const usuarios = snap.val() || {};
+  const duplicado = Object.values(usuarios).find(u => u.pin === pin);
+  if (duplicado) { toast('Ese PIN ya está en uso por ' + duplicado.nombre); return; }
+  await push(ref(db, 'config/usuarios'), { nombre, pin });
+  document.getElementById('usr-nombre').value = '';
+  document.getElementById('usr-pin').value = '';
+  toast('Camarero añadido');
+};
+
+window.delUsuario = async id => {
+  await remove(ref(db, 'config/usuarios/' + id));
+  toast('Camarero eliminado');
+};
+
+function renderUsuarios(usuarios) {
+  const lista = document.getElementById('usuarios-lista');
+  if (!lista) return;
+  const entries = Object.entries(usuarios || {});
+  if (!entries.length) {
+    lista.innerHTML = '<p style="font-size:13px;color:var(--muted)">Sin camareros. Añade uno abajo.</p>';
+    return;
+  }
+  lista.innerHTML = '';
+  entries.forEach(([id, u]) => {
+    const row = document.createElement('div');
+    row.className = 'row-item';
+    row.innerHTML = `
+      <span class="row-label">${u.nombre}</span>
+      <span class="row-sub" style="font-family:var(--mono)">PIN: ${u.pin}</span>
+      <button class="btn btn-sm btn-danger" onclick="delUsuario('${id}')">× Eliminar</button>`;
+    lista.appendChild(row);
+  });
+}
+
 // ─── INIT ────────────────────────────────────────────────────────────────────
 function init() {
   initFiltrosFecha();
@@ -817,6 +869,7 @@ function init() {
     document.getElementById('local-cif').value       = d.cif       || '';
     document.getElementById('local-footer').value    = d.footer    || '';
   });
+  onValue(ref(db, 'config/usuarios'), snap => renderUsuarios(snap.val()));
   // Cuota en tiempo real
   onValue(ref(db, 'config/quota/lineas'), snap => {
     const val = snap.val();

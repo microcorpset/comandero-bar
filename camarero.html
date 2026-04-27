@@ -315,8 +315,8 @@
 <!-- PIN SCREEN -->
 <div id="pin-screen">
   <div class="pin-box">
-    <div class="pin-title">Comandero</div>
-    <div class="pin-sub">Introduce el PIN para acceder</div>
+    <div class="pin-title">🍽️ Comandero</div>
+    <div class="pin-sub" id="pin-sub">Introduce tu PIN</div>
     <div class="pin-dots">
       <div class="pin-dot" id="pd0"></div>
       <div class="pin-dot" id="pd1"></div>
@@ -324,19 +324,19 @@
       <div class="pin-dot" id="pd3"></div>
     </div>
     <div class="pin-error-msg" id="pin-error">PIN incorrecto</div>
-    <div class="pin-pad">
-      <button class="pin-key" onclick="pinKey('1')">1</button>
-      <button class="pin-key" onclick="pinKey('2')">2</button>
-      <button class="pin-key" onclick="pinKey('3')">3</button>
-      <button class="pin-key" onclick="pinKey('4')">4</button>
-      <button class="pin-key" onclick="pinKey('5')">5</button>
-      <button class="pin-key" onclick="pinKey('6')">6</button>
-      <button class="pin-key" onclick="pinKey('7')">7</button>
-      <button class="pin-key" onclick="pinKey('8')">8</button>
-      <button class="pin-key" onclick="pinKey('9')">9</button>
-      <button class="pin-key empty"></button>
-      <button class="pin-key" onclick="pinKey('0')">0</button>
-      <button class="pin-key del" onclick="pinDel()">⌫</button>
+    <div class="pin-pad" id="pin-pad">
+      <button class="pin-key" data-k="1">1</button>
+      <button class="pin-key" data-k="2">2</button>
+      <button class="pin-key" data-k="3">3</button>
+      <button class="pin-key" data-k="4">4</button>
+      <button class="pin-key" data-k="5">5</button>
+      <button class="pin-key" data-k="6">6</button>
+      <button class="pin-key" data-k="7">7</button>
+      <button class="pin-key" data-k="8">8</button>
+      <button class="pin-key" data-k="9">9</button>
+      <button class="pin-key empty" data-k=""></button>
+      <button class="pin-key" data-k="0">0</button>
+      <button class="pin-key del" data-k="del">⌫</button>
     </div>
   </div>
 </div>
@@ -351,8 +351,9 @@
 </div>
 
 <div class="topbar">
-  <span class="topbar-title">Camarero</span>
+  <span class="topbar-title">🍽️ Comandero</span>
   <span class="mesa-badge" id="topbar-mesa"></span>
+  <span id="topbar-camarero" style="font-family:var(--mono);font-size:11px;color:var(--muted);flex-shrink:0"></span>
   <div class="spacer"></div>
   <label class="print-toggle" title="Pantalla siempre encendida">
     <div class="toggle-track" id="wake-track"><div class="toggle-thumb"></div></div>
@@ -380,6 +381,19 @@
 
 <div id="view-carta">
   <div class="carta-scroll" id="carta-body"><div class="loading">Cargando carta…</div></div>
+
+  <!-- Botón flotante categorías -->
+  <button id="btn-cats" onclick="toggleCatsPanel()"
+    style="position:fixed;left:1rem;bottom:88px;z-index:25;background:var(--accent);
+    color:#fff;border:none;border-radius:50%;width:44px;height:44px;font-size:18px;
+    cursor:pointer;box-shadow:0 4px 16px rgba(0,0,0,.18);display:none;
+    align-items:center;justify-content:center">☰</button>
+  <div id="cats-panel"
+    style="display:none;position:fixed;left:1rem;bottom:140px;z-index:26;
+    background:var(--surface);border:1px solid var(--border);border-radius:12px;
+    box-shadow:0 8px 32px rgba(0,0,0,.15);min-width:170px;overflow:hidden;
+    max-height:60vh;overflow-y:auto"></div>
+
   <div class="bottom-bar">
     <button class="btn btn-back" onclick="volverMesas()">← Mesas</button>
     <div class="resumen-info">
@@ -426,16 +440,28 @@ let mesasData = {}, cartaData = {}, categoriasData = {};
 let cartaReady = false, catsReady = false;
 let configLocal = {};
 
-// ── PIN ───────────────────────────────────────────────────────────────────────
-const PIN_SESSION = 'cam_auth';
-let PIN_CORRECTO = '1234';
-let pinBuffer = '';
+// ── USUARIOS / PIN multi-camarero ─────────────────────────────────────────────
+const PIN_SESSION  = 'cam_auth';
+const USER_SESSION = 'cam_user';
+let usuariosData   = {}; // { userId: { nombre, pin } }
+let camareroActual = sessionStorage.getItem(USER_SESSION) || '';
+let pinBuffer      = '';
 
-// Cargar PIN desde Firebase (actualizable desde el admin)
-get(ref(db, 'config/pins/camarero')).then(s => { if (s.val()) PIN_CORRECTO = s.val(); }).catch(()=>{});
+// Cargar usuarios desde Firebase
+get(ref(db, 'config/usuarios')).then(s => {
+  usuariosData = s.val() || {};
+  // Retrocompatibilidad: si no hay usuarios, usar PIN único de camarero
+  if (!Object.keys(usuariosData).length) {
+    get(ref(db, 'config/pins/camarero')).then(p => {
+      if (p.val()) usuariosData['_default'] = { nombre: 'Camarero', pin: p.val() };
+      else         usuariosData['_default'] = { nombre: 'Camarero', pin: '1234' };
+    });
+  }
+}).catch(() => { usuariosData['_default'] = { nombre: 'Camarero', pin: '1234' }; });
 
-if (sessionStorage.getItem(PIN_SESSION) === '1') {
+if (sessionStorage.getItem(PIN_SESSION) === '1' && camareroActual) {
   document.getElementById('pin-screen').style.display = 'none';
+  document.getElementById('topbar-camarero').textContent = camareroActual;
 }
 
 window.pinKey = d => {
@@ -454,15 +480,29 @@ function updatePinDots(error) {
   }
 }
 function verificarPin() {
-  if (pinBuffer === PIN_CORRECTO) {
-    sessionStorage.setItem(PIN_SESSION,'1');
+  // Buscar qué usuario tiene ese PIN
+  const match = Object.values(usuariosData).find(u => u.pin === pinBuffer);
+  if (match) {
+    camareroActual = match.nombre;
+    sessionStorage.setItem(PIN_SESSION, '1');
+    sessionStorage.setItem(USER_SESSION, camareroActual);
     document.getElementById('pin-screen').style.display = 'none';
+    document.getElementById('topbar-camarero').textContent = camareroActual;
   } else {
     updatePinDots(true);
     document.getElementById('pin-error').style.display = 'block';
     setTimeout(() => { pinBuffer=''; updatePinDots(false); document.getElementById('pin-error').style.display='none'; }, 900);
   }
 }
+
+// Listeners del teclado PIN (sin onclick inline para compatibilidad con módulos ES)
+document.getElementById('pin-pad').addEventListener('click', e => {
+  const btn = e.target.closest('[data-k]');
+  if (!btn) return;
+  const k = btn.dataset.k;
+  if (k === 'del') pinDel();
+  else if (k !== '') pinKey(k);
+});
 
 // ── MODAL ─────────────────────────────────────────────────────────────────────
 function showModal({ title, body, buttons }) {
@@ -658,6 +698,7 @@ function renderCarta() {
 
     const toggle = document.createElement('div');
     toggle.className = 'cat-toggle';
+    toggle.id = 'cathdr-' + catId;
     toggle.innerHTML = `
       <span class="cat-nombre-label">${cat.nombre}</span>
       <span class="cat-count" id="catcount-${catId}"></span>
@@ -699,9 +740,49 @@ function renderCarta() {
     cambiarQty(btn.dataset.id, parseInt(btn.dataset.d));
   };
 
+  // Rellenar panel de categorías
+  const panel = document.getElementById('cats-panel');
+  if (panel) {
+    panel.innerHTML = '';
+    cats.forEach(([catId, cat]) => {
+      const arts = Object.entries(cartaData).filter(([,a]) => a.catId === catId);
+      if (!arts.length) return;
+      const item = document.createElement('div');
+      item.style.cssText = 'padding:11px 16px;font-size:14px;cursor:pointer;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;transition:background .1s';
+      item.textContent = cat.nombre;
+      item.addEventListener('pointerdown', () => item.style.background = 'var(--surface2)');
+      item.addEventListener('click', () => {
+        cerrarCatsPanel();
+        const hdr = document.getElementById('cathdr-' + catId);
+        if (hdr) { hdr.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        // Si está colapsada, expandirla
+        const sec = document.getElementById('cat-' + catId);
+        if (sec && sec.classList.contains('collapsed')) toggleCat(sec);
+      });
+      panel.appendChild(item);
+    });
+  }
+  const btnCats = document.getElementById('btn-cats');
+  if (btnCats) btnCats.style.display = 'flex';
+
   updateQtyDisplay();
   updateUI();
 }
+
+window.toggleCatsPanel = () => {
+  const panel = document.getElementById('cats-panel');
+  if (!panel) return;
+  const abierto = panel.style.display !== 'none';
+  panel.style.display = abierto ? 'none' : 'block';
+};
+window.cerrarCatsPanel = () => {
+  const panel = document.getElementById('cats-panel');
+  if (panel) panel.style.display = 'none';
+};
+// Cerrar panel al tocar fuera
+document.addEventListener('click', e => {
+  if (!e.target.closest('#cats-panel') && !e.target.closest('#btn-cats')) cerrarCatsPanel();
+});
 
 function toggleCat(section) {
   const items = section.querySelector('.cat-items');
@@ -992,7 +1073,7 @@ window.enviarPedido = async () => {
     await push(ref(db, 'pedidos/' + mesaId), {
       artId, nombre: art.nombre, precio: Number(art.precio),
       qty, destino: art.destino, estado: 'pendiente',
-      nota: nota || '', ts: Date.now()
+      nota: nota || '', camarero: camareroActual, ts: Date.now()
     });
     lineasImprimir.push({ nombre: art.nombre, precio: Number(art.precio), qty, nota: nota || '' });
   }
@@ -1149,6 +1230,9 @@ window.show = v => {
   document.getElementById('view-mesas').style.display  = v === 'mesas'  ? 'block' : 'none';
   document.getElementById('view-carta').style.display  = v === 'carta'  ? 'block' : 'none';
   document.getElementById('view-ticket').style.display = v === 'ticket' ? 'block' : 'none';
+  const btnCats = document.getElementById('btn-cats');
+  if (btnCats) btnCats.style.display = v === 'carta' ? 'flex' : 'none';
+  cerrarCatsPanel();
 };
 </script>
 </body>
