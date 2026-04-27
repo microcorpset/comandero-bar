@@ -613,8 +613,12 @@ function renderMesas() {
     });
 }
 
-// Actualizar colores cada minuto
-setInterval(() => { if (Object.keys(mesasData).length) renderMesas(); }, 60000);
+// Actualizar colores y contadores cada 30 segundos, solo si la vista de mesas está activa
+setInterval(() => {
+  if (Object.keys(mesasData).length && document.getElementById('view-mesas').style.display !== 'none') {
+    renderMesas();
+  }
+}, 30000);
 
 function abrirMesa(id, nombre, ocupada) {
   mesaId = id; mesaNombre = nombre; carrito = {};
@@ -631,6 +635,8 @@ window.volverMesas = () => {
   mesaId = null; mesaNombre = null; carrito = {};
   document.getElementById('topbar-mesa').style.display = 'none';
   cerrarDrawer(); show('mesas');
+  // Refrescar colores inmediatamente al volver
+  if (Object.keys(mesasData).length) renderMesas();
 };
 
 // ── Carta ─────────────────────────────────────────────────────────────────────
