@@ -431,7 +431,13 @@ onValue(ref(db, 'pedidos'), snap => {
   const all = snap.val() || {};
   pedidosPorMesa = {};
   Object.entries(all).forEach(([mesaId, lineas]) => {
-    const mias = Object.entries(lineas).filter(([,l]) => l.destino === ROL || l.destino === 'ambos');
+    if (!lineas || typeof lineas !== 'object') return;
+    const mias = Object.entries(lineas).filter(([,l]) => {
+      if (!l || typeof l !== 'object') return false;
+      // Si no tiene destino, asumimos que es para ambos (compatibilidad hacia atrás)
+      const dest = l.destino || 'ambos';
+      return dest === ROL || dest === 'ambos';
+    });
     if (mias.length) pedidosPorMesa[mesaId] = Object.fromEntries(mias);
   });
 
@@ -512,10 +518,10 @@ function crearCard(mesaId, lineas) {
   card.id = 'card-' + mesaId;
 
   const nombre = mesasData[mesaId]?.nombre || mesaId;
-  const tiempos = Object.values(lineas).map(l => l.ts).filter(Boolean);
+  const tiempos = Object.values(lineas).map(l => l?.ts).filter(Boolean);
   const masViejo = tiempos.length ? Math.min(...tiempos) : null;
 
-  const camareros = [...new Set(lineas.map(l => l.camarero).filter(Boolean))];
+  const camareros = [...new Set(Object.values(lineas).map(l => l?.camarero).filter(Boolean))];
   const camareroTxt = camareros.join(', ');
 
   const header = document.createElement('div');
@@ -533,9 +539,11 @@ function crearCard(mesaId, lineas) {
   card.appendChild(header);
 
   Object.entries(lineas)
-    .filter(([,l]) => l.estado === 'pendiente')
-    .sort(([,a],[,b]) => (a.ts||0) - (b.ts||0))
+    .filter(([,l]) => l?.estado === 'pendiente')
+    .sort(([,a],[,b]) => ((a?.ts||0) - (b?.ts||0)))
     .forEach(([lineaId, l]) => {
+      if (!l || typeof l !== 'object') return; // Skip si la línea no es válida
+      
       const row = document.createElement('div');
       row.className = 'linea-row';
       row.id = 'linea-' + lineaId;
@@ -543,8 +551,8 @@ function crearCard(mesaId, lineas) {
       const main = document.createElement('div');
       main.className = 'linea-main';
       main.innerHTML = `
-        <span class="linea-qty">${l.qty}</span>
-        <span class="linea-nombre">${l.nombre}</span>
+        <span class="linea-qty">${l.qty || 0}</span>
+        <span class="linea-nombre">${l.nombre || 'Sin nombre'}</span>
         <button class="btn-servido" onclick="marcarServido('${mesaId}','${lineaId}',this)">Servido</button>
         <button class="btn-stock" onclick="marcarSinStock('${mesaId}','${lineaId}',this)" title="Sin stock — quitar sin cobrar">✕</button>`;
       row.appendChild(main);

@@ -1036,6 +1036,16 @@ function renderQuotaBadge() {
 // ── Enviar ────────────────────────────────────────────────────────────────────
 window.enviarPedido = async () => {
   if (!mesaId || !Object.keys(carrito).length) return;
+  
+  // Verificar que hay un camarero autenticado
+  if (!camareroActual || camareroActual.trim() === '') {
+    showModal({
+      title: 'Error de autenticación',
+      body: 'Debes estar autenticado para enviar pedidos. Por favor, ingresa el PIN.',
+      buttons: [{ label: 'Entendido', style: 'primary' }]
+    });
+    return;
+  }
 
   // Contar líneas del carrito (cada artículo = 1 línea)
   const nLineas = Object.keys(carrito).length;
