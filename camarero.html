@@ -167,9 +167,20 @@
   .btn-print{width:100%;margin-top:1rem;background:var(--accent);color:#fff;border:none;border-radius:10px;padding:12px;font-family:var(--mono);font-size:14px;cursor:pointer;font-weight:500}
   .btn-cerrar{width:100%;margin-top:.5rem;background:none;color:var(--danger);border:1px solid rgba(229,53,53,.3);border-radius:10px;padding:10px;font-family:var(--mono);font-size:13px;cursor:pointer}
   .ticket-edit-hint{font-size:11px;color:var(--muted);margin-bottom:.75rem;font-family:var(--mono);background:var(--surface2);border-radius:8px;padding:6px 10px;text-align:center}
+  .nota-verificado{display:inline-block;font-size:10px;color:var(--success);font-family:var(--mono);margin-top:2px}
   .btn-quitar-linea{background:none;border:none;color:var(--danger);font-size:20px;cursor:pointer;padding:0 4px;line-height:1;flex-shrink:0;opacity:.6}
   .btn-quitar-linea:active{opacity:1}
   .ticket-linea-edit{display:flex;align-items:center;gap:8px}
+
+  @media print {
+    body>*{display:none !important}
+    #view-ticket{display:block !important;padding:0 !important;margin:0 !important}
+    #view-ticket>div:first-child{display:none !important}
+    #view-ticket>div:last-child{padding:0 !important;margin:0 !important}
+    .ticket-card{border:none !important;border-radius:0 !important;padding:0 !important;margin:0 !important;max-width:100% !important;box-shadow:none !important;background:transparent !important}
+    .btn-print,.btn-cerrar,.ticket-edit-hint,.btn-quitar-linea,.no-print{display:none !important}
+    body{margin:0 !important;padding:0 !important;background:white !important}
+  }
 
   /* FAB acceso rápido barra/cocina */
   .fab-wrap{position:fixed;right:1rem;bottom:90px;z-index:29;display:none;flex-direction:column;align-items:flex-end;gap:8px}
