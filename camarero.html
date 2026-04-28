@@ -192,17 +192,14 @@
 
   /* ── RESPONSIVE MÓVIL ── */
   @media (max-width: 767px) {
-    /* Topbar compacto: quitar btn-carrito, comprimir toggles */
     .btn-carrito { display: none !important; }
     .topbar-title { font-size: 12px; }
     #topbar-camarero { font-size: 9px; }
-    /* Ocultar texto de los toggles, dejar solo el icono/track */
-    .print-toggle { gap: 3px; }
-    .print-toggle > span:last-child { display: none; }
-    /* Total clickable para drawer */
+    /* En móvil los toggles sin etiqueta de texto — solo el track */
+    .print-toggle > span { display: none; }
+    .print-toggle { gap: 2px; }
     .resumen-info { cursor: pointer; }
     .resumen-total::after { content: ' ›'; color: var(--accent2); }
-    /* Categorías laterales nunca visibles en móvil */
     .tablet-cats { display: none !important; }
   }
 
