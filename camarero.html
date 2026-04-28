@@ -187,6 +187,47 @@
   .fab-trigger:active{transform:scale(.9)}
   .fab-trigger.open{transform:rotate(45deg);background:var(--accent);color:#fff;border-color:var(--accent)}
 
+  /* ── RESPONSIVE MÓVIL: topbar compacto ── */
+  /* En móvil el btn-carrito se oculta del topbar y el área de total de abajo es clickable */
+  @media (max-width: 640px) {
+    .btn-carrito { display: none !important; }
+    .topbar-title { font-size: 13px; }
+    #topbar-camarero { font-size: 9px; }
+    .print-toggle span { display: none; } /* solo el toggle sin texto */
+    .resumen-total { cursor: pointer; }
+    .resumen-total::after { content: ' ›'; color: var(--accent2); }
+  }
+
+  /* ── RESPONSIVE TABLET: layout dividido ── */
+  @media (min-width: 768px) {
+    #btn-cats { display: none !important; }
+    #cats-panel { display: none !important; }
+
+    #view-carta { display: none; }
+    #view-carta.tablet-active { display: grid !important; grid-template-columns: 220px 1fr; height: calc(100vh - 54px); overflow: hidden; }
+
+    .carta-scroll { overflow-y: auto; height: 100%; padding-bottom: 80px; border-left: 1px solid var(--border); }
+
+    /* Panel lateral de categorías en tablet */
+    .tablet-cats {
+      display: none; overflow-y: auto; background: var(--bg);
+      border-right: 1px solid var(--border);
+    }
+    #view-carta.tablet-active .tablet-cats { display: flex; flex-direction: column; }
+    .tablet-cat-item {
+      padding: 13px 1rem; font-family: var(--mono); font-size: 13px;
+      cursor: pointer; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      transition: background .1s; color: var(--text);
+    }
+    .tablet-cat-item:hover { background: var(--surface); }
+    .tablet-cat-item.activa { background: var(--surface); border-left: 3px solid var(--accent2); color: var(--accent2); font-weight: 500; }
+    .tablet-cat-count { font-family: var(--mono); font-size: 11px; background: rgba(61,122,255,.12); color: var(--accent2); padding: 2px 7px; border-radius: 20px; }
+
+    /* En tablet el bottom-bar tiene más espacio */
+    .bottom-bar { padding: .75rem 1.5rem; }
+  }
+
   @media print {
     body>*{display:none !important}
     #view-ticket{display:block !important;padding:0 !important;margin:0 !important}
@@ -285,6 +326,10 @@
 </div>
 
 <div id="view-carta">
+  <!-- Panel lateral categorías (tablet) -->
+  <div class="tablet-cats" id="tablet-cats"></div>
+
+  <!-- Carta scrollable -->
   <div class="carta-scroll" id="carta-body"><div class="loading">Cargando carta…</div></div>
 
   <!-- Botón flotante categorías -->
