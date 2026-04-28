@@ -174,7 +174,7 @@
   /* FAB acceso rápido barra/cocina */
   .fab-wrap{position:fixed;right:1rem;bottom:90px;z-index:29;display:none;flex-direction:column;align-items:flex-end;gap:8px}
   .fab-wrap.visible{display:flex}
-  .fab-item{display:flex;align-items:center;gap:8px;text-decoration:none;opacity:0;transform:translateX(16px) scale(.9);transition:opacity .2s,transform .2s,box-shadow .2s}
+  .fab-item{display:flex;align-items:center;gap:8px;text-decoration:none;opacity:0;transform:translateX(16px) scale(.9);transition:opacity .2s,transform .2s}
   .fab-wrap.open .fab-item{opacity:1;transform:none}
   .fab-wrap.open .fab-item:nth-child(1){transition-delay:.06s}
   .fab-wrap.open .fab-item:nth-child(2){transition-delay:.12s}
@@ -187,44 +187,67 @@
   .fab-trigger:active{transform:scale(.9)}
   .fab-trigger.open{transform:rotate(45deg);background:var(--accent);color:#fff;border-color:var(--accent)}
 
-  /* ── RESPONSIVE MÓVIL: topbar compacto ── */
-  /* En móvil el btn-carrito se oculta del topbar y el área de total de abajo es clickable */
-  @media (max-width: 640px) {
+  /* Panel lateral tablet — oculto por defecto siempre */
+  .tablet-cats { display: none; }
+
+  /* ── RESPONSIVE MÓVIL ── */
+  @media (max-width: 767px) {
+    /* Topbar compacto: quitar btn-carrito, comprimir toggles */
     .btn-carrito { display: none !important; }
-    .topbar-title { font-size: 13px; }
+    .topbar-title { font-size: 12px; }
     #topbar-camarero { font-size: 9px; }
-    .print-toggle span { display: none; } /* solo el toggle sin texto */
-    .resumen-total { cursor: pointer; }
+    /* Ocultar texto de los toggles, dejar solo el icono/track */
+    .print-toggle { gap: 3px; }
+    .print-toggle > span:last-child { display: none; }
+    /* Total clickable para drawer */
+    .resumen-info { cursor: pointer; }
     .resumen-total::after { content: ' ›'; color: var(--accent2); }
+    /* Categorías laterales nunca visibles en móvil */
+    .tablet-cats { display: none !important; }
   }
 
-  /* ── RESPONSIVE TABLET: layout dividido ── */
+  /* ── RESPONSIVE TABLET/ESCRITORIO ── */
   @media (min-width: 768px) {
-    #btn-cats { display: none !important; }
-    #cats-panel { display: none !important; }
+    /* Ocultar botón flotante de cats y panel cats flotante */
+    #btn-cats    { display: none !important; }
+    #cats-panel  { display: none !important; }
 
-    #view-carta { display: none; }
-    #view-carta.tablet-active { display: grid !important; grid-template-columns: 220px 1fr; height: calc(100vh - 54px); overflow: hidden; }
-
-    .carta-scroll { overflow-y: auto; height: 100%; padding-bottom: 80px; border-left: 1px solid var(--border); }
-
-    /* Panel lateral de categorías en tablet */
-    .tablet-cats {
-      display: none; overflow-y: auto; background: var(--bg);
+    /* Layout dividido cuando está activo */
+    #view-carta.tablet-active {
+      display: grid !important;
+      grid-template-columns: 220px 1fr;
+      height: calc(100vh - 54px);
+      overflow: hidden;
+    }
+    #view-carta.tablet-active .tablet-cats {
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      background: var(--bg);
       border-right: 1px solid var(--border);
     }
-    #view-carta.tablet-active .tablet-cats { display: flex; flex-direction: column; }
+    #view-carta.tablet-active .carta-scroll {
+      overflow-y: auto;
+      height: 100%;
+      padding-bottom: 80px;
+    }
+    /* En tablet ocultar los cat-toggle (cabeceras de categoría) en la zona derecha */
+    #view-carta.tablet-active .cat-toggle { display: none; }
+    /* Y ocultar categorías que no sean la activa */
+    #view-carta.tablet-active .cat-section { display: none; }
+    #view-carta.tablet-active .cat-section.tablet-visible { display: block; }
+    /* Mostrar todos los artículos sin colapsar */
+    #view-carta.tablet-active .cat-items { max-height: none !important; overflow: visible !important; }
+
     .tablet-cat-item {
       padding: 13px 1rem; font-family: var(--mono); font-size: 13px;
       cursor: pointer; border-bottom: 1px solid var(--border);
       display: flex; align-items: center; justify-content: space-between;
-      transition: background .1s; color: var(--text);
+      transition: background .1s; color: var(--text); user-select: none;
     }
-    .tablet-cat-item:hover { background: var(--surface); }
+    .tablet-cat-item:hover  { background: var(--surface); }
     .tablet-cat-item.activa { background: var(--surface); border-left: 3px solid var(--accent2); color: var(--accent2); font-weight: 500; }
     .tablet-cat-count { font-family: var(--mono); font-size: 11px; background: rgba(61,122,255,.12); color: var(--accent2); padding: 2px 7px; border-radius: 20px; }
-
-    /* En tablet el bottom-bar tiene más espacio */
     .bottom-bar { padding: .75rem 1.5rem; }
   }
 
