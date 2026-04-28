@@ -12,7 +12,7 @@ if (!_dominiosPermitidos.some(d => location.hostname === d || location.hostname.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { db } from './firebase.js';
-import { ref, onValue, push, set, remove, get }
+import { ref, onValue, push, set, remove, get, update }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 // carrito: artId → { art, qty, nota }
