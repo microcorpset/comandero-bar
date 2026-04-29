@@ -1,4 +1,9 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInAnonymously
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getDatabase } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 // ─── CONFIGURA AQUÍ TUS CREDENCIALES DE FIREBASE ───────────────────────────
@@ -17,4 +22,23 @@ const firebaseConfig = {
 // ────────────────────────────────────────────────────────────────────────────
 
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 export const db = getDatabase(app);
+
+export const authReady = new Promise((resolve, reject) => {
+  let settled = false;
+
+  onAuthStateChanged(auth, user => {
+    if (!settled && user) {
+      settled = true;
+      resolve(user);
+    }
+  });
+
+  signInAnonymously(auth).catch(err => {
+    if (!settled) {
+      settled = true;
+      reject(err);
+    }
+  });
+});
