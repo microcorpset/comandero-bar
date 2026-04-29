@@ -30,16 +30,19 @@
     --accent-text: #001f24;
   }
   body.theme-light {
+    --accent: #6c8400;
+    --accent-dim: rgba(108,132,0,.14);
+    --accent-text: #f7f7ef;
     --bg: #f4f0e7;
     --surface: #fffdf8;
-    --surface2: #efe8db;
-    --border: #d8cfbe;
+    --surface2: #e8dfd0;
+    --border: #c9bea9;
     --text: #1d1b17;
-    --muted: #7a6f60;
-    --count-bg: rgba(0,0,0,.06);
-    --count-text: #534a3f;
-    --highlight-bg: rgba(232,255,90,.18);
-    --highlight-border: rgba(176,150,40,.45);
+    --muted: #5f5549;
+    --count-bg: rgba(70,58,38,.08);
+    --count-text: #43382d;
+    --highlight-bg: rgba(108,132,0,.12);
+    --highlight-border: rgba(108,132,0,.38);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; }
@@ -192,7 +195,7 @@
   .pedidos-grid {
     padding: 1rem;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
     gap: 12px;
     align-items: start;
   }
@@ -219,10 +222,11 @@
 
   .mesa-card {
     background: var(--surface);
-    border: 1px solid var(--border);
+    border: 1px solid color-mix(in srgb, var(--border) 85%, white 15%);
     border-radius: 14px;
     overflow: hidden;
     transition: border-color .3s;
+    box-shadow: 0 10px 24px rgba(0,0,0,.12);
   }
   .mesa-card.nueva { border-color: var(--accent); animation: flash-bg 1.4s ease-in-out infinite; }
 
@@ -245,8 +249,8 @@
     display: none;
   }
   .mesa-card.nueva .dot { display: block; }
-  .card-mesa-name { font-family: var(--mono); font-size: calc(14px * var(--font-scale)); font-weight: 500; color: var(--accent); flex: 1; }
-  .card-time { font-family: var(--mono); font-size: calc(11px * var(--font-scale)); color: var(--muted); }
+  .card-mesa-name { font-family: var(--mono); font-size: calc(14px * var(--font-scale)); font-weight: 700; color: var(--accent); flex: 1; min-width: 0; }
+  .card-time { font-family: var(--mono); font-size: calc(11px * var(--font-scale)); color: var(--text); opacity: .72; }
   .btn-imprimir {
     background: none;
     border: 1px solid var(--border);
@@ -257,6 +261,15 @@
     cursor: pointer;
     transition: border-color .15s, color .15s;
     flex-shrink: 0;
+  }
+  .btn-imprimir,
+  .btn-servido,
+  .btn-parcial,
+  .btn-deshacer,
+  .btn-stock {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
   .btn-imprimir:active { border-color: var(--accent); color: var(--accent); }
 
@@ -275,7 +288,7 @@
     outline: 1px solid var(--highlight-border);
   }
 
-  .linea-main { display: flex; align-items: center; gap: 8px; }
+  .linea-main { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .linea-count {
     min-width: 28px;
     height: 28px;
@@ -293,9 +306,16 @@
   }
   .linea-count.active { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
   .linea-count.hidden { visibility: hidden; }
-  .linea-qty { font-family: var(--mono); font-size: calc(16px * var(--font-scale)); font-weight: 500; min-width: 24px; color: var(--accent); }
+  .linea-qty { font-family: var(--mono); font-size: calc(16px * var(--font-scale)); font-weight: 700; min-width: 24px; color: var(--accent); }
   .linea-row.servida .linea-qty { color: var(--muted); }
-  .linea-nombre { flex: 1; font-size: calc(15px * var(--font-scale)); }
+  .linea-nombre { flex: 1 1 140px; min-width: 0; font-size: calc(15px * var(--font-scale)); color: var(--text); }
+  .linea-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-left: auto;
+  }
 
   .linea-nota {
     margin-top: 4px;
@@ -323,19 +343,23 @@
   }
   .btn-servido {
     font-size: calc(12px * var(--font-scale));
-    padding: 6px 12px;
-    border: 1px solid var(--border);
-    background: var(--surface2);
-    color: var(--muted);
+    min-width: 42px;
+    min-height: 38px;
+    padding: 6px 10px;
+    border: 1px solid color-mix(in srgb, var(--accent) 38%, var(--border) 62%);
+    background: color-mix(in srgb, var(--surface2) 78%, var(--accent-dim) 22%);
+    color: var(--accent);
     white-space: nowrap;
+    font-weight: 700;
   }
   .btn-servido:active { background: var(--border); }
-  .btn-servido.hecho { border-color: rgba(90,255,154,.25); color: #5aff9a; background: rgba(90,255,154,.08); }
+  .btn-servido.hecho { border-color: rgba(90,255,154,.35); color: #36cf78; background: rgba(90,255,154,.1); }
   .linea-row.servida .linea-nombre,
   .linea-row.servida .linea-qty { text-decoration: line-through; opacity: .45; }
   .btn-deshacer {
     font-size: calc(13px * var(--font-scale));
-    padding: 5px 8px;
+    min-height: 38px;
+    padding: 5px 10px;
     border: 1px solid rgba(255,255,255,.12);
     background: rgba(255,255,255,.06);
     color: var(--muted);
@@ -343,7 +367,8 @@
   .btn-deshacer:active { background: rgba(255,255,255,.15); }
   .btn-parcial {
     font-size: calc(12px * var(--font-scale));
-    padding: 5px 9px;
+    min-height: 38px;
+    padding: 5px 10px;
     border: 1px solid rgba(232,255,90,.25);
     background: rgba(232,255,90,.08);
     color: var(--accent);
@@ -351,10 +376,13 @@
   .btn-parcial:active { background: rgba(232,255,90,.2); }
   .btn-stock {
     font-size: calc(14px * var(--font-scale));
+    min-width: 42px;
+    min-height: 38px;
     padding: 5px 10px;
     border: 1px solid rgba(255,90,90,.3);
     background: rgba(255,90,90,.08);
-    color: #ff5a5a;
+    color: #ff4f4f;
+    font-weight: 700;
   }
   .btn-stock:active { background: rgba(255,90,90,.2); }
 
@@ -467,6 +495,21 @@
       left: 0;
     }
     .bulk-banner { margin-top: .75rem; }
+  }
+  @media (max-width: 420px) {
+    .pedidos-grid {
+      padding: .75rem;
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .card-header,
+    .linea-row {
+      padding-left: 12px;
+      padding-right: 12px;
+    }
+    .linea-actions {
+      width: 100%;
+      margin-left: 36px;
+    }
   }
 </style>
 </head>

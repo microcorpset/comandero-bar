@@ -523,8 +523,10 @@ function crearCard(envioId, mesaId, envio) {
         main.insertAdjacentHTML('beforeend', `
           <span class="linea-qty">${linea.qty}</span>
           <span class="linea-nombre">${linea.nombre}</span>
-          <span class="btn-servido hecho">✓</span>
-          <button class="btn-deshacer" onclick="deshacerServido('${mesaId}','${envioId}','${artId}',this)" title="Deshacer">↩</button>
+          <span class="linea-actions">
+            <span class="btn-servido hecho">✅</span>
+            <button class="btn-deshacer" onclick="deshacerServido('${mesaId}','${envioId}','${artId}',this)" title="Deshacer">↩</button>
+          </span>
         `);
       } else {
         const qtyServida = linea.qtyServida || 0;
@@ -534,9 +536,11 @@ function crearCard(envioId, mesaId, envio) {
         main.insertAdjacentHTML('beforeend', `
           <span class="linea-qty">${linea.qty}</span>
           <span class="linea-nombre">${linea.nombre}${progreso}</span>
-          <button class="btn-servido" onclick="marcarServido('${mesaId}','${envioId}','${artId}',this)">Servido</button>
-          ${linea.qty > 1 ? `<button class="btn-parcial" onclick="servirParcial('${mesaId}','${envioId}','${artId}',${linea.qty},'${escapeAttr(linea.nombre)}')" title="Servir parcial">½</button>` : ''}
-          <button class="btn-stock" onclick="marcarSinStock('${mesaId}','${envioId}','${artId}',this)" title="Sin stock">×</button>
+          <span class="linea-actions">
+            <button class="btn-servido" onclick="marcarServido('${mesaId}','${envioId}','${artId}',this)" title="Servido">✅</button>
+            ${linea.qty > 1 ? `<button class="btn-parcial" onclick="servirParcial('${mesaId}','${envioId}','${artId}',${linea.qty},'${escapeAttr(linea.nombre)}')" title="Servir parcial">½</button>` : ''}
+            <button class="btn-stock" onclick="marcarSinStock('${mesaId}','${envioId}','${artId}',this)" title="Sin stock">✕</button>
+          </span>
         `);
       }
 
