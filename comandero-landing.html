@@ -178,6 +178,7 @@ nav.scrolled{background:rgba(250,248,244,.95);backdrop-filter:blur(12px);box-sha
 
 /* PRICING */
 .pricing{padding:5rem 0;background:var(--paper2)}
+.pricing-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1.25rem;align-items:stretch}
 .pricing-card{max-width:560px;margin:0 auto;background:var(--charcoal);border-radius:20px;padding:2.5rem;position:relative;overflow:hidden}
 .pricing-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(201,168,76,.12),transparent 70%);pointer-events:none}
 .pricing-price{display:flex;align-items:baseline;gap:.2rem;margin-bottom:.5rem}
@@ -191,6 +192,9 @@ nav.scrolled{background:rgba(250,248,244,.95);backdrop-filter:blur(12px);box-sha
 .btn-pricing{width:100%;background:var(--gold);color:var(--charcoal);border:none;border-radius:50px;padding:1rem;font-family:var(--ff-body);font-size:1rem;font-weight:600;cursor:pointer;transition:all .2s;margin-bottom:1rem}
 .btn-pricing:hover{background:var(--gold2);transform:translateY(-1px)}
 .pricing-compat{text-align:center;font-size:.78rem;color:rgba(250,248,244,.35)}
+.pricing-card.secondary{background:#232321}
+.pricing-card.secondary::before{background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(90,122,80,.18),transparent 70%)}
+.pricing-kicker{display:inline-flex;align-items:center;gap:6px;background:rgba(90,122,80,.14);border:1px solid rgba(90,122,80,.32);border-radius:20px;padding:.3rem .9rem;font-size:.75rem;color:#b9d3be;margin-bottom:1.5rem}
 
 /* PACK */
 .pack-banner{max-width:560px;margin:1.5rem auto 0;background:rgba(90,122,80,.12);border:1px solid rgba(90,122,80,.3);border-radius:12px;padding:1.2rem 1.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
@@ -198,6 +202,10 @@ nav.scrolled{background:rgba(250,248,244,.95);backdrop-filter:blur(12px);box-sha
 .pack-text strong{color:var(--ink)}
 .pack-price{font-family:var(--ff-display);font-size:1.8rem;font-weight:700;color:var(--sage);white-space:nowrap}
 .pack-sub{font-size:.72rem;color:var(--warm)}
+.pack-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;width:100%;margin-top:1rem}
+.pack-option{background:rgba(250,248,244,.65);border:1px solid rgba(90,122,80,.22);border-radius:12px;padding:1rem}
+.pack-option-title{font-size:.9rem;font-weight:600;color:var(--ink);margin-bottom:.35rem}
+@media(max-width:700px){.pack-options{grid-template-columns:1fr}}
 
 /* FAQ */
 .faq{padding:4rem 0 5rem;background:var(--paper2)}
@@ -226,6 +234,7 @@ footer a:hover{text-decoration:underline}
 @media(max-width:900px){
   .hero-wrap{grid-template-columns:1fr;gap:3rem}
   .hero-screens{order:-1}
+  .pricing-grid{grid-template-columns:1fr}
 }
 @media(max-width:600px){
   .hero{padding:5rem 1rem 3rem}
@@ -238,7 +247,7 @@ footer a:hover{text-decoration:underline}
 <!-- NAV -->
 <nav id="nav">
   <a href="#" class="nav-brand">JON <span>GLEZ</span></a>
-  <a href="#pricing" class="nav-cta">Lo quiero · 90€</a>
+  <a href="#pricing" class="nav-cta">Desde 120€</a>
 </nav>
 
 <!-- HERO -->
@@ -253,8 +262,8 @@ footer a:hover{text-decoration:underline}
         <a href="#pricing" class="btn-ghost">Ver precio →</a>
       </div>
       <div class="hero-price-tag">
-        <span class="hero-price-num">90€</span>
-        <span class="hero-price-label">· pago único · sin cuota mensual</span>
+        <span class="hero-price-num">120€</span>
+        <span class="hero-price-label">· pago único · opción ya configurada por 170€/año</span>
       </div>
     </div>
 
@@ -709,16 +718,17 @@ footer a:hover{text-decoration:underline}
 <section class="pricing" id="pricing">
   <div class="wrap">
     <span class="section-label">Precio</span>
-    <h2 class="section-title">Simple y claro</h2>
-    <p class="section-sub">Un único pago, sin letra pequeña. Sin cuotas mensuales, sin contratos.</p>
+    <h2 class="section-title">Precio pensado para un cliente real</h2>
+    <p class="section-sub">Puedes contratar solo el sistema o recibirlo ya configurado contigo. Asi el cliente entiende rapido que compra y por que cuesta eso.</p>
+    <div class="pricing-grid">
     <div class="pricing-card">
       <div class="pricing-price">
         <span class="pricing-currency">€</span>
-        <span class="pricing-num">90</span>
+        <span class="pricing-num">120</span>
       </div>
       <div class="pricing-note">pago único · sin cuota mensual · sin contrato</div>
       <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.25);border-radius:20px;padding:.3rem .9rem;font-size:.75rem;color:var(--gold);margin-bottom:1.5rem">
-        ✦ Incluye hasta <strong style="margin:0 3px">3.000 líneas de pedido al mes</strong> — suficiente para un servicio completo
+        ✦ <strong style="margin:0 3px">Oferta de lanzamiento:</strong> sin límite de líneas de pedido ni de comanderos
       </div>
       <div class="pricing-feats">
         <div class="pricing-feat">5 pantallas: camarero, barra, cocina, ticket y panel admin</div>
@@ -729,26 +739,54 @@ footer a:hover{text-decoration:underline}
         <div class="pricing-feat">Comanda en PDF descargada automáticamente al enviar</div>
         <div class="pricing-feat">Ticket del cliente con logo, datos del local y total</div>
         <div class="pricing-feat">Toggle de impresión automática compatible con RawBT y Printfolder</div>
-        <div class="pricing-feat">Un mes de modificaciones y ajustes incluido</div>
         <div class="pricing-feat">Compatible con todos los planes de carta digital</div>
+        <div class="pricing-feat">Ideal si quieres el comandero sin cuota y montarlo a tu ritmo</div>
       </div>
       <hr class="pricing-divider">
-      <button class="btn-pricing" onclick="contactar()">Quiero el comandero →</button>
+      <button class="btn-pricing" onclick="contactar('Comandero 120€')">Quiero esta opción →</button>
       <div class="pricing-compat">¿Ya tienes carta digital conmigo? Se integra sin coste adicional.</div>
       <p style="font-size:.72rem;color:rgba(250,248,244,.25);text-align:center;margin-top:1rem;line-height:1.6">
-        * El plan incluye hasta 3.000 líneas de pedido al mes (aprox. 300 comandas de 10 artículos).
-        Si tu local supera ese volumen, puedes ampliar el contador por 10 €/mes adicionales.
-        La ampliación se gestiona por WhatsApp — en menos de 24 horas está activa.
+        * Oferta de lanzamiento disponible ahora: sin límite de líneas de pedido y sin límite de comanderos.
+        Pensado para que puedas empezar sin miedo a quedarte corto mientras el servicio sigue en revisión.
       </p>
+    </div>
+    <div class="pricing-card secondary">
+      <div class="pricing-kicker">Instalación recomendada</div>
+      <div class="pricing-price">
+        <span class="pricing-currency">€</span>
+        <span class="pricing-num">170</span>
+      </div>
+      <div class="pricing-note">precio anual · configuración hecha contigo · opción llave en mano</div>
+      <div class="pricing-feats">
+        <div class="pricing-feat">Incluye todo el comandero completo</div>
+        <div class="pricing-feat">Configuración inicial de mesas, carta y datos del local</div>
+        <div class="pricing-feat">Adaptación de nombres, categorías y destinos a tu forma de trabajar</div>
+        <div class="pricing-feat">Prueba guiada antes de entregarlo al equipo</div>
+        <div class="pricing-feat">Ajustes de arranque y soporte inicial para dejarlo fino</div>
+        <div class="pricing-feat">La mejor opción si quieres enseñarlo y usarlo ya preparado</div>
+      </div>
+      <hr class="pricing-divider">
+      <button class="btn-pricing" style="background:var(--sage);color:#fff" onclick="contactar('Comandero ya configurado 170€/año')">Quiero esta opción →</button>
+      <div class="pricing-compat">Perfecto si quieres recibirlo listo con tu carta, tus categorías, tus usuarios y tu forma de trabajar.</div>
+    </div>
     </div>
     <div class="pack-banner">
       <div>
-        <div class="pack-text">🎁 <strong>Pack Carta Dinámica + Comandero</strong><br>Los dos módulos juntos, perfectamente integrados. La carta digital para los clientes y el comandero para el equipo.</div>
+        <div class="pack-text">🎁 <strong>Packs carta + comandero</strong><br>Si quieres venderlo junto con la carta digital, aquí tienes las dos versiones claras: la base y la ya configurada.</div>
       </div>
-      <div style="text-align:right">
-        <div class="pack-price">150€</div>
-        <div class="pack-sub">en lugar de 170€ · ahorro de 20€</div>
-        <button onclick="contactar('Pack')" style="margin-top:.5rem;background:var(--sage);color:#fff;border:none;border-radius:8px;padding:.5rem 1rem;font-family:var(--ff-body);font-size:.82rem;font-weight:500;cursor:pointer">Quiero el pack →</button>
+      <div class="pack-options">
+        <div class="pack-option">
+          <div class="pack-option-title">Pack Carta Dinámica + Comandero</div>
+          <div class="pack-price">180€</div>
+          <div class="pack-sub">en lugar de 200€ · ahorro de 20€</div>
+          <button onclick="contactar('Pack carta + comandero 180€')" style="margin-top:.75rem;background:var(--sage);color:#fff;border:none;border-radius:8px;padding:.5rem 1rem;font-family:var(--ff-body);font-size:.82rem;font-weight:500;cursor:pointer">Quiero este pack →</button>
+        </div>
+        <div class="pack-option">
+          <div class="pack-option-title">Pack Carta Dinámica + Comandero ya configurado</div>
+          <div class="pack-price">220€</div>
+          <div class="pack-sub">en lugar de 250€ · ahorro de 30€</div>
+          <button onclick="contactar('Pack carta + comandero configurado 220€')" style="margin-top:.75rem;background:var(--sage);color:#fff;border:none;border-radius:8px;padding:.5rem 1rem;font-family:var(--ff-body);font-size:.82rem;font-weight:500;cursor:pointer">Quiero este pack →</button>
+        </div>
       </div>
     </div>
   </div>
@@ -762,7 +800,7 @@ footer a:hover{text-decoration:underline}
     <div class="faq-list">
       <div class="faq-item">
         <div class="faq-q">¿Hay algún límite de pedidos al mes?</div>
-        <div class="faq-a">El plan incluye hasta 3.000 líneas de pedido al mes, lo que equivale a unas 300 comandas de 10 artículos — más que suficiente para la mayoría de bares y restaurantes. Si tu local tiene un volumen mayor, avisas y en menos de 24 horas te amplio el contador por 10 €/mes. No hay cortes ni interrupciones del servicio.</div>
+        <div class="faq-a">Ahora mismo está en oferta de lanzamiento, así que no hay límite de líneas de pedido ni límite de comanderos. La idea es que puedas usarlo sin preocuparte por topes mientras termina esta fase de revisión y mejora.</div>
       </div>
       <div class="faq-item">
         <div class="faq-q">¿Necesito tener carta digital contigo para contratar el comandero?</div>
@@ -805,7 +843,7 @@ footer a:hover{text-decoration:underline}
   <div class="wrap" style="text-align:center">
     <span class="section-label">¿Empezamos?</span>
     <h2 class="section-title" style="color:#FAF8F4">Tu local, sin papel<br>ni malentendidos</h2>
-    <p class="section-sub" style="margin:0 auto 2rem">90€ una sola vez. Listo en 48 horas. Sin cuotas mensuales.</p>
+    <p class="section-sub" style="margin:0 auto 2rem">Desde 120€ si quieres solo el sistema, o 170€/año si prefieres recibirlo ya configurado. Oferta de lanzamiento sin límites de líneas ni de comanderos.</p>
     <button class="btn-primary" onclick="contactar()">Contactar por WhatsApp →</button>
   </div>
 </section>
