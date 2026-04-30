@@ -1,5 +1,5 @@
 {
-  "name": "Comandero Barra",
+  "name": "Comandero - Barra",
   "short_name": "Barra",
   "description": "Pantalla de barra para preparar y servir comandas.",
   "start_url": "./barra.html",

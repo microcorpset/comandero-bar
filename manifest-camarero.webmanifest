@@ -1,5 +1,5 @@
 {
-  "name": "Comandero Camarero",
+  "name": "Comandero - Camarero",
   "short_name": "Camarero",
   "description": "Toma comandas y gestiona mesas desde el movil.",
   "start_url": "./camarero.html",

@@ -1,5 +1,5 @@
 {
-  "name": "Comandero Cocina",
+  "name": "Comandero - Cocina",
   "short_name": "Cocina",
   "description": "Pantalla de cocina para gestionar comandas y preparaciones.",
   "start_url": "./barra.html?rol=cocina",
