@@ -571,6 +571,12 @@ function crearCard(envioId, mesaId, envio) {
   return card;
 }
 
+function actualizarLineaLocal(mesaId, envioId, artId, cambios) {
+  const linea = pedidosPorMesa[mesaId]?.[envioId]?.lineas?.[artId];
+  if (!linea) return;
+  Object.assign(linea, cambios);
+}
+
 async function marcarLineasComoServidas(lineasGrupo) {
   const updates = {};
   const enviosAfectados = new Set();
@@ -652,6 +658,12 @@ window.servirParcial = async (mesaId, envioId, artId, qtyTotal, nombreArt) => {
     if (esComprobacion) {
       await set(ref(db, `pedidos/${mesaId}/${envioId}/lineas/${artId}/verificado`), true);
     }
+    actualizarLineaLocal(mesaId, envioId, artId, {
+      qtyServida: nuevasServidas,
+      nota: notaBase,
+      ...(esComprobacion ? { verificado: true } : {})
+    });
+    renderPedidos();
 
     if (restoAun <= 0) {
       await update(ref(db), {
@@ -660,6 +672,13 @@ window.servirParcial = async (mesaId, envioId, artId, qtyTotal, nombreArt) => {
         [`pedidos/${mesaId}/${envioId}/lineas/${artId}/nota`]: notaBase,
         ...(esComprobacion ? { [`pedidos/${mesaId}/${envioId}/lineas/${artId}/verificado`]: true } : {})
       });
+      actualizarLineaLocal(mesaId, envioId, artId, {
+        estado: 'servido',
+        qtyServida: null,
+        nota: notaBase,
+        ...(esComprobacion ? { verificado: true } : {})
+      });
+      renderPedidos();
       return;
     }
 
@@ -677,6 +696,13 @@ window.servirParcial = async (mesaId, envioId, artId, qtyTotal, nombreArt) => {
               [`pedidos/${mesaId}/${envioId}/lineas/${artId}/qtyServida`]: null,
               [`pedidos/${mesaId}/${envioId}/lineas/${artId}/nota`]: notaBase
             });
+            actualizarLineaLocal(mesaId, envioId, artId, {
+              qty: nuevasServidas,
+              estado: 'servido',
+              qtyServida: null,
+              nota: notaBase
+            });
+            renderPedidos();
           }
         },
         {
