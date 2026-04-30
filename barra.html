@@ -227,6 +227,18 @@
     background:rgba(255,255,255,.04); border:1px solid var(--border); border-radius:10px; color:var(--muted);
     font-size:calc(13px * var(--font-scale)); padding:6px 8px; cursor:pointer; transition:border-color .15s,color .15s;
   }
+  .btn-imprimir.pendiente{
+    color:var(--accent-text);
+    border-color:var(--accent);
+    background:linear-gradient(180deg, color-mix(in srgb, var(--accent) 34%, transparent), color-mix(in srgb, var(--accent) 18%, transparent));
+    box-shadow:0 0 0 1px color-mix(in srgb, var(--accent) 32%, transparent), 0 0 18px color-mix(in srgb, var(--accent) 30%, transparent);
+  }
+  .btn-imprimir.impresa{
+    color:var(--muted);
+    border-color:var(--border);
+    background:rgba(255,255,255,.04);
+    box-shadow:none;
+  }
   .btn-imprimir:active{border-color:var(--accent); color:var(--accent)}
   .linea-row{
     padding:12px 16px;
