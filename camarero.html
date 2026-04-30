@@ -353,11 +353,30 @@
   .tablet-cats{display:none}
 
   @media (max-width:767px){
+    .topbar{
+      top:6px;
+      padding:8px 10px;
+      min-height:50px;
+      gap:6px;
+      flex-wrap:nowrap;
+      overflow-x:auto;
+      scrollbar-width:none;
+    }
+    .topbar::-webkit-scrollbar{display:none}
+    .topbar-logo{
+      width:30px;
+      height:30px;
+      border-radius:10px;
+      font-size:16px;
+      flex:0 0 auto;
+    }
     .btn-carrito{display:none !important}
-    .topbar-title{font-size:13px}
-    #topbar-camarero{font-size:10px}
+    .topbar-title{font-size:12px; flex:0 0 auto}
+    #topbar-camarero{font-size:9px; flex:0 0 auto; max-width:78px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+    .mesa-badge{padding:4px 8px; font-size:10px; flex:0 0 auto}
     .print-toggle>span{display:none}
-    .print-toggle{gap:2px}
+    .print-toggle{gap:2px; padding:5px 6px; flex:0 0 auto}
+    .quota-badge{display:none !important}
     .resumen-info{cursor:pointer}
     .resumen-total::after{content:' ›'; color:var(--accent2)}
     .tablet-cats{display:none !important}
@@ -391,13 +410,54 @@
   }
 
   @media print{
-    body>*{display:none !important}
-    #view-ticket{display:block !important;padding:0 !important;margin:0 !important}
-    #view-ticket>div:first-child{display:none !important}
-    #view-ticket>div:last-child{padding:0 !important;margin:0 !important}
-    .ticket-card{border:none !important;border-radius:0 !important;padding:0 !important;margin:0 !important;max-width:100% !important;box-shadow:none !important;background:transparent !important}
-    .btn-print,.btn-cerrar,.ticket-edit-hint,.btn-quitar-linea{display:none !important}
-    body{margin:0 !important;padding:0 !important;background:white !important}
+    body{
+      margin:0 !important;
+      padding:0 !important;
+      background:white !important;
+    }
+    #pin-screen,
+    .modal-overlay,
+    .topbar,
+    #view-mesas,
+    #view-carta,
+    .drawer,
+    .drawer-overlay,
+    .fab-wrap{
+      display:none !important;
+    }
+    .app-shell{
+      width:100% !important;
+      margin:0 !important;
+      padding:0 !important;
+      box-shadow:none !important;
+    }
+    #view-ticket{
+      display:block !important;
+      margin:0 !important;
+      padding:0 !important;
+    }
+    #view-ticket > div:first-child{display:none !important}
+    #view-ticket > div:last-child{
+      padding:0 !important;
+      margin:0 !important;
+    }
+    .ticket-card{
+      border:none !important;
+      border-radius:0 !important;
+      padding:0 !important;
+      margin:0 !important;
+      max-width:100% !important;
+      box-shadow:none !important;
+      background:transparent !important;
+    }
+    .btn-print,
+    .btn-cerrar,
+    .ticket-edit-hint,
+    .btn-quitar-linea,
+    .btn-refresh,
+    .no-print{
+      display:none !important;
+    }
   }
 </style>
 </head>
