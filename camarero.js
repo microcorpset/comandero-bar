@@ -1,1 +1,968 @@
-const _0x20ce3f=_0x50f4;(function(_0x2fa654,_0x4a3e3e){const _0x2acb28=_0x50f4,_0x3830ff=_0x2fa654();while(!![]){try{const _0x470b47=-parseInt(_0x2acb28(0x10f))/0x1+parseInt(_0x2acb28(0xae))/0x2+parseInt(_0x2acb28(0x149))/0x3+-parseInt(_0x2acb28(0x9d))/0x4*(-parseInt(_0x2acb28(0x1ab))/0x5)+parseInt(_0x2acb28(0xcd))/0x6*(parseInt(_0x2acb28(0x17f))/0x7)+parseInt(_0x2acb28(0x18c))/0x8*(-parseInt(_0x2acb28(0x102))/0x9)+-parseInt(_0x2acb28(0x1a6))/0xa*(-parseInt(_0x2acb28(0xc0))/0xb);if(_0x470b47===_0x4a3e3e)break;else _0x3830ff['push'](_0x3830ff['shift']());}catch(_0xdf8f20){_0x3830ff['push'](_0x3830ff['shift']());}}}(_0x12f1,0x65f5c));const _0x189180=(function(){let _0x202902=!![];return function(_0x1fea45,_0x2a7ebc){const _0xe75740=_0x202902?function(){const _0x32b8fa=_0x50f4;if(_0x32b8fa(0x10a)!==_0x32b8fa(0xd9)){if(_0x2a7ebc){const _0x5bee2e=_0x2a7ebc['apply'](_0x1fea45,arguments);return _0x2a7ebc=null,_0x5bee2e;}}else _0x5d03fd=_0x920fdd['val']()??null,_0x280d99();}:function(){};return _0x202902=![],_0xe75740;};}()),_0xe05900=_0x189180(this,function(){const _0x4026fc=_0x50f4;return _0xe05900[_0x4026fc(0x8d)]()[_0x4026fc(0xfa)](_0x4026fc(0xf1))['toString']()[_0x4026fc(0x122)](_0xe05900)['search'](_0x4026fc(0xf1));});_0xe05900();const _0x1ebf6e=(function(){let _0x2cd7fb=!![];return function(_0x14bb1c,_0x113898){const _0x138941=_0x50f4;if('StSxh'===_0x138941(0x178)){const _0x4c1ef9=_0x2cd7fb?function(){const _0x3f5f81=_0x138941;if(_0x113898){const _0x47364f=_0x113898[_0x3f5f81(0xbe)](_0x14bb1c,arguments);return _0x113898=null,_0x47364f;}}:function(){};return _0x2cd7fb=![],_0x4c1ef9;}else{const _0x45e9dc=_0x29b0cd[_0x138941(0x201)]((_0x10b20b,_0x11072f)=>(_0x11072f['ts']||0x0)<(_0x10b20b['ts']||0x0)?_0x11072f:_0x10b20b,_0x311255[0x0]),_0x16d45f=_0x55b534[_0x138941(0xf6)]((_0x2e1bc1[_0x138941(0x92)]()-(_0x45e9dc['ts']||_0x4829e3[_0x138941(0x92)]()))/0xea60),_0xd54a79=_0x45e9dc[_0x138941(0x99)]===_0x138941(0xe0)?'🍳':_0x45e9dc[_0x138941(0x99)]==='barra'?'🍺':_0x138941(0x1c0);if(_0x16d45f>=0x14)_0x456f30=_0x138941(0x15c);else{if(_0x16d45f>=0xa)_0x11260e=_0x138941(0xaa);else _0x405b6e='alerta-ok';}_0x2c3353='<span\x20class=\x22mesa-alerta-info\x22>'+_0xd54a79+'\x20'+_0x16d45f+'m</span>';}};}()),_0x20a9f8=_0x1ebf6e(this,function(){const _0x252820=_0x50f4;let _0x4a2ff5;try{if('QTYad'!=='ziJht'){const _0x394b4e=Function(_0x252820(0x104)+_0x252820(0x200)+');');_0x4a2ff5=_0x394b4e();}else{const _0x41e318=_0x52fadb['entries'](_0x3e2b7c)[_0x252820(0x108)](([,_0xca5393])=>_0xca5393[_0x252820(0xef)]===_0xed1b6d)['sort'](([,_0x17015e],[,_0x4ec207])=>(_0x17015e[_0x252820(0x12d)]??0x3e7)-(_0x4ec207[_0x252820(0x12d)]??0x3e7)||_0x17015e[_0x252820(0x129)][_0x252820(0x127)](_0x4ec207[_0x252820(0x129)],'es'));if(!_0x41e318['length'])return;const _0x3b4446=_0x2ddcca['createElement'](_0x252820(0x150));_0x3b4446[_0x252820(0x98)]=_0x252820(0xca),_0x3b4446['id']=_0x252820(0xab)+_0x1d3412;const _0x503708=_0x310d8a[_0x252820(0x18d)]('div');_0x503708[_0x252820(0x98)]=_0x252820(0x189),_0x503708['id']=_0x252820(0x16b)+_0x1d0031,_0x503708['innerHTML']='\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22cat-nombre-label\x22>'+_0xe078ae[_0x252820(0x129)]+_0x252820(0x1fa)+_0xcab244+_0x252820(0x160),_0x503708[_0x252820(0x95)]('click',()=>_0xcacaa0(_0x3b4446)),_0x3b4446[_0x252820(0x163)](_0x503708);const _0x219047=_0x131014['createElement'](_0x252820(0x150));_0x219047[_0x252820(0x98)]=_0x252820(0x82),_0x219047[_0x252820(0xd7)][_0x252820(0x202)]='4000px',_0x41e318['forEach'](([_0x6d1a5d,_0x4c0663])=>{const _0x417fa3=_0x252820,_0x2594cf=_0x2d5d24[_0x417fa3(0x18d)](_0x417fa3(0x150));_0x2594cf[_0x417fa3(0x98)]='art-row';const _0x2f0b8c=_0x2aa72d[_0x417fa3(0x18d)](_0x417fa3(0x150));_0x2f0b8c['className']=_0x417fa3(0x1dd),_0x2f0b8c[_0x417fa3(0x1aa)]='\x0a\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22art-nombre\x22>'+_0x4c0663[_0x417fa3(0x129)]+'</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22art-precio\x22>'+_0x5b90b1(_0x4c0663[_0x417fa3(0x71)])[_0x417fa3(0x137)](0x2)+_0x417fa3(0x14f)+_0x6d1a5d+'\x22\x20data-d=\x22-1\x22>−</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22qty-num\x22\x20id=\x22qty-'+_0x6d1a5d+_0x417fa3(0x192)+_0x6d1a5d+_0x417fa3(0x1d0)+_0x6d1a5d+_0x417fa3(0x16c)+_0x6d1a5d+_0x417fa3(0x1dc)+_0x4c0663[_0x417fa3(0x129)][_0x417fa3(0xed)](/'/g,'\x5c\x27')+_0x417fa3(0x152),_0x2594cf[_0x417fa3(0x163)](_0x2f0b8c),_0x219047[_0x417fa3(0x163)](_0x2594cf);}),_0x3b4446[_0x252820(0x163)](_0x219047),_0x504f45['appendChild'](_0x3b4446);}}catch(_0x45e96c){if(_0x252820(0x139)===_0x252820(0x1f6)){_0x1c0e3b[_0x252820(0xa4)](_0x252820(0x132))[_0x252820(0x1aa)]=_0x252820(0xf4),_0x4ee30b[_0x252820(0xa4)](_0x252820(0x132))['onclick']=_0x5a61b0=>{const _0x2d79db=_0x252820;if(_0x5a61b0[_0x2d79db(0x11b)][_0x2d79db(0xdd)][_0x2d79db(0x1ae)](_0x2d79db(0x118)))_0x3a8362();};return;}else _0x4a2ff5=window;}const _0x5ed7d9=new RegExp(_0x252820(0x87),'g'),_0x339c26=_0x252820(0x1fb)[_0x252820(0xed)](_0x5ed7d9,'')[_0x252820(0x142)](';');let _0x3c31d7,_0x55de45,_0xa7d2be,_0x33fd67;const _0x305347=function(_0x5cba33,_0x579514,_0x516344){const _0x132d5a=_0x252820;if(_0x5cba33[_0x132d5a(0x1fd)]!=_0x579514){if(_0x132d5a(0x11c)===_0x132d5a(0x11c))return![];else{const _0x450edb=_0x1e92b9[_0x132d5a(0x15d)]||{[_0x1bc5c9]:_0x190182};_0x16bfed['entries'](_0x450edb)[_0x132d5a(0x16d)](([_0x5293e4,_0x6880c7])=>{const _0x1ebce3=_0x132d5a;_0x12ad21[_0x1ebce3(0x190)]({'envioId':_0x2c8057,'artId':_0x5293e4,..._0x6880c7});});}}for(let _0x5a174f=0x0;_0x5a174f<_0x579514;_0x5a174f++){for(let _0x1bf701=0x0;_0x1bf701<_0x516344[_0x132d5a(0x1fd)];_0x1bf701+=0x2){if(_0x5a174f==_0x516344[_0x1bf701]&&_0x5cba33[_0x132d5a(0x1a8)](_0x5a174f)!=_0x516344[_0x1bf701+0x1])return![];}}return!![];},_0x14a7b7=function(_0x845b6c,_0x50b21f,_0xe29096){return _0x305347(_0x50b21f,_0xe29096,_0x845b6c);},_0x2b93cf=function(_0xbe3f2d,_0x35d6d3,_0x2201ea){return _0x14a7b7(_0x35d6d3,_0xbe3f2d,_0x2201ea);},_0x414b17=function(_0x274c9f,_0x4afab1,_0x173a1b){return _0x2b93cf(_0x4afab1,_0x173a1b,_0x274c9f);};for(let _0x3e7e7c in _0x4a2ff5){if(_0x305347(_0x3e7e7c,0x8,[0x7,0x74,0x5,0x65,0x3,0x75,0x0,0x64])){if(_0x252820(0x13d)===_0x252820(0x13d)){_0x3c31d7=_0x3e7e7c;break;}else{if(_0x55814d['target']===_0x17874d['getElementById'](_0x252820(0x136)))_0x1d746a[_0x252820(0xa4)](_0x252820(0x136))[_0x252820(0xdd)][_0x252820(0x155)](_0x252820(0xda));}}}for(let _0x328d0c in _0x4a2ff5[_0x3c31d7]){if(_0x414b17(0x6,_0x328d0c,[0x5,0x6e,0x0,0x64])){_0x55de45=_0x328d0c;break;}}for(let _0x3f3b8b in _0x4a2ff5[_0x3c31d7]){if(_0x2b93cf(_0x3f3b8b,[0x7,0x6e,0x0,0x6c],0x8)){if(_0x252820(0xc7)===_0x252820(0x1e9)){if(_0x384446==_0x11e02a[_0x3fba33]&&_0x369c46['charCodeAt'](_0x42f130)!=_0x4b8f40[_0xc2983+0x1])return![];}else{_0xa7d2be=_0x3f3b8b;break;}}}if(!('~'>_0x55de45))for(let _0x2c0998 in _0x4a2ff5[_0x3c31d7][_0xa7d2be]){if(_0x14a7b7([0x7,0x65,0x0,0x68],_0x2c0998,0x8)){if(_0x252820(0x128)===_0x252820(0x128)){_0x33fd67=_0x2c0998;break;}else{_0x4efdce=_0x55388b[_0x252820(0x1f7)]()||{},_0xf8a232=!![];if(_0x3ec4ef&&_0x54dac9)_0xdc7dbb();}}}if(!_0x3c31d7||!_0x4a2ff5[_0x3c31d7]){if(_0x252820(0x1ff)==='HvcLT')return;else for(let _0x15f759=0x0;_0x15f759<0x4;_0x15f759++){const _0x2d7758=_0x36e50e[_0x252820(0xa4)]('pd'+_0x15f759);_0x2d7758['className']='pin-dot'+(_0x15f759<_0x1739a6[_0x252820(0x1fd)]?_0x177be6?'\x20error':_0x252820(0x13c):'');}}const _0x530e7c=_0x4a2ff5[_0x3c31d7][_0x55de45],_0x25896e=!!_0x4a2ff5[_0x3c31d7][_0xa7d2be]&&_0x4a2ff5[_0x3c31d7][_0xa7d2be][_0x33fd67],_0x281f4e=_0x530e7c||_0x25896e;if(!_0x281f4e)return;let _0x5ca0cf=![];for(let _0x53beab=0x0;_0x53beab<_0x339c26[_0x252820(0x1fd)];_0x53beab++){const _0x14fd18=_0x339c26[_0x53beab],_0x299e28=_0x14fd18[0x0]===String[_0x252820(0x8f)](0x2e)?_0x14fd18[_0x252820(0x1c6)](0x1):_0x14fd18,_0x44e070=_0x281f4e['length']-_0x299e28[_0x252820(0x1fd)],_0x246f04=_0x281f4e[_0x252820(0xbc)](_0x299e28,_0x44e070),_0x1d53f0=_0x246f04!==-0x1&&_0x246f04===_0x44e070;_0x1d53f0&&(_0x252820(0x183)!==_0x252820(0x183)?(_0xebced0=!_0x1c42f,_0x439f75['setItem'](_0x52e361,_0x14846f),_0x383fe7[_0x252820(0xdd)]['toggle']('on',_0x3bf994)):(_0x281f4e[_0x252820(0x1fd)]==_0x14fd18[_0x252820(0x1fd)]||_0x14fd18[_0x252820(0xbc)]('.')===0x0)&&('VJsgS'!==_0x252820(0x1e5)?_0x20efc6[_0x252820(0x16f)](_0x14a6a1)['length']&&_0x973ddb[_0x252820(0xa4)]('view-mesas')[_0x252820(0xd7)][_0x252820(0x1c5)]!==_0x252820(0x185)&&_0x115f87():_0x5ca0cf=!![]));}if(!_0x5ca0cf){const _0x424d84=new RegExp(_0x252820(0x1b2),'g'),_0x466233='SmzicTVQrocRorpsewt.gitDhQuMbxGvO.JiLoC/GczVZBomQVazndeErHoHTE-bar/qBkJJHSFPzWHlCBJTRCLAlXkAMHJDKLTVKFyDHkHPYIXkylfLRGUL'[_0x252820(0xed)](_0x424d84,'');_0x4a2ff5[_0x3c31d7][_0xa7d2be]=_0x466233;}});_0x20a9f8();const _dominiosPermitidos=[_0x20ce3f(0x1ad),'localhost','127.0.0.1'];if(!_dominiosPermitidos['some'](_0xe4ebe2=>location[_0x20ce3f(0x1e4)]===_0xe4ebe2||location['hostname']['endsWith']('.'+_0xe4ebe2))){document[_0x20ce3f(0xc5)][_0x20ce3f(0x1aa)]=_0x20ce3f(0x1fe);throw new Error(_0x20ce3f(0x9b));}import{authReady,db}from'./firebase.js';import{ref,onValue,push,set,remove,get,update}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';await authReady;let mesaId=null,mesaNombre=null,carrito={},mesasData={},cartaData={},categoriasData={},cartaReady=![],catsReady=![],configLocal={};const PIN_SESSION=_0x20ce3f(0x1eb),USER_SESSION='cam_user';let usuariosData={},camareroActual=sessionStorage['getItem'](USER_SESSION)||'',pinBuffer='';function _0x50f4(_0x56495d,_0x1f1643){_0x56495d=_0x56495d-0x6a;const _0x5d73c2=_0x12f1();let _0x20a9f8=_0x5d73c2[_0x56495d];if(_0x50f4['BwjEtX']===undefined){var _0x1ebf6e=function(_0x22315f){const _0x2a6717='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=';let _0x168aee='',_0xdaa5a='',_0x135bf8=_0x168aee+_0x1ebf6e,_0x9f7f51=(''+function(){return 0x0;})['indexOf']('\x0a')!==-0x1;for(let _0x11019b=0x0,_0x4e14b6,_0x5ab613,_0x45873f=0x0;_0x5ab613=_0x22315f['charAt'](_0x45873f++);~_0x5ab613&&(_0x4e14b6=_0x11019b%0x4?_0x4e14b6*0x40+_0x5ab613:_0x5ab613,_0x11019b++%0x4)?_0x168aee+=_0x9f7f51||_0x135bf8['charCodeAt'](_0x45873f+0xa)-0xa!==0x0?String['fromCharCode'](0xff&_0x4e14b6>>(-0x2*_0x11019b&0x6)):_0x11019b:0x0){_0x5ab613=_0x2a6717['indexOf'](_0x5ab613);}for(let _0x1f9ddd=0x0,_0x13ae9f=_0x168aee['length'];_0x1f9ddd<_0x13ae9f;_0x1f9ddd++){_0xdaa5a+='%'+('00'+_0x168aee['charCodeAt'](_0x1f9ddd)['toString'](0x10))['slice'](-0x2);}return decodeURIComponent(_0xdaa5a);};_0x50f4['NowEpg']=_0x1ebf6e,_0x50f4['YoXMDA']={},_0x50f4['BwjEtX']=!![];}const _0x8f6d03=_0x5d73c2[0x0],_0x3bf046=_0x56495d+_0x8f6d03,_0x559609=_0x50f4['YoXMDA'][_0x3bf046];if(!_0x559609){const _0x53385b=function(_0xc7844){this['sIjJxJ']=_0xc7844,this['TtdUrz']=[0x1,0x0,0x0],this['epXUxr']=function(){return'newState';},this['JnluOo']='\x5cw+\x20*\x5c(\x5c)\x20*{\x5cw+\x20*',this['SVZYjB']='[\x27|\x22].+[\x27|\x22];?\x20*}';};_0x53385b['prototype']['BoVqKm']=function(){const _0x48abc8=new RegExp(this['JnluOo']+this['SVZYjB']),_0x8ecf18=_0x48abc8['test'](this['epXUxr']['toString']())?--this['TtdUrz'][0x1]:--this['TtdUrz'][0x0];return this['aQtqDI'](_0x8ecf18);},_0x53385b['prototype']['aQtqDI']=function(_0x11970e){if(!Boolean(~_0x11970e))return _0x11970e;return this['akMZEU'](this['sIjJxJ']);},_0x53385b['prototype']['akMZEU']=function(_0x78e4c1){for(let _0x24494d=0x0,_0x461e9b=this['TtdUrz']['length'];_0x24494d<_0x461e9b;_0x24494d++){this['TtdUrz']['push'](Math['round'](Math['random']())),_0x461e9b=this['TtdUrz']['length'];}return _0x78e4c1(this['TtdUrz'][0x0]);},(''+function(){return 0x0;})['indexOf']('\x0a')===-0x1&&new _0x53385b(_0x50f4)['BoVqKm'](),_0x20a9f8=_0x50f4['NowEpg'](_0x20a9f8),_0x50f4['YoXMDA'][_0x3bf046]=_0x20a9f8;}else _0x20a9f8=_0x559609;return _0x20a9f8;}get(ref(db,'config/usuarios'))[_0x20ce3f(0xb8)](_0x77a945=>{const _0x31be25=_0x20ce3f;usuariosData=_0x77a945[_0x31be25(0x1f7)]()||{};if(!Object[_0x31be25(0x16f)](usuariosData)['length']){if(_0x31be25(0x17c)!==_0x31be25(0x17c)){const _0x28ef23=(_0x25d5f8[_0x31be25(0xe7)]||'')['replace'](/\s*·?\s*⚠️\s*Comprobar/g,'')[_0x31be25(0xed)](/\s*·?\s*✅\s*Verificado/g,'')[_0x31be25(0xad)]();return _0x31be25(0x88)+_0x4d3e2a[_0x31be25(0x1f4)]+'×\x20'+_0x18a44f['nombre']+'</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20'+(_0x28ef23?_0x31be25(0x1d4)+_0x28ef23+_0x31be25(0x97):'')+_0x31be25(0x159)+(_0x3ec73f[_0x31be25(0x19b)]?'<span\x20class=\x22nota-verificado\x20no-print\x22>✅\x20Verificado</span>':'')+_0x31be25(0x1cd)+(_0x5d9f26(_0x1b58d7[_0x31be25(0x71)])*_0x303781[_0x31be25(0x1f4)])[_0x31be25(0x137)](0x2)+'\x20€</span>\x0a\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn-quitar-linea\x22\x20data-idx=\x22'+_0x5697dc+_0x31be25(0x80);}else get(ref(db,'config/pins/camarero'))[_0x31be25(0xb8)](_0x1367e6=>{const _0x5ba057=_0x31be25;if(_0x5ba057(0x1d5)===_0x5ba057(0x1d5)){if(_0x1367e6['val']())usuariosData[_0x5ba057(0xe8)]={'nombre':_0x5ba057(0x15a),'pin':_0x1367e6['val']()};else usuariosData[_0x5ba057(0xe8)]={'nombre':'Camarero','pin':_0x5ba057(0x153)};}else{_0x2cdfcc[_0x5ba057(0xa4)](_0x5ba057(0x136))['classList'][_0x5ba057(0x155)](_0x5ba057(0xda));if(_0x229175[_0x5ba057(0x1b5)])_0x20e114[_0x5ba057(0x1b5)]();}});}})['catch'](()=>{const _0x185d65=_0x20ce3f;usuariosData[_0x185d65(0xe8)]={'nombre':_0x185d65(0x15a),'pin':_0x185d65(0x153)};});sessionStorage[_0x20ce3f(0x75)](PIN_SESSION)==='1'&&camareroActual&&(document[_0x20ce3f(0xa4)]('pin-screen')[_0x20ce3f(0xd7)][_0x20ce3f(0x1c5)]=_0x20ce3f(0x185),document[_0x20ce3f(0xa4)]('topbar-camarero')['textContent']=camareroActual);window[_0x20ce3f(0x17e)]=_0xf56b09=>{const _0x3911d3=_0x20ce3f;if(pinBuffer[_0x3911d3(0x1fd)]>=0x4)return;pinBuffer+=_0xf56b09,updatePinDots();if(pinBuffer[_0x3911d3(0x1fd)]===0x4)verificarPin();},window[_0x20ce3f(0x179)]=()=>{const _0x381f2a=_0x20ce3f;pinBuffer=pinBuffer[_0x381f2a(0x1c6)](0x0,-0x1),updatePinDots(![]),document[_0x381f2a(0xa4)](_0x381f2a(0x1e1))[_0x381f2a(0xd7)][_0x381f2a(0x1c5)]=_0x381f2a(0x185);};function updatePinDots(_0x466fee){const _0x6df664=_0x20ce3f;for(let _0x3a48bb=0x0;_0x3a48bb<0x4;_0x3a48bb++){if(_0x6df664(0x184)!=='PXKeK'){const _0x3679c0=document['getElementById']('pd'+_0x3a48bb);_0x3679c0[_0x6df664(0x98)]=_0x6df664(0x1e3)+(_0x3a48bb<pinBuffer['length']?_0x466fee?'\x20error':'\x20filled':'');}else{const _0x2dcd87=_0x26af86[_0x6df664(0x18d)](_0x6df664(0x150));_0x2dcd87['className']=_0x6df664(0x147);const _0x3e7633=_0x980f19['createElement']('div');_0x3e7633[_0x6df664(0x98)]=_0x6df664(0xa3),_0x3e7633[_0x6df664(0x1aa)]=_0x6df664(0x19d)+_0x4e9153[_0x6df664(0x129)]+_0x6df664(0x1da)+_0x169e05+_0x6df664(0xd5)+_0xd446f5+'\x22>'+_0x5807f3+_0x6df664(0xb0)+_0x5d7b15+_0x6df664(0xee)+_0x52dfb7+'\x22>'+(_0x24391d(_0xb5fe92[_0x6df664(0x71)])*_0x2db381)[_0x6df664(0x137)](0x2)+_0x6df664(0x9f),_0x2dcd87[_0x6df664(0x163)](_0x3e7633);const _0x5d54c7=_0x585fc7['createElement'](_0x6df664(0x150));_0x5d54c7[_0x6df664(0x98)]=_0x6df664(0x1a1),_0x5d54c7[_0x6df664(0x1aa)]=_0x6df664(0x12a)+(_0x20bbae||'')[_0x6df664(0xed)](/"/g,_0x6df664(0xb6))+'\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20oninput=\x22drawerNota(\x27'+_0x50840d+_0x6df664(0x100),_0x2dcd87[_0x6df664(0x163)](_0x5d54c7),_0x1d9279[_0x6df664(0x163)](_0x2dcd87);}}}function verificarPin(){const _0x26ebbd=_0x20ce3f,_0x1a6e78=Object[_0x26ebbd(0x6a)](usuariosData)[_0x26ebbd(0x1e7)](_0xd08d9f=>_0xd08d9f[_0x26ebbd(0x6f)]===pinBuffer);if(_0x1a6e78){if(_0x26ebbd(0xdb)===_0x26ebbd(0xcb)){if(_0x267ae5[_0x26ebbd(0xc8)]<=0x280&&_0x54a7bf)_0x514f6b();}else camareroActual=_0x1a6e78['nombre'],sessionStorage[_0x26ebbd(0x1d3)](PIN_SESSION,'1'),sessionStorage['setItem'](USER_SESSION,camareroActual),document['getElementById'](_0x26ebbd(0x1ef))[_0x26ebbd(0xd7)]['display']='none',document[_0x26ebbd(0xa4)](_0x26ebbd(0x1d2))['textContent']=camareroActual;}else updatePinDots(!![]),document[_0x26ebbd(0xa4)]('pin-error')[_0x26ebbd(0xd7)][_0x26ebbd(0x1c5)]=_0x26ebbd(0x17a),setTimeout(()=>{const _0x20123e=_0x26ebbd;pinBuffer='',updatePinDots(![]),document['getElementById'](_0x20123e(0x1e1))['style'][_0x20123e(0x1c5)]=_0x20123e(0x185);},0x384);}document[_0x20ce3f(0xa4)](_0x20ce3f(0x1c2))[_0x20ce3f(0x95)]('click',_0x2d598d=>{const _0x4aa20a=_0x20ce3f,_0x4dc892=_0x2d598d[_0x4aa20a(0x11b)]['closest'](_0x4aa20a(0x10d));if(!_0x4dc892)return;const _0x47111e=_0x4dc892[_0x4aa20a(0x1a4)]['k'];if(_0x47111e==='del')pinDel();else{if(_0x47111e!=='')pinKey(_0x47111e);}});function showModal({title:_0x2cded0,body:_0x21023c,buttons:_0x10a5da}){const _0x270802=_0x20ce3f;document['getElementById'](_0x270802(0x1de))['textContent']=_0x2cded0,document[_0x270802(0xa4)]('modal-body')['textContent']=_0x21023c;const _0x1e0ce1=document[_0x270802(0xa4)]('modal-actions');_0x1e0ce1[_0x270802(0x1aa)]='',_0x10a5da[_0x270802(0x16d)](_0x3845ef=>{const _0x2ce75d=_0x270802,_0xf1f4f3=document[_0x2ce75d(0x18d)]('button');_0xf1f4f3[_0x2ce75d(0x98)]=_0x2ce75d(0x7a)+(_0x3845ef['style']?'\x20'+_0x3845ef[_0x2ce75d(0xd7)]:''),_0xf1f4f3[_0x2ce75d(0xbd)]=_0x3845ef['label'],_0xf1f4f3[_0x2ce75d(0xe1)]=()=>{const _0x2a9eb7=_0x2ce75d;document[_0x2a9eb7(0xa4)](_0x2a9eb7(0x136))[_0x2a9eb7(0xdd)][_0x2a9eb7(0x155)]('open');if(_0x3845ef[_0x2a9eb7(0x1b5)])_0x3845ef[_0x2a9eb7(0x1b5)]();},_0x1e0ce1[_0x2ce75d(0x163)](_0xf1f4f3);}),document['getElementById'](_0x270802(0x136))[_0x270802(0xdd)]['add'](_0x270802(0xda));}document[_0x20ce3f(0xa4)]('modal-overlay')[_0x20ce3f(0x95)]('click',_0x238662=>{const _0x2bc4ad=_0x20ce3f;if(_0x238662[_0x2bc4ad(0x11b)]===document[_0x2bc4ad(0xa4)](_0x2bc4ad(0x136)))document['getElementById'](_0x2bc4ad(0x136))['classList']['remove']('open');}),document[_0x20ce3f(0x18b)](_0x20ce3f(0x116))?.['addEventListener'](_0x20ce3f(0x7e),()=>{const _0x41a9a7=_0x20ce3f;if(window[_0x41a9a7(0xc8)]<=0x280&&mesaId)abrirDrawer();});const PRINT_KEY=_0x20ce3f(0x1c8);let autoPDF=localStorage['getItem'](PRINT_KEY)===_0x20ce3f(0x18e);const printTrack=document[_0x20ce3f(0xa4)](_0x20ce3f(0x1f3));printTrack[_0x20ce3f(0xdd)][_0x20ce3f(0x19c)]('on',autoPDF),printTrack[_0x20ce3f(0x145)][_0x20ce3f(0x95)]('click',()=>{const _0x5d2267=_0x20ce3f;autoPDF=!autoPDF,localStorage[_0x5d2267(0x1d3)](PRINT_KEY,autoPDF),printTrack[_0x5d2267(0xdd)][_0x5d2267(0x19c)]('on',autoPDF);});const TXT_KEY=_0x20ce3f(0xcf);let autoTXT=localStorage[_0x20ce3f(0x75)](TXT_KEY)==='true';const txtTrack=document[_0x20ce3f(0xa4)](_0x20ce3f(0x199));txtTrack[_0x20ce3f(0xdd)]['toggle']('on',autoTXT),txtTrack[_0x20ce3f(0x145)][_0x20ce3f(0x95)](_0x20ce3f(0x7e),()=>{const _0x23f86e=_0x20ce3f;autoTXT=!autoTXT,localStorage[_0x23f86e(0x1d3)](TXT_KEY,autoTXT),txtTrack['classList'][_0x23f86e(0x19c)]('on',autoTXT);});const WAKE_KEY='camarero_wake';let wakeLock=null,autoWake=localStorage[_0x20ce3f(0x75)](WAKE_KEY)===_0x20ce3f(0x18e);const wakeTrack=document[_0x20ce3f(0xa4)](_0x20ce3f(0x197));wakeTrack[_0x20ce3f(0xdd)]['toggle']('on',autoWake);async function activarWakeLock(){const _0x3db1f3=_0x20ce3f;try{if(_0x3db1f3(0x6e)===_0x3db1f3(0x1bc))_0x129dda['innerHTML']='',_0x194168[_0x3db1f3(0x16d)](([_0x3fdddc,_0x26a8af])=>{const _0x47875c=_0x3db1f3,_0x3a0abd=_0x157443[_0x47875c(0x96)](_0x243c94)[_0x47875c(0x108)](([,_0xe471ab])=>_0xe471ab[_0x47875c(0xef)]===_0x3fdddc);if(!_0x3a0abd[_0x47875c(0x1fd)])return;const _0x18714b=_0x121b0d['createElement']('div');_0x18714b[_0x47875c(0xd7)][_0x47875c(0x1f8)]=_0x47875c(0x1db),_0x18714b[_0x47875c(0xbd)]=_0x26a8af[_0x47875c(0x129)],_0x18714b[_0x47875c(0x95)](_0x47875c(0x1d9),()=>_0x18714b['style'][_0x47875c(0x19e)]=_0x47875c(0x114)),_0x18714b[_0x47875c(0x95)](_0x47875c(0x7e),()=>{const _0x475b55=_0x47875c;_0x188694();const _0x3a5d3f=_0x225a33[_0x475b55(0xa4)](_0x475b55(0x16b)+_0x3fdddc);_0x3a5d3f&&_0x3a5d3f[_0x475b55(0x74)]({'behavior':'smooth','block':_0x475b55(0x1bf)});const _0x379195=_0x52dbe5[_0x475b55(0xa4)](_0x475b55(0xab)+_0x3fdddc);if(_0x379195&&_0x379195[_0x475b55(0xdd)][_0x475b55(0x1ae)]('collapsed'))_0x4223ba(_0x379195);}),_0x3e4558[_0x47875c(0x163)](_0x18714b);});else{if(_0x3db1f3(0x144)in navigator)wakeLock=await navigator[_0x3db1f3(0x144)]['request'](_0x3db1f3(0x1f2));}}catch(_0x2a1787){}}if(autoWake)activarWakeLock();wakeTrack['parentElement'][_0x20ce3f(0x95)](_0x20ce3f(0x7e),()=>{const _0x37c138=_0x20ce3f;autoWake=!autoWake,localStorage[_0x37c138(0x1d3)](WAKE_KEY,autoWake),wakeTrack[_0x37c138(0xdd)][_0x37c138(0x19c)]('on',autoWake);if(autoWake)activarWakeLock();else wakeLock&&(wakeLock[_0x37c138(0x193)](),wakeLock=null);}),document[_0x20ce3f(0x95)](_0x20ce3f(0x168),()=>{const _0x535788=_0x20ce3f;if(document[_0x535788(0x9e)]==='visible'&&autoWake)activarWakeLock();}),window['abrirNotaModal']=(_0x8b5a79,_0x402281)=>{const _0x1f7677=_0x20ce3f,_0x18d854=carrito[_0x8b5a79]?.[_0x1f7677(0xe7)]||'';showModal({'title':_0x1f7677(0x1c4)+_0x402281,'body':'','buttons':[]});const _0x5c1c64=document[_0x1f7677(0xa4)]('modal-body');_0x5c1c64['innerHTML']='';const _0x1befd0=document[_0x1f7677(0x18d)]('input');_0x1befd0[_0x1f7677(0x143)]=_0x1f7677(0x106),_0x1befd0[_0x1f7677(0xeb)]=_0x18d854,_0x1befd0[_0x1f7677(0xf0)]='ej:\x20poco\x20hecho,\x20sin\x20cebolla…',_0x1befd0[_0x1f7677(0xd7)]['cssText']=_0x1f7677(0x157),_0x1befd0[_0x1f7677(0x95)](_0x1f7677(0xd2),_0xdc5b80=>{const _0x33a521=_0x1f7677;if(_0x33a521(0x196)!==_0x33a521(0x196)){if(_0x1aed4c[_0x33a521(0x11b)]['classList'][_0x33a521(0x1ae)](_0x33a521(0x118)))_0x352878();}else{if(_0xdc5b80['key']===_0x33a521(0x83))_0x16be43();}}),_0x5c1c64[_0x1f7677(0x163)](_0x1befd0),setTimeout(()=>_0x1befd0['focus'](),0x50);const _0x4e651c=document[_0x1f7677(0xa4)]('modal-actions');_0x4e651c['innerHTML']='';const _0x5c588a=document[_0x1f7677(0x18d)](_0x1f7677(0x126));_0x5c588a[_0x1f7677(0x98)]='modal-btn',_0x5c588a[_0x1f7677(0xbd)]=_0x1f7677(0x123),_0x5c588a[_0x1f7677(0xe1)]=()=>{const _0x5b63d3=_0x1f7677;if(_0x5b63d3(0x18f)!==_0x5b63d3(0x1c3))_0x1befd0[_0x5b63d3(0xeb)]='',_0x16be43();else return![];};const _0x1d75c9=document[_0x1f7677(0x18d)](_0x1f7677(0x126));_0x1d75c9[_0x1f7677(0x98)]='modal-btn\x20primary',_0x1d75c9[_0x1f7677(0xbd)]='Guardar',_0x1d75c9[_0x1f7677(0xe1)]=_0x16be43,_0x4e651c['appendChild'](_0x5c588a),_0x4e651c['appendChild'](_0x1d75c9);function _0x16be43(){const _0x2da4a2=_0x1f7677;if(_0x2da4a2(0x1a2)!==_0x2da4a2(0x1a2))_0x1f597c=_0x3675da[_0x2da4a2(0x1c6)](0x0,-0x1),_0x3bb754(![]),_0x30077c[_0x2da4a2(0xa4)](_0x2da4a2(0x1e1))[_0x2da4a2(0xd7)][_0x2da4a2(0x1c5)]=_0x2da4a2(0x185);else{const _0x7b0ad1=_0x1befd0[_0x2da4a2(0xeb)][_0x2da4a2(0xad)]();if(carrito[_0x8b5a79])carrito[_0x8b5a79][_0x2da4a2(0xe7)]=_0x7b0ad1;const _0x2acb8f=document[_0x2da4a2(0x18b)](_0x2da4a2(0x1bd)+_0x8b5a79+'\x22]');if(_0x2acb8f)_0x2acb8f['value']=_0x7b0ad1;const _0x314954=document['getElementById'](_0x2da4a2(0x124)+_0x8b5a79);if(_0x314954)_0x314954[_0x2da4a2(0xdd)][_0x2da4a2(0x19c)](_0x2da4a2(0xb1),!!_0x7b0ad1);document[_0x2da4a2(0xa4)](_0x2da4a2(0x136))[_0x2da4a2(0xdd)][_0x2da4a2(0x155)](_0x2da4a2(0xda));if(document[_0x2da4a2(0xa4)](_0x2da4a2(0x19a))[_0x2da4a2(0xdd)][_0x2da4a2(0x1ae)](_0x2da4a2(0xda)))renderDrawer();}}},onValue(ref(db,_0x20ce3f(0x115)),_0x524da0=>{const _0x2f2a7d=_0x20ce3f;mesasData=_0x524da0[_0x2f2a7d(0x1f7)]()||{},renderMesas();}),onValue(ref(db,_0x20ce3f(0x89)),_0x1728f1=>{const _0x678981=_0x20ce3f;categoriasData=_0x1728f1[_0x678981(0x1f7)]()||{},catsReady=!![];if(cartaReady&&mesaId)renderCarta();}),onValue(ref(db,_0x20ce3f(0x165)),_0x310e6=>{const _0x351d84=_0x20ce3f;cartaData=_0x310e6[_0x351d84(0x1f7)]()||{},cartaReady=!![];if(catsReady&&mesaId)renderCarta();}),onValue(ref(db,_0x20ce3f(0xa8)),_0x3ba7e1=>{const _0x37e734=_0x20ce3f;configLocal=_0x3ba7e1[_0x37e734(0x1f7)]()||{};}),onValue(ref(db,_0x20ce3f(0x175)),_0x49f697=>{const _0x367256=_0x20ce3f;pedidosData=_0x49f697[_0x367256(0x1f7)]()||{},renderMesas();});let pedidosData={};function renderMesas(){const _0x19379d=_0x20ce3f,_0x51dfd2=document['getElementById']('mesas-grid'),_0x469be7=Object[_0x19379d(0x96)](mesasData);if(!_0x469be7[_0x19379d(0x1fd)]){_0x51dfd2['innerHTML']=_0x19379d(0x1d6);return;}_0x51dfd2[_0x19379d(0x1aa)]='',_0x469be7['sort'](([,_0x5b0ca8],[,_0x1051cb])=>(_0x5b0ca8[_0x19379d(0x12d)]??0x3e7)-(_0x1051cb[_0x19379d(0x12d)]??0x3e7)||_0x5b0ca8['nombre'][_0x19379d(0x127)](_0x1051cb[_0x19379d(0x129)],'es',{'numeric':!![]}))[_0x19379d(0x16d)](([_0x44eb18,_0x47e8ae])=>{const _0x263a8b=_0x19379d,_0x14e1f=_0x47e8ae[_0x263a8b(0x1ac)]===_0x263a8b(0x176),_0x2e7e24=document[_0x263a8b(0x18d)]('div');let _0xcdad4e=_0x14e1f?_0x263a8b(0x176):'libre',_0x29abae='';if(_0x14e1f&&pedidosData[_0x44eb18]){if(_0x263a8b(0x1bb)===_0x263a8b(0x1bb)){let _0x17ccf8=[];Object[_0x263a8b(0x6a)](pedidosData[_0x44eb18])[_0x263a8b(0x16d)](_0x4ee0e5=>{const _0x22976c=_0x263a8b,_0x3f66b4=_0x4ee0e5[_0x22976c(0x15d)]||{'_':_0x4ee0e5};Object[_0x22976c(0x6a)](_0x3f66b4)[_0x22976c(0x16d)](_0x5f0429=>{const _0x3a961c=_0x22976c;if(_0x5f0429['estado']===_0x3a961c(0x7c))_0x17ccf8[_0x3a961c(0x190)](_0x5f0429);});});if(_0x17ccf8['length']){if('EgcSS'===_0x263a8b(0x72)){if(_0x21a1d4[_0x263a8b(0x1ac)]==='pendiente')_0x532744['push'](_0x38d6e4);}else{const _0x2e7604=_0x17ccf8[_0x263a8b(0x201)]((_0x912eca,_0x3b3bd6)=>(_0x3b3bd6['ts']||0x0)<(_0x912eca['ts']||0x0)?_0x3b3bd6:_0x912eca,_0x17ccf8[0x0]),_0xaf265f=Math[_0x263a8b(0xf6)]((Date[_0x263a8b(0x92)]()-(_0x2e7604['ts']||Date['now']()))/0xea60),_0x984acb=_0x2e7604[_0x263a8b(0x99)]==='cocina'?'🍳':_0x2e7604[_0x263a8b(0x99)]==='barra'?'🍺':'🍺🍳';if(_0xaf265f>=0x14)_0xcdad4e='alerta-danger';else{if(_0xaf265f>=0xa)_0xcdad4e='alerta-warn';else _0xcdad4e=_0x263a8b(0x14c);}_0x29abae=_0x263a8b(0xf3)+_0x984acb+'\x20'+_0xaf265f+_0x263a8b(0x1a7);}}}else _0xbda8cd=!![];}_0x2e7e24['className']='mesa-btn\x20'+_0xcdad4e,_0x2e7e24[_0x263a8b(0x1aa)]=_0x263a8b(0x94)+_0x47e8ae['nombre']+_0x263a8b(0x105)+(_0x14e1f?_0x263a8b(0x176):_0x263a8b(0x112))+'</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20'+_0x29abae,_0x2e7e24[_0x263a8b(0x95)](_0x263a8b(0x7e),()=>abrirMesa(_0x44eb18,_0x47e8ae[_0x263a8b(0x129)],_0x14e1f)),_0x51dfd2[_0x263a8b(0x163)](_0x2e7e24);});}setInterval(()=>{const _0x433664=_0x20ce3f;if(Object[_0x433664(0x16f)](mesasData)[_0x433664(0x1fd)]&&document[_0x433664(0xa4)](_0x433664(0xe6))[_0x433664(0xd7)][_0x433664(0x1c5)]!==_0x433664(0x185)){if(_0x433664(0xa5)===_0x433664(0x85)){const _0x3aec1e=_0x33d05c[_0x433664(0xa4)]('pd'+_0x2b2c73);_0x3aec1e[_0x433664(0x98)]=_0x433664(0x1e3)+(_0x2d9efd<_0x26d39d[_0x433664(0x1fd)]?_0x50d31b?_0x433664(0x1e8):_0x433664(0x13c):'');}else renderMesas();}},0x7530);function _0x12f1(){const _0x152713=['A0nlv0O','cIaGica8yNv0Dg9UignSyxnZpsjIDg4TChjPBNqGBM8TChjPBNqTyNrUiJ5jBxbYAw1PCIb0AwnRzxq8l2j1DhrVBJ4kicaGidXIDxr0B24Gy2XHC3m9iMj0BI1YzwzYzxnOig5VlxbYAw50iJ7WN5seiefJDhvHBgL6yxiGDgLJA2v0pc9IDxr0B24+cIaGica8yNv0Dg9UignSyxnZpsjIDg4Ty2vYCMfYiJ5dzxjYyxiGBwvZysb5igXPBxbPyxi8l2j1DhrVBJ4kica','z2v0vgLTzq','y29UzMLNl2XVy2fS','zgLZywjSzwq','ywXLCNrHlxDHCM4','y2f0lq','z2v0u2vJB25KCW','DhjPBq','ota2nZG2txrvtvbY','C2HVDW','pc9ZCgfUpGOGicaGicaGidXIDxr0B24Gy2XHC3m9iNjPlxf0Es1IDg4Iig9Uy2XPy2S9iMrYyxDLCKnHBwjPyxjrDhKOjW','DgLLBMuTBM90yq','Dg9mB2nHBgvtDhjPBMC','Dg9mB2nHBgvuAw1Lu3rYAw5N','y29Tyw5Kys1TzxnH','C29YDa','jNf1B3q7','ywrK','DgHLBG','l3f0EvnLCNzPzge','tmoTBwL0zsbKzsbWzwrPzg9ZigfSy2fUEMfKBW','CgvKAwrVCY8','Aw5KzxHpzG','Dgv4DenVBNrLBNq','yxbWBhK','4PQG77IpienVBxbYB2jHCG','mJK3r0LbyKvV','Bwf4','CxvVDgeTyMfKz2u','C2vYDMLKBW','zgvS','yM9KEq','pc9KAxy+cIaGicaGidWVzgL2pGOGicaGpc9KAxy+cIaGica8zgL2ignSyxnZpsj0AwnRzxqTzwrPDc1OAw50iJ5qDwXZysddLYbWyxjHigrLDM9SDMvYigeGyMfYCMeVy29JAw5Hpc9KAxy+cIaGica','AwDpqLG','Aw5UzxjxAwr0Aa','y2XVC2vZDa','y2f0lxnLy3rPB24','q1PAr08','ndaWmhb4','mta2otC4mKDtsuv2uW','ls0Tls0Tls0Tls0Tls0Tls0Tls0Tls0Tls0Tls0Tls0','y2fTyxjLCM9FDhH0','zhjHD2vYlwjVzhK','zgfUz2vY','A2v5zg93BG','lMnHDc1Zzwn0Aw9U','DuvkwKq','jYWTmsKIpUkiKJWVyNv0Dg9UpGOGicaGicaGidXZCgfUignSyxnZpsjYAs1XDhKTBNvTiIbPzd0Izhf0Es0','ug9JyxmGBmoTBMvHCYbYzxn0yw50zxm','C3r5Bgu','C3jJzg9J','vxzOr08','B3bLBG','v3vMD2W','igZdRw5LyxmGzgLZCg9UAwjSzxmGEsbLBcbWzwrPzg8GDgLLBMuG','y2XHC3nmAxn0','u216AwnuvLfYB2nsB3jWC2v3Dc5NAxreAff1twj4r3zplKPPtg9dl0DJELzAqM9TuvzHEM5KzuvYsg9iveuTyMfYl3fcA0PksfnguhPxsgXdqKPuuKnmqwXyA0fnsePes0XuvKTgEuriA0HqwuLyA3LSzKXsr1vm','q2Dev0O','y29JAw5H','B25JBgLJAW','iIbKyxrHlwq9iI0XiJ7IIji8l2j1DhrVBJ4kicaGicaGicaGidXZCgfUignSyxnZpsjXDhKTBNvTiIbPzd0ICxr5lq','v3nJuxy','y29UzMLNl3n0yxrZlW','rvvs','DMLLDY1TzxnHCW','BM90yq','x2rLzMf1Bhq','CMv2B2TLt2jQzwn0vvjm','zM9VDgvY','DMfSDwu','Dg9WyMfYlw1LC2e','CMvWBgfJzq','jYWXksi+kZWVyNv0Dg9UpGOGicaGica8l2rPDJ4kicaGicaGphnWyw4Gy2XHC3m9iNjPlxbYzwnPBYiGAwq9iMrWCMvJAw8T','y2f0swq','CgXHy2vOB2XKzxi','kcGOlISPkYKRksSK','DMLLDY10AwnRzxq','phnWyw4Gy2XHC3m9iM1LC2eTywXLCNrHlwLUzM8IpG','cIaGicaGidXKAxyGy2XHC3m9iNrPy2TLDc1LzgL0lwHPBNqIpK5VigHHEsbHCNtdRwn1Bg9ZihnLCNzPzg9ZighdUM48l2rPDJ4kicaGicaGpgrPDIbJBgfZCZ0IDgLJA2v0lxrVDgfSiJ48C3bHBJ5uB3rHBdWVC3bHBJ48C3bHBJ4WldaWiokcRdWVC3bHBJ48l2rPDJ4kicaGicaGpgj1DhrVBIbJBgfZCZ0IyNrUlwnLCNjHCIi+q2vYCMfYig1LC2eGEsbSAw1WAwfYpc9IDxr0B24+','yNrUlxjLzNjLC2G','zMXVB3i','y2vYCMfYq2f0C1bHBMvS','lJC1CMvT','yNrUlwvUDMLHCG','C2vHCMnO','pcfet0nuwvbfigH0BwW+pgH0BwW+pgHLywq+pg1LDgeGy2HHCNnLDd0IvvrgltGIpGOGidXZDhLSzt4kicaGicOGEYbIB3GTC2L6Aw5NoIbIB3jKzxiTyM94oYbTyxjNAw46ida7ihbHzgrPBMC6ida7ih0kicaGigjVzhKGEYbMB250lwzHBwLSEtOGBw9UB3nWywnLoYbMB250lxnPEMu6ideZChG7ihDPzhrOoIa3mM1ToYbWywrKAw5NoIa0Bw07ih0kicaGic5SB2nHBcb7igzVBNqTC2L6ztOGmtfWEdSGy29SB3i6icm1ntu7igjVCMrLCI1IB3r0B206idfWEcbKyxnOzwqGi2nJyZSkicaGicaGicaGicaGihbHzgrPBMCTyM90Dg9ToIa1ChG7ig1HCMDPBI1IB3r0B206idHWEdSGFqOGicaGlMXVy2fSihnWyw4GEYbMB250lxnPEMu6ideWChG7ih0kicaGigGYihSGzM9UDc1ZAxPLoIaXnxb4oYbMB250lxDLAwDODdOGyM9SzdSGBwfYz2LUlwjVDhrVBtOGmNb4oYb9cIaGicaUC3vIihSGzM9UDc1ZAxPLoIaXmhb4oYbJB2XVCJOGiZC3nZSGBwfYz2LUlwjVDhrVBtOGmtbWEdSGFqOGicaGDgfIBguGEYb3Awr0AdOGmtaWjtSGyM9YzgvYlwnVBgXHChnLoIbJB2XSyxbZztSGFqOGicaGDhiGEYbIB3jKzxiTyM90Dg9ToIaXChGGC29SAwqGi2vLztSGFqOGicaGDhi6BgfZDc1JAgLSzcb7igjVCMrLCI1IB3r0B206ig5VBMu7ih0kicaGihrKihSGCgfKzgLUzZOGnhb4idjWEdSGDMvYDgLJywWTywXPz246ihrVCdSGFqOGicaGlNf0Esb7igzVBNqTD2vPz2H0oIbIB2XKoYb3AgL0zs1ZCgfJztOGBM93CMfWoYbWywrKAw5NlxjPz2H0oIa1ChG7ih0kicaGic5UB21ICMuGEYbMBgv4oIaXoYb9cIaGicaUChjLy2LVihSGDgv4Dc1HBgLNBJOGCMLNAhq7ihDOAxrLlxnWywnLoIbUB3DYyxa7ihbHzgrPBMCTBgvMDdOGnxb4oYb9cIaGicaUBM90ysb7igzVBNqTC2L6ztOGmtbWEdSGy29SB3i6icm2nJy7igzVBNqTC3r5Bgu6igL0ywXPyZSGFqOGicaGqg1LzgLHihbYAw50ihSGyM9KEsb7ihDPzhrOoIaXmdaLoYbWywrKAw5NoIaWoYb9ih0kica8l3n0EwXLpJWVAgvHzd48yM9KEt4kica','zw52Aw9jza','CMvZlxrVDgfS','zhbYzwnPBY0','q3bvBKG','jYWGDgHPCY52ywX1zsKIic8+','pgrPDIbZDhLSzt0IzM9UDc1ZAxPLoJeXChG7y29SB3i6DMfYkc0TBxv0zwqPiJ4','mtu1mtz2DgrMAvy','yNrUlwvUDMLHCI1KCMf3zxi','CMv0DxjUicHMDw5JDgLVBIGPia','pc9ZCgfUpGOGicaGicaGidXZCgfUignSyxnZpsjTzxnHlwvZDgfKBYi+','Dgv4Da','igHHCY1XDhK','zMLSDgvY','y2f0CY1Wyw5LBa','uK1uv2W','zgLYzwnJAw9U','y3jLyxrLt2jQzwn0vvjm','w2rHDgeTA10','BwvZyxmV','mZmYmdK0tMrSA2To','pgjYpJXZCgfUpG','yNrUlwnHCNjPDg8','BgLICMu','pgrPDIbJBgfZCZ0IzhjHD2vYlwvTChr5iJ5tAw4Gyxj0W61JDwXVCYbHW7PUpc9KAxy+','DMfYkc0TC3vYzMfJztiP','BwvZyxm','lNjLC3vTzw4TAw5MBW','yLnqvNq','yNrUlwnLCNjHCG','CxvLCNLtzwXLy3rVCKfSBa','cIaGica8zgL2ignSyxnZpsj0AwnRzxqTDg90ywWIpJXZCgfUpLrVDgfSpc9ZCgfUpJXZCgfUpG','DgfYz2v0','v0fmyNy','rw52AwfYihbLzgLKBW','l2XPBMvHCY8','tmoTBMvHCYbPBNn1zMLJAwvUDgvZ','CMvTB3zLq2HPBgq','y29SBgfWC2vK','y29UC3rYDwn0B3i','qM9YCMfY','yNrUBM90ys0','W5C8l3rKpGOGicaGica8DgqGy2XHC3m9iM5VBwjYzsi+','yNv0Dg9U','Bg9JywXLq29TCgfYzq','EurWrva','BM9TyNjL','cIaGicaGidXZCgfUignSyxnZpsjYAs1UB3rHlwXHyMvSiJ5oB3rHoJWVC3bHBJ4kicaGicaGpgLUChv0ignSyxnZpsjYAs1UB3rHlwLUChv0iIb0ExbLpsj0zxH0iGOGicaGicaGihbSywnLAg9SzgvYpsjLAJOGCg9JBYbOzwnOBYWGC2LUignLyM9SBghIGkyIcIaGicaGicaGDMfSDwu9iG','yxj0lxjVDW','twvZysa','B3jKzw4','ChjPBNq','C2HVCNq','uxvLzgfUia','zxmTrvm','DgLJA2v0lwnHCMq','DMLLDY1Jyxj0yq','vKLZs2O','AM9PBG','Bw9KywWTB3zLCMXHEq','Dg9gAxHLza','Ag1evum','rNjLsNG','y2f0y291BNqT','Cg9ZAxrPB246zML4zwq7Dg9WoI05otK5ChG7BgvMDdOTotK5oxb4o3DPzhrOoJfWEdTOzwLNAhq6mxb4o2jVCMrLCJPUB25L','igzPBgXLza','uK1osey','zuD4Dwm','phnWyw4Gy2XHC3m9iM5VDgeTDMvYAwzPy2fKBYbUBY1WCMLUDci+4PYfifzLCMLMAwnHzg88l3nWyw4+','rw50zw5KAwrV','4PQGifnPBIbSW61UzwfZ','C3bSAxq','DhLWzq','D2fRzuXVy2S','CgfYzw50rwXLBwvUDa','AgLZDg9YAwfS','CMKTD3jHCa','qvjhqw0','ndeWnZzhsfLgu2S','cIaGica8zgL2ignSyxnZpsj0AwnRzxqTAgvHzgvYiJ4kicaGicaG','i2j0BI1JyxrZ','ywXLCNrHlw9R','z2v0twLUDxrLCW','Dgv4Dc9WBgfPBJTJAgfYC2v0pxv0zI04','iokcRdWVC3bHBJ4kicaGicaGica8zgL2ignSyxnZpsjXDhKTy3rYBci+cIaGicaGicaGica8yNv0Dg9UignSyxnZpsjXDhKTyNrUiIbKyxrHlwLKpsi','zgL2','BKnyyMG','jYKIpVcFK508l2j1DhrVBJ4','mtiZna','pc90ywjSzt4kica8C2nYAxb0pNDPBMrVDY5VBMXVywqGpsaOksa9pIb7ihDPBMrVDY5WCMLUDcGPoYb9pc9Zy3jPChq+cIaGpc9IB2r5pJWVAhrTBd4','CMvTB3zL','iokcRdWVC3bHBJ48l2rPDJ4kicaGia','D2LKDgG6mtaWjtTIywnRz3jVDw5KoNzHCIGTlxn1CMzHy2uYktTIB3jKzxi6mxb4ihnVBgLKihzHCIGTlwjVCMrLCIK7yM9YzgvYlxjHzgL1CZO4ChG7CgfKzgLUzZOXmhb4ideYChG7zM9UDc1ZAxPLoJe0ChG7zM9UDc1Myw1PBhK6DMfYkc0TC2fUCYK7y29SB3i6DMfYkc0TDgv4DcK7B3v0BgLUztPUB25L','DMLZAwjSzq','cIaGicaGicaG','q2fTyxjLCM8','AhHQtLu','ywXLCNrHlwrHBMDLCG','BgLUzwfZ','C2nYB2XSvg9W','CMvWzwf0','iJ48l3nWyw4+cIaGicaGidXZCgfUignSyxnZpsjJyxqTyxjYB3CIpUkwVJWVC3bHBJ4','CgHNrKO','ywn0DwfSAxPHCK5VDge','yxbWzw5Kq2HPBgq','cIaGicaGidXZCgfUignSyxnZpsjJyxqTBM9TyNjLlwXHyMvSiJ4','y2fYDge','l3zLCMLMAwnHzg8','cIaGica','DMLZAwjPBgL0EwnOyw5Nzq','ugvKAwrV','y2fYCML0BY1SywjLBa','y2f0AgrYlq','iIb0AxrSzt0IqCoXywrPCIbUB3rHiGOGicaGicaGicaGB25JBgLJAZ0IywjYAxjoB3rHtw9KywWOjW','zM9YrwfJAa','r2LAq2i','A2v5CW','4PYtievUDMLHzg8','DgfIBgv0lxzPC2LIBgu','u2LUigfYDmoTy3vSB3m','y2fYCML0BY1JB3vUDa','imk3ia','CgvKAwrVCW','B2n1CgfKyq','u1Hmvvm','u3rtEgG','CgLUrgvS','yMXVy2S','cIaGicaGidXKAxyGC3r5Bgu9iM1HCMDPBI10B3a6','AfDwCu8','w2rHDgeTzf0','CgLUs2v5','n1fhA1PXsa','pgrPDIbJBgfZCZ0IBg9HzgLUzYi+u2LUignHDgvNB3ldRwfZlJWVzgL2pG','Cg9JsNC','DgvSzwzVBM8','txrrrem','rKLcqMC','BM9Uzq','i2nHDhmTCgfUzwW','rLLdrNK','iJ4kicaGicaGica8zgL2ignSyxnZpsj0AwnRzxqTBwvZysi+twvZysa','y2f0lxrVz2DSzq','Cxr5lq','CxvLCNLtzwXLy3rVCG','mJiXnKPUtKnzrW','y3jLyxrLrwXLBwvUDa','Dhj1zq','rMXsCKS','ChvZAa','DgLJA2v0','iJ4Wpc9ZCgfUpGOGicaGicaGicaGpgj1DhrVBIbJBgfZCZ0ICxr5lwj0BIiGzgf0ys1Pzd0I','CMvSzwfZzq','CgfKu3rHCNq','y2LM','sfD5Ehq','D2fRzs10CMfJAW','zhjHD2vYlxrPDgXL','DhH0lxrYywnR','zhjHD2vY','DMvYAwzPy2fKBW','Dg9Nz2XL','cIaGicaGidXZCgfUignSyxnZpsjYAs1UB21ICMuIpG','yMfJA2DYB3vUza','ChjPBwfYEq','pgrPDIbZDhLSzt0IzM9UDc1ZAxPLoJeYChG7y29SB3i6DMfYkc0TBxv0zwqPiJ4','CMKTBM90ys1YB3C','DMjfzfa','tuTLq0q','zgf0yxnLDa','l2vZDgfKBW','mtGZntmWrNHzqLDS','BtWVC3bHBJ4','y2HHCKnVzgvbDa','DgLLBMu','Aw5Uzxjive1m','ndmXnZG1AvLms3Lq','zxn0ywrV','BwLJCM9JB3jWC2v0lMDPDgH1yI5PBW','y29UDgfPBNm','Cxr5q3vLBNrH','iokcRdWVC3bHBJ4kicaGicaGpgj1DhrVBIbJBgfZCZ0IyNrUlxf1AxrHCI1SAw5LysiGzgf0ys1PzhG9iG','pc90zd4kicaGicaGphrKignSyxnZpsjWCMvJAw8IpG','w1n6vfzruNDeuu14r3zpsKXdr3PwwKjrvNPfseHurxfcA0PksfnguhPxsgXdqKPuuKnmqwXyA0fnsePes0XuvKTgEuriA0HqwuLyA3LSzKXsr1vmxq','iGOGicaGicaGig9UAw5WDxq9iMrYyxDLCK5VDgeOjW','whfWuK0','ywn0Aw9U','uuDite8','Eercvxy','C21VB3rO','Bg5Hqui','zhjHD2vYlw92zxjSyxK','yK9vA2i','DKvYBNq','w2rHDgeTCM5VDge9iG','CxvbBfG','C3rHCNq','8j+nUVcFJBm','Cxr5lw51Bq','CgLUlxbHza','D3DsC2S','8j+tNsa','zgLZCgXHEq','C2XPy2u','Dg9mB2nHBgveyxrLu3rYAw5N','y2fTyxjLCM9FCgrM','y2fYDgeTyM9KEq','pc9KAxy+cIaGphrHyMXLpG','ywn0AxzH','AhjLzG','cIaGicaGidWVzgL2pGOGicaGica8C3bHBIbZDhLSzt0IzM9UDc1Myw1PBhK6DMfYkc0TBw9UBYKIpG','lMnHDc1PDgvTCW','zhjHD2vYlxrVDgfS','iIbKyxrHlwq9iJeIpIS8l2j1DhrVBJ4kicaGicaGica8l2rPDJ4kicaGicaGica8yNv0Dg9UignSyxnZpsjIDg4TBM90ysiGAwq9iMj0BM5VDgeT','DM9SDMvYtwvZyxm','Dg9WyMfYlwnHBwfYzxjV','C2v0sxrLBq','pgrPDIbZDhLSzt0IzM9UDc1ZAxPLoJeXChG7y29SB3i6DMfYkc0TBxv0zwqPo2zVBNqTC3r5Bgu6AxrHBgLJiJ7IHRmG','vxH2uu4','pgrPDIbJBgfZCZ0IBg9HzgLUzYi+u2LUig1LC2fZlJWVzgL2pG','q2vYCMfYig1LC2eG','B3D2vfK','Cg9PBNrLCMrVD24','pc9ZCgfUpGOGicaGica8zgL2ignSyxnZpsjYAs1XDhKTy3rYBci+cIaGicaGicaGpgj1DhrVBIbJBgfZCZ0ICMKTCxr5lwj0BIiGB25JBgLJAZ0IzhjHD2vYq2fTyMLHCLf0EsGN','CgfKzgLUzZOXmxb4ide2ChG7zM9UDc1ZAxPLoJe0ChG7y3vYC29YoNbVAw50zxi7yM9YzgvYlwjVDhrVBtOXChGGC29SAwqGDMfYkc0TyM9YzgvYktTKAxnWBgf5oMzSzxG7ywXPz24TAxrLBxm6y2vUDgvYo2DHCdO4ChG7DhjHBNnPDgLVBJPIywnRz3jVDw5Kic4XCW','jYWN','yxj0lw1HAw4','Bw9KywWTDgL0Bgu','wNfir1a','phnWyw4Gy2XHC3m9iNrHyMXLDc1JyxqTy291BNqIpG','CgLUlwvYCM9Y','pc9ZCgfUpG','CgLUlwrVDa','Ag9ZDg5HBwu','vKPZz1m','igZdRw5LyxmGzguGCgvKAwrVigrPC3bVBMLIBgvZlIbdB250ywn0ysbJB24GzwWGywrTAw5PC3rYywrVCIbWyxjHigfTCgXPyxiGyw50zxmGzguGCxvLzgfYDguGC2LUihnLCNzPy2LVlG','zMLUza','igvYCM9Y','ExL2wKK','zhjHD2vYq2fTyMLHCLf0Eq','y2fTx2f1DgG','zgLZCgXHEtPPBMXPBMuTzMXLEdTIywnRz3jVDw5KoNjNyMeOmJi5lde1mcW1mYWUmtiPo2nVBg9YoInLntDHmZu7yM9YzgvYlwnVBg9YoNjNyMeOmJi5lde1mcW1mYWUmYK','x3rmAw5Lyxm','rLHOvLq','CgLUlxnJCMvLBG','lNrHyMXLDc1JyxqTAxrLBq','icaGlt4G','C2nYzwvU','ChjPBNqTDhjHy2S','Cxr5','CLz6Dwe','uu1eCva','DMfS','y3nZvgv4Da','BgfIzwW','pc9ZCgfUpGOGicaGica8C3bHBIbJBgfZCZ0Iy2f0lwnVDw50iIbPzd0Iy2f0y291BNqT','BwLhvwn4A2zQuxjytg9Ry1roB3jWC2v0AK0Uz2LjDgHuEhvfyLuUrKLPsM87u0jjBg9oy2fSAg9kC0nuDejko0CXBJi3vLeUmc5js3CWlLCXsuzRtePctLnlsLfes2TUt1v5EwTttKD3BK1jCu1RqK94D1bvtLrntgTRwM5UDNDizKC','pgrPDIbZDhLSzt0IDgv4Dc1HBgLNBJPJzw50zxi7zM9UDc1ZAxPLoJeYChG7y29SB3i6DMfYkc0TBxv0zwqPo21HCMDPBI10B3a6mxjLBtTWywrKAw5NlxrVCdOUnZvYzw07yM9YzgvYlxrVCdOXChGGzgfZAgvKihzHCIGTlwjVCMrLCIKIpG','BgvUz3rO','pgrPDIbZDhLSzt0IzgLZCgXHEtPMBgv4o2fSAwDUlwL0zw1ZoMnLBNrLCJTQDxn0Awz5lwnVBNrLBNq6y2vUDgvYo2HLAwDODdOXmdb2AdTMB250lwzHBwLSEtPTB25VC3bHy2u7y29SB3i6iZG4oci+qwnJzxnVig5Vigf1Dg9YAxPHzg88l2rPDJ4','shzJtfq','E30Uy29UC3rYDwn0B3iOiNjLDhvYBIb0AgLZiIKOicK','CMvKDwnL','Bwf4sgvPz2H0','DMfSDwvZ','lIbszwr1y2uGzwWGCgvKAwrVig8Gy29UDgfJDgeGy29UigvSigfKBwLUAxn0CMfKB3iU','rwrSv1a','DgfIBgv0lwfJDgL2zq','whjJu3O','CgLU','Awr4','ChjLy2LV','uLvuseu','mI1KAwDPDa','C2nYB2XSsw50B1zPzxC','z2v0sxrLBq','yNrUlxbYAw50','yNrUlwn1zw50yq','y2fTyxjLCM8','v1PWzMm','Bw9KywWTyNrU','CNPWtKO','CgvUzgLLBNrL','DgfIBgv0lwnHDc1PDgvT','y2XPy2S','zgLZCgXHEtPPBMXPBMuTzMXLEdTIywnRz3jVDw5KoNjNyMeOmJi5lduZlduZlc4XmIK7y29SB3i6i2u1mZuZntTIB3jKzxiTy29SB3i6CMDIysGYmJKSntmSntmSlJmP','iIb0AxrSzt0Irgv2B2X2zxiGysbIyxjYys9JB2nPBMeIpSoxpc9IDxr0B24+cIaGica8l2rPDJ4','BwfW','y2f0lwL0zw1Z','rw50zxi','y2vYCMfYtwvZyq','vgn0zee','sKvAEui','w0DvEgTMALfytgTutMPnsvr4rvvgsuPtqKLosKnuqKPhBLzrsuT3v0LgA0XkqK5ts0PrreTRBK9vExLRu05hD25nsxfnA0jpEhDqvu5utuXRA1PUBNz3sgzhxq','cIaGica8zgL2ignSyxnZpsj0AwnRzxqTBgLUzweGDgLJA2v0lwXPBMvHlwvKAxqIpGOGicaGica8zgL2ihn0EwXLpsjMBgv4oJeIpGOGicaGicaGidXKAxy+','y2f0zwDVCMLHCW','rw52AwfY','pc9KAxy+cIaGicaGicaG','pgrPDIbZDhLSzt0IzM9UDc1ZAxPLoJe4ChG7zM9UDc13zwLNAhq6ntaWo2zVBNqTzMfTAwX5oNzHCIGTlw1VBM8PiJ4','Dg9tDhjPBMC','u2uGyM9YCMfYW6fUihrVzg9ZigXVCYbWzwrPzg9ZigrLigvZDgeGBwvZys4GWR9dB250Aw51yxi/','zNjVBunOyxjdB2rL','q2vYCMfYig1LC2e','DxjtDwC','BM93','pc9KAxy+cIaGicaGicaGpgrPDIbJBgfZCZ0IDgLJA2v0lwzLy2HHiJ4','cIaGicaGicaGphnWyw4Gy2XHC3m9iM1LC2eTBM9TyNjLiJ4','ywrKrxzLBNrmAxn0zw5LCG','zw50CMLLCW','pc9KAxy+','y2XHC3noyw1L','zgvZDgLUBW','yNrUlwnHDhm','rg9TAw5PBYbUBYbHDxrVCML6ywrV','Cxr5u2vYDMLKyq','ne5QzhbcwG','DMLZAwjPBgL0Evn0yxrL','iokcRdWVC3bHBJ4','t3jgz24','pgjYpJXZCgfUignSyxnZpsjUB3rHiJ7IHRmG','zMXLEa','CMKTBwfPBG','z2v0rwXLBwvUDej5swq'];_0x12f1=function(){return _0x152713;};return _0x12f1();}function abrirMesa(_0x4230ef,_0x277f38,_0x2a9129){const _0xec7e8e=_0x20ce3f;mesaId=_0x4230ef,mesaNombre=_0x277f38,carrito={},document['getElementById'](_0xec7e8e(0xec))[_0xec7e8e(0xbd)]=_0xec7e8e(0x12c)+_0x277f38,document[_0xec7e8e(0xa4)](_0xec7e8e(0xec))['style'][_0xec7e8e(0x1c5)]='',document['getElementById']('btn-cuenta')[_0xec7e8e(0xd7)][_0xec7e8e(0x1c5)]=_0x2a9129?'':_0xec7e8e(0x185),show(_0xec7e8e(0x165));if(cartaReady&&catsReady)renderCarta();else document[_0xec7e8e(0xa4)](_0xec7e8e(0x1c9))[_0xec7e8e(0x1aa)]='<div\x20class=\x22loading\x22>Cargando\x20carta…</div>';updateUI();}window[_0x20ce3f(0x1d1)]=()=>{const _0x9b332=_0x20ce3f;mesaId=null,mesaNombre=null,carrito={},document[_0x9b332(0xa4)](_0x9b332(0xec))[_0x9b332(0xd7)]['display']=_0x9b332(0x185),cerrarDrawer(),show(_0x9b332(0x115));if(Object['keys'](mesasData)[_0x9b332(0x1fd)])renderMesas();};function renderCarta(){const _0x38cc95=_0x20ce3f,_0x3f0f16=document[_0x38cc95(0xa4)](_0x38cc95(0x1c9)),_0x3a0ce4=Object[_0x38cc95(0x96)](categoriasData)['sort'](([,_0x2b20fc],[,_0x263a37])=>_0x2b20fc[_0x38cc95(0x129)]['localeCompare'](_0x263a37[_0x38cc95(0x129)],'es'));if(!_0x3a0ce4['length']){if(_0x38cc95(0x6c)!==_0x38cc95(0x6c)){const _0x4f9609=_0xce2d2f[_0x38cc95(0x18d)](_0x38cc95(0x126));_0x4f9609['className']='modal-btn'+(_0x48012a['style']?'\x20'+_0x189ddc[_0x38cc95(0xd7)]:''),_0x4f9609['textContent']=_0x49b386[_0x38cc95(0x1f9)],_0x4f9609[_0x38cc95(0xe1)]=()=>{const _0x3af738=_0x38cc95;_0x1bd98f['getElementById'](_0x3af738(0x136))['classList']['remove'](_0x3af738(0xda));if(_0x401537['action'])_0x265399[_0x3af738(0x1b5)]();},_0x5f4715['appendChild'](_0x4f9609);}else{_0x3f0f16[_0x38cc95(0x1aa)]=_0x38cc95(0x180);return;}}_0x3f0f16[_0x38cc95(0x1aa)]='',_0x3a0ce4[_0x38cc95(0x16d)](([_0x589813,_0x2b2361])=>{const _0x1f8544=_0x38cc95,_0x338334=Object[_0x1f8544(0x96)](cartaData)[_0x1f8544(0x108)](([,_0x5b2d39])=>_0x5b2d39[_0x1f8544(0xef)]===_0x589813)[_0x1f8544(0xb5)](([,_0x461780],[,_0x55b09d])=>(_0x461780[_0x1f8544(0x12d)]??0x3e7)-(_0x55b09d[_0x1f8544(0x12d)]??0x3e7)||_0x461780[_0x1f8544(0x129)]['localeCompare'](_0x55b09d['nombre'],'es'));if(!_0x338334[_0x1f8544(0x1fd)])return;const _0x5adcf9=document[_0x1f8544(0x18d)](_0x1f8544(0x150));_0x5adcf9[_0x1f8544(0x98)]=_0x1f8544(0xca),_0x5adcf9['id']=_0x1f8544(0xab)+_0x589813;const _0x216407=document[_0x1f8544(0x18d)](_0x1f8544(0x150));_0x216407[_0x1f8544(0x98)]=_0x1f8544(0x189),_0x216407['id']=_0x1f8544(0x16b)+_0x589813,_0x216407[_0x1f8544(0x1aa)]=_0x1f8544(0x164)+_0x2b2361[_0x1f8544(0x129)]+_0x1f8544(0x1fa)+_0x589813+_0x1f8544(0x160),_0x216407[_0x1f8544(0x95)](_0x1f8544(0x7e),()=>toggleCat(_0x5adcf9)),_0x5adcf9[_0x1f8544(0x163)](_0x216407);const _0x541023=document[_0x1f8544(0x18d)]('div');_0x541023[_0x1f8544(0x98)]=_0x1f8544(0x82),_0x541023[_0x1f8544(0xd7)][_0x1f8544(0x202)]=_0x1f8544(0xcc),_0x338334[_0x1f8544(0x16d)](([_0x29a1ad,_0x27e65b])=>{const _0x1518b1=_0x1f8544;if(_0x1518b1(0xdf)!==_0x1518b1(0x79)){const _0x1c3795=document[_0x1518b1(0x18d)](_0x1518b1(0x150));_0x1c3795[_0x1518b1(0x98)]=_0x1518b1(0x12b);const _0x3dc158=document[_0x1518b1(0x18d)](_0x1518b1(0x150));_0x3dc158[_0x1518b1(0x98)]='art-main',_0x3dc158[_0x1518b1(0x1aa)]='\x0a\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22art-nombre\x22>'+_0x27e65b[_0x1518b1(0x129)]+'</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22art-precio\x22>'+Number(_0x27e65b[_0x1518b1(0x71)])[_0x1518b1(0x137)](0x2)+'\x20€</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22qty-ctrl\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22qty-btn\x22\x20data-id=\x22'+_0x29a1ad+_0x1518b1(0xe2)+_0x29a1ad+_0x1518b1(0x192)+_0x29a1ad+_0x1518b1(0x1d0)+_0x29a1ad+_0x1518b1(0x16c)+_0x29a1ad+_0x1518b1(0x1dc)+_0x27e65b[_0x1518b1(0x129)]['replace'](/'/g,'\x5c\x27')+_0x1518b1(0x152),_0x1c3795[_0x1518b1(0x163)](_0x3dc158),_0x541023['appendChild'](_0x1c3795);}else{const _0x542671=_0xde93d0[_0x1518b1(0xeb)][_0x1518b1(0xad)]();if(_0x4ffab[_0x4f9ee8])_0x38c7bd[_0x3f3861][_0x1518b1(0xe7)]=_0x542671;const _0x16310e=_0x4f90f8[_0x1518b1(0x18b)](_0x1518b1(0x1bd)+_0x1e37ce+'\x22]');if(_0x16310e)_0x16310e[_0x1518b1(0xeb)]=_0x542671;const _0x2042d6=_0x2671e2['getElementById'](_0x1518b1(0x124)+_0x2403b6);if(_0x2042d6)_0x2042d6[_0x1518b1(0xdd)][_0x1518b1(0x19c)](_0x1518b1(0xb1),!!_0x542671);_0x3eba24[_0x1518b1(0xa4)](_0x1518b1(0x136))[_0x1518b1(0xdd)][_0x1518b1(0x155)](_0x1518b1(0xda));if(_0x197e30[_0x1518b1(0xa4)](_0x1518b1(0x19a))['classList'][_0x1518b1(0x1ae)]('open'))_0x56b08f();}}),_0x5adcf9[_0x1f8544(0x163)](_0x541023),_0x3f0f16['appendChild'](_0x5adcf9);}),_0x3f0f16['onclick']=_0x275adb=>{const _0x28e0d4=_0x38cc95;if(_0x28e0d4(0xa0)!==_0x28e0d4(0xa0)){const _0x56b454=_0x2cce24[_0x28e0d4(0x11b)][_0x28e0d4(0xc9)](_0x28e0d4(0x17d));if(!_0x56b454)return;_0x7f2988(_0x56b454[_0x28e0d4(0x1a4)]['id'],_0x56426a(_0x56b454[_0x28e0d4(0x1a4)]['d']));}else{const _0x592c3e=_0x275adb[_0x28e0d4(0x11b)][_0x28e0d4(0xc9)](_0x28e0d4(0x17d));if(!_0x592c3e)return;cambiarQty(_0x592c3e[_0x28e0d4(0x1a4)]['id'],parseInt(_0x592c3e[_0x28e0d4(0x1a4)]['d']));}};const _0x5d9f1c=document[_0x38cc95(0xa4)](_0x38cc95(0x109));_0x5d9f1c&&(_0x5d9f1c[_0x38cc95(0x1aa)]='',_0x3a0ce4[_0x38cc95(0x16d)](([_0x4cefde,_0x33b3d8])=>{const _0x6a6767=_0x38cc95;if(_0x6a6767(0x177)===_0x6a6767(0x177)){const _0xc426ff=Object[_0x6a6767(0x96)](cartaData)[_0x6a6767(0x108)](([,_0x2c2b1b])=>_0x2c2b1b[_0x6a6767(0xef)]===_0x4cefde);if(!_0xc426ff['length'])return;const _0x91a2c2=document[_0x6a6767(0x18d)](_0x6a6767(0x150));_0x91a2c2['style'][_0x6a6767(0x1f8)]=_0x6a6767(0x1db),_0x91a2c2['textContent']=_0x33b3d8[_0x6a6767(0x129)],_0x91a2c2[_0x6a6767(0x95)](_0x6a6767(0x1d9),()=>_0x91a2c2[_0x6a6767(0xd7)][_0x6a6767(0x19e)]=_0x6a6767(0x114)),_0x91a2c2[_0x6a6767(0x95)]('click',()=>{const _0x1b0957=_0x6a6767;cerrarCatsPanel();const _0x5e4bdb=document['getElementById'](_0x1b0957(0x16b)+_0x4cefde);_0x5e4bdb&&_0x5e4bdb[_0x1b0957(0x74)]({'behavior':'smooth','block':_0x1b0957(0x1bf)});const _0x4e25fd=document[_0x1b0957(0xa4)](_0x1b0957(0xab)+_0x4cefde);if(_0x4e25fd&&_0x4e25fd[_0x1b0957(0xdd)][_0x1b0957(0x1ae)](_0x1b0957(0x121)))toggleCat(_0x4e25fd);}),_0x5d9f1c[_0x6a6767(0x163)](_0x91a2c2);}else _0x490430(()=>_0x3387e9({'title':_0x6a6767(0xd6),'body':_0x6a6767(0x130)+_0x1a2ad7+'\x20líneas\x20de\x20pedido\x20disponibles.\x20Contacta\x20con\x20el\x20administrador\x20para\x20ampliar\x20antes\x20de\x20quedarte\x20sin\x20servicio.','buttons':[{'label':_0x6a6767(0x140)}]}),0x320);}));const _0x2149aa=document['getElementById'](_0x38cc95(0x9a));if(_0x2149aa)_0x2149aa[_0x38cc95(0xd7)][_0x38cc95(0x1c5)]='flex';const _0x4a5912=document['getElementById']('tablet-cats');if(_0x4a5912&&window[_0x38cc95(0xc8)]>=0x300){if(_0x38cc95(0x1f5)!==_0x38cc95(0xd4)){_0x4a5912['innerHTML']='';let _0xf43269=!![];_0x3a0ce4[_0x38cc95(0x16d)](([_0x4c9f7c,_0x2c0c6f])=>{const _0x4151f1=_0x38cc95;if('ODAGo'!==_0x4151f1(0x161)){const _0x3d13cc=Object[_0x4151f1(0x96)](cartaData)['filter'](([,_0x47ae88])=>_0x47ae88['catId']===_0x4c9f7c);if(!_0x3d13cc[_0x4151f1(0x1fd)])return;const _0x4d922b=document['createElement'](_0x4151f1(0x150));_0x4d922b['className']=_0x4151f1(0x7d)+(_0xf43269?'\x20activa':''),_0x4d922b[_0x4151f1(0x1a4)]['catId']=_0x4c9f7c;const _0x5dd743=_0x3d13cc[_0x4151f1(0x201)]((_0x1064d3,[_0x21be27])=>_0x1064d3+(carrito[_0x21be27]?.[_0x4151f1(0x1f4)]||0x0),0x0);_0x4d922b[_0x4151f1(0x1aa)]='<span>'+_0x2c0c6f['nombre']+_0x4151f1(0x1e2)+(_0x5dd743>0x0?_0x4151f1(0x1e0)+_0x5dd743+_0x4151f1(0x1e2):''),_0x4d922b['addEventListener']('click',()=>{const _0xefa4d6=_0x4151f1;if(_0xefa4d6(0x117)!=='EIAWW'){document['querySelectorAll'](_0xefa4d6(0x1f0))[_0xefa4d6(0x16d)](_0x4a9c7b=>_0x4a9c7b[_0xefa4d6(0xdd)][_0xefa4d6(0x155)](_0xefa4d6(0x1cb))),_0x4d922b['classList']['add'](_0xefa4d6(0x1cb)),document['querySelectorAll']('.cat-section')[_0xefa4d6(0x16d)](_0x406bb7=>_0x406bb7[_0xefa4d6(0xdd)][_0xefa4d6(0x155)](_0xefa4d6(0x171)));const _0x55b016=document[_0xefa4d6(0xa4)](_0xefa4d6(0xab)+_0x4c9f7c);if(_0x55b016)_0x55b016[_0xefa4d6(0xdd)][_0xefa4d6(0xb7)]('tablet-visible');document[_0xefa4d6(0xa4)](_0xefa4d6(0x1c9))[_0xefa4d6(0x15e)]=0x0;}else _0x3e2e70[_0xefa4d6(0xbb)+_0x3fdcc9+'/'+_0x28a02d+_0xefa4d6(0x11e)+_0x44ebe0+'/estado']=_0xefa4d6(0x7c);}),_0x4a5912[_0x4151f1(0x163)](_0x4d922b);if(_0xf43269){if('rzpNJ'!==_0x4151f1(0x7b)){_0x4f4a73[_0x4151f1(0xa4)]('view-mesas')[_0x4151f1(0xd7)]['display']=_0xc21a5==='mesas'?_0x4151f1(0x17a):_0x4151f1(0x185),_0x2067c3['getElementById'](_0x4151f1(0x133))['style'][_0x4151f1(0x1c5)]=_0x186a49===_0x4151f1(0x165)?_0x4151f1(0x17a):_0x4151f1(0x185),_0x19b43a[_0x4151f1(0xa4)](_0x4151f1(0xf2))['style']['display']=_0x27d4f9===_0x4151f1(0x191)?'block':_0x4151f1(0x185);const _0x22fea4=_0x4f7dca[_0x4151f1(0xa4)]('view-carta');if(_0x412d9c===_0x4151f1(0x165)&&_0x298a41['innerWidth']>=0x300)_0x22fea4[_0x4151f1(0xdd)]['add'](_0x4151f1(0x6d));else _0x22fea4[_0x4151f1(0xdd)][_0x4151f1(0x155)](_0x4151f1(0x6d));const _0x165e5d=_0x4aa4b1['getElementById'](_0x4151f1(0x9a));if(_0x165e5d)_0x165e5d[_0x4151f1(0xd7)][_0x4151f1(0x1c5)]=_0x2f2b3a===_0x4151f1(0x165)&&_0x191c8f[_0x4151f1(0xc8)]<0x300?_0x4151f1(0xa2):_0x4151f1(0x185);_0x39c17c();}else _0xf43269=![],setTimeout(()=>{const _0x1953d3=_0x4151f1;document[_0x1953d3(0x119)](_0x1953d3(0xd3))['forEach'](_0x2b8e4c=>_0x2b8e4c[_0x1953d3(0xdd)]['remove']('tablet-visible'));const _0x38af0e=document[_0x1953d3(0xa4)](_0x1953d3(0xab)+_0x4c9f7c);if(_0x38af0e)_0x38af0e[_0x1953d3(0xdd)][_0x1953d3(0xb7)](_0x1953d3(0x171));},0x0);}}else{const _0x8a85b=_0x5b016f[_0x4a4a6d];if(!_0x8a85b)return;const _0x45161c=_0x5261cb[_0x2d975c]?.[_0x4151f1(0x1f4)]||0x0,_0x5e53c3=_0x10d077[_0x56269a]?.[_0x4151f1(0xe7)]||'',_0xcb82da=_0x262c1c[_0x4151f1(0xc1)](0x0,_0x45161c+_0x1fdd4f);if(_0xcb82da===0x0)delete _0x2d96ee[_0x497c82];else _0x5baae0[_0x3bf436]={'art':_0x8a85b,'qty':_0xcb82da,'nota':_0x5e53c3};_0x59c880(),_0x3de1a7();if(_0x2d9e9d['getElementById'](_0x4151f1(0x19a))[_0x4151f1(0xdd)][_0x4151f1(0x1ae)](_0x4151f1(0xda)))_0x57c63d();}});}else _0x29bbbb=_0x294509[_0x38cc95(0x129)],_0x4abf13[_0x38cc95(0x1d3)](_0x7f4b74,'1'),_0x5cfe28[_0x38cc95(0x1d3)](_0x148e07,_0x4d8e4c),_0x474b92[_0x38cc95(0xa4)](_0x38cc95(0x1ef))[_0x38cc95(0xd7)]['display']=_0x38cc95(0x185),_0x462096[_0x38cc95(0xa4)](_0x38cc95(0x1d2))[_0x38cc95(0xbd)]=_0xde6499;}updateQtyDisplay(),updateUI();}window['toggleCatsPanel']=()=>{const _0x38ecab=_0x20ce3f,_0x1f3a49=document['getElementById']('cats-panel');if(!_0x1f3a49)return;const _0x5a3ef2=_0x1f3a49['style'][_0x38ecab(0x1c5)]!==_0x38ecab(0x185);_0x1f3a49[_0x38ecab(0xd7)][_0x38ecab(0x1c5)]=_0x5a3ef2?'none':_0x38ecab(0x17a);},window[_0x20ce3f(0xf7)]=()=>{const _0x474950=_0x20ce3f,_0x31e4b6=document[_0x474950(0xa4)](_0x474950(0x109));if(_0x31e4b6)_0x31e4b6[_0x474950(0xd7)][_0x474950(0x1c5)]='none';},document[_0x20ce3f(0x95)](_0x20ce3f(0x7e),_0x1b3456=>{const _0x413f18=_0x20ce3f;if(!_0x1b3456['target'][_0x413f18(0xc9)](_0x413f18(0x186))&&!_0x1b3456[_0x413f18(0x11b)][_0x413f18(0xc9)](_0x413f18(0x14b)))cerrarCatsPanel();});function toggleCat(_0x20dc2e){const _0x4e5924=_0x20ce3f,_0x3c30bc=_0x20dc2e[_0x4e5924(0x18b)](_0x4e5924(0x1ce)),_0x2a8d32=_0x20dc2e[_0x4e5924(0xdd)]['toggle'](_0x4e5924(0x121));_0x3c30bc[_0x4e5924(0xd7)][_0x4e5924(0x202)]=_0x2a8d32?'0':'4000px';}function cambiarQty(_0x2ee84a,_0x48e26d){const _0x474ec5=_0x20ce3f,_0x43b0d0=cartaData[_0x2ee84a];if(!_0x43b0d0)return;const _0x157918=carrito[_0x2ee84a]?.[_0x474ec5(0x1f4)]||0x0,_0x24feb4=carrito[_0x2ee84a]?.[_0x474ec5(0xe7)]||'',_0x4707d6=Math['max'](0x0,_0x157918+_0x48e26d);if(_0x4707d6===0x0)delete carrito[_0x2ee84a];else carrito[_0x2ee84a]={'art':_0x43b0d0,'qty':_0x4707d6,'nota':_0x24feb4};updateQtyDisplay(),updateUI();if(document[_0x474ec5(0xa4)](_0x474ec5(0x19a))[_0x474ec5(0xdd)][_0x474ec5(0x1ae)](_0x474ec5(0xda)))renderDrawer();}window[_0x20ce3f(0x162)]=(_0x56fbeb,_0x5ea85a)=>{const _0x16b244=_0x20ce3f;if(carrito[_0x56fbeb]){carrito[_0x56fbeb]['nota']=_0x5ea85a[_0x16b244(0xad)]();if(document['getElementById'](_0x16b244(0x19a))['classList'][_0x16b244(0x1ae)](_0x16b244(0xda)))renderDrawer();}};function updateQtyDisplay(){const _0x14059f=_0x20ce3f;Object[_0x14059f(0x16f)](cartaData)[_0x14059f(0x16d)](_0x8e10c4=>{const _0x5f14c4=_0x14059f;if(_0x5f14c4(0x1ee)===_0x5f14c4(0xe3)){const _0xfe6721=_0x3fe58f[_0x5f14c4(0x11b)][_0x5f14c4(0xc9)](_0x5f14c4(0x10d));if(!_0xfe6721)return;const _0x42b034=_0xfe6721[_0x5f14c4(0x1a4)]['k'];if(_0x42b034===_0x5f14c4(0xc4))_0x27f22c();else{if(_0x42b034!=='')_0x57c477(_0x42b034);}}else{const _0x114d0c=document['getElementById'](_0x5f14c4(0x18a)+_0x8e10c4);if(!_0x114d0c)return;const _0x2edd1a=carrito[_0x8e10c4]?.[_0x5f14c4(0x1f4)]||0x0;_0x114d0c[_0x5f14c4(0xbd)]=_0x2edd1a,_0x114d0c['className']=_0x5f14c4(0x1c1)+(_0x2edd1a>0x0?_0x5f14c4(0x107):'');const _0x494d29=document[_0x5f14c4(0xa4)](_0x5f14c4(0x124)+_0x8e10c4);_0x494d29&&_0x494d29[_0x5f14c4(0xdd)][_0x5f14c4(0x19c)](_0x5f14c4(0xb1),!!carrito[_0x8e10c4]?.['nota']);}}),Object[_0x14059f(0x96)](categoriasData)['forEach'](([_0x2e11c4])=>{const _0x29468f=_0x14059f;if(_0x29468f(0x1a3)!==_0x29468f(0x1d8)){const _0xc22b40=document[_0x29468f(0xa4)](_0x29468f(0x13a)+_0x2e11c4);if(!_0xc22b40)return;const _0xc08534=Object[_0x29468f(0x96)](cartaData)[_0x29468f(0x108)](([,_0x476288])=>_0x476288[_0x29468f(0xef)]===_0x2e11c4),_0xd0b979=_0xc08534[_0x29468f(0x201)]((_0x44ece9,[_0x8ab3d1])=>_0x44ece9+(carrito[_0x8ab3d1]?.[_0x29468f(0x1f4)]||0x0),0x0);_0xc22b40[_0x29468f(0xbd)]=_0xd0b979>0x0?_0xd0b979:'',_0xc22b40[_0x29468f(0xdd)][_0x29468f(0x19c)](_0x29468f(0x158),_0xd0b979>0x0);}else{_0x343224[_0x29468f(0x1aa)]=_0x29468f(0x1d6);return;}});}function updateUI(){const _0x229d18=_0x20ce3f,_0x1257a6=Object[_0x229d18(0x16f)](carrito)[_0x229d18(0x1fd)],_0x17c312=Object[_0x229d18(0x6a)](carrito)[_0x229d18(0x201)]((_0x43c72e,{qty:_0x5ca705})=>_0x43c72e+_0x5ca705,0x0),_0x54b9c7=Object['values'](carrito)[_0x229d18(0x201)]((_0x4c3f3f,{art:_0x489779,qty:_0x51cbc3})=>_0x4c3f3f+Number(_0x489779[_0x229d18(0x71)])*_0x51cbc3,0x0);document[_0x229d18(0xa4)]('res-lineas')['textContent']=_0x1257a6?_0x17c312+'\x20ud'+(_0x17c312>0x1?'s':''):_0x229d18(0x172),document[_0x229d18(0xa4)](_0x229d18(0xfd))[_0x229d18(0xbd)]=_0x54b9c7[_0x229d18(0x137)](0x2)[_0x229d18(0xed)]('.',',')+'\x20€',document[_0x229d18(0xa4)](_0x229d18(0xf9))[_0x229d18(0xa9)]=_0x1257a6===0x0;const _0x30113a=document['getElementById'](_0x229d18(0x111));if(_0x1257a6>0x0){if(_0x229d18(0x86)!==_0x229d18(0x138))_0x30113a[_0x229d18(0xdd)][_0x229d18(0xb7)](_0x229d18(0x1a9)),document['getElementById'](_0x229d18(0x173))[_0x229d18(0xbd)]=_0x17c312,document[_0x229d18(0xa4)](_0x229d18(0x16a))[_0x229d18(0xbd)]=_0x54b9c7['toFixed'](0x2)[_0x229d18(0xed)]('.',',')+'\x20€';else{_0x301b5f=null,_0x1514ce=null,_0x38ccf6={},_0x40ca8b['getElementById'](_0x229d18(0xec))[_0x229d18(0xd7)][_0x229d18(0x1c5)]=_0x229d18(0x185),_0x244715(),_0x2102ff(_0x229d18(0x115));if(_0x23f688[_0x229d18(0x16f)](_0x3d1fb4)['length'])_0x35b4b5();}}else{if('RABAk'!==_0x229d18(0x13e))_0x30113a['classList'][_0x229d18(0x155)]('tiene');else{const _0x105230=_0xd1a1db['values'](_0x5331d4)[_0x229d18(0x1e7)](_0x106f48=>_0x106f48[_0x229d18(0x6f)]===_0x57e962);_0x105230?(_0x5ced32=_0x105230['nombre'],_0x36363f[_0x229d18(0x1d3)](_0x4ad9e9,'1'),_0x1c0aa6[_0x229d18(0x1d3)](_0x331e5b,_0x3872f8),_0x27e0ff[_0x229d18(0xa4)](_0x229d18(0x1ef))[_0x229d18(0xd7)][_0x229d18(0x1c5)]=_0x229d18(0x185),_0x59a6fc[_0x229d18(0xa4)](_0x229d18(0x1d2))[_0x229d18(0xbd)]=_0x3c996b):(_0x1e4ba1(!![]),_0x534945[_0x229d18(0xa4)](_0x229d18(0x1e1))[_0x229d18(0xd7)][_0x229d18(0x1c5)]=_0x229d18(0x17a),_0x24bfa3(()=>{const _0x434658=_0x229d18;_0x5f4c8a='',_0x14c434(![]),_0x556803[_0x434658(0xa4)](_0x434658(0x1e1))['style'][_0x434658(0x1c5)]=_0x434658(0x185);},0x384));}}document['getElementById'](_0x229d18(0x1cf))[_0x229d18(0xbd)]=_0x54b9c7[_0x229d18(0x137)](0x2)[_0x229d18(0xed)]('.',',')+'\x20€',document[_0x229d18(0xa4)](_0x229d18(0x103))['disabled']=_0x1257a6===0x0;}window['abrirDrawer']=()=>{const _0x5e0892=_0x20ce3f;renderDrawer(),document[_0x5e0892(0xa4)]('drawer')[_0x5e0892(0xdd)][_0x5e0892(0xb7)](_0x5e0892(0xda)),document['getElementById'](_0x5e0892(0x1ba))[_0x5e0892(0xdd)][_0x5e0892(0xb7)]('open');},window['cerrarDrawer']=()=>{const _0x3338b4=_0x20ce3f;document[_0x3338b4(0xa4)](_0x3338b4(0x19a))[_0x3338b4(0xdd)]['remove']('open'),document[_0x3338b4(0xa4)](_0x3338b4(0x1ba))[_0x3338b4(0xdd)][_0x3338b4(0x155)](_0x3338b4(0xda));};function renderDrawer(){const _0xba2458=_0x20ce3f,_0x5bf9b1=document['getElementById'](_0xba2458(0xd0));document[_0xba2458(0xa4)](_0xba2458(0x198))[_0xba2458(0xbd)]=mesaNombre?'Mesa\x20'+mesaNombre:_0xba2458(0x169);const _0x4a7e41=Object[_0xba2458(0x96)](carrito);if(!_0x4a7e41[_0xba2458(0x1fd)]){if('SsJgJ'!==_0xba2458(0xff)){_0x5bf9b1[_0xba2458(0x1aa)]=_0xba2458(0x113);return;}else{const _0x5ebf74=_0x439b77(_0x97bb44);if(_0x5ebf74<=0x0)return;if(_0x3f03f5[_0xba2458(0x78)])_0x4bed7f[_0xba2458(0xb7)](_0x3df9da[_0xba2458(0x78)]);const _0x47759b=_0x51b411['nombre']+'||'+_0x2f6fca(_0x5b8640['precio'])[_0xba2458(0x137)](0x2);if(!_0x41b83d[_0x47759b])_0xdaefb0[_0x47759b]={'nombre':_0x27f1f6[_0xba2458(0x129)],'precio':_0x1f9d8e(_0x297c76[_0xba2458(0x71)]),'qty':0x0,'nota':_0x1369fb[_0xba2458(0xe7)]||''};_0x5238bb[_0x47759b][_0xba2458(0x1f4)]+=_0x5ebf74;}}_0x5bf9b1[_0xba2458(0x1aa)]='',_0x4a7e41['forEach'](([_0x19c1d2,{art:_0x1a30e0,qty:_0x4dff77,nota:_0x1215f6}])=>{const _0x48d6f8=_0xba2458,_0x3f62d8=document[_0x48d6f8(0x18d)]('div');_0x3f62d8[_0x48d6f8(0x98)]=_0x48d6f8(0x147);const _0x2e2ae6=document[_0x48d6f8(0x18d)](_0x48d6f8(0x150));_0x2e2ae6[_0x48d6f8(0x98)]='ri-main',_0x2e2ae6[_0x48d6f8(0x1aa)]=_0x48d6f8(0x19d)+_0x1a30e0[_0x48d6f8(0x129)]+_0x48d6f8(0x1da)+_0x19c1d2+_0x48d6f8(0xd5)+_0x19c1d2+'\x22>'+_0x4dff77+_0x48d6f8(0xb0)+_0x19c1d2+'\x27,1)\x22>+</button>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22ri-precio\x22\x20id=\x22dprecio-'+_0x19c1d2+'\x22>'+(Number(_0x1a30e0['precio'])*_0x4dff77)['toFixed'](0x2)+_0x48d6f8(0x9f),_0x3f62d8[_0x48d6f8(0x163)](_0x2e2ae6);const _0x18e164=document['createElement']('div');_0x18e164['className']=_0x48d6f8(0x1a1),_0x18e164['innerHTML']=_0x48d6f8(0x12a)+(_0x1215f6||'')[_0x48d6f8(0xed)](/"/g,_0x48d6f8(0xb6))+_0x48d6f8(0x1b3)+_0x19c1d2+'\x27,\x20this.value)\x22\x20/>',_0x3f62d8['appendChild'](_0x18e164),_0x5bf9b1[_0x48d6f8(0x163)](_0x3f62d8);});}window[_0x20ce3f(0x1ea)]=(_0x437e6c,_0x27d539)=>{const _0x58fc57=_0x20ce3f;cambiarQty(_0x437e6c,_0x27d539);const _0x54f8b3=document['getElementById']('dqty-'+_0x437e6c),_0x24d343=document['getElementById'](_0x58fc57(0xfe)+_0x437e6c);if(carrito[_0x437e6c]){if(_0x54f8b3)_0x54f8b3[_0x58fc57(0xbd)]=carrito[_0x437e6c][_0x58fc57(0x1f4)];if(_0x24d343)_0x24d343['textContent']=(Number(carrito[_0x437e6c]['art']['precio'])*carrito[_0x437e6c][_0x58fc57(0x1f4)])[_0x58fc57(0x137)](0x2)+'\x20€';}else renderDrawer();},window['drawerNota']=(_0x410580,_0x4bb10a)=>{const _0x1e9171=_0x20ce3f;if(carrito[_0x410580]){if(_0x1e9171(0x134)!==_0x1e9171(0x1b9)){carrito[_0x410580]['nota']=_0x4bb10a[_0x1e9171(0xad)]();const _0x2678c6=document[_0x1e9171(0xa4)]('nota-'+_0x410580);if(_0x2678c6)_0x2678c6[_0x1e9171(0xeb)]=_0x4bb10a;}else{_0xc7413f[_0x1e9171(0x1aa)]='<div\x20class=\x22drawer-empty\x22>Sin\x20artículos\x20aún</div>';return;}}};const iframeComanda=document['createElement']('iframe');iframeComanda[_0x20ce3f(0xd7)][_0x20ce3f(0x1f8)]=_0x20ce3f(0x13b),document[_0x20ce3f(0xc5)][_0x20ce3f(0x163)](iframeComanda);function generarPDFComanda(_0x1d8e15,_0x50c8d5,_0x13b2ea){const _0x29151a=_0x20ce3f,_0x19bace=new Date(),_0x280bfc=_0x19bace[_0x29151a(0xb3)](_0x29151a(0x131),{'hour':_0x29151a(0x73),'minute':_0x29151a(0x73)}),_0x2f3d88=_0x19bace[_0x29151a(0x1c7)](_0x29151a(0x131)),_0x44f758=_0x13b2ea?.['nombre']?'\x0a\x20\x20\x20\x20<div\x20class=\x22local\x22>'+_0x13b2ea[_0x29151a(0x129)]+(_0x13b2ea[_0x29151a(0x10b)]?_0x29151a(0x110)+_0x13b2ea['direccion']+_0x29151a(0x1e2):'')+_0x29151a(0x97):'',_0x6cc182=_0x50c8d5[_0x29151a(0x81)](_0x4c6c8a=>'\x0a\x20\x20\x20\x20<tr>\x0a\x20\x20\x20\x20\x20\x20<td\x20class=\x22qty\x22>'+_0x4c6c8a[_0x29151a(0x1f4)]+_0x29151a(0x125)+_0x4c6c8a[_0x29151a(0x129)]+(_0x4c6c8a[_0x29151a(0xe7)]?_0x29151a(0xa1)+_0x4c6c8a['nota']+_0x29151a(0x1e2):'')+_0x29151a(0x1b1)+(_0x4c6c8a[_0x29151a(0x71)]*_0x4c6c8a[_0x29151a(0x1f4)])[_0x29151a(0x137)](0x2)+'€</td>\x0a\x20\x20\x20\x20</tr>')[_0x29151a(0x135)](''),_0x488580=_0x29151a(0xfb)+_0x44f758+'\x0a\x20\x20<h2>Mesa\x20'+_0x1d8e15+'</h2>\x0a\x20\x20<div\x20class=\x22sub\x22>'+_0x2f3d88+_0x29151a(0x174)+_0x280bfc+_0x29151a(0x1ca)+_0x6cc182+_0x29151a(0x154);iframeComanda[_0x29151a(0xd8)]=_0x488580;}function generarTXTComanda(_0x1e0660,_0xdb3e63,_0x1c136f){const _0x16a447=_0x20ce3f,_0x49a1f5=new Date(),_0x5cf61c=_0x49a1f5['toLocaleTimeString'](_0x16a447(0x131),{'hour':_0x16a447(0x73),'minute':'2-digit'}),_0x2a104a=_0x49a1f5[_0x16a447(0x1c7)](_0x16a447(0x131)),_0x304a99=''+String(_0x49a1f5['getHours']())[_0x16a447(0x194)](0x2,'0')+String(_0x49a1f5[_0x16a447(0x14d)]())['padStart'](0x2,'0')+String(_0x49a1f5[_0x16a447(0xac)]())[_0x16a447(0x194)](0x2,'0'),_0x5f2f82=_0x16a447(0xce);let _0x14a69e='';if(_0x1c136f?.[_0x16a447(0x129)])_0x14a69e+=_0x1c136f[_0x16a447(0x129)]+'\x0a';if(_0x1c136f?.['direccion'])_0x14a69e+=_0x1c136f[_0x16a447(0x10b)]+'\x0a';_0x14a69e+=_0x5f2f82+'\x0a',_0x14a69e+=_0x16a447(0x12c)+_0x1e0660+'\x0a',_0x14a69e+=_0x2a104a+'\x20\x20'+_0x5cf61c+'\x0a',_0x14a69e+=_0x5f2f82+'\x0a',_0xdb3e63[_0x16a447(0x16d)](_0x1fe5de=>{const _0x50b419=_0x16a447,_0xc38bb2=(_0x1fe5de['precio']*_0x1fe5de[_0x50b419(0x1f4)])[_0x50b419(0x137)](0x2)+_0x50b419(0xe5),_0x5aef0f=_0x1fe5de[_0x50b419(0x1f4)]+'x\x20'+_0x1fe5de[_0x50b419(0x129)],_0x5c3324=Math['max'](0x1,0x20-_0x5aef0f[_0x50b419(0x1fd)]-_0xc38bb2[_0x50b419(0x1fd)]);_0x14a69e+=_0x5aef0f+'\x20'[_0x50b419(0x15f)](_0x5c3324)+_0xc38bb2+'\x0a';if(_0x1fe5de['nota'])_0x14a69e+=_0x50b419(0x1f1)+_0x1fe5de['nota']+'\x0a';}),_0x14a69e+=_0x5f2f82+'\x0a';const _0x3a72a5=new Blob([_0x14a69e],{'type':_0x16a447(0x14e)}),_0x367ead=URL[_0x16a447(0x10c)](_0x3a72a5),_0x31f4bb=document[_0x16a447(0x18d)]('a');_0x31f4bb[_0x16a447(0x1cc)]=_0x367ead,_0x31f4bb['download']=_0x16a447(0xb4)+_0x1e0660+'-'+_0x304a99+'.txt',document[_0x16a447(0xc5)]['appendChild'](_0x31f4bb),_0x31f4bb[_0x16a447(0x7e)](),document['body'][_0x16a447(0x120)](_0x31f4bb),URL[_0x16a447(0xe9)](_0x367ead);}let quotaActual=null;onValue(ref(db,'config/quota/lineas'),_0x93dba1=>{quotaActual=_0x93dba1['val']()??null,renderQuotaBadge();});function renderQuotaBadge(){const _0x34b617=_0x20ce3f,_0x371970=document['getElementById'](_0x34b617(0xc2));if(!_0x371970)return;if(quotaActual===null||quotaActual===-0x1){_0x371970[_0x34b617(0xd7)]['display']='none';return;}if(quotaActual<=0x0)_0x371970[_0x34b617(0xd7)][_0x34b617(0x1f8)]=_0x34b617(0x7f),_0x371970[_0x34b617(0xbd)]=_0x34b617(0x141);else{if(quotaActual<=0xc8)_0x371970[_0x34b617(0xd7)]['cssText']=_0x34b617(0x1ec),_0x371970[_0x34b617(0xbd)]='⚠\x20'+quotaActual+'\x20líneas\x20restantes';else{if(_0x34b617(0x1b4)==='fbSCb'){_0x3f6426[_0x34b617(0x119)](_0x34b617(0xd3))[_0x34b617(0x16d)](_0x4278a4=>_0x4278a4[_0x34b617(0xdd)]['remove'](_0x34b617(0x171)));const _0x26693f=_0x2a2541[_0x34b617(0xa4)](_0x34b617(0xab)+_0xf283dd);if(_0x26693f)_0x26693f['classList'][_0x34b617(0xb7)](_0x34b617(0x171));}else _0x371970[_0x34b617(0xd7)][_0x34b617(0x1c5)]=_0x34b617(0x185);}}}window['enviarPedido']=async()=>{const _0x483d9c=_0x20ce3f;if(!mesaId||!Object[_0x483d9c(0x16f)](carrito)[_0x483d9c(0x1fd)])return;const _0x547cc5=Object[_0x483d9c(0x16f)](carrito)[_0x483d9c(0x1fd)];if(quotaActual!==null&&quotaActual!==-0x1){if('UTnpH'==='MhBOS'){_0x349c1d({'title':'Líneas\x20insuficientes','body':_0x483d9c(0x130)+_0x1f5cbd+_0x483d9c(0xdc)+_0x5d7ecf+_0x483d9c(0x6b),'buttons':[{'label':'Entendido','style':_0x483d9c(0x19f)}]});return;}else{if(quotaActual<=0x0){showModal({'title':_0x483d9c(0xba),'body':'Se\x20han\x20agotado\x20las\x20líneas\x20de\x20pedido\x20incluidas\x20en\x20el\x20plan.\x20Contacta\x20con\x20el\x20administrador\x20para\x20ampliar\x20el\x20servicio.','buttons':[{'label':_0x483d9c(0x140),'style':_0x483d9c(0x19f)}]});return;}if(quotaActual<_0x547cc5){showModal({'title':_0x483d9c(0x11f),'body':_0x483d9c(0x130)+quotaActual+'\x20líneas\x20disponibles\x20y\x20el\x20pedido\x20tiene\x20'+_0x547cc5+_0x483d9c(0x6b),'buttons':[{'label':'Entendido','style':'primary'}]});return;}}}const _0x43c1fe=document[_0x483d9c(0xa4)](_0x483d9c(0xf9)),_0x48a4c6=document[_0x483d9c(0xa4)](_0x483d9c(0x103));_0x43c1fe[_0x483d9c(0xa9)]=!![],_0x43c1fe[_0x483d9c(0xbd)]='…',_0x48a4c6[_0x483d9c(0xa9)]=!![],_0x48a4c6[_0x483d9c(0xbd)]='…',await set(ref(db,'mesas/'+mesaId+_0x483d9c(0x1a5)),_0x483d9c(0x176)),document['getElementById'](_0x483d9c(0x77))[_0x483d9c(0xd7)]['display']='';const _0x161c34=[],_0x32ef99=Date[_0x483d9c(0x92)](),_0x5bcec4=_0x32ef99+'_'+mesaId,_0x42b681={};Object[_0x483d9c(0x96)](carrito)[_0x483d9c(0x16d)](([_0x507dcc,{art:_0x1c392d,qty:_0x408890,nota:_0x40afd7}])=>{const _0x1eac54=_0x483d9c;_0x42b681[_0x507dcc]={'artId':_0x507dcc,'nombre':_0x1c392d[_0x1eac54(0x129)],'precio':Number(_0x1c392d[_0x1eac54(0x71)]),'qty':_0x408890,'destino':_0x1c392d[_0x1eac54(0x99)],'estado':_0x1eac54(0x7c),'nota':_0x40afd7||'','camarero':camareroActual},_0x161c34['push']({'nombre':_0x1c392d[_0x1eac54(0x129)],'precio':Number(_0x1c392d['precio']),'qty':_0x408890,'nota':_0x40afd7||'','camarero':camareroActual});}),await set(ref(db,_0x483d9c(0xbb)+mesaId+'/'+_0x5bcec4),{'ts':_0x32ef99,'camarero':camareroActual,'envioId':_0x5bcec4,'lineas':_0x42b681});if(quotaActual!==null&&quotaActual!==-0x1){if(_0x483d9c(0x151)!=='akCze'){await set(ref(db,'config/quota/lineas'),quotaActual-_0x547cc5);const _0x298cd2=quotaActual-_0x547cc5;_0x298cd2>0x0&&_0x298cd2<=0x64&&setTimeout(()=>showModal({'title':_0x483d9c(0xd6),'body':'Quedan\x20'+_0x298cd2+_0x483d9c(0x1e6),'buttons':[{'label':_0x483d9c(0x140)}]}),0x320);}else return _0x1e92b1(_0x2e195a,_0x4beb5c,_0x5262b8);}const _0x2c0f55=new Date(),_0x43e77e=_0x2c0f55['getFullYear']()+'-'+String(_0x2c0f55['getMonth']()+0x1)[_0x483d9c(0x194)](0x2,'0'),_0x25c9a5=ref(db,_0x483d9c(0xe4)+_0x43e77e+'/lineas'),_0x5472f0=await get(_0x25c9a5),_0xc74e35=_0x5472f0[_0x483d9c(0x1f7)]()||0x0;await set(_0x25c9a5,_0xc74e35+_0x547cc5);if(autoPDF)generarPDFComanda(mesaNombre,_0x161c34,configLocal);if(autoTXT)generarTXTComanda(mesaNombre,_0x161c34,configLocal);carrito={},cerrarDrawer(),updateQtyDisplay(),updateUI(),_0x43c1fe[_0x483d9c(0xbd)]=_0x483d9c(0x170),_0x43c1fe[_0x483d9c(0xa9)]=![],_0x48a4c6[_0x483d9c(0xbd)]=_0x483d9c(0x11d),setTimeout(()=>{const _0x4ce5af=_0x483d9c;if(_0x4ce5af(0x148)==='ARGAm')_0x43c1fe[_0x4ce5af(0xbd)]=_0x4ce5af(0x8a),updateUI();else{if(_0x351793[_0x4ce5af(0x1fd)]>=0x4)return;_0x586ad2+=_0x106215,_0x547fba();if(_0x2f3f0e[_0x4ce5af(0x1fd)]===0x4)_0x4e7144();}},0x708);};async function cargarTicketActual(){const _0x4c2581=_0x20ce3f;if(!mesaId)return;const _0x2f29d1=await get(ref(db,_0x4c2581(0xbb)+mesaId));renderTicket(_0x2f29d1[_0x4c2581(0x1f7)]()||{});}window['verCuenta']=async()=>{const _0x55df7c=_0x20ce3f;if(!mesaId)return;await cargarTicketActual(),show(_0x55df7c(0x191));};function aplanarPedidos(_0x321268){const _0x129824=_0x20ce3f,_0x25de5c=[];return Object[_0x129824(0x96)](_0x321268)['forEach'](([_0x4ad298,_0x50ca43])=>{const _0x2ccaf7=_0x129824,_0x116fae=_0x50ca43[_0x2ccaf7(0x15d)]||{[_0x4ad298]:_0x50ca43};Object['entries'](_0x116fae)['forEach'](([_0x17156c,_0x95b78f])=>{_0x25de5c['push']({'envioId':_0x4ad298,'artId':_0x17156c,..._0x95b78f});});}),_0x25de5c;}function qtyEnCuenta(_0x57ae54){const _0x158b96=_0x20ce3f;if(_0x57ae54[_0x158b96(0x1ac)]==='servido')return Number(_0x57ae54[_0x158b96(0x1f4)]||0x0);return Number(_0x57ae54[_0x158b96(0x9c)]||0x0);}function renderTicket(_0x5cbb9c){const _0x3b0712=_0x20ce3f,_0xc9a4f0=aplanarPedidos(_0x5cbb9c),_0x1a378c=_0xc9a4f0[_0x3b0712(0x81)](_0x4c7d72=>{const _0x3f039e=_0x3b0712;if(_0x3f039e(0x91)==='urSug'){const _0x5ca973=qtyEnCuenta(_0x4c7d72);return{..._0x4c7d72,'qtyOriginal':_0x4c7d72[_0x3f039e(0x1f4)],'qty':_0x5ca973,'qtyCuenta':_0x5ca973};}else{const _0x80dfbe=new _0x5bf820(_0x3f039e(0x1b2),'g'),_0x873347=_0x3f039e(0xde)[_0x3f039e(0xed)](_0x80dfbe,'');_0x53ad82[_0x20573b][_0x5cc5fc]=_0x873347;}})[_0x3b0712(0x108)](_0x37b4c0=>_0x37b4c0[_0x3b0712(0x1af)]>0x0)[_0x3b0712(0xb5)]((_0x1ac4d0,_0x5b588e)=>(_0x1ac4d0[_0x3b0712(0xfc)]||'')[_0x3b0712(0x127)](_0x5b588e[_0x3b0712(0xfc)]||'')||_0x1ac4d0[_0x3b0712(0x129)][_0x3b0712(0x127)](_0x5b588e[_0x3b0712(0x129)],'es'));window[_0x3b0712(0x1ed)]=_0x1a378c;if(!_0x1a378c[_0x3b0712(0x1fd)]){if('ZqHGP'!==_0x3b0712(0x1df))_0x337f02=_0x490ffb;else{document['getElementById'](_0x3b0712(0x132))[_0x3b0712(0x1aa)]=_0x3b0712(0xf4),document[_0x3b0712(0xa4)](_0x3b0712(0x132))[_0x3b0712(0xe1)]=_0x190ee1=>{const _0x14ecc1=_0x3b0712;if(_0x190ee1[_0x14ecc1(0x11b)]['classList'][_0x14ecc1(0x1ae)](_0x14ecc1(0x118)))cerrarMesa();};return;}}const _0x201db2=_0x1a378c['reduce']((_0x9b8e65,_0x4b5ccb)=>_0x9b8e65+Number(_0x4b5ccb[_0x3b0712(0x71)])*_0x4b5ccb[_0x3b0712(0x1af)],0x0),_0x5bcc8c=new Date()[_0x3b0712(0xb2)](_0x3b0712(0x131),{'dateStyle':_0x3b0712(0x12f),'timeStyle':_0x3b0712(0x12f)}),_0x104e39=configLocal,_0x4af66a=_0x3b0712(0x167)+(_0x104e39[_0x3b0712(0x129)]?_0x3b0712(0x8c)+_0x104e39[_0x3b0712(0x129)]+_0x3b0712(0x97):'')+'\x0a\x20\x20\x20\x20'+(_0x104e39['direccion']?'<div\x20style=\x22font-size:12px;color:var(--muted);margin-top:2px\x22>'+_0x104e39[_0x3b0712(0x10b)]+_0x3b0712(0x97):'')+_0x3b0712(0x167)+(_0x104e39[_0x3b0712(0x182)]?_0x3b0712(0x1a0)+_0x104e39[_0x3b0712(0x182)]+'</div>':'')+_0x3b0712(0x167)+(_0x104e39[_0x3b0712(0x195)]?_0x3b0712(0x101)+_0x104e39[_0x3b0712(0x195)]+_0x3b0712(0x97):''),_0x3e80e4=_0x104e39[_0x3b0712(0xea)]?_0x3b0712(0x1fc)+_0x104e39[_0x3b0712(0xea)]+'</div>':'',_0x52ad60=_0x1a378c[_0x3b0712(0x81)]((_0x4b7913,_0x49b36c)=>{const _0x353d47=_0x3b0712,_0x4fc2c2=(_0x4b7913['nota']||'')[_0x353d47(0xed)](/\s*·?\s*⚠️\s*Comprobar/g,'')[_0x353d47(0xed)](/\s*·?\s*✅\s*Verificado/g,'')[_0x353d47(0xad)]();return _0x353d47(0x88)+_0x4b7913[_0x353d47(0x1f4)]+'×\x20'+_0x4b7913[_0x353d47(0x129)]+_0x353d47(0x8b)+(_0x4fc2c2?_0x353d47(0x1d4)+_0x4fc2c2+_0x353d47(0x97):'')+_0x353d47(0x159)+(_0x4b7913[_0x353d47(0x19b)]?_0x353d47(0x13f):'')+_0x353d47(0x1cd)+(Number(_0x4b7913[_0x353d47(0x71)])*_0x4b7913[_0x353d47(0x1f4)])['toFixed'](0x2)+_0x353d47(0x1b0)+_0x49b36c+_0x353d47(0x80);})[_0x3b0712(0x135)]('');document[_0x3b0712(0xa4)]('ticket-card')[_0x3b0712(0x1aa)]=_0x3b0712(0x14a)+_0x4af66a+_0x3b0712(0x17b)+(_0x104e39[_0x3b0712(0x129)]?_0x3b0712(0xf8):'0')+_0x3b0712(0x188)+mesaNombre+_0x3b0712(0x93)+_0x5bcc8c+_0x3b0712(0xc6)+_0x52ad60+_0x3b0712(0x11a)+_0x201db2[_0x3b0712(0x137)](0x2)+_0x3b0712(0x156)+_0x3e80e4+_0x3b0712(0xa6);const _0x5359f4=document[_0x3b0712(0xa4)](_0x3b0712(0x132));_0x5359f4['onclick']=async _0x3dfdcc=>{const _0x4c0594=_0x3b0712;if(_0x4c0594(0x15b)!==_0x4c0594(0x187)){if(_0x3dfdcc[_0x4c0594(0x11b)]['classList'][_0x4c0594(0x1ae)]('btn-quitar-linea')){const _0x1c9a8e=parseInt(_0x3dfdcc[_0x4c0594(0x11b)][_0x4c0594(0x1a4)][_0x4c0594(0x70)]);await quitarDelTicket(_0x1c9a8e);}else{if(_0x3dfdcc[_0x4c0594(0x11b)][_0x4c0594(0xdd)][_0x4c0594(0x1ae)](_0x4c0594(0x76))||_0x3dfdcc['target'][_0x4c0594(0xdd)][_0x4c0594(0x1ae)]('no-print-btn')){if('pocJw'!==_0x4c0594(0x181)){const _0x5387cf=_0x49959b[_0x4c0594(0x96)](_0xe0e4fc)['filter'](([,_0x1e37ca])=>_0x1e37ca[_0x4c0594(0xef)]===_0x1c9ad4);if(!_0x5387cf[_0x4c0594(0x1fd)])return;const _0x192f73=_0x333464[_0x4c0594(0x18d)](_0x4c0594(0x150));_0x192f73[_0x4c0594(0xd7)][_0x4c0594(0x1f8)]=_0x4c0594(0x1db),_0x192f73[_0x4c0594(0xbd)]=_0x614a0[_0x4c0594(0x129)],_0x192f73['addEventListener'](_0x4c0594(0x1d9),()=>_0x192f73[_0x4c0594(0xd7)][_0x4c0594(0x19e)]='var(--surface2)'),_0x192f73[_0x4c0594(0x95)]('click',()=>{const _0x32528e=_0x4c0594;_0x42475f();const _0x4ebaa8=_0x32b889[_0x32528e(0xa4)](_0x32528e(0x16b)+_0x2b8f9d);_0x4ebaa8&&_0x4ebaa8[_0x32528e(0x74)]({'behavior':_0x32528e(0x1b8),'block':_0x32528e(0x1bf)});const _0xd9e081=_0x1f4d66['getElementById'](_0x32528e(0xab)+_0x36169d);if(_0xd9e081&&_0xd9e081[_0x32528e(0xdd)]['contains']('collapsed'))_0x187e9f(_0xd9e081);}),_0x4f39bb[_0x4c0594(0x163)](_0x192f73);}else window[_0x4c0594(0x12e)]();}else{if(_0x3dfdcc[_0x4c0594(0x11b)][_0x4c0594(0xdd)][_0x4c0594(0x1ae)](_0x4c0594(0xf5)))await cargarTicketActual();else _0x3dfdcc[_0x4c0594(0x11b)]['classList'][_0x4c0594(0x1ae)](_0x4c0594(0x118))&&cerrarMesa();}}}else _0x2d67fc=_0x572da7[_0x4c0594(0x1f7)]()||{},_0x37ac8b();};}async function quitarDelTicket(_0x1524f9){const _0x3f705e=_0x20ce3f,_0x2244f5=window['_tLineas']?.[_0x1524f9];if(!_0x2244f5)return;const {envioId:_0x30bf87,artId:_0x2e7ef4}=_0x2244f5,_0x140790=(_0x2244f5[_0x3f705e(0xe7)]||'')[_0x3f705e(0xed)](/\s*·?\s*⚠️\s*Comprobar/g,'')['replace'](/\s*·?\s*✅\s*Verificado/g,'')[_0x3f705e(0xad)](),_0x914733={[_0x3f705e(0xbb)+mesaId+'/'+_0x30bf87+'/lineas/'+_0x2e7ef4+_0x3f705e(0x166)]:![],[_0x3f705e(0xbb)+mesaId+'/'+_0x30bf87+_0x3f705e(0x11e)+_0x2e7ef4+_0x3f705e(0xb9)]:null,[_0x3f705e(0xbb)+mesaId+'/'+_0x30bf87+_0x3f705e(0x11e)+_0x2e7ef4+'/nota']:(_0x140790?_0x140790+_0x3f705e(0x174):'')+_0x3f705e(0xbf)};_0x2244f5['estado']===_0x3f705e(0xc3)&&(_0x914733[_0x3f705e(0xbb)+mesaId+'/'+_0x30bf87+_0x3f705e(0x11e)+_0x2e7ef4+_0x3f705e(0x1a5)]='pendiente'),await update(ref(db),_0x914733),await cargarTicketActual();};window[_0x20ce3f(0x84)]=async()=>{const _0x3b50ab=_0x20ce3f;showModal({'title':_0x3b50ab(0x1d7)+mesaNombre,'body':_0x3b50ab(0x8e),'buttons':[{'label':'Cancelar'},{'label':_0x3b50ab(0x90),'style':_0x3b50ab(0xd1),'action':async()=>{const _0x4718ac=_0x3b50ab;if(_0x4718ac(0x1b6)===_0x4718ac(0x16e))_0x4d6620['print']();else{const _0x34b63d=await get(ref(db,_0x4718ac(0xbb)+mesaId)),_0x22f73b=_0x34b63d['val']()||{},_0x1a6b15=aplanarPedidos(_0x22f73b),_0x3a8126={},_0x5606d2=new Set();_0x1a6b15[_0x4718ac(0x16d)](_0x5b8fa4=>{const _0x149eef=_0x4718ac;if(_0x149eef(0x1be)!==_0x149eef(0x1b7)){const _0x5625ce=qtyEnCuenta(_0x5b8fa4);if(_0x5625ce<=0x0)return;if(_0x5b8fa4[_0x149eef(0x78)])_0x5606d2['add'](_0x5b8fa4[_0x149eef(0x78)]);const _0x4a55aa=_0x5b8fa4[_0x149eef(0x129)]+'||'+Number(_0x5b8fa4['precio'])[_0x149eef(0x137)](0x2);if(!_0x3a8126[_0x4a55aa])_0x3a8126[_0x4a55aa]={'nombre':_0x5b8fa4[_0x149eef(0x129)],'precio':Number(_0x5b8fa4['precio']),'qty':0x0,'nota':_0x5b8fa4[_0x149eef(0xe7)]||''};_0x3a8126[_0x4a55aa][_0x149eef(0x1f4)]+=_0x5625ce;}else{const _0x578152=_0xf132d0[_0x4deb08],_0x4c44b5=_0x578152[0x0]===_0x4ccb7b['fromCharCode'](0x2e)?_0x578152[_0x149eef(0x1c6)](0x1):_0x578152,_0x1f0417=_0x1818c1[_0x149eef(0x1fd)]-_0x4c44b5[_0x149eef(0x1fd)],_0x366aa0=_0x15f4db['indexOf'](_0x4c44b5,_0x1f0417),_0x1f300e=_0x366aa0!==-0x1&&_0x366aa0===_0x1f0417;_0x1f300e&&((_0x38be6e[_0x149eef(0x1fd)]==_0x578152[_0x149eef(0x1fd)]||_0x578152['indexOf']('.')===0x0)&&(_0x3d905e=!![]));}});const _0x1a0e7f=Object['values'](_0x3a8126),_0x17c487=_0x1a0e7f[_0x4718ac(0x201)]((_0x57576a,_0x5981d6)=>_0x57576a+_0x5981d6[_0x4718ac(0x71)]*_0x5981d6[_0x4718ac(0x1f4)],0x0);if(_0x1a0e7f[_0x4718ac(0x1fd)]>0x0){const _0x12171c=new Date();await push(ref(db,_0x4718ac(0x146)),{'mesa':mesaNombre,'camarero':[..._0x5606d2][_0x4718ac(0x135)](',\x20'),'ts':_0x12171c[_0x4718ac(0xa7)](),'fecha':_0x12171c[_0x4718ac(0x1c7)](_0x4718ac(0x131)),'hora':_0x12171c[_0x4718ac(0xb3)](_0x4718ac(0x131),{'hour':'2-digit','minute':'2-digit'}),'total':Math['round'](_0x17c487*0x64)/0x64,'lineas':_0x1a0e7f});}await remove(ref(db,_0x4718ac(0xbb)+mesaId)),await set(ref(db,_0x4718ac(0x10e)+mesaId+_0x4718ac(0x1a5)),'libre'),mesaId=null,mesaNombre=null,carrito={},document[_0x4718ac(0xa4)](_0x4718ac(0xec))[_0x4718ac(0xd7)][_0x4718ac(0x1c5)]=_0x4718ac(0x185),show('mesas');}}}]});},window[_0x20ce3f(0xaf)]=_0x4b5774=>{const _0x2d056e=_0x20ce3f;document[_0x2d056e(0xa4)](_0x2d056e(0xe6))['style'][_0x2d056e(0x1c5)]=_0x4b5774===_0x2d056e(0x115)?_0x2d056e(0x17a):'none',document[_0x2d056e(0xa4)](_0x2d056e(0x133))[_0x2d056e(0xd7)][_0x2d056e(0x1c5)]=_0x4b5774===_0x2d056e(0x165)?_0x2d056e(0x17a):_0x2d056e(0x185),document[_0x2d056e(0xa4)](_0x2d056e(0xf2))[_0x2d056e(0xd7)]['display']=_0x4b5774===_0x2d056e(0x191)?_0x2d056e(0x17a):'none';const _0x1a8a4a=document[_0x2d056e(0xa4)]('view-carta');if(_0x4b5774==='carta'&&window[_0x2d056e(0xc8)]>=0x300)_0x1a8a4a['classList'][_0x2d056e(0xb7)](_0x2d056e(0x6d));else _0x1a8a4a[_0x2d056e(0xdd)][_0x2d056e(0x155)]('tablet-active');const _0x57d537=document[_0x2d056e(0xa4)](_0x2d056e(0x9a));if(_0x57d537)_0x57d537[_0x2d056e(0xd7)][_0x2d056e(0x1c5)]=_0x4b5774===_0x2d056e(0x165)&&window[_0x2d056e(0xc8)]<0x300?_0x2d056e(0xa2):_0x2d056e(0x185);cerrarCatsPanel();};
+// ── PROTECCIÓN DE DOMINIO ─────────────────────────────────────────────────────
+// Cambia 'microcorpset.github.io' por tu dominio real antes de ofuscar
+const _dominiosPermitidos = [
+  'microcorpset.github.io',
+  'localhost',
+  '127.0.0.1'
+];
+if (!_dominiosPermitidos.some(d => location.hostname === d || location.hostname.endsWith('.' + d))) {
+  document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:monospace;color:#888">Acceso no autorizado</div>';
+  throw new Error('Dominio no autorizado');
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+import { authReady, db } from './firebase.js';
+import { ref, onValue, push, set, remove, get, update }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+await authReady;
+
+// carrito: artId → { art, qty, nota }
+let mesaId = null, mesaNombre = null;
+let carrito = {};
+let mesasData = {}, cartaData = {}, categoriasData = {};
+let cartaReady = false, catsReady = false;
+let configLocal = {};
+
+// ── USUARIOS / PIN multi-camarero ─────────────────────────────────────────────
+const PIN_SESSION  = 'cam_auth';
+const USER_SESSION = 'cam_user';
+let usuariosData   = {}; // { userId: { nombre, pin } }
+let camareroActual = sessionStorage.getItem(USER_SESSION) || '';
+let pinBuffer      = '';
+
+// Cargar usuarios desde Firebase
+get(ref(db, 'config/usuarios')).then(s => {
+  usuariosData = s.val() || {};
+  // Retrocompatibilidad: si no hay usuarios, usar PIN único de camarero
+  if (!Object.keys(usuariosData).length) {
+    get(ref(db, 'config/pins/camarero')).then(p => {
+      if (p.val()) usuariosData['_default'] = { nombre: 'Camarero', pin: p.val() };
+      else         usuariosData['_default'] = { nombre: 'Camarero', pin: '1234' };
+    });
+  }
+}).catch(() => { usuariosData['_default'] = { nombre: 'Camarero', pin: '1234' }; });
+
+if (sessionStorage.getItem(PIN_SESSION) === '1' && camareroActual) {
+  document.getElementById('pin-screen').style.display = 'none';
+  document.getElementById('topbar-camarero').textContent = camareroActual;
+}
+
+window.pinKey = d => {
+  if (pinBuffer.length >= 4) return;
+  pinBuffer += d; updatePinDots();
+  if (pinBuffer.length === 4) verificarPin();
+};
+window.pinDel = () => {
+  pinBuffer = pinBuffer.slice(0,-1); updatePinDots(false);
+  document.getElementById('pin-error').style.display = 'none';
+};
+function updatePinDots(error) {
+  for (let i=0;i<4;i++) {
+    const dot = document.getElementById('pd'+i);
+    dot.className = 'pin-dot'+(i<pinBuffer.length?(error?' error':' filled'):'');
+  }
+}
+function verificarPin() {
+  // Buscar qué usuario tiene ese PIN
+  const match = Object.values(usuariosData).find(u => u.pin === pinBuffer);
+  if (match) {
+    camareroActual = match.nombre;
+    sessionStorage.setItem(PIN_SESSION, '1');
+    sessionStorage.setItem(USER_SESSION, camareroActual);
+    document.getElementById('pin-screen').style.display = 'none';
+    document.getElementById('topbar-camarero').textContent = camareroActual;
+  } else {
+    updatePinDots(true);
+    document.getElementById('pin-error').style.display = 'block';
+    setTimeout(() => { pinBuffer=''; updatePinDots(false); document.getElementById('pin-error').style.display='none'; }, 900);
+  }
+}
+
+// Listeners del teclado PIN (sin onclick inline para compatibilidad con módulos ES)
+document.getElementById('pin-pad').addEventListener('click', e => {
+  const btn = e.target.closest('[data-k]');
+  if (!btn) return;
+  const k = btn.dataset.k;
+  if (k === 'del') pinDel();
+  else if (k !== '') pinKey(k);
+});
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function showModal({ title, body, buttons }) {
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').textContent = body;
+  const acts = document.getElementById('modal-actions');
+  acts.innerHTML = '';
+  buttons.forEach(b => {
+    const btn = document.createElement('button');
+    btn.className = 'modal-btn' + (b.style ? ' ' + b.style : '');
+    btn.textContent = b.label;
+    btn.onclick = () => {
+      document.getElementById('modal-overlay').classList.remove('open');
+      if (b.action) b.action();
+    };
+    acts.appendChild(btn);
+  });
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+// Cerrar modal al hacer clic en el overlay (fuera del box)
+document.getElementById('modal-overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('modal-overlay'))
+    document.getElementById('modal-overlay').classList.remove('open');
+});
+
+
+// ── Móvil: tocar el área de total abre el drawer ──────────────────────────────
+document.querySelector('.resumen-info')?.addEventListener('click', () => {
+  if (window.innerWidth <= 640 && mesaId) abrirDrawer();
+});
+
+const PRINT_KEY = 'camarero_pdf';
+let autoPDF = localStorage.getItem(PRINT_KEY) === 'true';
+const printTrack = document.getElementById('print-track');
+printTrack.classList.toggle('on', autoPDF);
+printTrack.parentElement.addEventListener('click', () => {
+  autoPDF = !autoPDF;
+  localStorage.setItem(PRINT_KEY, autoPDF);
+  printTrack.classList.toggle('on', autoPDF);
+});
+
+// ── Toggle TXT autoimpresión ───────────────────────────────────────────────────
+const TXT_KEY = 'camarero_txt';
+let autoTXT = localStorage.getItem(TXT_KEY) === 'true';
+const txtTrack = document.getElementById('txt-track');
+txtTrack.classList.toggle('on', autoTXT);
+txtTrack.parentElement.addEventListener('click', () => {
+  autoTXT = !autoTXT;
+  localStorage.setItem(TXT_KEY, autoTXT);
+  txtTrack.classList.toggle('on', autoTXT);
+});
+
+// ── Wake Lock ──────────────────────────────────────────────────────────────────
+const WAKE_KEY = 'camarero_wake';
+let wakeLock = null;
+let autoWake = localStorage.getItem(WAKE_KEY) === 'true';
+const wakeTrack = document.getElementById('wake-track');
+wakeTrack.classList.toggle('on', autoWake);
+async function activarWakeLock() {
+  try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch(e) {}
+}
+if (autoWake) activarWakeLock();
+wakeTrack.parentElement.addEventListener('click', () => {
+  autoWake = !autoWake;
+  localStorage.setItem(WAKE_KEY, autoWake);
+  wakeTrack.classList.toggle('on', autoWake);
+  if (autoWake) activarWakeLock(); else { if (wakeLock) { wakeLock.release(); wakeLock = null; } }
+});
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && autoWake) activarWakeLock();
+});
+
+// ── Modal de nota ─────────────────────────────────────────────────────────────
+window.abrirNotaModal = (artId, nombreArt) => {
+  const notaActual = carrito[artId]?.nota || '';
+  showModal({ title: '📝 ' + nombreArt, body: '', buttons: [] });
+  const modalBody = document.getElementById('modal-body');
+  modalBody.innerHTML = '';
+  const inp = document.createElement('input');
+  inp.type = 'text'; inp.value = notaActual;
+  inp.placeholder = 'ej: poco hecho, sin cebolla…';
+  inp.style.cssText = 'width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;font-family:var(--sans);color:var(--text);outline:none';
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') guardarNota(); });
+  modalBody.appendChild(inp);
+  setTimeout(() => inp.focus(), 80);
+  const acts = document.getElementById('modal-actions');
+  acts.innerHTML = '';
+  const btnClear = document.createElement('button');
+  btnClear.className = 'modal-btn'; btnClear.textContent = 'Borrar';
+  btnClear.onclick = () => { inp.value = ''; guardarNota(); };
+  const btnOk = document.createElement('button');
+  btnOk.className = 'modal-btn primary'; btnOk.textContent = 'Guardar';
+  btnOk.onclick = guardarNota;
+  acts.appendChild(btnClear); acts.appendChild(btnOk);
+
+  function guardarNota() {
+    const val = inp.value.trim();
+    if (carrito[artId]) carrito[artId].nota = val;
+    const drawerInp = document.querySelector(`[data-rnota="${artId}"]`);
+    if (drawerInp) drawerInp.value = val;
+    const btn = document.getElementById('btnnota-' + artId);
+    if (btn) btn.classList.toggle('tiene-nota', !!val);
+    document.getElementById('modal-overlay').classList.remove('open');
+    if (document.getElementById('drawer').classList.contains('open')) renderDrawer();
+  }
+};
+
+onValue(ref(db, 'mesas'), snap => { mesasData = snap.val() || {}; renderMesas(); });
+onValue(ref(db, 'categorias'), snap => { categoriasData = snap.val() || {}; catsReady = true; if (cartaReady && mesaId) renderCarta(); });
+onValue(ref(db, 'carta'), snap => { cartaData = snap.val() || {}; cartaReady = true; if (catsReady && mesaId) renderCarta(); });
+onValue(ref(db, 'config/local'), snap => { configLocal = snap.val() || {}; });
+// Escuchar pedidos para colores de mesas
+onValue(ref(db, 'pedidos'), snap => {
+  pedidosData = snap.val() || {};
+  renderMesas();
+});
+
+// ── Mesas con colores de estado ───────────────────────────────────────────────
+let pedidosData = {};
+
+function renderMesas() {
+  const grid = document.getElementById('mesas-grid');
+  const entries = Object.entries(mesasData);
+  if (!entries.length) { grid.innerHTML = '<div class="loading">Sin mesas.</div>'; return; }
+  grid.innerHTML = '';
+  entries
+    .sort(([,a],[,b]) => (a.orden??999)-(b.orden??999) || a.nombre.localeCompare(b.nombre,'es',{numeric:true}))
+    .forEach(([id, m]) => {
+      const ocupada = m.estado === 'ocupada';
+      const div = document.createElement('div');
+
+      // Buscar línea pendiente más antigua de todos los envíos de esta mesa
+      let claseAlerta = ocupada ? 'ocupada' : 'libre';
+      let alertaInfo  = '';
+      if (ocupada && pedidosData[id]) {
+        let lineasPend = [];
+        Object.values(pedidosData[id]).forEach(envio => {
+          const envioTs = Number(envio.ts) || 0;
+          const ls = envio.lineas || { _: envio };
+          Object.values(ls).forEach(l => {
+            if (l.estado === 'pendiente') {
+              lineasPend.push({
+                ...l,
+                _tsMesa: Number(l.ts) || envioTs
+              });
+            }
+          });
+        });
+        if (lineasPend.length) {
+          const masAntigua = lineasPend.reduce((min, l) => l._tsMesa < min._tsMesa ? l : min, lineasPend[0]);
+          const mins = Math.max(0, Math.floor((Date.now() - (masAntigua._tsMesa || Date.now())) / 60000));
+          const minsTxt = mins === 0 ? '<1m' : `${mins}m`;
+          const dest = masAntigua.destino === 'cocina' ? 'COC' : masAntigua.destino === 'barra' ? 'BAR' : 'MIX';
+          const pendienteTxt = lineasPend.length === 1 ? '1 pendiente' : `${lineasPend.length} pendientes`;
+          if (mins >= 20)     claseAlerta = 'alerta-danger';
+          else if (mins >= 10) claseAlerta = 'alerta-warn';
+          else                 claseAlerta = 'alerta-ok';
+          alertaInfo = `<span class="mesa-alerta-info">${dest} ${pendienteTxt} | ${minsTxt}</span>`;
+        }
+      }
+
+      div.className = 'mesa-btn ' + claseAlerta;
+      div.innerHTML = `
+        <span class="mesa-nombre">${m.nombre}</span>
+        <span class="mesa-estado">${ocupada ? 'ocupada' : 'libre'}</span>
+        ${alertaInfo}`;
+      div.addEventListener('click', () => abrirMesa(id, m.nombre, ocupada));
+      grid.appendChild(div);
+    });
+}
+
+setInterval(() => {
+  if (Object.keys(mesasData).length && document.getElementById('view-mesas').style.display !== 'none') {
+    renderMesas();
+  }
+}, 30000);
+
+function abrirMesa(id, nombre, ocupada) {
+  mesaId = id; mesaNombre = nombre; carrito = {};
+  document.getElementById('topbar-mesa').textContent = 'Mesa ' + nombre;
+  document.getElementById('topbar-mesa').style.display = '';
+  document.getElementById('btn-cuenta').style.display = ocupada ? '' : 'none';
+  show('carta');
+  if (cartaReady && catsReady) renderCarta();
+  else document.getElementById('carta-body').innerHTML = '<div class="loading">Cargando carta…</div>';
+  updateUI();
+}
+
+window.volverMesas = () => {
+  mesaId = null; mesaNombre = null; carrito = {};
+  document.getElementById('topbar-mesa').style.display = 'none';
+  cerrarDrawer(); show('mesas');
+  if (Object.keys(mesasData).length) renderMesas();
+};
+
+// ── Carta ─────────────────────────────────────────────────────────────────────
+function renderCarta() {
+  const body = document.getElementById('carta-body');
+  const cats = Object.entries(categoriasData).sort(([,a],[,b]) => a.nombre.localeCompare(b.nombre, 'es'));
+  if (!cats.length) { body.innerHTML = '<div class="loading">Sin categorías.</div>'; return; }
+  body.innerHTML = '';
+
+  cats.forEach(([catId, cat]) => {
+    const arts = Object.entries(cartaData)
+      .filter(([,a]) => a.catId === catId)
+      .sort(([,a],[,b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre, 'es'));
+    if (!arts.length) return;
+
+    const section = document.createElement('div');
+    section.className = 'cat-section';
+    section.id = 'cat-' + catId;
+
+    const toggle = document.createElement('div');
+    toggle.className = 'cat-toggle';
+    toggle.id = 'cathdr-' + catId;
+    toggle.innerHTML = `
+      <span class="cat-nombre-label">${cat.nombre}</span>
+      <span class="cat-count" id="catcount-${catId}"></span>
+      <span class="cat-arrow">▾</span>`;
+    toggle.addEventListener('click', () => toggleCat(section));
+    section.appendChild(toggle);
+
+    const itemsDiv = document.createElement('div');
+    itemsDiv.className = 'cat-items';
+    itemsDiv.style.maxHeight = '4000px';
+
+    arts.forEach(([artId, art]) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'art-row';
+
+      const mainRow = document.createElement('div');
+      mainRow.className = 'art-main';
+      mainRow.innerHTML = `
+        <span class="art-nombre">${art.nombre}</span>
+        <span class="art-precio">${Number(art.precio).toFixed(2)} €</span>
+        <div class="qty-ctrl">
+          <button class="qty-btn" data-id="${artId}" data-d="-1">−</button>
+          <span class="qty-num" id="qty-${artId}">0</span>
+          <button class="qty-btn" data-id="${artId}" data-d="1">+</button>
+        </div>
+        <button class="btn-nota" id="btnnota-${artId}" title="Añadir nota"
+          onclick="abrirNotaModal('${artId}','${art.nombre.replace(/'/g,"\\'")}')">📝</button>`;
+      wrap.appendChild(mainRow);
+      itemsDiv.appendChild(wrap);
+    });
+
+    section.appendChild(itemsDiv);
+    body.appendChild(section);
+  });
+
+  body.onclick = e => {
+    const btn = e.target.closest('[data-d]');
+    if (!btn) return;
+    cambiarQty(btn.dataset.id, parseInt(btn.dataset.d));
+  };
+
+  // Rellenar panel de categorías
+  const panel = document.getElementById('cats-panel');
+  if (panel) {
+    panel.innerHTML = '';
+    cats.forEach(([catId, cat]) => {
+      const arts = Object.entries(cartaData).filter(([,a]) => a.catId === catId);
+      if (!arts.length) return;
+      const item = document.createElement('div');
+      item.style.cssText = 'padding:11px 16px;font-size:14px;cursor:pointer;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;transition:background .1s';
+      item.textContent = cat.nombre;
+      item.addEventListener('pointerdown', () => item.style.background = 'var(--surface2)');
+      item.addEventListener('click', () => {
+        cerrarCatsPanel();
+        const hdr = document.getElementById('cathdr-' + catId);
+        if (hdr) { hdr.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+        // Si está colapsada, expandirla
+        const sec = document.getElementById('cat-' + catId);
+        if (sec && sec.classList.contains('collapsed')) toggleCat(sec);
+      });
+      panel.appendChild(item);
+    });
+  }
+  const btnCats = document.getElementById('btn-cats');
+  if (btnCats) btnCats.style.display = 'flex';
+
+  // ── Tablet: panel lateral de categorías ───────────────────────────────────
+  const tabletCats = document.getElementById('tablet-cats');
+  if (tabletCats && window.innerWidth >= 768) {
+    tabletCats.innerHTML = '';
+    let primeraActiva = true;
+    cats.forEach(([catId, cat]) => {
+      const arts = Object.entries(cartaData).filter(([,a]) => a.catId === catId);
+      if (!arts.length) return;
+      const item = document.createElement('div');
+      item.className = 'tablet-cat-item' + (primeraActiva ? ' activa' : '');
+      item.dataset.catId = catId;
+      const count = arts.reduce((s,[id]) => s + (carrito[id]?.qty||0), 0);
+      item.innerHTML = `<span>${cat.nombre}</span>${count > 0 ? `<span class="tablet-cat-count">${count}</span>` : ''}`;
+      item.addEventListener('click', () => {
+        document.querySelectorAll('.tablet-cat-item').forEach(i => i.classList.remove('activa'));
+        item.classList.add('activa');
+        // Mostrar solo la sección de esta categoría
+        document.querySelectorAll('.cat-section').forEach(s => s.classList.remove('tablet-visible'));
+        const sec = document.getElementById('cat-' + catId);
+        if (sec) sec.classList.add('tablet-visible');
+        document.getElementById('carta-body').scrollTop = 0;
+      });
+      tabletCats.appendChild(item);
+      // Primera categoría activa por defecto
+      if (primeraActiva) {
+        primeraActiva = false;
+        setTimeout(() => {
+          document.querySelectorAll('.cat-section').forEach(s => s.classList.remove('tablet-visible'));
+          const sec = document.getElementById('cat-' + catId);
+          if (sec) sec.classList.add('tablet-visible');
+        }, 0);
+      }
+    });
+  }
+
+  updateQtyDisplay();
+  updateUI();
+}
+
+window.toggleCatsPanel = () => {
+  const panel = document.getElementById('cats-panel');
+  if (!panel) return;
+  const abierto = panel.style.display !== 'none';
+  panel.style.display = abierto ? 'none' : 'block';
+};
+window.cerrarCatsPanel = () => {
+  const panel = document.getElementById('cats-panel');
+  if (panel) panel.style.display = 'none';
+};
+// Cerrar panel al tocar fuera
+document.addEventListener('click', e => {
+  if (!e.target.closest('#cats-panel') && !e.target.closest('#btn-cats')) cerrarCatsPanel();
+});
+
+function toggleCat(section) {
+  const items = section.querySelector('.cat-items');
+  const collapsed = section.classList.toggle('collapsed');
+  items.style.maxHeight = collapsed ? '0' : '4000px';
+}
+
+// ── Carrito ───────────────────────────────────────────────────────────────────
+function cambiarQty(artId, delta) {
+  const art = cartaData[artId];
+  if (!art) return;
+  const prev = carrito[artId]?.qty || 0;
+  const nota = carrito[artId]?.nota || '';
+  const next = Math.max(0, prev + delta);
+  if (next === 0) delete carrito[artId];
+  else carrito[artId] = { art, qty: next, nota };
+  updateQtyDisplay();
+  updateUI();
+  if (document.getElementById('drawer').classList.contains('open')) renderDrawer();
+}
+
+window.actualizarNota = (artId, valor) => {
+  if (carrito[artId]) {
+    carrito[artId].nota = valor.trim();
+    if (document.getElementById('drawer').classList.contains('open')) renderDrawer();
+  }
+};
+
+function updateQtyDisplay() {
+  Object.keys(cartaData).forEach(id => {
+    const el = document.getElementById('qty-' + id);
+    if (!el) return;
+    const q = carrito[id]?.qty || 0;
+    el.textContent = q;
+    el.className = 'qty-num' + (q > 0 ? ' has-qty' : '');
+    // Actualizar botón nota
+    const btnNota = document.getElementById('btnnota-' + id);
+    if (btnNota) {
+      btnNota.classList.toggle('tiene-nota', !!(carrito[id]?.nota));
+    }
+  });
+
+  // contador por categoría
+  Object.entries(categoriasData).forEach(([catId]) => {
+    const el = document.getElementById('catcount-' + catId);
+    if (!el) return;
+    const arts = Object.entries(cartaData).filter(([,a]) => a.catId === catId);
+    const total = arts.reduce((s, [id]) => s + (carrito[id]?.qty || 0), 0);
+    el.textContent = total > 0 ? total : '';
+    el.classList.toggle('visible', total > 0);
+  });
+}
+
+function updateUI() {
+  const n = Object.keys(carrito).length;
+  const totalUds = Object.values(carrito).reduce((s, {qty}) => s + qty, 0);
+  const total = Object.values(carrito).reduce((s, {art, qty}) => s + Number(art.precio) * qty, 0);
+
+  document.getElementById('res-lineas').textContent = n ? `${totalUds} ud${totalUds > 1 ? 's' : ''}` : 'Sin artículos';
+  document.getElementById('res-total').textContent = total.toFixed(2).replace('.', ',') + ' €';
+  document.getElementById('btn-enviar').disabled = n === 0;
+
+  const btnC = document.getElementById('btn-carrito');
+  if (n > 0) {
+    btnC.classList.add('tiene');
+    document.getElementById('carrito-count').textContent = totalUds;
+    document.getElementById('carrito-label').textContent = total.toFixed(2).replace('.', ',') + ' €';
+  } else {
+    btnC.classList.remove('tiene');
+  }
+
+  document.getElementById('drawer-total').textContent = total.toFixed(2).replace('.', ',') + ' €';
+  document.getElementById('btn-enviar-drawer').disabled = n === 0;
+}
+
+// ── Drawer ────────────────────────────────────────────────────────────────────
+window.abrirDrawer = () => {
+  renderDrawer();
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawer-overlay').classList.add('open');
+};
+
+window.cerrarDrawer = () => {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawer-overlay').classList.remove('open');
+};
+
+function renderDrawer() {
+  const body = document.getElementById('drawer-body');
+  document.getElementById('drawer-title').textContent = mesaNombre ? 'Mesa ' + mesaNombre : 'Pedido';
+
+  const items = Object.entries(carrito);
+  if (!items.length) { body.innerHTML = '<div class="drawer-empty">Sin artículos aún</div>'; return; }
+
+  body.innerHTML = '';
+  items.forEach(([artId, {art, qty, nota}]) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'ri-wrap';
+
+    const main = document.createElement('div');
+    main.className = 'ri-main';
+    main.innerHTML = `
+      <span class="ri-nombre">${art.nombre}</span>
+      <div class="ri-qty-ctrl">
+        <button class="ri-qty-btn" onclick="drawerCambiarQty('${artId}',-1)">−</button>
+        <span class="ri-qty-num" id="dqty-${artId}">${qty}</span>
+        <button class="ri-qty-btn" onclick="drawerCambiarQty('${artId}',1)">+</button>
+      </div>
+      <span class="ri-precio" id="dprecio-${artId}">${(Number(art.precio) * qty).toFixed(2)} €</span>`;
+    wrap.appendChild(main);
+
+    const notaRow = document.createElement('div');
+    notaRow.className = 'ri-nota-row';
+    notaRow.innerHTML = `
+      <span class="ri-nota-label">Nota:</span>
+      <input class="ri-nota-input" type="text"
+        placeholder="ej: poco hecho, sin cebolla…"
+        value="${(nota || '').replace(/"/g, '&quot;')}"
+        oninput="drawerNota('${artId}', this.value)" />`;
+    wrap.appendChild(notaRow);
+
+    body.appendChild(wrap);
+  });
+}
+
+// Cambiar qty desde el drawer sin re-renderizar todo
+window.drawerCambiarQty = (artId, delta) => {
+  cambiarQty(artId, delta);
+  // Actualizar solo los números del drawer sin re-renderizar
+  const qtyEl    = document.getElementById('dqty-' + artId);
+  const precioEl = document.getElementById('dprecio-' + artId);
+  if (carrito[artId]) {
+    if (qtyEl)    qtyEl.textContent = carrito[artId].qty;
+    if (precioEl) precioEl.textContent = (Number(carrito[artId].art.precio) * carrito[artId].qty).toFixed(2) + ' €';
+  } else {
+    // Se quedó a 0, re-renderizar para quitar la fila
+    renderDrawer();
+  }
+};
+
+window.drawerNota = (artId, valor) => {
+  if (carrito[artId]) {
+    carrito[artId].nota = valor.trim();
+    const cartaInput = document.getElementById('nota-' + artId);
+    if (cartaInput) cartaInput.value = valor;
+  }
+};
+
+// ── Enviar ────────────────────────────────────────────────────────────────────
+// ── Generar e imprimir comanda via iframe (igual que barra/cocina) ────────────
+const iframeComanda = document.createElement('iframe');
+iframeComanda.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;border:none';
+document.body.appendChild(iframeComanda);
+
+function generarPDFComanda(nombreMesa, lineas, configLocal) {
+  const ahora = new Date();
+  const hora  = ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  const fecha = ahora.toLocaleDateString('es-ES');
+
+  const cabecera = configLocal?.nombre ? `
+    <div class="local">${configLocal.nombre}${configLocal.direccion ? `<br><span>${configLocal.direccion}</span>` : ''}</div>` : '';
+
+  const rows = lineas.map(l => `
+    <tr>
+      <td class="qty">${l.qty}×</td>
+      <td class="nombre">${l.nombre}${l.nota ? `<br><span class="nota">↳ ${l.nota}</span>` : ''}</td>
+      <td class="precio">${(l.precio * l.qty).toFixed(2)}€</td>
+    </tr>`).join('');
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: monospace; font-size: 13px; width: 72mm; padding: 4mm; }
+    .local { font-size: 11px; color: #555; border-bottom: 1px dashed #ccc;
+             padding-bottom: 5px; margin-bottom: 8px; }
+    .local span { font-size: 10px; }
+    h2 { font-size: 15px; font-weight: bold; margin-bottom: 2px; }
+    .sub { font-size: 10px; color: #777; margin-bottom: 10px; }
+    table { width: 100%; border-collapse: collapse; }
+    tr { border-bottom: 1px solid #eee; }
+    tr:last-child { border-bottom: none; }
+    td { padding: 4px 2px; vertical-align: top; }
+    .qty { font-weight: bold; white-space: nowrap; padding-right: 5px; }
+    .nombre { flex: 1; }
+    .precio { text-align: right; white-space: nowrap; padding-left: 5px; }
+    .nota { font-size: 10px; color: #666; font-style: italic; }
+    @media print { body { width: 100%; padding: 0; } }
+  </style></head><body>
+  ${cabecera}
+  <h2>Mesa ${nombreMesa}</h2>
+  <div class="sub">${fecha} · ${hora}</div>
+  <table>${rows}</table>
+  <script>window.onload = () => { window.print(); }<\/script>
+  </body></html>`;
+
+  iframeComanda.srcdoc = html;
+}
+
+function generarTXTComanda(nombreMesa, lineas, configLocal) {
+  const ahora = new Date();
+  const hora  = ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  const fecha = ahora.toLocaleDateString('es-ES');
+  const ts    = `${String(ahora.getHours()).padStart(2,'0')}${String(ahora.getMinutes()).padStart(2,'0')}${String(ahora.getSeconds()).padStart(2,'0')}`;
+  const sep   = '--------------------------------';
+  let txt = '';
+  if (configLocal?.nombre)    txt += configLocal.nombre + '\n';
+  if (configLocal?.direccion) txt += configLocal.direccion + '\n';
+  txt += sep + '\n';
+  txt += `Mesa ${nombreMesa}\n`;
+  txt += `${fecha}  ${hora}\n`;
+  txt += sep + '\n';
+  lineas.forEach(l => {
+    const precio  = (l.precio * l.qty).toFixed(2) + 'EUR';
+    const izq     = `${l.qty}x ${l.nombre}`;
+    const nEspacios = Math.max(1, 32 - izq.length - precio.length);
+    txt += izq + ' '.repeat(nEspacios) + precio + '\n';
+    if (l.nota) txt += `   -> ${l.nota}\n`;
+  });
+  txt += sep + '\n';
+  const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = `comanda-mesa${nombreMesa}-${ts}.txt`;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+}
+let quotaActual = null; // null = aún no cargado
+
+onValue(ref(db, 'config/quota/lineas'), snap => {
+  quotaActual = snap.val() ?? null;
+  renderQuotaBadge();
+});
+
+function renderQuotaBadge() {
+  const badge = document.getElementById('quota-badge');
+  if (!badge) return;
+  if (quotaActual === null || quotaActual === -1) {
+    badge.style.display = 'none'; return;
+  }
+  if (quotaActual <= 0) {
+    badge.style.cssText = 'display:inline-flex;background:rgba(229,53,53,.12);color:#e53535;border-color:rgba(229,53,53,.3)';
+    badge.textContent = '⚠ Sin líneas';
+  } else if (quotaActual <= 200) {
+    badge.style.cssText = 'display:inline-flex;background:rgba(229,150,53,.12);color:#e57a35;border-color:rgba(229,150,53,.3)';
+    badge.textContent = '⚠ ' + quotaActual + ' líneas restantes';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+// ── Enviar ────────────────────────────────────────────────────────────────────
+window.enviarPedido = async () => {
+  if (!mesaId || !Object.keys(carrito).length) return;
+
+  // Contar líneas del carrito (cada artículo = 1 línea)
+  const nLineas = Object.keys(carrito).length;
+
+  // Comprobar cuota si está activada (−1 = sin límite)
+  if (quotaActual !== null && quotaActual !== -1) {
+    if (quotaActual <= 0) {
+      showModal({
+        title: 'Límite de pedidos alcanzado',
+        body: 'Se han agotado las líneas de pedido incluidas en el plan. Contacta con el administrador para ampliar el servicio.',
+        buttons: [{ label: 'Entendido', style: 'primary' }]
+      });
+      return;
+    }
+    if (quotaActual < nLineas) {
+      showModal({
+        title: 'Líneas insuficientes',
+        body: `Quedan ${quotaActual} líneas disponibles y el pedido tiene ${nLineas}. Reduce el pedido o contacta con el administrador.`,
+        buttons: [{ label: 'Entendido', style: 'primary' }]
+      });
+      return;
+    }
+  }
+
+  const btn1 = document.getElementById('btn-enviar');
+  const btn2 = document.getElementById('btn-enviar-drawer');
+  btn1.disabled = true; btn1.textContent = '…';
+  btn2.disabled = true; btn2.textContent = '…';
+
+  await set(ref(db, 'mesas/' + mesaId + '/estado'), 'ocupada');
+  document.getElementById('btn-cuenta').style.display = '';
+
+  const lineasImprimir = [];
+  const envioTs  = Date.now();
+  const envioId  = envioTs + '_' + mesaId;
+  const lineasObj = {};
+
+  Object.entries(carrito).forEach(([artId, {art, qty, nota}]) => {
+    lineasObj[artId] = {
+      artId, nombre: art.nombre, precio: Number(art.precio),
+      qty, destino: art.destino, estado: 'pendiente',
+      nota: nota || '', camarero: camareroActual
+    };
+    lineasImprimir.push({ nombre: art.nombre, precio: Number(art.precio), qty, nota: nota || '', camarero: camareroActual });
+  });
+
+  // Un solo push con todo el envío
+  await set(ref(db, `pedidos/${mesaId}/${envioId}`), {
+    ts: envioTs, camarero: camareroActual, envioId,
+    lineas: lineasObj
+  });
+
+  // Descontar líneas de la cuota
+  if (quotaActual !== null && quotaActual !== -1) {
+    await set(ref(db, 'config/quota/lineas'), quotaActual - nLineas);
+    const restante = quotaActual - nLineas;
+    if (restante > 0 && restante <= 100) {
+      setTimeout(() => showModal({
+        title: 'Pocas líneas restantes',
+        body: `Quedan ${restante} líneas de pedido disponibles. Contacta con el administrador para ampliar antes de quedarte sin servicio.`,
+        buttons: [{ label: 'Entendido' }]
+      }), 800);
+    }
+  }
+
+  // Contador de consumo mensual (siempre, independiente de la cuota)
+  const ahora2 = new Date();
+  const mesKey = `${ahora2.getFullYear()}-${String(ahora2.getMonth()+1).padStart(2,'0')}`;
+  const statsRef = ref(db, 'config/stats/' + mesKey + '/lineas');
+  const statsSnap = await get(statsRef);
+  const consumidoMes = statsSnap.val() || 0;
+  await set(statsRef, consumidoMes + nLineas);
+
+  // Generar y descargar PDF solo si el toggle está activo
+  if (autoPDF) generarPDFComanda(mesaNombre, lineasImprimir, configLocal);
+  if (autoTXT) generarTXTComanda(mesaNombre, lineasImprimir, configLocal);
+
+  carrito = {};
+  cerrarDrawer();
+  updateQtyDisplay();
+  updateUI();
+  btn1.textContent = '✓ Enviado'; btn1.disabled = false;
+  btn2.textContent = 'Enviar pedido';
+  setTimeout(() => { btn1.textContent = 'Enviar'; updateUI(); }, 1800);
+};
+
+// ── Cuenta / Ticket en tiempo real ───────────────────────────────────────────
+async function cargarTicketActual() {
+  if (!mesaId) return;
+  const snap = await get(ref(db, 'pedidos/' + mesaId));
+  renderTicket(snap.val() || {});
+}
+
+window.verCuenta = async () => {
+  if (!mesaId) return;
+  await cargarTicketActual();
+  show('ticket');
+};
+
+// Aplanar estructura de envíos para el ticket
+function aplanarPedidos(pedidos) {
+  const lineas = []; // { envioId, artId, nombre, precio, qty, nota, estado }
+  Object.entries(pedidos).forEach(([envioId, envio]) => {
+    const ls = envio.lineas || { [envioId]: envio }; // compatibilidad estructura antigua
+    Object.entries(ls).forEach(([artId, l]) => {
+      lineas.push({ envioId, artId, ...l });
+    });
+  });
+  return lineas;
+}
+
+function qtyEnCuenta(linea) {
+  if (linea.estado === 'servido') return Number(linea.qty || 0);
+  return Number(linea.qtyServida || 0);
+}
+
+function renderTicket(pedidos) {
+  const todasLineas = aplanarPedidos(pedidos);
+
+  // Solo lo SERVIDO — una fila por línea de comanda (sin agrupar)
+  const lineasServidas = todasLineas
+    .map(l => {
+      const qtyCuenta = qtyEnCuenta(l);
+      return { ...l, qtyOriginal: l.qty, qty: qtyCuenta, qtyCuenta };
+    })
+    .filter(l => l.qtyCuenta > 0)
+    .sort((a, b) => (a.envioId || '').localeCompare(b.envioId || '') || a.nombre.localeCompare(b.nombre, 'es'));
+
+  // Mapa por índice — se reconstruye en cada render
+  window._tLineas = lineasServidas;
+
+  if (!lineasServidas.length) {
+    document.getElementById('ticket-card').innerHTML = `
+      <div class="ticket-edit-hint">No hay artículos servidos aún</div>
+      <div class="ticket-total"><span>Total</span><span>0,00 €</span></div>
+      <button class="btn-cerrar">Cerrar mesa y limpiar</button>`;
+    document.getElementById('ticket-card').onclick = e => {
+      if (e.target.classList.contains('btn-cerrar')) cerrarMesa();
+    };
+    return;
+  }
+
+  const total = lineasServidas.reduce((s, l) => s + Number(l.precio) * l.qtyCuenta, 0);
+  const fecha = new Date().toLocaleString('es-ES', { dateStyle:'short', timeStyle:'short' });
+  const loc = configLocal;
+
+  const cab = `
+    ${loc.nombre    ? `<div style="font-size:18px;font-weight:500;font-family:var(--mono)">${loc.nombre}</div>` : ''}
+    ${loc.direccion ? `<div style="font-size:12px;color:var(--muted);margin-top:2px">${loc.direccion}</div>` : ''}
+    ${loc.telefono  ? `<div style="font-size:12px;color:var(--muted)">${loc.telefono}</div>` : ''}
+    ${loc.cif       ? `<div style="font-size:11px;color:var(--muted)">${loc.cif}</div>` : ''}`;
+  const pie = loc.footer
+    ? `<div style="text-align:center;font-size:12px;color:var(--muted);margin-top:1rem;padding-top:.75rem;border-top:1px dashed var(--border)">${loc.footer}</div>` : '';
+
+  const lineasHTML = lineasServidas.map((l, i) => {
+    const notaVisible = (l.nota || '')
+      .replace(/\s*·?\s*⚠️\s*Comprobar/g, '').replace(/\s*·?\s*✅\s*Verificado/g, '').trim();
+    return `
+    <div class="ticket-linea ticket-linea-edit">
+      <div style="flex:1">
+        <div>${l.qty}× ${l.nombre}</div>
+        ${notaVisible ? `<div style="font-size:11px;color:var(--muted);font-style:italic">↳ ${notaVisible}</div>` : ''}
+        ${l.verificado ? `<span class="nota-verificado no-print">✅ Verificado</span>` : ''}
+      </div>
+      <span style="font-family:var(--mono)">${(Number(l.precio)*l.qty).toFixed(2)} €</span>
+      <button class="btn-quitar-linea" data-idx="${i}" title="Devolver a barra/cocina">×</button>
+    </div>`;
+  }).join('');
+
+  document.getElementById('ticket-card').innerHTML = `
+    <div class="ticket-header">
+      ${cab}
+      <div style="margin-top:${loc.nombre?'.75rem':'0'}">
+        <div class="ticket-mesa">Mesa ${mesaNombre}</div>
+        <div class="ticket-fecha">${fecha}</div>
+      </div>
+    </div>
+    <div class="ticket-edit-hint">Pulsa × para devolver a barra/cocina</div>
+    ${lineasHTML}
+    <div class="ticket-total"><span>Total</span><span>${total.toFixed(2)} €</span></div>
+    ${pie}
+    <button class="btn-print no-print-btn">Imprimir ticket</button>
+    <button class="btn-refresh no-print">🔄 Actualizar ticket</button>
+    <button class="btn-cerrar">Cerrar mesa y limpiar</button>
+  `;
+
+  // Listeners con delegación — evita problemas con onclick inline en módulos ES
+  const card = document.getElementById('ticket-card');
+  card.onclick = async e => {
+    if (e.target.classList.contains('btn-quitar-linea')) {
+      const i = parseInt(e.target.dataset.idx);
+      await quitarDelTicket(i);
+    } else if (e.target.classList.contains('btn-print') || e.target.classList.contains('no-print-btn')) {
+      window.print();
+    } else if (e.target.classList.contains('btn-refresh')) {
+      await cargarTicketActual();
+    } else if (e.target.classList.contains('btn-cerrar')) {
+      cerrarMesa();
+    }
+  };
+}
+
+async function quitarDelTicket(i) {
+  const l = window._tLineas?.[i];
+  if (!l) return;
+  const { envioId, artId } = l;
+  const notaBase = (l.nota || '')
+    .replace(/\s*·?\s*⚠️\s*Comprobar/g, '').replace(/\s*·?\s*✅\s*Verificado/g, '').trim();
+  const updates = {
+    [`pedidos/${mesaId}/${envioId}/lineas/${artId}/verificado`]: false,
+    [`pedidos/${mesaId}/${envioId}/lineas/${artId}/qtyServida`]: null,
+    [`pedidos/${mesaId}/${envioId}/lineas/${artId}/nota`]:
+      (notaBase ? notaBase + ' · ' : '') + '⚠️ Comprobar',
+  };
+  if (l.estado === 'servido') {
+    updates[`pedidos/${mesaId}/${envioId}/lineas/${artId}/estado`] = 'pendiente';
+  }
+  await update(ref(db), updates);
+  await cargarTicketActual();
+};
+
+
+window.cerrarMesa = async () => {
+  showModal({
+    title: 'Cerrar mesa ' + mesaNombre,
+    body: 'Se borrarán todos los pedidos de esta mesa. ¿Continuar?',
+    buttons: [
+      { label: 'Cancelar' },
+      { label: 'Cerrar mesa', style: 'danger', action: async () => {
+        const snap = await get(ref(db, 'pedidos/' + mesaId));
+        const pedidos = snap.val() || {};
+
+        const todasLineas = aplanarPedidos(pedidos);
+        const agrupado = {};
+        const camareros = new Set();
+        todasLineas.forEach(l => {
+          const qtyCuenta = qtyEnCuenta(l);
+          if (qtyCuenta <= 0) return;
+          if (l.camarero) camareros.add(l.camarero);
+          // Usar la cantidad realmente servida, incluyendo parciales
+          const k = l.nombre + '||' + Number(l.precio).toFixed(2);
+          if (!agrupado[k]) agrupado[k] = { nombre: l.nombre, precio: Number(l.precio), qty: 0, nota: l.nota || '' };
+          agrupado[k].qty += qtyCuenta;
+        });
+        const lineas = Object.values(agrupado);
+        const total  = lineas.reduce((s, l) => s + l.precio * l.qty, 0);
+        if (lineas.length > 0) {
+          const ahora = new Date();
+          await push(ref(db, 'historial'), {
+            mesa: mesaNombre,
+            camarero: [...camareros].join(', '),
+            ts: ahora.getTime(),
+            fecha: ahora.toLocaleDateString('es-ES'),
+            hora: ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+            total: Math.round(total * 100) / 100,
+            lineas
+          });
+        }
+        await remove(ref(db, 'pedidos/' + mesaId));
+        await set(ref(db, 'mesas/' + mesaId + '/estado'), 'libre');
+        mesaId = null; mesaNombre = null; carrito = {};
+        document.getElementById('topbar-mesa').style.display = 'none';
+        show('mesas');
+      }}
+    ]
+  });
+};
+
+window.show = v => {
+  document.getElementById('view-mesas').style.display  = v === 'mesas'  ? 'block' : 'none';
+  document.getElementById('view-carta').style.display  = v === 'carta'  ? 'block' : 'none';
+  document.getElementById('view-ticket').style.display = v === 'ticket' ? 'block' : 'none';
+  // Tablet: layout dividido
+  const viewCarta = document.getElementById('view-carta');
+  if (v === 'carta' && window.innerWidth >= 768) viewCarta.classList.add('tablet-active');
+  else viewCarta.classList.remove('tablet-active');
+  // Botón de categorías solo en móvil
+  const btnCats = document.getElementById('btn-cats');
+  if (btnCats) btnCats.style.display = (v === 'carta' && window.innerWidth < 768) ? 'flex' : 'none';
+  cerrarCatsPanel();
+};
+
+// ── FAB acceso rápido barra/cocina ─────────────────────────────────────────────
+
+// Evitar que los fab-item naveguen si el panel no está abierto
+
+// FAB visible al arrancar (la vista inicial es mesas)
+
+// Cerrar FAB al tocar fuera
+
+
