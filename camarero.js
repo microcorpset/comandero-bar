@@ -23,6 +23,7 @@ let carrito = {};
 let mesasData = {}, cartaData = {}, categoriasData = {};
 let cartaReady = false, catsReady = false;
 let configLocal = {};
+let ticketEditMode = false;
 
 // ── USUARIOS / PIN multi-camarero ─────────────────────────────────────────────
 const PIN_SESSION  = 'cam_auth';
@@ -208,6 +209,20 @@ onValue(ref(db, 'pedidos'), snap => {
 // ── Mesas con colores de estado ───────────────────────────────────────────────
 let pedidosData = {};
 
+function fmtEu(n) {
+  return Number(n || 0).toFixed(2).replace('.', ',') + ' €';
+}
+
+function resumenMesaActual(id) {
+  const pedidosMesa = pedidosData[id];
+  if (!pedidosMesa) return 'Sin consumo';
+  const lineas = aplanarPedidos(pedidosMesa).filter(l => l.estado !== 'cancelado');
+  const uds = lineas.reduce((s, l) => s + Number(l.qty || 0), 0);
+  const total = lineas.reduce((s, l) => s + Number(l.precio || 0) * Number(l.qty || 0), 0);
+  if (!uds) return 'Sin consumo';
+  return `<strong>${uds} uds</strong> | <strong>${fmtEu(total)}</strong>`;
+}
+
 function renderMesas() {
   const grid = document.getElementById('mesas-grid');
   const entries = Object.entries(mesasData);
@@ -240,7 +255,7 @@ function renderMesas() {
           const masAntigua = lineasPend.reduce((min, l) => l._tsMesa < min._tsMesa ? l : min, lineasPend[0]);
           const mins = Math.max(0, Math.floor((Date.now() - (masAntigua._tsMesa || Date.now())) / 60000));
           const minsTxt = mins === 0 ? '<1m' : `${mins}m`;
-          const dest = masAntigua.destino === 'cocina' ? 'COC' : masAntigua.destino === 'barra' ? 'BAR' : 'MIX';
+          const dest = masAntigua.destino === 'cocina' ? '&#127869;' : masAntigua.destino === 'barra' ? '&#127866;' : '&#127866;&#127869;';
           const pendienteTxt = lineasPend.length === 1 ? '1 pendiente' : `${lineasPend.length} pendientes`;
           if (mins >= 20)     claseAlerta = 'alerta-danger';
           else if (mins >= 10) claseAlerta = 'alerta-warn';
@@ -249,10 +264,13 @@ function renderMesas() {
         }
       }
 
+      const resumenMesa = resumenMesaActual(id);
+
       div.className = 'mesa-btn ' + claseAlerta;
       div.innerHTML = `
         <span class="mesa-nombre">${m.nombre}</span>
         <span class="mesa-estado">${ocupada ? 'ocupada' : 'libre'}</span>
+        <span class="mesa-resumen">${resumenMesa}</span>
         ${alertaInfo}`;
       div.addEventListener('click', () => abrirMesa(id, m.nombre, ocupada));
       grid.appendChild(div);
@@ -278,6 +296,7 @@ function abrirMesa(id, nombre, ocupada) {
 
 window.volverMesas = () => {
   mesaId = null; mesaNombre = null; carrito = {};
+  ticketEditMode = false;
   document.getElementById('topbar-mesa').style.display = 'none';
   cerrarDrawer(); show('mesas');
   if (Object.keys(mesasData).length) renderMesas();
@@ -770,6 +789,8 @@ async function cargarTicketActual() {
 
 window.verCuenta = async () => {
   if (!mesaId) return;
+  const btn = document.getElementById('btn-edit-ticket');
+  if (btn) btn.textContent = ticketEditMode ? 'Listo' : 'Editar cuenta';
   await cargarTicketActual();
   show('ticket');
 };
@@ -787,30 +808,44 @@ function aplanarPedidos(pedidos) {
 }
 
 function qtyEnCuenta(linea) {
+  if (linea.qtyTicket !== undefined && linea.qtyTicket !== null) return Number(linea.qtyTicket || 0);
+  return qtyMaxEnCuenta(linea);
+}
+
+function qtyMaxEnCuenta(linea) {
   if (linea.estado === 'servido') return Number(linea.qty || 0);
   return Number(linea.qtyServida || 0);
+}
+
+function limpiarNotaTicket(nota) {
+  return (nota || '')
+    .replace(/Comprobar/g, '')
+    .replace(/Verificado/g, '')
+    .replace(/⚠️/g, '')
+    .replace(/✅/g, '')
+    .replace(/Â·/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 function renderTicket(pedidos) {
   const todasLineas = aplanarPedidos(pedidos);
 
-  // Solo lo SERVIDO — una fila por línea de comanda (sin agrupar)
   const lineasServidas = todasLineas
     .map(l => {
       const qtyCuenta = qtyEnCuenta(l);
-      return { ...l, qtyOriginal: l.qty, qty: qtyCuenta, qtyCuenta };
+      const qtyMax = qtyMaxEnCuenta(l);
+      return { ...l, qtyOriginal: l.qty, qtyCuenta, qtyMax };
     })
     .filter(l => l.qtyCuenta > 0)
     .sort((a, b) => (a.envioId || '').localeCompare(b.envioId || '') || a.nombre.localeCompare(b.nombre, 'es'));
 
-  // Mapa por índice — se reconstruye en cada render
   window._tLineas = lineasServidas;
 
   if (!lineasServidas.length) {
-    document.getElementById('ticket-card').innerHTML = `
-      <div class="ticket-edit-hint">No hay artículos servidos aún</div>
-      <div class="ticket-total"><span>Total</span><span>0,00 €</span></div>
-      <button class="btn-cerrar">Cerrar mesa y limpiar</button>`;
+    document.getElementById('ticket-card').innerHTML =       '<div class="ticket-edit-hint">No hay articulos servidos aun</div>' +
+      '<div class="ticket-total"><span>Total</span><span>' + fmtEu(0) + '</span></div>' +
+      '<button class="btn-cerrar">Cerrar mesa y limpiar</button>';
     document.getElementById('ticket-card').onclick = e => {
       if (e.target.classList.contains('btn-cerrar')) cerrarMesa();
     };
@@ -818,53 +853,65 @@ function renderTicket(pedidos) {
   }
 
   const total = lineasServidas.reduce((s, l) => s + Number(l.precio) * l.qtyCuenta, 0);
+  const totalUds = lineasServidas.reduce((s, l) => s + l.qtyCuenta, 0);
   const fecha = new Date().toLocaleString('es-ES', { dateStyle:'short', timeStyle:'short' });
   const loc = configLocal;
 
-  const cab = `
-    ${loc.nombre    ? `<div style="font-size:18px;font-weight:500;font-family:var(--mono)">${loc.nombre}</div>` : ''}
-    ${loc.direccion ? `<div style="font-size:12px;color:var(--muted);margin-top:2px">${loc.direccion}</div>` : ''}
-    ${loc.telefono  ? `<div style="font-size:12px;color:var(--muted)">${loc.telefono}</div>` : ''}
-    ${loc.cif       ? `<div style="font-size:11px;color:var(--muted)">${loc.cif}</div>` : ''}`;
+  const cab =     (loc.nombre ? '<div style="font-size:18px;font-weight:500;font-family:var(--mono)">' + loc.nombre + '</div>' : '') +
+    (loc.direccion ? '<div style="font-size:12px;color:var(--muted);margin-top:2px">' + loc.direccion + '</div>' : '') +
+    (loc.telefono ? '<div style="font-size:12px;color:var(--muted)">' + loc.telefono + '</div>' : '') +
+    (loc.cif ? '<div style="font-size:11px;color:var(--muted)">' + loc.cif + '</div>' : '');
   const pie = loc.footer
-    ? `<div style="text-align:center;font-size:12px;color:var(--muted);margin-top:1rem;padding-top:.75rem;border-top:1px dashed var(--border)">${loc.footer}</div>` : '';
+    ? '<div style="text-align:center;font-size:12px;color:var(--muted);margin-top:1rem;padding-top:.75rem;border-top:1px dashed var(--border)">' + loc.footer + '</div>'
+    : '';
 
   const lineasHTML = lineasServidas.map((l, i) => {
-    const notaVisible = (l.nota || '')
-      .replace(/\s*·?\s*⚠️\s*Comprobar/g, '').replace(/\s*·?\s*✅\s*Verificado/g, '').trim();
-    return `
-    <div class="ticket-linea ticket-linea-edit">
-      <div style="flex:1">
-        <div>${l.qty}× ${l.nombre}</div>
-        ${notaVisible ? `<div style="font-size:11px;color:var(--muted);font-style:italic">↳ ${notaVisible}</div>` : ''}
-        ${l.verificado ? `<span class="nota-verificado no-print">✅ Verificado</span>` : ''}
-      </div>
-      <span style="font-family:var(--mono)">${(Number(l.precio)*l.qty).toFixed(2)} €</span>
-      <button class="btn-quitar-linea" data-idx="${i}" title="Devolver a barra/cocina">×</button>
-    </div>`;
+    const notaVisible = limpiarNotaTicket(l.nota);
+    const controlesEdicion = ticketEditMode
+      ? '<div class="ticket-qty-edit no-print">' +
+        '<button class="ticket-qty-btn" data-accion="restar" data-idx="' + i + '"' + (l.qtyCuenta <= 1 ? ' disabled' : '') + '>-</button>' +
+        '<span class="ticket-qty-num">' + l.qtyCuenta + '</span>' +
+        '<button class="ticket-qty-btn" data-accion="sumar" data-idx="' + i + '"' + (l.qtyCuenta >= l.qtyMax ? ' disabled' : '') + '>+</button>' +
+      '</div>'
+      : '';
+    return '<div class="ticket-linea ticket-linea-edit">' +
+      '<div style="flex:1">' +
+        '<div>' + l.qtyCuenta + 'x ' + l.nombre + '</div>' +
+        (notaVisible ? '<div style="font-size:11px;color:var(--muted);font-style:italic">-> ' + notaVisible + '</div>' : '') +
+        (l.verificado ? '<span class="nota-verificado no-print">Verificado</span>' : '') +
+      '</div>' +
+      controlesEdicion +
+      '<span class="ticket-linea-precio">' + fmtEu(Number(l.precio) * l.qtyCuenta) + '</span>' +
+      (ticketEditMode ? '' : '<button class="btn-quitar-linea" data-idx="' + i + '" title="Devolver a barra/cocina">x</button>') +
+    '</div>';
   }).join('');
 
-  document.getElementById('ticket-card').innerHTML = `
-    <div class="ticket-header">
-      ${cab}
-      <div style="margin-top:${loc.nombre?'.75rem':'0'}">
-        <div class="ticket-mesa">Mesa ${mesaNombre}</div>
-        <div class="ticket-fecha">${fecha}</div>
-      </div>
-    </div>
-    <div class="ticket-edit-hint">Pulsa × para devolver a barra/cocina</div>
-    ${lineasHTML}
-    <div class="ticket-total"><span>Total</span><span>${total.toFixed(2)} €</span></div>
-    ${pie}
-    <button class="btn-print no-print-btn">Imprimir ticket</button>
-    <button class="btn-refresh no-print">🔄 Actualizar ticket</button>
-    <button class="btn-cerrar">Cerrar mesa y limpiar</button>
-  `;
+  const textoHint = ticketEditMode
+    ? 'Modo edicion: ajusta cantidades sin reenviar nada a barra o cocina'
+    : 'Cuenta actual: ' + totalUds + ' uds | ' + fmtEu(total);
 
-  // Listeners con delegación — evita problemas con onclick inline en módulos ES
+  document.getElementById('ticket-card').innerHTML =     '<div class="ticket-header">' +
+      cab +
+      '<div style="margin-top:' + (loc.nombre ? '.75rem' : '0') + '">' +
+        '<div class="ticket-mesa">Mesa ' + mesaNombre + '</div>' +
+        '<div class="ticket-fecha">' + fecha + '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="ticket-edit-hint">' + textoHint + '</div>' +
+    lineasHTML +
+    '<div class="ticket-total"><span>Total</span><span>' + fmtEu(total) + '</span></div>' +
+    pie +
+    '<button class="btn-print no-print-btn">Imprimir ticket</button>' +
+    '<button class="btn-refresh no-print">Actualizar ticket</button>' +
+    '<button class="btn-cerrar">Cerrar mesa y limpiar</button>';
+
   const card = document.getElementById('ticket-card');
   card.onclick = async e => {
-    if (e.target.classList.contains('btn-quitar-linea')) {
+    if (e.target.classList.contains('ticket-qty-btn')) {
+      const i = parseInt(e.target.dataset.idx);
+      const delta = e.target.dataset.accion === 'sumar' ? 1 : -1;
+      await editarCantidadTicket(i, delta);
+    } else if (e.target.classList.contains('btn-quitar-linea')) {
       const i = parseInt(e.target.dataset.idx);
       await quitarDelTicket(i);
     } else if (e.target.classList.contains('btn-print') || e.target.classList.contains('no-print-btn')) {
@@ -877,6 +924,23 @@ function renderTicket(pedidos) {
   };
 }
 
+window.toggleEditarCuenta = () => {
+  ticketEditMode = !ticketEditMode;
+  const btn = document.getElementById('btn-edit-ticket');
+  if (btn) btn.textContent = ticketEditMode ? 'Listo' : 'Editar cuenta';
+  cargarTicketActual();
+};
+
+async function editarCantidadTicket(i, delta) {
+  const l = window._tLineas?.[i];
+  if (!l) return;
+  const nuevaQty = Math.max(1, Math.min(l.qtyMax, l.qtyCuenta + delta));
+  const path = 'pedidos/' + mesaId + '/' + l.envioId + '/lineas/' + l.artId + '/qtyTicket';
+  if (nuevaQty === l.qtyMax) await set(ref(db, path), null);
+  else await set(ref(db, path), nuevaQty);
+  await cargarTicketActual();
+}
+
 async function quitarDelTicket(i) {
   const l = window._tLineas?.[i];
   if (!l) return;
@@ -886,6 +950,7 @@ async function quitarDelTicket(i) {
   const updates = {
     [`pedidos/${mesaId}/${envioId}/lineas/${artId}/verificado`]: false,
     [`pedidos/${mesaId}/${envioId}/lineas/${artId}/qtyServida`]: null,
+    [`pedidos/${mesaId}/${envioId}/lineas/${artId}/qtyTicket`]: null,
     [`pedidos/${mesaId}/${envioId}/lineas/${artId}/nota`]:
       (notaBase ? notaBase + ' · ' : '') + '⚠️ Comprobar',
   };
