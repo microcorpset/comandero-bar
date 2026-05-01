@@ -871,7 +871,7 @@ function renderTicket(pedidos) {
       ? '<div class="ticket-qty-edit no-print">' +
         '<button class="ticket-qty-btn" data-accion="restar" data-idx="' + i + '"' + (l.qtyCuenta <= 1 ? ' disabled' : '') + '>-</button>' +
         '<span class="ticket-qty-num">' + l.qtyCuenta + '</span>' +
-        '<button class="ticket-qty-btn" data-accion="sumar" data-idx="' + i + '"' + (l.qtyCuenta >= l.qtyMax ? ' disabled' : '') + '>+</button>' +
+        '<button class="ticket-qty-btn" data-accion="sumar" data-idx="' + i + '">+</button>' +
       '</div>'
       : '';
     return '<div class="ticket-linea ticket-linea-edit">' +
@@ -934,9 +934,9 @@ window.toggleEditarCuenta = () => {
 async function editarCantidadTicket(i, delta) {
   const l = window._tLineas?.[i];
   if (!l) return;
-  const nuevaQty = Math.max(1, Math.min(l.qtyMax, l.qtyCuenta + delta));
+  const nuevaQty = Math.max(1, l.qtyCuenta + delta);
   const path = 'pedidos/' + mesaId + '/' + l.envioId + '/lineas/' + l.artId + '/qtyTicket';
-  if (nuevaQty === l.qtyMax) await set(ref(db, path), null);
+  if (nuevaQty === qtyMaxEnCuenta(l)) await set(ref(db, path), null);
   else await set(ref(db, path), nuevaQty);
   await cargarTicketActual();
 }
