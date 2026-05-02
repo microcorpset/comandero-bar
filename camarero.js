@@ -999,9 +999,13 @@ function renderTicket(pedidos) {
     document.getElementById('ticket-card').innerHTML =
       '<div class="ticket-edit-hint">No hay artículos servidos aún</div>' +
       '<div class="ticket-total"><span>Total</span><span>' + fmtEu(0) + '</span></div>' +
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:1rem">' +
+        '<button class="btn-transferir no-print" style="flex:1;background:none;color:var(--muted);border:1px solid var(--border);border-radius:12px;padding:10px;font-family:var(--mono);font-size:13px;cursor:pointer">Transferir</button>' +
+      '</div>' +
       '<button class="btn-cerrar">Cerrar mesa y limpiar</button>';
     document.getElementById('ticket-card').onclick = e => {
       if (e.target.classList.contains('btn-cerrar')) cerrarMesa();
+      else if (e.target.classList.contains('btn-transferir')) abrirTransferirMesaModal();
     };
     return;
   }
