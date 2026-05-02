@@ -1,1 +1,791 @@
-const _0x4dd813=_0x5b3a;(function(_0x30da1e,_0x393698){const _0x108143=_0x5b3a,_0x1bca8c=_0x30da1e();while(!![]){try{const _0x177e35=-parseInt(_0x108143(0x189))/0x1+parseInt(_0x108143(0x19c))/0x2+-parseInt(_0x108143(0x175))/0x3*(-parseInt(_0x108143(0x15b))/0x4)+-parseInt(_0x108143(0x160))/0x5+parseInt(_0x108143(0x154))/0x6*(parseInt(_0x108143(0xd9))/0x7)+-parseInt(_0x108143(0x152))/0x8*(-parseInt(_0x108143(0x130))/0x9)+-parseInt(_0x108143(0xba))/0xa*(parseInt(_0x108143(0xd2))/0xb);if(_0x177e35===_0x393698)break;else _0x1bca8c['push'](_0x1bca8c['shift']());}catch(_0x421305){_0x1bca8c['push'](_0x1bca8c['shift']());}}}(_0x4863,0x665c3));function _0x4863(){const _0x29976e=['cIaGicaGicaGica8zgL2ihn0EwXLpsjKAxnWBgf5oMzSzxG7zMXLEc1KAxjLy3rPB246y29SDw1Uo2DHCdOYChG7zMXLEdOXo21PBI13Awr0AdOWiJ4kicaGicaGicaGicaGphnWyw4Gy2XHC3m9iNjVDY1SywjLBciGAwq9iMfYDc1SywjLBc0','jYKIpKnHBMnLBgfYpc9IDxr0B24+','tufot04','ug5IBhC','AMD0uMC','zgLZCgXHEtPUB25Lo3bHzgrPBMC6mtbWEcaXmNb4o2jHy2TNCM91BMq6DMfYkc0TC3vYzMfJztiPo2jVCMrLCI1IB3r0B206mxb4ihnVBgLKihzHCIGTlwjVCMrLCIK7z2fWoJHWEdTMBgv4lxDYyxa6D3jHCdTHBgLNBI1PDgvTCZPJzw50zxi','zMLSDhjVlwzLy2HHlwLUAq','AgLZDg9YAwfS','jYKIpUkCJZWVyNv0Dg9UpGOGicaGicaGicaGica8yNv0Dg9UignSyxnZpsjIDg4GyNrUlxnTigj0BI1Kyw5NzxiIig9Uy2XPy2S9iMrLBefYDgLJDwXVkcC','lc0XksiG','mte4nZm2AhjJz0Lh','jYKIigLKpsjHCNqTzgvZDc0','mJaYnZrcrvPkyNu','y29UC3rYDwn0B3i','phnWyw4GC3r5Bgu9iMzVBNqTzMfTAwX5oNzHCIGTlw1VBM8Po2zVBNqTC2L6ztOXmxb4o2nVBg9YoNzHCIGTlwfJy2vUDcKIpG','cIaGica8zgL2ihn0EwXLpsjKAxnWBgf5oMzSzxG7ANvZDgLMEs1JB250zw50oNnWywnLlwjLDhDLzw47ywXPz24TAxrLBxm6y2vUDgvYo3bHzgrPBMC6ohb4idaGmtjWEdTIB3jKzxiTyM90Dg9ToJfWEcbZB2XPzcb2yxiOls1IB3jKzxiPo21HCMDPBI1IB3r0B206nhb4iJ4kicaGicaGphnWyw4GC3r5Bgu9iMzVBNqTC2L6ztOXm3b4o2nVBg9YoNzHCIGTlw11DgvKksi+vg90ywWGywn1BxvSywrVpc9ZCgfUpGOGicaGica8C3bHBIbZDhLSzt0IzM9UDc1Myw1PBhK6DMfYkc0TBw9UBYK7zM9UDc1ZAxPLoJe4ChG7zM9UDc13zwLNAhq6ntaWiJ4','Dg90ywW','y29UzMLNl3f1B3rHl2XPBMvHCW','A3bhq3G','mtiYnJbnD3nrC0q','phaGC3r5Bgu9iMzVBNqTC2L6ztOXm3b4o2nVBg9YoNzHCIGTlw11DgvKksi+u2LUignHBwfYzxjVCY4GqCoXywrLihvUBYbHyMfQBY48l3a+','Bg9JywXLq29TCgfYzq','y29SB3i','zMLSDhjVlwHVCMeTAw5P','nduXmJK1BMzwBxzi','pc9ZCgfUpGOGicaGica8C3bHBIbJBgfZCZ0ICM93lxn1yIi+','rwv6uhO','BwvZyq','jNf1B3q7','Bg9UzW','zLr1zfO','y2HHBMDLuhDK','pg9WDgLVBIb2ywX1zt0I','iokcRdWVC3bHBJ4kicaGicaGica8l2rPDJ4kicaGicaGpc9KAxy+','y2f0lw5VBwjYzq','ywjquwy','y29UzMLNl3bPBNmV','rwWGueLoigrLyMuGDgvUzxiGncbKW61NAxrVCW','mti3lJaUmc4X','qxj0W61JDwXVighdSwfKAwrV','yMXVy2S','CxvLCNLtzwXLy3rVCKfSBa','C2vJlq','Dgv4DenVBNrLBNq','DMfSDwvZ','odaXqwj5quLk','y29UzMLNl3vZDwfYAw9Z','jYKIpKD1yxjKyxi8l2j1DhrVBJ4kicaGicaGicaGidXIDxr0B24Gy2XHC3m9iMj0BIbIDg4TC20Iig9Uy2XPy2S9iMnHBMnLBgfYrwrPy2LVBIGN','zgLZCgXHEq','BM9TyNjL','BM9Uzq','mcdIGjqGqKXpuvvfqurp','lNrHyI1IDg4','pc9ZCgfUpGOGicaGicaGicaGica8C3bHBIbJBgfZCZ0ICM93lxn1yIi+','zgvZDgLUBW','q2f0zwDVCSoTysbHW7fHzgLKyq','y2fYDgeTBgLZDge','cIaGicaGidXZCgfUignSyxnZpsjYB3CTBgfIzwWIpG','z2v0rwXLBwvUDej5swq','DMfYkc0TyM9YzgvYkq','z3vHCMrHCKXVy2fS','iokcRdWVC3bHBJ4kicaGicaGicaGidWVzgL2pGOGicaGicaGicaGphnWyw4Gy2XHC3m9iMjHzgDLlwrLC3qGyMqT','y2fUy2vSyxjfzgLJAw9U','C2HVD1rHyG','uejnvM0','nJaZmJmWq0XyCujU','ywrK','iIbZDhLSzt0IzMXLEdOXo21PBI13Awr0AdOXmtbWEci+pc9ZzwXLy3q+cIaGicaGicaGica8yNv0Dg9UignSyxnZpsjIDg4GyNrUlxn1y2nLC3mGyNrUlxnTiIbVBMnSAwnRpsjNDwfYzgfYqxj0Awn1Bg8OjW','CMvWBgfJzq','zM9JDxm','ELbIuve','C2v0sxrLBq','jYKIpSoxpc9IDxr0B24+','zwrPDgfYqxj0Awn1Bg8','BgLICMu','z2v0rNvSBfLLyxi','zwrPDc1JyxqT','yxj0lxjVDY0','y2XHC3nmAxn0','mda6mda','Bg9NAw4TC2nYzwvU','w3fjufngDKzMshD4ELfkrfvxuLDABeLXEujAtLruv1jezNf6ufLuwLPnvhHesKjuEuX2CurtwfHdsNL5EfnmrunMrLbuq0Hbvev4v1jzDNLD','C3rHDc10B3rHBa','pc9ZCgfUpGOGicaGicaGia','mtm5mdi3nLjfB3rhvW','zMLUza','C29YDa','pc9ZCgfUpGOGicaGicaGicaGica8C3bHBIbZDhLSzt0IzM9UDc1Myw1PBhK6DMfYkc0TBw9UBYKIpG','q29UDhjHC2xdSweGywn0DwfSAxPHzge','y29UzMLNl2XVy2fS','jtTIywnRz3jVDw5KoG','phaGC3r5Bgu9iMnVBg9YoNzHCIGTlw11DgvKktTMB250lxnPEMu6mtnWEdTWywrKAw5NoJrWEcaWiJ5tAw4GBwvZyxmGyCo6BJWVCd4','A0fIs00','cIaGicaGicaGphnWyw4GC3r5Bgu9iMzVBNqTzMfTAwX5oNzHCIGTlw1VBM8Po2zVBNqTC2L6ztOXnhb4o2zVBNqTD2vPz2H0oJuWmci+','y3nZvgv4Da','phnWyw4GC3r5Bgu9iMzVBNqTC2L6ztOXmxb4o2jHy2TNCM91BMq6DMfYkc0TywnJzw50lwrPBsK7y29SB3i6DMfYkc0TywnJzw50ktTWywrKAw5NoJjWEca4ChG7yM9YzgvYlxjHzgL1CZOYmhb4o2zVBNqTzMfTAwX5oNzHCIGTlw1VBM8PiJ5LBIbJDxjZBZWVC3bHBJ4','qxj0W61JDwXVigvSAw1PBMfKBW','yxj0lxbYzwnPBW','A2v5CW','twvZysbLBgLTAw5Hzge','zwrPDc1Wyw5LBc0','C3r4tvi','C3rHDc1TzwrPyq','ywrKrxzLBNrmAxn0zw5LCG','rxnLifbjtIb5ysbLC3tdOsbLBIb1C28GCg9Yia','DMvUDgfZlwXPC3rH','z2v0sxrLBq','Bw92zxjbCNq','Bg9JywWTzM9VDgvY','BwvZyxmTBgLZDge','Aw5Uzxjive1m','pc9VChrPB24+','u2LUignVBMzPz3vYyxi','zw50CMLLCW','B254rwW','DMfS','Dg9tDhjPBMC','A2v5','qLjQzuS','zwrPDc1WCMvJAw8T','zxn0ywrV','Bg9NAw4TzxjYB3i','rwWGueLoigrLyMuGDgvUzxiGzxHHy3rHBwvUDguGncbKW61NAxrVCW','cIaGicaGicaGphnWyw4Gy2XHC3m9iNrPy2TLDc1OAxn0lxrVDgfSiJ4','C2vHCMnO','DMfYkc0TywnJzw50kq','Bg9JywWTzgLYzwnJAw9U','CMvTB3zL','lMrLC3qTyNrU','sg1ht0e','zgLYzwnJAw9U','pgrPDIbJBgfZCZ0IDMvUDgfZlwvTChr5iJ5tAw4GDMvUDgfZigvUigvZzsbWzxldRw9KBZWVzgL2pG','zgvStwvZyq','vLf5rxK','yxbWBhK','zgiT','yxbWzw5Kq2HPBgq','y2HHCKnVzgvbDa','Bg9JywWTDgvSzwzVBM8','DMfSDwu','lNnLy3rPB24','Cxr5','pgrPDIbZDhLSzt0IzgLZCgXHEtPMBgv4o2fSAwDUlwL0zw1ZoMnLBNrLCJTQDxn0Awz5lwnVBNrLBNq6y2vUDgvYo2HLAwDODdOXmdb2AdTMB250lwzHBwLSEtPTB25VC3bHy2u7y29SB3i6iZG4oci+qwnJzxnVig5Vigf1Dg9YAxPHzg88l2rPDJ4','ywrTAw5FChDK','yxj0lw5VBwjYzq','BwvZyxm','BNvTzxjPyW','cIaGicaGicaGpgrPDIbZDhLSzt0IzgLZCgXHEtPMBgv4o2P1C3rPzNKTy29UDgvUDdPZCgfJzs1Izxr3zwvUo2zVBNqTzMfTAwX5oNzHCIGTlw1VBM8Po2zVBNqTD2vPz2H0oJuWmdTTyxjNAw4TDg9WoJHWEdTWywrKAw5NlxrVCdO4ChG7yM9YzgvYlxrVCdOYChGGC29SAwqGDMfYkc0TyM9YzgvYksi+cIaGicaGicaGica8C3bHBJ5uB3rHBdWVC3bHBJ48C3bHBJ4','ywfMAhm','DMfYkc0TzgfUz2vYkq','y2HLy2TmB2DPBG','pc9ZCgfUpGOGicaGicaGidXZCgfUihn0EwXLpsjMB250lxnPEMu6mtjWEdTJB2XVCJP2yxiOls1TDxrLzcKIpMZdRw5Lyxm8l3nWyw4+cIaGicaGidWVzgL2pGOGicaGica8zgL2ihn0EwXLpsjOzwLNAhq6nhb4o2jHy2TNCM91BMq6DMfYkc0TC3vYzMfJztiPo2jVCMrLCI1YywrPDxm6mNb4o292zxjMBg93oMHPzgrLBIi+cIaGicaGicaGpgrPDIbZDhLSzt0IAgvPz2H0oJeWmcu7D2LKDgG6','yxj0lwnHDa','CMv0DxjUicHMDw5JDgLVBIGPia','jYKIpSoxpc9IDxr0B24+cIaGicaGicaGica8l2rPDJ4','yMX1CG','DgvZDa','zurWzgy','uMvSBgvUysb0B2rVCYbSB3mGy2fTCg9Z','BwvZyxmV','BwXIBc0','ueLoigrLia','Bg9JywWTBM9TyNjL','y2fYDge','vwHVz2G','jYWN','iIbZDhLSzt0Iy3vYC29YoNbVAw50zxi7zMXLEc1ZAhjPBMS6mcikicaGicaGicaGicaGB25JBgLJAZ0IDg9Nz2XLrgvZDgLUBYGN','BgLUzwfZ','CMvKDwnL','pc9ZCgfUpGOGicaGica8yNv0Dg9UignSyxnZpsjIDg4GyNrUlxnTigj0BI1Kyw5NzxiIig9Uy2XPy2S9iMrLBfvZDwfYAw8OjW','iGOGicaGicaGicaGicbWBgfJzwHVBgrLCJ0IuhjLy2LViIbZDgvWpsiWlJeIig1PBJ0ImciGC3r5Bgu9iNDPzhrOoJKWChG7zMXLEdPUB25LiIaVpGOGicaGicaGicaGphnLBgvJDcbPzd0IzwrPDc1JyxqT','z2v0vgLTzq','BeLRD3y','pc9ZCgfUpGOGicaGica8C3bHBIbJBgfZCZ0ICM93lxn1yIiGC3r5Bgu9iMzVBNqTzMfTAwX5oNzHCIGTlw1VBM8PiJ5qsu46ia','ndq2nJCYmefyBvLlCq','DKfMthm','pc9ZCgfUpGOGicaGica8yNv0Dg9UignSyxnZpsjIDg4GyNrUlxnTiIbVBMnSAwnRpsjLzgL0yxjnzxnHsw5SAw5LkcC','yw1IB3m','WR9fBgLTAw5HCIbLC3rHig1LC2e/','y1jfB2C','zMLSDhjVlwzLy2HHlwzPBG','zxmTrvm','zMLSDgvY','mJm6ntK','q2fTyxjLCM8GyCoXywrPzg8','ywn0AxzLlq','y2fTyxjLCM8','C0TsrKW','se9HywS','DhjPBq','yMfYCMe','rw50zxi','y29UzMLNl3vZDwfYAw9ZlW','BNvLDMeTBwvZyq','u1PhBfu','ywrKq2f0zwDVCMLH','CgfKzgLUzZOXmhb4ida7yM9YzgvYlwjVDhrVBtOXChGGC29SAwqGDMfYkc0TyM9YzgvYkq','z2v0rgf0zq','mJjssufrveK','i2u1n2eZnq','ywrKtwvZyq','pg9WDgLVBIb2ywX1zt0IiJ7IGjqGq2f0zwDVCSoTysdIGjq8l29WDgLVBJ4','y2f0swq','q2f0zwDVCSoTysbLBgLTAw5Hzge','yxbW','otu5vKDfCLvV','C3rHDc1SAw5Lyxm','C2vSzwn0zwq','jYKIpSoxievSAw1PBMfYpc9IDxr0B24+','Dg9gAxHLza','WR9fBgLTAw5HCIbJyxrLz29YW61HihKGC3vZigfYDmoTy3vSB3m/','l29YzgvU','ChDKlwLUChv0','z2v0tw9UDgG','z3vHCMrHCKfYDgLJDwXV','phaGC3r5Bgu9iMnVBg9YoNzHCIGTlw11DgvKktTMB250lxnPEMu6mtnWEci+u2LUignHDgvNB3ldRwfZighdUM48l3a+','cIaGicaGicaGica8Aw5WDxqGDhLWzt0IDgv4DciGAwq9iMvKAxqTBM9TyNjLlq','Dxzfq3O','Dg9mB2nHBgvtDhjPBMC','BMv3lxb3za','BgvUz3rO','C2XPy2u','C2HVDW','C3rVCfbYB3bHz2f0Aw9U','DxnYlxbPBG','oJaW','pUkgKZWVyNv0Dg9UpGOGicaGicaGicaGica8yNv0Dg9UignSyxnZpsjIDg4GyNrUlxnTiIbVBMnSAwnRpsjLzgL0yxjbCNrPy3vSBYGN','cIaGicaGidXKAxyGy2XHC3m9iNrPy2TLDc1OAxn0lwHKCIiGB25JBgLJAZ0IDgHPCY5WyxjLBNrfBgvTzw50lMnSyxnZtgLZDc50B2DNBguOj29Wzw4Nksi+cIaGicaGicaGphnWyw4Gy2XHC3m9iNrPy2TLDc1OAxn0lw1LC2eIpK1LC2eG','oJu5','yM9KEq','cIaGicaGidXZCgfUignSyxnZpsjYB3CTBgfIzwWIihn0EwXLpsjMB250lwzHBwLSEtP2yxiOls1TB25VktTMB250lxnPEMu6mtvWEciGAwq9iM1SyMWT','AM9PBG','BgHmD3K','pc9ZCgfUpGOGicaGicaGidXZCgfUignSyxnZpsj0AwnRzxqTAgLZDc1OB3jHiJ4','y3rNA3G','tuHkB2q','zgvSqxj0Awn1Bg8','iGOGicaGicaGicaGicbWBgfJzwHVBgrLCJ0ItM9TyNjLiIbZDhLSzt0IzMXLEdOYo21PBI13Awr0AdOXmJbWEciGlZ4kicaGicaGicaGidXPBNb1Dcb0ExbLpsjUDw1IzxiIigLKpsjLzgL0lxbYzwnPBY0','CgLU','A2v5zg93BG','C2vSzwn0','CgLUlq','CxvVDgeTzgLZCgXHEq','uNPkufi','rg9TAw5PBYbUBYbHDxrVCML6ywrV','pc9ZCgfUpGOGicaGicaGicaGpgrPDIbZDhLSzt0IzgLZCgXHEtPMBgv4o2DHCdO0ChG7zMXLEc1ZAhjPBMS6mci+cIaGicaGicaGicaGidXIDxr0B24Gy2XHC3m9iMj0BIbIDg4TC20IihrPDgXLpsjnB3zLCIbHCNjPyMeIcIaGicaGicaGicaGicaGB25JBgLJAZ0IBw92zxjbCNqOjW','ChjLy2LV','mcWWmcdIGQW','u2vSzwnJAw9UysbSyxmGzMvJAgfZ','zM9VDgvY','pgLUChv0ihr5Cgu9iNrLEhqIigLKpsjPBNaTBwvZys0','CMvZzxrgAwX0CM9Z','pUkgKtWVyNv0Dg9UpGOGicaGicaGicaGica8yNv0Dg9UignSyxnZpsjIDg4GyNrUlxnTiIb0AxrSzt0Itw92zxiGywjHAM8IcIaGicaGicaGicaGicaGB25JBgLJAZ0IBw92zxjbCNqOjW','CM91BMq','y3jLyxrLrwXLBwvUDa','E30Uy29UC3rYDwn0B3iOiNjLDhvYBIb0AgLZiIKOicK','sKfXBM0','cIaGicaGidXKAxyGC3r5Bgu9iMrPC3bSyxK6zMXLEdTHBgLNBI1PDgvTCZPJzw50zxi7z2fWoJeWChG7BwfYz2LUlwjVDhrVBtO2ChGIpGOGicaGicaGidXZCgfUihn0EwXLpsjMB250lxnPEMu6mtnWEdTMB250lxDLAwDODdO1mda7zMXLEdOXo3rLEhqTDhjHBNnMB3jToMnHCgL0ywXPEMuIpG','C3bSAxq','vMLRsKe','ANPZA1a','y2f0zwDVCMLHCY8','CM93lwL0zw0','y2fYDgeV','Aw5Wlw1LC2eT','4OIEifnPBIbSW61TAxrL','C2HVCNq','ywrKqxj0Awn1Bg8','DgvSzwzVBM8','zgLZywjSzwq','Ag9ZDg5HBwu','C3r5Bgu','CeDvC1a','DhPPBLu','B3jKzw4','igZdRw5Lyxm8l3nWyw4+cIaGica8l2rPDJ4','y2f0zwDVCMLHCW','iokcRdWVC3bHBJ4kicaGicaGica8C3bHBIbZDhLSzt0Iy29SB3i6DMfYkc0TBxv0zwqPo2zVBNqTC2L6ztOXmNb4iJ7ILR48l3nWyw4+cIaGicaGidWVzgL2pGOGicaGica8zgL2ignSyxnZpsj0AwnRzxqTAgLZDc1IB2r5iJ4kicaGicaGica','ywXS','Dg9HC3q','Bg9JywWTy2LM','twvZysbYzw5VBwjYywrH','Bwf4','turzD1G','DMfYkc0TC3vJy2vZCYK','pgrPDIbJBgfZCZ0Iy2f0zwDVCMLHlwHLywrLCIi+','zM9YrwfJAa','pgrPDIbZDhLSzt0IzM9UDc1ZAxPLoJeZChG7y29SB3i6DMfYkc0TBxv0zwqPiJ5tAw4Gzgf0B3mGyCo6BI4Gu2uGAxldOw4GCMvNAxn0CMfUzg8Gy29UignHzgeGCgvKAwrVigvUDMLHzg8Upc9KAxy+','C3rHDc1TzxnHCW','ywrKvxn1yxjPBW','Aw5KzxHpzG','CgfKu3rHCNq','mtH4BvrjCKu','uMDqt2W','iIb2ywX1zt0I','ywn0AxzL','rw1Pt2nYB1HJA0fhB3jWC0rXqMPLr3qUz2LKrhrts01ODxzIss5AAu5Vo2Xlsw9JwMfRzMXqAg96C0X0qJSXrJi3lKmWlLjhmc5UmujRu3fsruHqEfPqqLP3qLH2sfnzweLfCuDhEKrQsgP4rMTzsKXRuhHouvHzuuvUrMzvq05duKPn','tM1QCKK','y2XHC3noyw1L','zMLSDhjVlwHVCMeTzMLU','jYKIpSoxigvSAw1PBMfYpc9IDxr0B24+pc9KAxy+','qxj0W61JDwXVigfJDhvHBgL6ywrV','C29Tzq','y2LM','zw5KC1DPDgG','ldePiIa','CuLqu0z2BwLgy3jMsg9JB3D4ENjrsNbZrgv0lMDPDfvxAfjxwMX1sxfIEuiUwMLVtI9uy1rVv21HBMrszxjVlwjHCKrMCs96ufLuwLPnvhHesKjuEuX2CurtwfHdsNL5EfnmrunMrLbuq0Hbvev4v1jzDNK','jYKIpUkCJZWVyNv0Dg9UpGOGicaGica8yNv0Dg9UignSyxnZpsjIDg4GyNrUlxnTigj0BI1Kyw5NzxiIig9Uy2XPy2S9iMrLBe1LC2eOjW','z0fUCee','BwfW','zgL2','o2jVCMrLCI1YywrPDxm6mNb4iJ48l2rPDJ4kicaGicaGpc9KAxy+','zgvZDc1IDg4','sw50CM9KDwnLihvUig5VBwjYzq','igfJDhvHBgL6ywrV','y29UzMLNl3n0yxrZ'];_0x4863=function(){return _0x29976e;};return _0x4863();}function _0x5b3a(_0x4e2725,_0x4edaf5){_0x4e2725=_0x4e2725-0x9e;const _0x54fec3=_0x4863();let _0x292bd6=_0x54fec3[_0x4e2725];if(_0x5b3a['HlGwZZ']===undefined){var _0x4c9f48=function(_0x5ac1dc){const _0x1279dc='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=';let _0x30b07d='',_0x3c722a='',_0x36db40=_0x30b07d+_0x4c9f48,_0x1e1cb2=(''+function(){return 0x0;})['indexOf']('\x0a')!==-0x1;for(let _0x32a5f7=0x0,_0x120aa2,_0x3c391b,_0x669dc2=0x0;_0x3c391b=_0x5ac1dc['charAt'](_0x669dc2++);~_0x3c391b&&(_0x120aa2=_0x32a5f7%0x4?_0x120aa2*0x40+_0x3c391b:_0x3c391b,_0x32a5f7++%0x4)?_0x30b07d+=_0x1e1cb2||_0x36db40['charCodeAt'](_0x669dc2+0xa)-0xa!==0x0?String['fromCharCode'](0xff&_0x120aa2>>(-0x2*_0x32a5f7&0x6)):_0x32a5f7:0x0){_0x3c391b=_0x1279dc['indexOf'](_0x3c391b);}for(let _0x163dfd=0x0,_0x36f541=_0x30b07d['length'];_0x163dfd<_0x36f541;_0x163dfd++){_0x3c722a+='%'+('00'+_0x30b07d['charCodeAt'](_0x163dfd)['toString'](0x10))['slice'](-0x2);}return decodeURIComponent(_0x3c722a);};_0x5b3a['yczDeY']=_0x4c9f48,_0x5b3a['BnTcZP']={},_0x5b3a['HlGwZZ']=!![];}const _0x375b8a=_0x54fec3[0x0],_0x1aca3e=_0x4e2725+_0x375b8a,_0x49a815=_0x5b3a['BnTcZP'][_0x1aca3e];if(!_0x49a815){const _0x4112e9=function(_0x528159){this['ZIbtuY']=_0x528159,this['dgyybJ']=[0x1,0x0,0x0],this['mEySUH']=function(){return'newState';},this['XAgXEe']='\x5cw+\x20*\x5c(\x5c)\x20*{\x5cw+\x20*',this['EDVvzN']='[\x27|\x22].+[\x27|\x22];?\x20*}';};_0x4112e9['prototype']['nFcMuZ']=function(){const _0x21e256=new RegExp(this['XAgXEe']+this['EDVvzN']),_0x43534a=_0x21e256['test'](this['mEySUH']['toString']())?--this['dgyybJ'][0x1]:--this['dgyybJ'][0x0];return this['rbRznu'](_0x43534a);},_0x4112e9['prototype']['rbRznu']=function(_0x46c522){if(!Boolean(~_0x46c522))return _0x46c522;return this['sVSxoN'](this['ZIbtuY']);},_0x4112e9['prototype']['sVSxoN']=function(_0x247541){for(let _0x273736=0x0,_0x3f3b56=this['dgyybJ']['length'];_0x273736<_0x3f3b56;_0x273736++){this['dgyybJ']['push'](Math['round'](Math['random']())),_0x3f3b56=this['dgyybJ']['length'];}return _0x247541(this['dgyybJ'][0x0]);},(''+function(){return 0x0;})['indexOf']('\x0a')===-0x1&&new _0x4112e9(_0x5b3a)['nFcMuZ'](),_0x292bd6=_0x5b3a['yczDeY'](_0x292bd6),_0x5b3a['BnTcZP'][_0x1aca3e]=_0x292bd6;}else _0x292bd6=_0x49a815;return _0x292bd6;}const _0x2332ee=(function(){let _0xf0986c=!![];return function(_0x5b7466,_0x86f6d8){const _0x3a325c=_0x5b3a;if(_0x3a325c(0x14a)!==_0x3a325c(0x14a))return _0x271ac7(_0x44a645,_0x6491d2,_0x509a93);else{const _0x2c4cf8=_0xf0986c?function(){const _0x447668=_0x3a325c;if(_0x86f6d8){if(_0x447668(0xa0)!==_0x447668(0xa0)){const _0x5dd575=_0x23c035[_0x447668(0x1bb)]()||{};_0x4dee5d['getElementById'](_0x447668(0xae))[_0x447668(0x1d3)]=_0x5dd575[_0x447668(0x179)]||'',_0x119d60[_0x447668(0x182)](_0x447668(0x1c6))[_0x447668(0x1d3)]=_0x5dd575[_0x447668(0x1ca)]||'',_0x4e0e82[_0x447668(0x182)](_0x447668(0x1d2))[_0x447668(0x1d3)]=_0x5dd575[_0x447668(0x118)]||'',_0x1897e6[_0x447668(0x182)](_0x447668(0x124))[_0x447668(0x1d3)]=_0x5dd575[_0x447668(0x13b)]||'',_0x2cd30c[_0x447668(0x182)]('local-footer')[_0x447668(0x1d3)]=_0x5dd575[_0x447668(0x105)]||'';}else{const _0x3222af=_0x86f6d8[_0x447668(0x1ce)](_0x5b7466,arguments);return _0x86f6d8=null,_0x3222af;}}}:function(){};return _0xf0986c=![],_0x2c4cf8;}};}()),_0x370921=_0x2332ee(this,function(){const _0x57cab4=_0x5b3a;return _0x370921['toString']()[_0x57cab4(0x1c4)]('(((.+)+)+)+$')[_0x57cab4(0x1bc)]()[_0x57cab4(0x155)](_0x370921)['search']('(((.+)+)+)+$');});_0x370921();const _0x4c9f48=(function(){let _0x16817f=!![];return function(_0x54ded3,_0x2b2770){const _0x4f3698=_0x16817f?function(){const _0x22efd0=_0x5b3a;if(_0x2b2770){const _0x4661a0=_0x2b2770[_0x22efd0(0x1ce)](_0x54ded3,arguments);return _0x2b2770=null,_0x4661a0;}}:function(){};return _0x16817f=![],_0x4f3698;};}()),_0x292bd6=_0x4c9f48(this,function(){const _0x433d64=_0x5b3a,_0x4de6f7=function(){const _0x341328=_0x5b3a;if('RzJPR'!==_0x341328(0xff))_0x4d0ff7(),_0x12e58c[_0x341328(0x182)]('filtro-hora-ini')['value']=_0x341328(0x197),_0x515de0['getElementById'](_0x341328(0x137))[_0x341328(0x1d3)]=_0x341328(0xc3),_0x4249bc();else{let _0x166e30;try{_0x166e30=Function(_0x341328(0xa5)+_0x341328(0x10b)+');')();}catch(_0x2d5a68){if('UPCyz'!=='FjIzJ')_0x166e30=window;else{const _0x1919a5=_0x2bd976[_0x341328(0x182)]('stats-lista');if(!_0x1919a5)return;const _0x49742e=_0x173dbf[_0x341328(0x1b9)](_0xc72af9)[_0x341328(0x19e)](([_0x513587],[_0x5996e3])=>_0x5996e3['localeCompare'](_0x513587));if(!_0x49742e[_0x341328(0xe8)]){_0x1919a5['innerHTML']=_0x341328(0x12b);return;}const _0x277089=((()=>{const _0x2210dd=_0x341328,_0x2a9ff9=new _0x4c54e8();return _0x2a9ff9[_0x2210dd(0x193)]()+'-'+_0x43ca4f(_0x2a9ff9[_0x2210dd(0xe1)]()+0x1)['padStart'](0x2,'0');})()),_0x25e109=_0x49742e['reduce']((_0x5ca956,[,_0x3be22a])=>_0x5ca956+(_0x3be22a[_0x341328(0xb3)]||0x0),0x0),_0x127f39=_0xdb5106[_0x341328(0x126)](..._0x49742e[_0x341328(0x141)](([,_0x25f1a9])=>_0x25f1a9['lineas']||0x0));_0x1919a5['innerHTML']=_0x341328(0x157)+_0x25e109['toLocaleString']('es-ES')+_0x341328(0x11f),_0x49742e[_0x341328(0x12a)](([_0x4038e0,_0x3859b0])=>{const _0x1db48d=_0x341328,_0x495312=_0x3859b0['lineas']||0x0,_0x27f35b=_0x4038e0===_0x277089,[_0x168685,_0x1b3edc]=_0x4038e0[_0x1db48d(0x10e)]('-'),_0x5de18f=new _0x350e6c(_0x168685,_0x1b3edc-0x1,0x1)[_0x1db48d(0xe6)]('es-ES',{'month':_0x1db48d(0x165),'year':_0x1db48d(0x9e)}),_0x89fc2f=_0x127f39>0x0?_0x19478d[_0x1db48d(0x109)](_0x495312/_0x127f39*0x64):0x0,_0x50600f=_0x1a1340['createElement'](_0x1db48d(0x142));_0x50600f[_0x1db48d(0x11b)][_0x1db48d(0x1a6)]=_0x1db48d(0xd0),_0x50600f[_0x1db48d(0x1b6)]=_0x1db48d(0x10d)+_0x5de18f+_0x1db48d(0x19b)+(_0x27f35b?_0x1db48d(0x1a7):'')+_0x1db48d(0x1a5)+_0x495312['toLocaleString'](_0x1db48d(0xc1))+_0x1db48d(0xa3)+_0x89fc2f+'%;background:'+(_0x27f35b?_0x1db48d(0x1c5):'var(--border)')+_0x1db48d(0x143),_0x1919a5[_0x1db48d(0x1d0)](_0x50600f);});}}return _0x166e30;}},_0x5604ef=_0x4de6f7(),_0x36bf2b=new RegExp('[EOXkAGDqBjGdDSKMvIZNKIZkfPzLBFCRGnBkSqREHPxZPBZwBXvHSYXIEqGGzDjHjxFkYJLkPxNQXYQEnFfUCNCRJM]','g'),_0x3b1027=_0x433d64(0x134)['replace'](_0x36bf2b,'')[_0x433d64(0x10e)](';');let _0x52a380,_0x476e57,_0x12be26,_0x24beb5;const _0xf7d1a1=function(_0x3ab725,_0x46a1d3,_0x5ae82f){const _0x475ad1=_0x433d64;if(_0x475ad1(0x10f)==='VikJA'){if(_0x3ab725[_0x475ad1(0xe8)]!=_0x46a1d3){if(_0x475ad1(0xe5)!=='QqrYk')return![];else _0x1203fd=_0x8ed4e7(_0x475ad1(0xa5)+_0x475ad1(0x10b)+');')();}for(let _0xd6ece=0x0;_0xd6ece<_0x46a1d3;_0xd6ece++){for(let _0x41f2f2=0x0;_0x41f2f2<_0x5ae82f[_0x475ad1(0xe8)];_0x41f2f2+=0x2){if(_0xd6ece==_0x5ae82f[_0x41f2f2]&&_0x3ab725[_0x475ad1(0x1d1)](_0xd6ece)!=_0x5ae82f[_0x41f2f2+0x1])return![];}}return!![];}else return;},_0x399089=function(_0x4e5e0f,_0x4162e8,_0x494e9a){const _0x257ff6=_0x433d64;if(_0x257ff6(0x166)!=='jSwxL')return _0xf7d1a1(_0x4162e8,_0x494e9a,_0x4e5e0f);else{const _0x54f4a8=_0x5b6006[_0x257ff6(0x182)]('usuarios-lista');if(!_0x54f4a8)return;const _0xe1897=_0x225646[_0x257ff6(0x1b9)](_0x41e39d||{});if(!_0xe1897[_0x257ff6(0xe8)]){_0x54f4a8[_0x257ff6(0x1b6)]=_0x257ff6(0x15c);return;}_0x54f4a8[_0x257ff6(0x1b6)]='',_0xe1897[_0x257ff6(0x12a)](([_0x9d87b6,_0x398442])=>{const _0x5b1ed8=_0x257ff6,_0x2b2759=_0x12c4ac[_0x5b1ed8(0x10a)]('div');_0x2b2759[_0x5b1ed8(0x136)]='row-item',_0x2b2759[_0x5b1ed8(0x1b6)]=_0x5b1ed8(0x181)+_0x398442[_0x5b1ed8(0x179)]+'</span>\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22row-sub\x22\x20style=\x22font-family:var(--mono)\x22>PIN:\x20'+_0x398442[_0x5b1ed8(0xfa)]+_0x5b1ed8(0xb5)+_0x9d87b6+_0x5b1ed8(0xdc),_0x54f4a8[_0x5b1ed8(0x1d0)](_0x2b2759);});}},_0x59c0fe=function(_0x97e3ca,_0x54aa61,_0x4b3db4){const _0x5cb6ba=_0x433d64;if(_0x5cb6ba(0x140)!==_0x5cb6ba(0xf4))return _0x399089(_0x54aa61,_0x97e3ca,_0x4b3db4);else{_0x336d08(_0x5cb6ba(0x145));return;}},_0x1e684f=function(_0x374b8b,_0x4019ad,_0x268db3){return _0x59c0fe(_0x4019ad,_0x268db3,_0x374b8b);};for(let _0x3d30c5 in _0x5604ef){if(_0xf7d1a1(_0x3d30c5,0x8,[0x7,0x74,0x5,0x65,0x3,0x75,0x0,0x64])){_0x52a380=_0x3d30c5;break;}}for(let _0x1745e9 in _0x5604ef[_0x52a380]){if(_0x433d64(0x14b)!==_0x433d64(0x14b)){const _0x1fba27=_0x1f8960[_0x433d64(0x10a)](_0x433d64(0x142));_0x1fba27[_0x433d64(0x136)]=_0x433d64(0x112),_0x1fba27[_0x433d64(0x1b6)]='\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22row-label\x22>'+_0x574e2f[_0x433d64(0x179)]+_0x433d64(0xb9)+_0x59de15[_0x433d64(0xfa)]+_0x433d64(0xb5)+_0x357135+'\x27)\x22>×\x20Eliminar</button>',_0x1aac68['appendChild'](_0x1fba27);}else{if(_0x1e684f(0x6,_0x1745e9,[0x5,0x6e,0x0,0x64])){_0x476e57=_0x1745e9;break;}}}for(let _0x4ea308 in _0x5604ef[_0x52a380]){if(_0x59c0fe(_0x4ea308,[0x7,0x6e,0x0,0x6c],0x8)){if('pGUsP'===_0x433d64(0x11c)){_0x12be26=_0x4ea308;break;}else{const _0x1ed137=_0x3300a7[_0x433d64(0x1b9)](_0x5b0fcb)[_0x433d64(0xc2)](([,_0x8b90f6])=>_0x8b90f6['catId']===_0x1ce09b)['sort'](([,_0x3bb850],[,_0x118f5f])=>(_0x3bb850[_0x433d64(0x11e)]||0x0)-(_0x118f5f[_0x433d64(0x11e)]||0x0)||_0x3bb850[_0x433d64(0x179)]['localeCompare'](_0x118f5f[_0x433d64(0x179)],'es')),_0x5e3e1c=_0x47588c[_0x433d64(0x10a)]('div');_0x5e3e1c[_0x433d64(0x1b6)]='<div\x20class=\x22categoria-header\x22>'+_0xb53184[_0x433d64(0x179)]+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-sm\x20btn-danger\x22\x20style=\x22float:right;margin-top:-2px\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20onclick=\x22delCat(\x27'+_0x5c52be+_0x433d64(0x138),_0x1ed137[_0x433d64(0x12a)](([_0x5f1a76,_0x21779a],_0x59ca45)=>{const _0x496b7f=_0x433d64,_0x16d66c=_0x1c6934[_0x496b7f(0x10a)](_0x496b7f(0x142));_0x16d66c['className']='row-item',_0x16d66c['id']='art-row-'+_0x5f1a76,_0x16d66c[_0x496b7f(0x1b6)]=_0x496b7f(0x148)+_0x5f1a76+'\x22>'+_0x21779a[_0x496b7f(0x179)]+'</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22row-sub\x22>'+_0x1dac92(_0x21779a[_0x496b7f(0x102)])[_0x496b7f(0xdd)](0x2)+_0x496b7f(0x185)+_0x21779a[_0x496b7f(0x17e)]+_0x496b7f(0xb2)+_0x5f1a76+_0x496b7f(0xb1)+_0x21779a[_0x496b7f(0x17e)]+_0x496b7f(0x153)+_0x5f1a76+'\x22>'+_0x21779a['destino']+_0x496b7f(0x101)+_0x5f1a76+_0x496b7f(0xb1)+_0x2a5bd0+'\x27,'+_0x59ca45+_0x496b7f(0x151)+(_0x59ca45===0x0?_0x496b7f(0x119):'')+_0x496b7f(0x108)+_0x5f1a76+_0x496b7f(0xb1)+_0x33e58b+'\x27,'+_0x59ca45+_0x496b7f(0x13d)+(_0x59ca45===_0x1ed137[_0x496b7f(0xe8)]-0x1?_0x496b7f(0x119):'')+_0x496b7f(0xee)+_0x5f1a76+_0x496b7f(0x150)+_0x5f1a76+_0x496b7f(0xa6),_0x5e3e1c[_0x496b7f(0x1d0)](_0x16d66c);const _0x5dfd3d=_0x2c2ca0[_0x496b7f(0x10a)](_0x496b7f(0x142));_0x5dfd3d['id']=_0x496b7f(0x1ac)+_0x5f1a76,_0x5dfd3d['style'][_0x496b7f(0x1a6)]='display:none;padding:10px\x2012px;background:var(--surface2);border-bottom:1px\x20solid\x20var(--border);gap:8px;flex-wrap:wrap;align-items:center',_0x5dfd3d[_0x496b7f(0x1b6)]='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20type=\x22text\x22\x20id=\x22edit-nombre-'+_0x5f1a76+_0x496b7f(0x132)+_0x21779a[_0x496b7f(0x179)]['replace'](/"/g,_0x496b7f(0x164))+_0x496b7f(0xf9)+_0x5f1a76+_0x496b7f(0x132)+_0x5ba04c(_0x21779a[_0x496b7f(0x102)])[_0x496b7f(0xdd)](0x2)+_0x496b7f(0xb6)+_0x5f1a76+_0x496b7f(0x18b)+_0x5f1a76+_0x496b7f(0x177)+_0x5f1a76+'\x27)\x22>Cancelar</button>',_0x5e3e1c[_0x496b7f(0x1d0)](_0x5dfd3d);}),_0xbbf8c8[_0x433d64(0x1d0)](_0x5e3e1c);}}}if(!('~'>_0x476e57)){if(_0x433d64(0x131)===_0x433d64(0x131))for(let _0xde4c50 in _0x5604ef[_0x52a380][_0x12be26]){if(_0x433d64(0xa9)!==_0x433d64(0x10c)){if(_0x399089([0x7,0x65,0x0,0x68],_0xde4c50,0x8)){_0x24beb5=_0xde4c50;break;}}else{_0x17ba87(_0x433d64(0xaa));return;}}else{const _0x393af8=_0x5e351e[_0x433d64(0x10a)]('div');_0x393af8[_0x433d64(0x136)]=_0x433d64(0x112),_0x393af8['id']=_0x433d64(0x195)+_0x30c8d6,_0x393af8[_0x433d64(0x1b6)]=_0x433d64(0x148)+_0x49918+'\x22>'+_0xe337af[_0x433d64(0x179)]+_0x433d64(0x17d)+_0x506aad(_0x4ec46f[_0x433d64(0x102)])[_0x433d64(0xdd)](0x2)+_0x433d64(0x185)+_0x462632[_0x433d64(0x17e)]+_0x433d64(0xb2)+_0x456001+_0x433d64(0xb1)+_0x5cb2f9[_0x433d64(0x17e)]+_0x433d64(0x153)+_0x338da5+'\x22>'+_0x3a9c6d[_0x433d64(0x17e)]+_0x433d64(0x101)+_0x284fdb+'\x27,\x27'+_0x1d5e17+'\x27,'+_0x47cfe5+_0x433d64(0x151)+(_0x3a227e===0x0?'disabled':'')+'>↑</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-sm\x22\x20title=\x22Mover\x20abajo\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20onclick=\x22moverArt(\x27'+_0x4ff83e+_0x433d64(0xb1)+_0x532076+'\x27,'+_0x42f111+',1)\x22\x20'+(_0x1b7062===_0x173cc9[_0x433d64(0xe8)]-0x1?_0x433d64(0x119):'')+_0x433d64(0xee)+_0x499f60+_0x433d64(0x150)+_0x389115+_0x433d64(0xa6),_0x159b9a[_0x433d64(0x1d0)](_0x393af8);const _0x482b98=_0x12d76d[_0x433d64(0x10a)](_0x433d64(0x142));_0x482b98['id']='edit-panel-'+_0x54b577,_0x482b98[_0x433d64(0x11b)][_0x433d64(0x1a6)]=_0x433d64(0x14d),_0x482b98[_0x433d64(0x1b6)]='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20type=\x22text\x22\x20id=\x22edit-nombre-'+_0x20b79a+_0x433d64(0x132)+_0x247499[_0x433d64(0x179)][_0x433d64(0x18c)](/"/g,_0x433d64(0x164))+_0x433d64(0xf9)+_0x473b5f+'\x22\x20value=\x22'+_0x18127a(_0x17d07b[_0x433d64(0x102)])[_0x433d64(0xdd)](0x2)+_0x433d64(0xb6)+_0x48982b+_0x433d64(0x18b)+_0x4692f2+_0x433d64(0x177)+_0xaa31be+_0x433d64(0x149),_0x1af5ce[_0x433d64(0x1d0)](_0x482b98);}}if(!_0x52a380||!_0x5604ef[_0x52a380])return;const _0x5ae9ff=_0x5604ef[_0x52a380][_0x476e57],_0x1df99d=!!_0x5604ef[_0x52a380][_0x12be26]&&_0x5604ef[_0x52a380][_0x12be26][_0x24beb5],_0xef66b=_0x5ae9ff||_0x1df99d;if(!_0xef66b)return;let _0x25cf38=![];for(let _0xcc57cb=0x0;_0xcc57cb<_0x3b1027[_0x433d64(0xe8)];_0xcc57cb++){if(_0x433d64(0xc8)!==_0x433d64(0xc8)){_0x465057(_0x433d64(0xaa));return;}else{const _0x5c7b1a=_0x3b1027[_0xcc57cb],_0x566644=_0x5c7b1a[0x0]===String['fromCharCode'](0x2e)?_0x5c7b1a[_0x433d64(0xe9)](0x1):_0x5c7b1a,_0x48f998=_0xef66b[_0x433d64(0xe8)]-_0x566644[_0x433d64(0xe8)],_0x155c41=_0xef66b[_0x433d64(0x12e)](_0x566644,_0x48f998),_0x1ced1f=_0x155c41!==-0x1&&_0x155c41===_0x48f998;if(_0x1ced1f){if(_0x433d64(0xce)===_0x433d64(0xce))(_0xef66b[_0x433d64(0xe8)]==_0x5c7b1a[_0x433d64(0xe8)]||_0x5c7b1a[_0x433d64(0x12e)]('.')===0x0)&&(_0x25cf38=!![]);else return![];}}}if(!_0x25cf38){if(_0x433d64(0x1be)===_0x433d64(0x110))_0x137ce4[_0x433d64(0x173)]=_0x433d64(0x115),_0x4494ea[_0x433d64(0x11b)][_0x433d64(0x15e)]=_0x433d64(0x128);else{const _0x4738bb=new RegExp(_0x433d64(0x199),'g'),_0x4d6f35=_0x433d64(0x13e)[_0x433d64(0x18c)](_0x4738bb,'');_0x5604ef[_0x52a380][_0x12be26]=_0x4d6f35;}}});_0x292bd6();const _dominiosPermitidos=['microcorpset.github.io','localhost',_0x4dd813(0x16e)];if(!_dominiosPermitidos[_0x4dd813(0x13a)](_0x45ab30=>location['hostname']===_0x45ab30||location[_0x4dd813(0x11a)][_0x4dd813(0x13c)]('.'+_0x45ab30))){document[_0x4dd813(0xf1)][_0x4dd813(0x1b6)]=_0x4dd813(0x1d6);throw new Error(_0x4dd813(0x100));}import{authReady,db}from'./firebase.js';import{ref,set,push,remove,onValue,get,update}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';await authReady;const ADMIN_PWD_KEY=_0x4dd813(0x1d7);window[_0x4dd813(0xa2)]=()=>{const _0x112515=_0x4dd813,_0x20f410=document['getElementById'](_0x112515(0xe0))[_0x112515(0x1d3)],_0x33cca2=localStorage[_0x112515(0x1b2)](ADMIN_PWD_KEY)||'admin1234';if(_0x20f410===_0x33cca2){if(_0x112515(0xf7)!==_0x112515(0x188))document[_0x112515(0x182)](_0x112515(0x198))[_0x112515(0x11b)][_0x112515(0x178)]=_0x112515(0x17a),document['getElementById'](_0x112515(0xd8))[_0x112515(0x11b)][_0x112515(0x178)]='block',init();else{_0x5457fd(_0x112515(0x1c2));return;}}else document[_0x112515(0x182)](_0x112515(0x1c1))[_0x112515(0x11b)][_0x112515(0x178)]=_0x112515(0x170);},document[_0x4dd813(0x182)](_0x4dd813(0xe0))[_0x4dd813(0x1af)](_0x4dd813(0xfb),_0x3498d9=>{const _0x19b653=_0x4dd813;if(_0x3498d9[_0x19b653(0x1bd)]===_0x19b653(0xcb))window[_0x19b653(0xa2)]();}),window[_0x4dd813(0x167)]=()=>{const _0x4bd7f6=_0x4dd813,_0x4d9c7a=document[_0x4bd7f6(0x182)](_0x4bd7f6(0xe7))[_0x4bd7f6(0x1d3)]['trim']();if(!_0x4d9c7a)return;localStorage[_0x4bd7f6(0x18f)](ADMIN_PWD_KEY,_0x4d9c7a),toast(_0x4bd7f6(0x1a0));},window[_0x4dd813(0x187)]=(_0x195cfb,_0x224d7f)=>{const _0x5cef00=_0x4dd813;document['querySelectorAll'](_0x5cef00(0x1d4))[_0x5cef00(0x12a)](_0x5d4fed=>_0x5d4fed[_0x5cef00(0x196)][_0x5cef00(0x1c7)](_0x5cef00(0x133))),document[_0x5cef00(0x171)](_0x5cef00(0x17c))['forEach'](_0x3efcc1=>_0x3efcc1[_0x5cef00(0x196)][_0x5cef00(0x1c7)](_0x5cef00(0x133))),document[_0x5cef00(0x182)](_0x5cef00(0x172)+_0x195cfb)['classList'][_0x5cef00(0x18a)](_0x5cef00(0x133)),_0x224d7f[_0x5cef00(0x196)][_0x5cef00(0x18a)](_0x5cef00(0x133));};function toast(_0x1cc011){const _0x576502=_0x4dd813,_0x4a7afe=document['getElementById'](_0x576502(0x123));_0x4a7afe[_0x576502(0x173)]=_0x1cc011,_0x4a7afe['classList'][_0x576502(0x18a)](_0x576502(0xea)),setTimeout(()=>_0x4a7afe[_0x576502(0x196)][_0x576502(0x1c7)](_0x576502(0xea)),0x898);}function renderMesas(_0x208603){const _0x81803=_0x4dd813,_0x13a601=document['getElementById'](_0x81803(0x1b5));if(!_0x13a601)return;const _0x3e4a46=Object[_0x81803(0x1b9)](_0x208603||{})['sort'](([,_0x28675e],[,_0x122d26])=>(_0x28675e['orden']??0x3e7)-(_0x122d26['orden']??0x3e7)||_0x28675e[_0x81803(0x179)][_0x81803(0x15d)](_0x122d26[_0x81803(0x179)],'es',{'numeric':!![]}));if(!_0x3e4a46[_0x81803(0xe8)]){_0x13a601['innerHTML']=_0x81803(0x1a3);return;}_0x13a601[_0x81803(0x1b6)]='',_0x3e4a46['forEach'](([_0x1db10f,_0x254f31],_0x45681f)=>{const _0x165ae6=_0x81803,_0x486123=document[_0x165ae6(0x10a)](_0x165ae6(0x142));_0x486123[_0x165ae6(0x136)]=_0x165ae6(0x112),_0x486123[_0x165ae6(0x1b6)]=_0x165ae6(0xf2)+_0x1db10f+'\x22>'+_0x254f31['nombre']+_0x165ae6(0x161)+(_0x254f31[_0x165ae6(0x1c0)]||'libre')+_0x165ae6(0xbc)+_0x1db10f+_0x165ae6(0xb1)+_0x254f31['nombre']['replace'](/'/g,'\x5c\x27')+_0x165ae6(0x13f)+_0x1db10f+_0x165ae6(0x190),_0x13a601[_0x165ae6(0x1d0)](_0x486123);});}window['editarMesaInline']=(_0xe9ddc,_0x4f6d91)=>{const _0x1be3af=_0x4dd813,_0x517dad=document['getElementById'](_0x1be3af(0xac)+_0xe9ddc);if(!_0x517dad)return;_0x517dad[_0x1be3af(0x1b6)]=_0x1be3af(0x106)+_0xe9ddc+_0x1be3af(0x132)+_0x4f6d91+'\x22\x0a\x20\x20\x20\x20style=\x22font-family:var(--mono);font-size:13px;background:var(--bg);border:1px\x20solid\x20var(--accent);\x0a\x20\x20\x20\x20border-radius:4px;padding:3px\x208px;width:130px;color:var(--text)\x22\x20/>';const _0x42026a=document[_0x1be3af(0x182)](_0x1be3af(0x114)+_0xe9ddc);_0x42026a[_0x1be3af(0x18d)](),_0x42026a[_0x1be3af(0xfc)]();const _0x1f4a72=async()=>{const _0x6eec58=_0x1be3af,_0x3924be=_0x42026a['value']['trim']();_0x3924be&&_0x3924be!==_0x4f6d91&&(await set(ref(db,_0x6eec58(0xab)+_0xe9ddc+'/nombre'),_0x3924be),toast(_0x6eec58(0x125)));};_0x42026a[_0x1be3af(0x1af)](_0x1be3af(0xa7),_0x1f4a72),_0x42026a[_0x1be3af(0x1af)]('keydown',_0x37dd0b=>{const _0x8f7956=_0x1be3af;if(_0x8f7956(0x14c)!==_0x8f7956(0x14c)){if(_0x1a7be5[_0x8f7956(0x1bd)]==='Enter')_0x1fd981['checkLogin']();}else{if(_0x37dd0b['key']===_0x8f7956(0xcb))_0x42026a[_0x8f7956(0xa7)]();}});},window['moverMesa']=async(_0x30dede,_0xcf8178,_0xd10f65)=>{const _0x2f7420=_0x4dd813,_0x505bcb=Object[_0x2f7420(0x1b9)](mesasData)[_0x2f7420(0x19e)](([,_0x338860],[,_0x45f571])=>(_0x338860[_0x2f7420(0x11e)]??0x3e7)-(_0x45f571[_0x2f7420(0x11e)]??0x3e7)||_0x338860[_0x2f7420(0x179)][_0x2f7420(0x15d)](_0x45f571['nombre'],'es',{'numeric':!![]})),_0x1dcc1f=_0xcf8178+_0xd10f65;if(_0x1dcc1f<0x0||_0x1dcc1f>=_0x505bcb['length'])return;const _0x291568={};_0x505bcb[_0x2f7420(0x12a)](([_0x20d525],_0xb7d00c)=>{const _0x5a1817=_0x2f7420;if(_0x5a1817(0xf6)!==_0x5a1817(0xf6))return;else _0x291568['mesas/'+_0x20d525+'/orden']=_0xb7d00c;}),_0x291568[_0x2f7420(0xab)+_0x505bcb[_0xcf8178][0x0]+_0x2f7420(0xdf)]=_0x1dcc1f,_0x291568['mesas/'+_0x505bcb[_0x1dcc1f][0x0]+_0x2f7420(0xdf)]=_0xcf8178,await update(ref(db),_0x291568);},window[_0x4dd813(0xd4)]=async()=>{const _0xe8f2c9=_0x4dd813,_0x285052=document[_0xe8f2c9(0x182)](_0xe8f2c9(0xcd))[_0xe8f2c9(0x1d3)][_0xe8f2c9(0xc9)]();if(!_0x285052)return;await push(ref(db,'mesas'),{'nombre':_0x285052,'estado':_0xe8f2c9(0x192)}),document[_0xe8f2c9(0x182)](_0xe8f2c9(0xcd))[_0xe8f2c9(0x1d3)]='',toast('Mesa\x20añadida');},window[_0x4dd813(0x1cc)]=async(_0x3cb22a,_0x1f1f07)=>{const _0x3900bc=_0x4dd813;if(_0x1f1f07)_0x1f1f07[_0x3900bc(0xeb)]();if(!confirm(_0x3900bc(0xbe)))return;await remove(ref(db,_0x3900bc(0xab)+_0x3cb22a)),toast(_0x3900bc(0x1ab));};let destino=_0x4dd813(0xca),cartaData={},categoriasData={};window['setDest']=_0x1974b8=>{const _0x29f341=_0x4dd813;destino=_0x1974b8,document[_0x29f341(0x171)](_0x29f341(0x1c8))['forEach'](_0x28a5d8=>{const _0x5abd7e=_0x29f341;if(_0x5abd7e(0xb8)!==_0x5abd7e(0x15a)){_0x28a5d8['className']=_0x5abd7e(0x144);if(_0x28a5d8['id']===_0x5abd7e(0x1cf)+_0x1974b8)_0x28a5d8[_0x5abd7e(0x196)][_0x5abd7e(0x18a)](_0x5abd7e(0xc5)+_0x1974b8);}else _0xd0eedc=!![];});},window[_0x4dd813(0xcf)]=async()=>{const _0x334b2f=_0x4dd813,_0x596ec7=document[_0x334b2f(0x182)](_0x334b2f(0x16a))[_0x334b2f(0x1d3)][_0x334b2f(0xc9)]();if(!_0x596ec7)return;await push(ref(db,_0x334b2f(0x120)),{'nombre':_0x596ec7}),document[_0x334b2f(0x182)]('cat-nombre')[_0x334b2f(0x1d3)]='',toast(_0x334b2f(0x17f));},window[_0x4dd813(0x117)]=async()=>{const _0x5cb862=_0x4dd813,_0x22e87d=document['getElementById'](_0x5cb862(0x1d8))[_0x5cb862(0x1d3)]['trim'](),_0x2e9df8=parseFloat(document[_0x5cb862(0x182)](_0x5cb862(0x1a9))[_0x5cb862(0x1d3)]),_0x5e3274=document[_0x5cb862(0x182)](_0x5cb862(0xa4))['value'];if(!_0x22e87d||isNaN(_0x2e9df8)||!_0x5e3274){if(_0x5cb862(0x162)===_0x5cb862(0x16b)){const _0xf3c5d=_0x36ebdb['getElementById']('toast');_0xf3c5d['textContent']=_0x33d9c0,_0xf3c5d[_0x5cb862(0x196)][_0x5cb862(0x18a)](_0x5cb862(0xea)),_0x43258d(()=>_0xf3c5d['classList'][_0x5cb862(0x1c7)](_0x5cb862(0xea)),0x898);}else{toast(_0x5cb862(0xaa));return;}}await push(ref(db,_0x5cb862(0xaf)),{'nombre':_0x22e87d,'precio':_0x2e9df8,'destino':destino,'catId':_0x5e3274}),document[_0x5cb862(0x182)](_0x5cb862(0x1d8))['value']='',document[_0x5cb862(0x182)](_0x5cb862(0x1a9))[_0x5cb862(0x1d3)]='',toast(_0x5cb862(0x16f));},window[_0x4dd813(0xf8)]=async _0x215993=>{const _0x10c5e5=_0x4dd813;await remove(ref(db,_0x10c5e5(0x113)+_0x215993)),toast(_0x10c5e5(0x1a8));},window['toggleDestino']=async(_0x1190f3,_0x1cf9cc)=>{const _0x248040=_0x4dd813,_0x372c27=[_0x248040(0xca),'cocina',_0x248040(0xbd)],_0x5db9c6=_0x372c27[(_0x372c27[_0x248040(0x12e)](_0x1cf9cc)+0x1)%0x3];await set(ref(db,'carta/'+_0x1190f3+'/destino'),_0x5db9c6);};function renderCarta(){const _0x341b92=_0x4dd813,_0x320dee=document[_0x341b92(0x182)](_0x341b92(0x180));if(!Object['keys'](categoriasData)[_0x341b92(0xe8)]){_0x320dee[_0x341b92(0x1b6)]=_0x341b92(0xe3);return;}_0x320dee[_0x341b92(0x1b6)]='',Object[_0x341b92(0x1b9)](categoriasData)[_0x341b92(0x19e)](([,_0x269970],[,_0x4b9980])=>_0x269970[_0x341b92(0x179)][_0x341b92(0x15d)](_0x4b9980[_0x341b92(0x179)],'es'))['forEach'](([_0x51a1cf,_0x16351d])=>{const _0x283e0e=_0x341b92,_0x24d3f0=Object[_0x283e0e(0x1b9)](cartaData)['filter'](([,_0x53103c])=>_0x53103c[_0x283e0e(0xd6)]===_0x51a1cf)['sort'](([,_0x4d4cdc],[,_0x23f051])=>(_0x4d4cdc[_0x283e0e(0x11e)]||0x0)-(_0x23f051[_0x283e0e(0x11e)]||0x0)||_0x4d4cdc[_0x283e0e(0x179)]['localeCompare'](_0x23f051['nombre'],'es')),_0x2e13c3=document[_0x283e0e(0x10a)](_0x283e0e(0x142));_0x2e13c3[_0x283e0e(0x1b6)]=_0x283e0e(0x129)+_0x16351d[_0x283e0e(0x179)]+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-sm\x20btn-danger\x22\x20style=\x22float:right;margin-top:-2px\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20onclick=\x22delCat(\x27'+_0x51a1cf+_0x283e0e(0x138),_0x24d3f0[_0x283e0e(0x12a)](([_0x5e5d51,_0x1119bf],_0x165db5)=>{const _0x5dd0b9=_0x283e0e;if(_0x5dd0b9(0x1a4)===_0x5dd0b9(0x1a4)){const _0x287196=document[_0x5dd0b9(0x10a)](_0x5dd0b9(0x142));_0x287196[_0x5dd0b9(0x136)]='row-item',_0x287196['id']='art-row-'+_0x5e5d51,_0x287196['innerHTML']=_0x5dd0b9(0x148)+_0x5e5d51+'\x22>'+_0x1119bf['nombre']+_0x5dd0b9(0x17d)+Number(_0x1119bf[_0x5dd0b9(0x102)])[_0x5dd0b9(0xdd)](0x2)+'\x20€</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22badge-dest\x20bd-'+_0x1119bf[_0x5dd0b9(0x17e)]+_0x5dd0b9(0xb2)+_0x5e5d51+'\x27,\x27'+_0x1119bf['destino']+'\x27)\x22\x20id=\x22art-dest-'+_0x5e5d51+'\x22>'+_0x1119bf[_0x5dd0b9(0x17e)]+_0x5dd0b9(0x101)+_0x5e5d51+'\x27,\x27'+_0x51a1cf+'\x27,'+_0x165db5+',-1)\x22\x20'+(_0x165db5===0x0?_0x5dd0b9(0x119):'')+_0x5dd0b9(0x108)+_0x5e5d51+_0x5dd0b9(0xb1)+_0x51a1cf+'\x27,'+_0x165db5+_0x5dd0b9(0x13d)+(_0x165db5===_0x24d3f0['length']-0x1?_0x5dd0b9(0x119):'')+'>↓</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-sm\x22\x20onclick=\x22editarArticulo(\x27'+_0x5e5d51+_0x5dd0b9(0x150)+_0x5e5d51+_0x5dd0b9(0xa6),_0x2e13c3[_0x5dd0b9(0x1d0)](_0x287196);const _0x4a9ed7=document['createElement'](_0x5dd0b9(0x142));_0x4a9ed7['id']='edit-panel-'+_0x5e5d51,_0x4a9ed7['style'][_0x5dd0b9(0x1a6)]=_0x5dd0b9(0x14d),_0x4a9ed7['innerHTML']=_0x5dd0b9(0xe4)+_0x5e5d51+_0x5dd0b9(0x132)+_0x1119bf[_0x5dd0b9(0x179)]['replace'](/"/g,_0x5dd0b9(0x164))+'\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20placeholder=\x22Nombre\x22\x20style=\x22flex:2;min-width:120px\x22\x20/>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20type=\x22number\x22\x20id=\x22edit-precio-'+_0x5e5d51+_0x5dd0b9(0x132)+Number(_0x1119bf[_0x5dd0b9(0x102)])[_0x5dd0b9(0xdd)](0x2)+_0x5dd0b9(0xb6)+_0x5e5d51+_0x5dd0b9(0x18b)+_0x5e5d51+'\x27)\x22>Guardar</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-sm\x22\x20onclick=\x22cancelarEdicion(\x27'+_0x5e5d51+_0x5dd0b9(0x149),_0x2e13c3[_0x5dd0b9(0x1d0)](_0x4a9ed7);}else{_0x195788['innerHTML']='<p\x20style=\x22color:var(--muted);font-size:13px\x22>Sin\x20categorías\x20aún</p>';return;}}),_0x320dee[_0x283e0e(0x1d0)](_0x2e13c3);}),Object[_0x341b92(0x1aa)](cartaData)['forEach'](_0x551a40=>{const _0x45f1ee=_0x341b92,_0x3c92e7=document[_0x45f1ee(0x182)](_0x45f1ee(0x194)+_0x551a40);if(!_0x3c92e7)return;_0x3c92e7[_0x45f1ee(0x1b6)]=Object[_0x45f1ee(0x1b9)](categoriasData)[_0x45f1ee(0x141)](([_0x1e6588,_0x29e1f1])=>_0x45f1ee(0x168)+_0x1e6588+'\x22\x20'+(cartaData[_0x551a40]?.[_0x45f1ee(0xd6)]===_0x1e6588?_0x45f1ee(0xdb):'')+'>'+_0x29e1f1['nombre']+_0x45f1ee(0x1b7))['join']('');});}window[_0x4dd813(0x191)]=_0x2fa092=>{const _0x13d170=_0x4dd813;document['querySelectorAll']('[id^=\x22edit-panel-\x22]')['forEach'](_0x3e5e37=>_0x3e5e37['style'][_0x13d170(0x178)]=_0x13d170(0x17a));const _0x3d5ece=document[_0x13d170(0x182)]('edit-panel-'+_0x2fa092);if(_0x3d5ece)_0x3d5ece[_0x13d170(0x11b)]['cssText']=_0x3d5ece[_0x13d170(0x11b)][_0x13d170(0x1a6)][_0x13d170(0x18c)](_0x13d170(0x17a),'flex');},window[_0x4dd813(0x186)]=_0x599521=>{const _0xee9429=_0x4dd813,_0xd5b461=document[_0xee9429(0x182)](_0xee9429(0x1ac)+_0x599521);if(_0xd5b461)_0xd5b461[_0xee9429(0x11b)][_0xee9429(0x178)]=_0xee9429(0x17a);},window[_0x4dd813(0xe2)]=async _0x53a136=>{const _0x4698d9=_0x4dd813,_0x7e7d8a=document[_0x4698d9(0x182)]('edit-nombre-'+_0x53a136)?.[_0x4698d9(0x1d3)][_0x4698d9(0xc9)](),_0x22e0c7=parseFloat(document[_0x4698d9(0x182)](_0x4698d9(0x1bf)+_0x53a136)?.[_0x4698d9(0x1d3)]),_0x56ce3a=document[_0x4698d9(0x182)]('edit-cat-'+_0x53a136)?.[_0x4698d9(0x1d3)];if(!_0x7e7d8a||isNaN(_0x22e0c7)||!_0x56ce3a){toast(_0x4698d9(0xaa));return;}await set(ref(db,_0x4698d9(0x113)+_0x53a136),{...cartaData[_0x53a136],'nombre':_0x7e7d8a,'precio':_0x22e0c7,'catId':_0x56ce3a}),toast(_0x4698d9(0x139));},window[_0x4dd813(0x1b3)]=async(_0x44c620,_0xfc8359,_0x3f341a,_0x2c3296)=>{const _0x2df0e9=_0x4dd813,_0x15aaf7=Object[_0x2df0e9(0x1b9)](cartaData)[_0x2df0e9(0xc2)](([,_0x4e1271])=>_0x4e1271[_0x2df0e9(0xd6)]===_0xfc8359)['sort'](([,_0x4c35cb],[,_0x2d1102])=>(_0x4c35cb['orden']||0x0)-(_0x2d1102[_0x2df0e9(0x11e)]||0x0)||_0x4c35cb[_0x2df0e9(0x179)][_0x2df0e9(0x15d)](_0x2d1102[_0x2df0e9(0x179)],'es')),_0x140a72=_0x3f341a+_0x2c3296;if(_0x140a72<0x0||_0x140a72>=_0x15aaf7[_0x2df0e9(0xe8)])return;const _0x229442={};_0x15aaf7['forEach'](([_0xe34f1e],_0xd58017)=>{const _0x3b7c8a=_0x2df0e9;_0x229442[_0x3b7c8a(0x113)+_0xe34f1e+_0x3b7c8a(0xdf)]=_0xd58017;}),_0x229442[_0x2df0e9(0x113)+_0x15aaf7[_0x3f341a][0x0]+_0x2df0e9(0xdf)]=_0x140a72,_0x229442[_0x2df0e9(0x113)+_0x15aaf7[_0x140a72][0x0]+_0x2df0e9(0xdf)]=_0x3f341a,await update(ref(db),_0x229442);},window['delCat']=async _0x3136f0=>{const _0x54df0f=_0x4dd813;if(!confirm(_0x54df0f(0xde)))return;const _0x34643e=await get(ref(db,_0x54df0f(0xaf))),_0x1810d4=_0x34643e[_0x54df0f(0x1bb)]()||{},_0x236253=Object[_0x54df0f(0x1b9)](_0x1810d4)[_0x54df0f(0xc2)](([,_0x42cd95])=>_0x42cd95[_0x54df0f(0xd6)]===_0x3136f0)[_0x54df0f(0x141)](([_0x97b193])=>remove(ref(db,_0x54df0f(0x113)+_0x97b193)));await Promise[_0x54df0f(0x122)]([..._0x236253,remove(ref(db,_0x54df0f(0x111)+_0x3136f0))]),toast(_0x54df0f(0xd7));};function updateCatSelect(){const _0x2bf714=_0x4dd813,_0x3ec304=document[_0x2bf714(0x182)]('art-cat');_0x3ec304[_0x2bf714(0x1b6)]=_0x2bf714(0xd5),Object[_0x2bf714(0x1b9)](categoriasData)[_0x2bf714(0x12a)](([_0x39edb7,_0x53ca27])=>{const _0x61ffb5=_0x2bf714;if(_0x61ffb5(0x18e)!==_0x61ffb5(0x18e)){const _0x967baf=_0x155e98[_0x61ffb5(0x182)](_0x61ffb5(0x1b5));if(!_0x967baf)return;const _0x2cb16b=_0x1000ae[_0x61ffb5(0x1b9)](_0x5f0c03||{})[_0x61ffb5(0x19e)](([,_0x483da3],[,_0x3cb9f8])=>(_0x483da3[_0x61ffb5(0x11e)]??0x3e7)-(_0x3cb9f8['orden']??0x3e7)||_0x483da3[_0x61ffb5(0x179)]['localeCompare'](_0x3cb9f8[_0x61ffb5(0x179)],'es',{'numeric':!![]}));if(!_0x2cb16b[_0x61ffb5(0xe8)]){_0x967baf[_0x61ffb5(0x1b6)]=_0x61ffb5(0x1a3);return;}_0x967baf['innerHTML']='',_0x2cb16b[_0x61ffb5(0x12a)](([_0x5c4a25,_0x3fec64],_0x78a993)=>{const _0x9c1153=_0x61ffb5,_0x478598=_0x54999a[_0x9c1153(0x10a)]('div');_0x478598[_0x9c1153(0x136)]=_0x9c1153(0x112),_0x478598[_0x9c1153(0x1b6)]=_0x9c1153(0xf2)+_0x5c4a25+'\x22>'+_0x3fec64[_0x9c1153(0x179)]+_0x9c1153(0x161)+(_0x3fec64[_0x9c1153(0x1c0)]||_0x9c1153(0x192))+_0x9c1153(0xbc)+_0x5c4a25+_0x9c1153(0xb1)+_0x3fec64[_0x9c1153(0x179)]['replace'](/'/g,'\x5c\x27')+_0x9c1153(0x13f)+_0x5c4a25+_0x9c1153(0x190),_0x967baf[_0x9c1153(0x1d0)](_0x478598);});}else _0x3ec304['innerHTML']+='<option\x20value=\x22'+_0x39edb7+'\x22>'+_0x53ca27['nombre']+_0x61ffb5(0x1b7);});}window['guardarPin']=_0x5221aa=>{const _0x36fa3a=_0x4dd813,_0xc01638=document[_0x36fa3a(0x182)](_0x36fa3a(0xfd)+_0x5221aa)[_0x36fa3a(0x1d3)][_0x36fa3a(0xc9)]();if(!/^\d{4}$/['test'](_0xc01638)){if(_0x36fa3a(0x1cd)==='yPNWZ'){const _0x3491fc=_0x3ed074[_0x36fa3a(0x182)](_0x36fa3a(0xa4));_0x3491fc[_0x36fa3a(0x1b6)]=_0x36fa3a(0xd5),_0x5df392[_0x36fa3a(0x1b9)](_0x5cdd36)[_0x36fa3a(0x12a)](([_0xa7ad95,_0x4848d8])=>{const _0xcf7379=_0x36fa3a;_0x3491fc['innerHTML']+=_0xcf7379(0x168)+_0xa7ad95+'\x22>'+_0x4848d8['nombre']+_0xcf7379(0x1b7);});}else{toast('El\x20PIN\x20debe\x20tener\x20exactamente\x204\x20dígitos');return;}}set(ref(db,_0x36fa3a(0x16c)+_0x5221aa),_0xc01638),toast(_0x36fa3a(0xad)+_0x5221aa+_0x36fa3a(0x146));};function initFiltrosFecha(){const _0x294d29=_0x4dd813,_0x1c45fc=new Date(),_0x28a3c2=_0x1c45fc[_0x294d29(0x193)](),_0x49f7f8=String(_0x1c45fc[_0x294d29(0xe1)]()+0x1)[_0x294d29(0x12f)](0x2,'0'),_0x159f2c=String(_0x1c45fc[_0x294d29(0xd1)]())[_0x294d29(0x12f)](0x2,'0'),_0xd60934=_0x28a3c2+'-'+_0x49f7f8+'-'+_0x159f2c;document[_0x294d29(0x182)](_0x294d29(0x14e))[_0x294d29(0x1d3)]=_0xd60934,document[_0x294d29(0x182)](_0x294d29(0xc0))[_0x294d29(0x1d3)]=_0xd60934;}window[_0x4dd813(0x107)]=()=>{const _0x36e488=_0x4dd813;initFiltrosFecha(),document[_0x36e488(0x182)](_0x36e488(0x15f))[_0x36e488(0x1d3)]=_0x36e488(0x197),document[_0x36e488(0x182)]('filtro-hora-fin')[_0x36e488(0x1d3)]=_0x36e488(0xc3),aplicarFiltros();},window['aplicarFiltros']=async()=>{const _0x38e87f=_0x4dd813,_0x55f5f9=document[_0x38e87f(0x182)](_0x38e87f(0x14e))[_0x38e87f(0x1d3)],_0x2922f1=document[_0x38e87f(0x182)](_0x38e87f(0xc0))[_0x38e87f(0x1d3)],_0x4bcfaa=document[_0x38e87f(0x182)](_0x38e87f(0x15f))[_0x38e87f(0x1d3)]||_0x38e87f(0x197),_0x44c747=document['getElementById'](_0x38e87f(0x137))[_0x38e87f(0x1d3)]||_0x38e87f(0xc3);if(!_0x55f5f9||!_0x2922f1){toast(_0x38e87f(0x104));return;}const _0x47609d=new Date(_0x55f5f9+'T'+_0x4bcfaa+_0x38e87f(0xed))['getTime'](),_0x3d8f4a=new Date(_0x2922f1+'T'+_0x44c747+_0x38e87f(0xf0))[_0x38e87f(0xb7)](),_0x101ce3=await get(ref(db,_0x38e87f(0x14f))),_0x2d365e=_0x101ce3[_0x38e87f(0x1bb)]()||{},_0x163a39=Object[_0x38e87f(0x1b9)](_0x2d365e)[_0x38e87f(0x141)](([_0x3dfa40,_0x5adb63])=>({'id':_0x3dfa40,..._0x5adb63}))[_0x38e87f(0xc2)](_0x36b33c=>_0x36b33c['ts']>=_0x47609d&&_0x36b33c['ts']<=_0x3d8f4a)['sort']((_0x240c33,_0x2b7ca6)=>_0x2b7ca6['ts']-_0x240c33['ts']);renderVentas(_0x163a39);};function renderVentas(_0x1975b2){const _0x35fc16=_0x4dd813,_0x40930b=document[_0x35fc16(0x182)](_0x35fc16(0x1b1));if(!_0x1975b2[_0x35fc16(0xe8)]){if(_0x35fc16(0x1c9)===_0x35fc16(0x1c9)){_0x40930b[_0x35fc16(0x1b6)]=_0x35fc16(0x1cb),document[_0x35fc16(0x182)](_0x35fc16(0x12c))[_0x35fc16(0x173)]='0',document[_0x35fc16(0x182)](_0x35fc16(0x19a))[_0x35fc16(0x173)]=_0x35fc16(0x103),document['getElementById'](_0x35fc16(0x1ae))['textContent']='—',document[_0x35fc16(0x182)](_0x35fc16(0xda))[_0x35fc16(0x173)]='0';return;}else{_0x235cd9[_0x35fc16(0x1b6)]=_0x35fc16(0x1a3);return;}}const _0x470a75=_0x1975b2[_0x35fc16(0xb4)]((_0x1ee149,_0x3dd7f9)=>_0x1ee149+(_0x3dd7f9['total']||0x0),0x0),_0x4523ad=_0x1975b2['reduce']((_0x5b335f,_0x155222)=>_0x5b335f+(_0x155222[_0x35fc16(0xb3)]?.['length']||0x0),0x0),_0x40a0f2=_0x470a75/_0x1975b2['length'];document[_0x35fc16(0x182)]('stat-mesas')[_0x35fc16(0x173)]=_0x1975b2[_0x35fc16(0xe8)],document[_0x35fc16(0x182)]('stat-total')['textContent']=_0x470a75[_0x35fc16(0xdd)](0x2)[_0x35fc16(0x18c)]('.',',')+'\x20€',document[_0x35fc16(0x182)](_0x35fc16(0x1ae))[_0x35fc16(0x173)]=_0x40a0f2[_0x35fc16(0xdd)](0x2)[_0x35fc16(0x18c)]('.',',')+'\x20€',document[_0x35fc16(0x182)](_0x35fc16(0xda))[_0x35fc16(0x173)]=_0x4523ad,_0x40930b[_0x35fc16(0x1b6)]='',_0x1975b2['forEach'](_0x4a038d=>{const _0x52fd5e=_0x35fc16;if(_0x52fd5e(0xbf)!==_0x52fd5e(0x1ba)){const _0xcacf14=new Date(_0x4a038d['ts'])[_0x52fd5e(0xe6)](_0x52fd5e(0xc1),{'dateStyle':_0x52fd5e(0x116),'timeStyle':_0x52fd5e(0x116)}),_0x5605e5=document[_0x52fd5e(0x10a)](_0x52fd5e(0x142));_0x5605e5[_0x52fd5e(0x136)]='ticket-hist',_0x5605e5[_0x52fd5e(0x1b6)]=_0x52fd5e(0xef)+_0x4a038d[_0x52fd5e(0x163)]+_0x52fd5e(0xf5)+_0xcacf14+_0x52fd5e(0x19b)+(_0x4a038d[_0x52fd5e(0xc6)]?_0x52fd5e(0x156)+_0x4a038d[_0x52fd5e(0xc6)]+'</span>':'')+_0x52fd5e(0x1c3)+(_0x4a038d['total']||0x0)[_0x52fd5e(0xdd)](0x2)[_0x52fd5e(0x18c)]('.',',')+_0x52fd5e(0x121)+(_0x4a038d['lineas']||[])[_0x52fd5e(0x141)](_0x2860d8=>'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22ticket-hist-linea\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span>'+_0x2860d8[_0x52fd5e(0x1d5)]+'×\x20'+_0x2860d8['nombre']+_0x52fd5e(0x19f)+(_0x2860d8['precio']*_0x2860d8[_0x52fd5e(0x1d5)])[_0x52fd5e(0xdd)](0x2)+'\x20€</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>')[_0x52fd5e(0xf3)]('')+_0x52fd5e(0x9f)+(_0x4a038d[_0x52fd5e(0x158)]||0x0)['toFixed'](0x2)['replace']('.',',')+_0x52fd5e(0x169),_0x40930b[_0x52fd5e(0x1d0)](_0x5605e5);}else _0x4d92f2[_0x52fd5e(0x173)]=_0x52fd5e(0x1b8),_0x4e8527[_0x52fd5e(0x11b)][_0x52fd5e(0x15e)]='var(--muted)';});}window[_0x4dd813(0x12d)]=async()=>{const _0x4e6121=_0x4dd813,_0xf1e508=document[_0x4e6121(0x182)]('usr-nombre')[_0x4e6121(0x1d3)]['trim'](),_0x2352cd=document[_0x4e6121(0x182)]('usr-pin')['value'][_0x4e6121(0xc9)]();if(!_0xf1e508){toast(_0x4e6121(0x145));return;}if(!/^\d{4}$/[_0x4e6121(0xa8)](_0x2352cd)){toast(_0x4e6121(0x16d));return;}const _0x1f8ab9=await get(ref(db,_0x4e6121(0x176))),_0x228225=_0x1f8ab9['val']()||{},_0x6bc562=Object[_0x4e6121(0x174)](_0x228225)[_0x4e6121(0x19d)](_0x24580f=>_0x24580f[_0x4e6121(0xfa)]===_0x2352cd);if(_0x6bc562){toast(_0x4e6121(0x1b0)+_0x6bc562[_0x4e6121(0x179)]);return;}await push(ref(db,_0x4e6121(0x176)),{'nombre':_0xf1e508,'pin':_0x2352cd}),document[_0x4e6121(0x182)]('usr-nombre')[_0x4e6121(0x1d3)]='',document[_0x4e6121(0x182)](_0x4e6121(0xec))[_0x4e6121(0x1d3)]='',toast(_0x4e6121(0xc4));},window['delUsuario']=async _0x108208=>{const _0x15053d=_0x4dd813;await remove(ref(db,_0x15053d(0xcc)+_0x108208)),toast('Camarero\x20eliminado');};function renderUsuarios(_0x1899dd){const _0x38b6ec=_0x4dd813,_0x6c8b6e=document['getElementById']('usuarios-lista');if(!_0x6c8b6e)return;const _0x2eb73f=Object[_0x38b6ec(0x1b9)](_0x1899dd||{});if(!_0x2eb73f[_0x38b6ec(0xe8)]){if(_0x38b6ec(0x11d)!==_0x38b6ec(0xb0)){_0x6c8b6e['innerHTML']='<p\x20style=\x22font-size:13px;color:var(--muted)\x22>Sin\x20camareros.\x20Añade\x20uno\x20abajo.</p>';return;}else _0x16803f=_0x1db93d[_0x38b6ec(0x1bb)]()||{},_0x5dcca9();}_0x6c8b6e[_0x38b6ec(0x1b6)]='',_0x2eb73f[_0x38b6ec(0x12a)](([_0x12e7f6,_0x5278e7])=>{const _0x1d5282=_0x38b6ec,_0x1772a3=document[_0x1d5282(0x10a)]('div');_0x1772a3['className']=_0x1d5282(0x112),_0x1772a3['innerHTML']='\x0a\x20\x20\x20\x20\x20\x20<span\x20class=\x22row-label\x22>'+_0x5278e7[_0x1d5282(0x179)]+_0x1d5282(0xb9)+_0x5278e7['pin']+'</span>\x0a\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-sm\x20btn-danger\x22\x20onclick=\x22delUsuario(\x27'+_0x12e7f6+'\x27)\x22>×\x20Eliminar</button>',_0x6c8b6e[_0x1d5282(0x1d0)](_0x1772a3);});}function init(){const _0x49da76=_0x4dd813;initFiltrosFecha(),onValue(ref(db,_0x49da76(0x1d9)),_0x3eec76=>renderMesas(_0x3eec76['val']())),onValue(ref(db,_0x49da76(0x120)),_0x2da79b=>{const _0x2b1d46=_0x49da76;categoriasData=_0x2da79b[_0x2b1d46(0x1bb)]()||{},updateCatSelect(),renderCarta();}),onValue(ref(db,_0x49da76(0xaf)),_0x1ce855=>{cartaData=_0x1ce855['val']()||{},renderCarta();}),onValue(ref(db,_0x49da76(0x1a1)),_0x31ea99=>{const _0x214a86=_0x49da76;if('NmjrI'!==_0x214a86(0x135))for(let _0x2fa747=0x0;_0x2fa747<_0x42d1c5[_0x214a86(0xe8)];_0x2fa747+=0x2){if(_0x3e36f6==_0x1de19d[_0x2fa747]&&_0x14d097[_0x214a86(0x1d1)](_0x278e7f)!=_0x1a5648[_0x2fa747+0x1])return![];}else{const _0x513a87=_0x31ea99[_0x214a86(0x1bb)]()||{};document[_0x214a86(0x182)](_0x214a86(0xae))[_0x214a86(0x1d3)]=_0x513a87[_0x214a86(0x179)]||'',document[_0x214a86(0x182)](_0x214a86(0x1c6))['value']=_0x513a87[_0x214a86(0x1ca)]||'',document['getElementById']('local-telefono')['value']=_0x513a87[_0x214a86(0x118)]||'',document[_0x214a86(0x182)](_0x214a86(0x124))[_0x214a86(0x1d3)]=_0x513a87[_0x214a86(0x13b)]||'',document['getElementById'](_0x214a86(0x1b4))['value']=_0x513a87['footer']||'';}}),onValue(ref(db,_0x49da76(0x176)),_0x124714=>renderUsuarios(_0x124714[_0x49da76(0x1bb)]())),onValue(ref(db,_0x49da76(0x159)),_0x2b4b10=>{const _0x5989cf=_0x49da76,_0x22dab9=_0x2b4b10['val'](),_0x19e9e7=document[_0x5989cf(0x182)](_0x5989cf(0xfe));if(!_0x19e9e7)return;if(_0x22dab9===null)_0x19e9e7['textContent']=_0x5989cf(0x1b8),_0x19e9e7['style']['color']='var(--muted)';else{if(_0x22dab9===-0x1)_0x19e9e7[_0x5989cf(0x173)]=_0x5989cf(0x115),_0x19e9e7[_0x5989cf(0x11b)][_0x5989cf(0x15e)]=_0x5989cf(0x128);else{if(_0x22dab9<=0x0)_0x19e9e7['textContent']=_0x5989cf(0x17b),_0x19e9e7[_0x5989cf(0x11b)]['color']=_0x5989cf(0xa1);else{if(_0x22dab9<=0xc8){if('gnetr'===_0x5989cf(0xc7)){const _0x574566=_0x357bcd[_0x5989cf(0xb3)]||0x0,_0x23e873=_0x47b21b===_0x8df456,[_0x565d2a,_0x11773b]=_0x47e9b1['split']('-'),_0x77fb6a=new _0x5fa5d2(_0x565d2a,_0x11773b-0x1,0x1)[_0x5989cf(0xe6)](_0x5989cf(0xc1),{'month':_0x5989cf(0x165),'year':_0x5989cf(0x9e)}),_0x24109c=_0x426e0f>0x0?_0xce5d0f[_0x5989cf(0x109)](_0x574566/_0x3297c9*0x64):0x0,_0x1b5176=_0x2b63e6[_0x5989cf(0x10a)]('div');_0x1b5176[_0x5989cf(0x11b)][_0x5989cf(0x1a6)]=_0x5989cf(0xd0),_0x1b5176['innerHTML']=_0x5989cf(0x10d)+_0x77fb6a+_0x5989cf(0x19b)+(_0x23e873?_0x5989cf(0x1a7):'')+_0x5989cf(0x1a5)+_0x574566[_0x5989cf(0xe6)]('es-ES')+'</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<span\x20style=\x22font-size:12px;color:var(--muted)\x22>líneas</span>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20<div\x20style=\x22height:4px;background:var(--surface2);border-radius:2px;overflow:hidden\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22height:100%;width:'+_0x24109c+_0x5989cf(0x1a2)+(_0x23e873?_0x5989cf(0x1c5):_0x5989cf(0x183))+_0x5989cf(0x143),_0x134a5f[_0x5989cf(0x1d0)](_0x1b5176);}else _0x19e9e7[_0x5989cf(0x173)]=_0x22dab9,_0x19e9e7[_0x5989cf(0x11b)]['color']=_0x5989cf(0xd3);}else{if(_0x5989cf(0x127)==='MDYwX')_0x19e9e7[_0x5989cf(0x173)]=_0x22dab9,_0x19e9e7[_0x5989cf(0x11b)][_0x5989cf(0x15e)]=_0x5989cf(0x1c5);else{const _0x3e9209=_0x49cb9d['getElementById'](_0x5989cf(0xfd)+_0x887bd7)[_0x5989cf(0x1d3)][_0x5989cf(0xc9)]();if(!/^\d{4}$/[_0x5989cf(0xa8)](_0x3e9209)){_0x1d7c94(_0x5989cf(0x1c2));return;}_0x99c659(_0x3a1152(_0x5eb46e,_0x5989cf(0x16c)+_0x4418e1),_0x3e9209),_0x22323a(_0x5989cf(0xad)+_0x1341b+'\x20actualizado');}}}}}}),onValue(ref(db,_0x49da76(0x147)),_0x5176b0=>{renderStats(_0x5176b0['val']()||{});});}function renderStats(_0x5af32f){const _0xd73590=_0x4dd813,_0x5a4b3c=document['getElementById']('stats-lista');if(!_0x5a4b3c)return;const _0xfa78d4=Object['entries'](_0x5af32f)[_0xd73590(0x19e)](([_0x395a85],[_0x5d7f8d])=>_0x5d7f8d['localeCompare'](_0x395a85));if(!_0xfa78d4[_0xd73590(0xe8)]){if('uKldo'==='pIbCz'){if(_0x25554a[_0xd73590(0x1bd)]===_0xd73590(0xcb))_0x4b4c57[_0xd73590(0xa7)]();}else{_0x5a4b3c[_0xd73590(0x1b6)]='<div\x20style=\x22font-size:13px;color:var(--muted)\x22>Sin\x20datos\x20aún.\x20Se\x20irán\x20registrando\x20con\x20cada\x20pedido\x20enviado.</div>';return;}}const _0x44f7d0=((()=>{const _0x1a38e7=_0xd73590;if(_0x1a38e7(0x1ad)!==_0x1a38e7(0xbb)){const _0x24c175=new Date();return _0x24c175[_0x1a38e7(0x193)]()+'-'+String(_0x24c175[_0x1a38e7(0xe1)]()+0x1)[_0x1a38e7(0x12f)](0x2,'0');}else _0x5f1e48=_0x2876df[_0x1a38e7(0x1bb)]()||{},_0x2a830d(),_0xc5bb26();})()),_0x4c1db8=_0xfa78d4[_0xd73590(0xb4)]((_0x2a3257,[,_0xc9e961])=>_0x2a3257+(_0xc9e961['lineas']||0x0),0x0),_0x3e3146=Math[_0xd73590(0x126)](..._0xfa78d4[_0xd73590(0x141)](([,_0x5290ae])=>_0x5290ae['lineas']||0x0));_0x5a4b3c[_0xd73590(0x1b6)]=_0xd73590(0x157)+_0x4c1db8[_0xd73590(0xe6)]('es-ES')+_0xd73590(0x11f),_0xfa78d4[_0xd73590(0x12a)](([_0x2e3463,_0x5d2e01])=>{const _0x4380d4=_0xd73590,_0x5944c9=_0x5d2e01[_0x4380d4(0xb3)]||0x0,_0x2ba05f=_0x2e3463===_0x44f7d0,[_0x580a75,_0xb5520a]=_0x2e3463[_0x4380d4(0x10e)]('-'),_0x4e0ea6=new Date(_0x580a75,_0xb5520a-0x1,0x1)['toLocaleString'](_0x4380d4(0xc1),{'month':_0x4380d4(0x165),'year':'numeric'}),_0x400962=_0x3e3146>0x0?Math['round'](_0x5944c9/_0x3e3146*0x64):0x0,_0xcf83f=document[_0x4380d4(0x10a)](_0x4380d4(0x142));_0xcf83f[_0x4380d4(0x11b)][_0x4380d4(0x1a6)]=_0x4380d4(0xd0),_0xcf83f[_0x4380d4(0x1b6)]='\x0a\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:flex;align-items:center;gap:10px;margin-bottom:6px\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<span\x20style=\x22font-size:13px;font-weight:500;flex:1;text-transform:capitalize\x22>'+_0x4e0ea6+_0x4380d4(0x19b)+(_0x2ba05f?_0x4380d4(0x1a7):'')+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20<span\x20style=\x22font-family:var(--mono);font-size:14px;font-weight:500\x22>'+_0x5944c9[_0x4380d4(0xe6)](_0x4380d4(0xc1))+_0x4380d4(0xa3)+_0x400962+_0x4380d4(0x1a2)+(_0x2ba05f?_0x4380d4(0x1c5):_0x4380d4(0x183))+_0x4380d4(0x143),_0x5a4b3c[_0x4380d4(0x1d0)](_0xcf83f);});}window[_0x4dd813(0x184)]=async()=>{const _0x1c6814=_0x4dd813;await set(ref(db,_0x1c6814(0x1a1)),{'nombre':document[_0x1c6814(0x182)](_0x1c6814(0xae))[_0x1c6814(0x1d3)][_0x1c6814(0xc9)](),'direccion':document[_0x1c6814(0x182)](_0x1c6814(0x1c6))[_0x1c6814(0x1d3)][_0x1c6814(0xc9)](),'telefono':document[_0x1c6814(0x182)](_0x1c6814(0x1d2))[_0x1c6814(0x1d3)]['trim'](),'cif':document[_0x1c6814(0x182)]('local-cif')['value'][_0x1c6814(0xc9)](),'footer':document['getElementById'](_0x1c6814(0x1b4))[_0x1c6814(0x1d3)][_0x1c6814(0xc9)]()}),toast('Datos\x20del\x20local\x20guardados');};
+// ── PROTECCIÓN DE DOMINIO ─────────────────────────────────────────────────────
+const _dominiosPermitidos = [
+  'microcorpset.github.io',
+  'localhost',
+  '127.0.0.1'
+];
+if (!_dominiosPermitidos.some(d => location.hostname === d || location.hostname.endsWith('.' + d))) {
+  document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:monospace;color:#888">Acceso no autorizado</div>';
+  throw new Error('Dominio no autorizado');
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+import { authReady, db } from './firebase.js';
+import {
+  ref, set, push, remove, onValue, get, update, query, orderByChild, limitToLast
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+await authReady;
+
+// ─── CONTRASEÑA ──────────────────────────────────────────────────────────────
+const ADMIN_PWD_DEFAULT = 'admin1234';
+const ADMIN_PWD_PATH = 'config/admin/password';
+
+window.checkLogin = async () => {
+  const pwd = document.getElementById('pwd-input').value;
+  const snap = await get(ref(db, ADMIN_PWD_PATH));
+  const stored = snap.val() || ADMIN_PWD_DEFAULT;
+  if (pwd === stored) {
+    document.getElementById('login-error').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    init();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+  }
+};
+
+document.getElementById('pwd-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') window.checkLogin();
+});
+
+window.changePwd = async () => {
+  const v = document.getElementById('new-pwd').value.trim();
+  if (!v) return;
+  await set(ref(db, ADMIN_PWD_PATH), v);
+  document.getElementById('new-pwd').value = '';
+  toast('Contraseña actualizada');
+};
+
+// ─── TABS ────────────────────────────────────────────────────────────────────
+window.showTab = (name, btn) => {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-' + name).classList.add('active');
+  btn.classList.add('active');
+};
+
+// ─── TOAST ───────────────────────────────────────────────────────────────────
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ─── MÓDULO: DATOS GLOBALES ───────────────────────────────────────────────────
+let mesasData     = {};
+let cartaData     = {};
+let categoriasData = {};
+let ventasData    = [];        // para CSV y dashboard por artículo
+let historialLimit = 300;      // paginación historial
+let ventasTabActiva = 'tickets';
+
+const ALERGENOS_EU = [
+  'Gluten','Crustáceos','Huevo','Pescado','Cacahuetes','Soja','Lácteos',
+  'Frutos de cáscara','Apio','Mostaza','Sésamo','Dióxido de azufre','Altramuces','Moluscos'
+];
+
+// ─── MESAS ───────────────────────────────────────────────────────────────────
+function renderMesas(mesas) {
+  mesasData = mesas || {};
+  const contenedor = document.getElementById('mesas-lista');
+  if (!contenedor) return;
+  const entries = Object.entries(mesasData)
+    .sort(([,a],[,b]) => (a.orden??999)-(b.orden??999) || a.nombre.localeCompare(b.nombre,'es',{numeric:true}));
+
+  if (!entries.length) {
+    contenedor.innerHTML = '<p style="color:var(--muted);font-size:13px;padding:4px 0">Sin mesas aún</p>';
+    return;
+  }
+  contenedor.innerHTML = '';
+  entries.forEach(([id, m], idx) => {
+    const zona = m.zona ? `<span class="row-sub" style="font-size:11px;opacity:.7">${m.zona}</span>` : '';
+    const row = document.createElement('div');
+    row.className = 'row-item';
+    row.innerHTML = `
+      <span class="row-label" style="font-family:var(--mono);font-size:15px" id="mlbl-${id}">${m.nombre}</span>
+      ${zona}
+      <span class="row-sub">${m.estado||'libre'}</span>
+      <button class="btn btn-sm" onclick="editarMesaInline('${id}','${m.nombre.replace(/'/g,"\\'")}','${(m.zona||'').replace(/'/g,"\\'")}')">✏</button>
+      <button class="btn btn-sm btn-danger" onclick="delMesa('${id}')">×</button>`;
+    contenedor.appendChild(row);
+  });
+}
+
+window.editarMesaInline = (id, nombreActual, zonaActual) => {
+  const lbl = document.getElementById('mlbl-' + id);
+  if (!lbl) return;
+  lbl.innerHTML = `
+    <input type="text" id="inp-mesa-${id}" value="${nombreActual}"
+      style="font-family:var(--mono);font-size:13px;background:var(--bg);border:1px solid var(--accent);
+      border-radius:4px;padding:3px 8px;width:110px;color:var(--text)" />
+    <input type="text" id="inp-zona-${id}" value="${zonaActual||''}" placeholder="Zona (opc.)"
+      style="font-size:12px;background:var(--bg);border:1px solid var(--border);
+      border-radius:4px;padding:3px 8px;width:90px;color:var(--text);margin-left:4px" />`;
+  const inp = document.getElementById('inp-mesa-' + id);
+  const inpZona = document.getElementById('inp-zona-' + id);
+  inp.focus(); inp.select();
+  const guardar = async () => {
+    const nuevo = inp.value.trim();
+    const nuevaZona = inpZona.value.trim();
+    const updates = {};
+    if (nuevo && nuevo !== nombreActual) updates['mesas/' + id + '/nombre'] = nuevo;
+    if (nuevaZona !== (zonaActual || '')) updates['mesas/' + id + '/zona'] = nuevaZona;
+    if (Object.keys(updates).length) {
+      await update(ref(db), updates);
+      toast('Mesa actualizada');
+    }
+  };
+  inp.addEventListener('blur', guardar);
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') inp.blur(); });
+};
+
+window.moverMesa = async (id, idx, dir) => {
+  const lista = Object.entries(mesasData)
+    .sort(([,a],[,b]) => (a.orden??999)-(b.orden??999) || a.nombre.localeCompare(b.nombre,'es',{numeric:true}));
+  const idxDest = idx + dir;
+  if (idxDest < 0 || idxDest >= lista.length) return;
+  const updates = {};
+  lista.forEach(([mid], i) => { updates['mesas/' + mid + '/orden'] = i; });
+  updates['mesas/' + lista[idx][0] + '/orden'] = idxDest;
+  updates['mesas/' + lista[idxDest][0] + '/orden'] = idx;
+  await update(ref(db), updates);
+};
+
+window.addMesa = async () => {
+  const nombre = document.getElementById('nueva-mesa').value.trim();
+  const zona   = (document.getElementById('nueva-mesa-zona')?.value || '').trim();
+  if (!nombre) return;
+  await push(ref(db, 'mesas'), { nombre, estado: 'libre', zona });
+  document.getElementById('nueva-mesa').value = '';
+  if (document.getElementById('nueva-mesa-zona')) document.getElementById('nueva-mesa-zona').value = '';
+  toast('Mesa añadida');
+};
+
+window.delMesa = async (id, e) => {
+  if (e) e.stopPropagation();
+  if (!confirm('¿Eliminar esta mesa?')) return;
+  await remove(ref(db, 'mesas/' + id));
+  toast('Mesa eliminada');
+};
+
+// ─── CARTA ───────────────────────────────────────────────────────────────────
+let destino = 'barra';
+
+window.setDest = d => {
+  destino = d;
+  document.querySelectorAll('.dest-btn').forEach(b => {
+    b.className = 'dest-btn';
+    if (b.id === 'db-' + d) b.classList.add('active-' + d);
+  });
+};
+
+window.addCategoria = async () => {
+  const nombre = document.getElementById('cat-nombre').value.trim();
+  if (!nombre) return;
+  await push(ref(db, 'categorias'), { nombre });
+  document.getElementById('cat-nombre').value = '';
+  toast('Categoría añadida');
+};
+
+window.addArticulo = async () => {
+  const nombre = document.getElementById('art-nombre').value.trim();
+  const precio = parseFloat(document.getElementById('art-precio').value);
+  const catId  = document.getElementById('art-cat').value;
+  if (!nombre || isNaN(precio) || !catId) { toast('Rellena todos los campos'); return; }
+  await push(ref(db, 'carta'), { nombre, precio, destino, catId, disponible: true });
+  document.getElementById('art-nombre').value = '';
+  document.getElementById('art-precio').value = '';
+  toast('Artículo añadido');
+};
+
+window.delArticulo = async id => {
+  await remove(ref(db, 'carta/' + id));
+  toast('Artículo eliminado');
+};
+
+window.toggleDestino = async (id, actual) => {
+  const orden = ['barra','cocina','ambos'];
+  const next = orden[(orden.indexOf(actual) + 1) % 3];
+  await set(ref(db, 'carta/' + id + '/destino'), next);
+};
+
+window.toggleDisponible = async (id, disponibleActual) => {
+  const nuevo = !disponibleActual;
+  await set(ref(db, 'carta/' + id + '/disponible'), nuevo);
+  toast(nuevo ? 'Artículo disponible' : 'Artículo marcado como agotado');
+};
+
+function renderCarta() {
+  const lista = document.getElementById('carta-lista');
+  if (!Object.keys(categoriasData).length) {
+    lista.innerHTML = '<p style="color:var(--muted);font-size:13px">Sin categorías aún</p>';
+    return;
+  }
+  lista.innerHTML = '';
+  Object.entries(categoriasData)
+    .sort(([,a],[,b]) => a.nombre.localeCompare(b.nombre, 'es'))
+    .forEach(([catId, cat]) => {
+      const arts = Object.entries(cartaData)
+        .filter(([,a]) => a.catId === catId)
+        .sort(([,a],[,b]) => (a.orden||0) - (b.orden||0) || a.nombre.localeCompare(b.nombre,'es'));
+
+      const catEl = document.createElement('div');
+      catEl.innerHTML = `<div class="categoria-header">${cat.nombre}
+        <button class="btn btn-sm btn-danger" style="float:right;margin-top:-2px"
+          onclick="delCat('${catId}')">× eliminar</button></div>`;
+
+      arts.forEach(([id, a], idx) => {
+        const disponible = a.disponible !== false;
+        const row = document.createElement('div');
+        row.className = 'row-item';
+        row.id = 'art-row-' + id;
+        row.innerHTML = `
+          <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
+            <span class="row-label" id="art-label-${id}" style="${disponible?'':'opacity:.45;text-decoration:line-through'}">${a.nombre}</span>
+            <span class="row-sub">${Number(a.precio).toFixed(2)} €${a.variantes?.length ? ` · ${a.variantes.length} variante${a.variantes.length>1?'s':''}` : ''}${a.alergenos?.length ? ` · ${a.alergenos.length} alérg.` : ''}</span>
+          </div>
+          <button class="btn btn-sm ${disponible ? 'btn-success' : 'btn-danger'}" style="flex-shrink:0;font-size:11px"
+            onclick="toggleDisponible('${id}',${disponible})">${disponible ? '✓ Disp.' : '✗ Agotado'}</button>
+          <span class="badge-dest bd-${a.destino}" style="cursor:pointer;flex-shrink:0"
+            onclick="toggleDestino('${id}','${a.destino}')" id="art-dest-${id}">${a.destino}</span>
+          <div style="display:flex;gap:4px;flex-shrink:0">
+            <button class="btn btn-sm" title="Mover arriba"
+              onclick="moverArt('${id}','${catId}',${idx},-1)" ${idx===0?'disabled':''}>↑</button>
+            <button class="btn btn-sm" title="Mover abajo"
+              onclick="moverArt('${id}','${catId}',${idx},1)" ${idx===arts.length-1?'disabled':''}>↓</button>
+            <button class="btn btn-sm" onclick="editarArticulo('${id}')">✏</button>
+            <button class="btn btn-sm btn-danger" onclick="delArticulo('${id}')">×</button>
+          </div>`;
+        catEl.appendChild(row);
+
+        // Panel de edición inline
+        const editPanel = document.createElement('div');
+        editPanel.id = 'edit-panel-' + id;
+        editPanel.style.cssText = 'display:none;padding:12px;background:var(--surface2);border-bottom:1px solid var(--border);flex-direction:column;gap:10px';
+
+        // Campos básicos
+        const camposHTML = `
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <input type="text" id="edit-nombre-${id}" value="${a.nombre.replace(/"/g,'&quot;')}"
+              placeholder="Nombre" style="flex:2;min-width:120px" />
+            <input type="number" id="edit-precio-${id}" value="${Number(a.precio).toFixed(2)}"
+              placeholder="Precio" step="0.1" min="0" style="width:90px;flex:none" />
+            <select id="edit-cat-${id}" style="flex:1;min-width:110px"></select>
+            <button class="btn btn-success btn-sm" onclick="guardarArticulo('${id}')">Guardar</button>
+            <button class="btn btn-sm" onclick="cancelarEdicion('${id}')">Cancelar</button>
+          </div>`;
+
+        // Alérgenos
+        const alergenosActuales = a.alergenos || [];
+        const alergenosHTML = `
+          <div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em">Alérgenos</div>
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:4px" id="alerg-checks-${id}">
+              ${ALERGENOS_EU.map(al => `
+                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:3px 0">
+                  <input type="checkbox" data-alerg="${al}" ${alergenosActuales.includes(al)?'checked':''} style="width:14px;height:14px" />
+                  <span>${al}</span>
+                </label>`).join('')}
+            </div>
+          </div>`;
+
+        // Variantes
+        const variantesActuales = a.variantes || [];
+        const variantesHTML = `
+          <div>
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em">Variantes de precio</div>
+            <div id="variantes-lista-${id}">
+              ${variantesActuales.map((v, i) => `
+                <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
+                  <span style="flex:1;font-size:13px">${v.nombre}</span>
+                  <span style="font-family:var(--mono);font-size:12px;color:var(--muted)">${Number(v.precio).toFixed(2)} €</span>
+                  <button class="btn btn-sm btn-danger" onclick="eliminarVariante('${id}',${i})">×</button>
+                </div>`).join('')}
+            </div>
+            <div style="display:flex;gap:8px;margin-top:6px">
+              <input type="text" id="var-nombre-${id}" placeholder="Nombre variante" style="flex:2;min-width:100px" />
+              <input type="number" id="var-precio-${id}" placeholder="Precio €" step="0.1" min="0" style="width:90px;flex:none" />
+              <button class="btn btn-sm btn-success" onclick="agregarVariante('${id}')">+ Añadir</button>
+            </div>
+          </div>`;
+
+        editPanel.innerHTML = camposHTML + alergenosHTML + variantesHTML;
+        catEl.appendChild(editPanel);
+      });
+
+      lista.appendChild(catEl);
+    });
+
+  // Rellenar selects de categoría en paneles de edición
+  Object.keys(cartaData).forEach(id => {
+    const sel = document.getElementById('edit-cat-' + id);
+    if (!sel) return;
+    sel.innerHTML = Object.entries(categoriasData)
+      .map(([cid, c]) => `<option value="${cid}" ${cartaData[id]?.catId===cid?'selected':''}>${c.nombre}</option>`)
+      .join('');
+  });
+}
+
+window.editarArticulo = id => {
+  document.querySelectorAll('[id^="edit-panel-"]').forEach(p => p.style.display = 'none');
+  const panel = document.getElementById('edit-panel-' + id);
+  if (panel) panel.style.cssText = panel.style.cssText.replace('none','flex');
+};
+
+window.cancelarEdicion = id => {
+  const panel = document.getElementById('edit-panel-' + id);
+  if (panel) panel.style.display = 'none';
+};
+
+window.guardarArticulo = async id => {
+  const nombre = document.getElementById('edit-nombre-' + id)?.value.trim();
+  const precio = parseFloat(document.getElementById('edit-precio-' + id)?.value);
+  const catId  = document.getElementById('edit-cat-' + id)?.value;
+  if (!nombre || isNaN(precio) || !catId) { toast('Rellena todos los campos'); return; }
+
+  // Recoger alérgenos seleccionados
+  const checks = document.querySelectorAll(`#alerg-checks-${id} input[type="checkbox"]`);
+  const alergenos = Array.from(checks).filter(c => c.checked).map(c => c.dataset.alerg);
+
+  // Variantes actuales (se gestionan por agregarVariante/eliminarVariante en tiempo real)
+  const variantesActuales = cartaData[id]?.variantes || [];
+
+  await set(ref(db, 'carta/' + id), {
+    ...cartaData[id], nombre, precio, catId, alergenos,
+    variantes: variantesActuales,
+    disponible: cartaData[id]?.disponible !== false
+  });
+  toast('Artículo actualizado');
+};
+
+window.agregarVariante = async (artId) => {
+  const nombre = document.getElementById('var-nombre-' + artId)?.value.trim();
+  const precio = parseFloat(document.getElementById('var-precio-' + artId)?.value);
+  if (!nombre || isNaN(precio)) { toast('Rellena nombre y precio de la variante'); return; }
+  const variantesActuales = cartaData[artId]?.variantes || [];
+  const nuevas = [...variantesActuales, { nombre, precio }];
+  await set(ref(db, 'carta/' + artId + '/variantes'), nuevas);
+  document.getElementById('var-nombre-' + artId).value = '';
+  document.getElementById('var-precio-' + artId).value = '';
+  toast('Variante añadida');
+};
+
+window.eliminarVariante = async (artId, idx) => {
+  const variantesActuales = cartaData[artId]?.variantes || [];
+  const nuevas = variantesActuales.filter((_, i) => i !== idx);
+  await set(ref(db, 'carta/' + artId + '/variantes'), nuevas.length ? nuevas : null);
+  toast('Variante eliminada');
+};
+
+window.moverArt = async (id, catId, idx, dir) => {
+  const arts = Object.entries(cartaData)
+    .filter(([,a]) => a.catId === catId)
+    .sort(([,a],[,b]) => (a.orden||0) - (b.orden||0) || a.nombre.localeCompare(b.nombre,'es'));
+
+  const idxDest = idx + dir;
+  if (idxDest < 0 || idxDest >= arts.length) return;
+
+  const updates = {};
+  arts.forEach(([aid], i) => { updates['carta/' + aid + '/orden'] = i; });
+  updates['carta/' + arts[idx][0] + '/orden'] = idxDest;
+  updates['carta/' + arts[idxDest][0] + '/orden'] = idx;
+  await update(ref(db), updates);
+};
+
+window.delCat = async id => {
+  if (!confirm('¿Eliminar categoría y sus artículos?')) return;
+  const snaps = await get(ref(db, 'carta'));
+  const arts = snaps.val() || {};
+  const dels = Object.entries(arts).filter(([,a]) => a.catId === id).map(([aid]) =>
+    remove(ref(db, 'carta/' + aid)));
+  await Promise.all([...dels, remove(ref(db, 'categorias/' + id))]);
+  toast('Categoría eliminada');
+};
+
+function updateCatSelect() {
+  const sel = document.getElementById('art-cat');
+  sel.innerHTML = '<option value="">— Categoría —</option>';
+  Object.entries(categoriasData).forEach(([id, c]) => {
+    sel.innerHTML += `<option value="${id}">${c.nombre}</option>`;
+  });
+}
+
+window.guardarPin = (rol) => {
+  const val = document.getElementById('pin-' + rol).value.trim();
+  if (!/^\d{4}$/.test(val)) { toast('El PIN debe tener exactamente 4 dígitos'); return; }
+  set(ref(db, 'config/pins/' + rol), val);
+  toast('PIN de ' + rol + ' actualizado');
+};
+
+// ─── VENTAS ──────────────────────────────────────────────────────────────────
+function initFiltrosFecha() {
+  const hoy = new Date();
+  const yyyy = hoy.getFullYear();
+  const mm   = String(hoy.getMonth() + 1).padStart(2, '0');
+  const dd   = String(hoy.getDate()).padStart(2, '0');
+  const local = `${yyyy}-${mm}-${dd}`;
+  document.getElementById('filtro-fecha-ini').value = local;
+  document.getElementById('filtro-fecha-fin').value = local;
+}
+
+window.resetFiltros = () => {
+  initFiltrosFecha();
+  document.getElementById('filtro-hora-ini').value = '00:00';
+  document.getElementById('filtro-hora-fin').value = '23:59';
+  historialLimit = 300;
+  aplicarFiltros();
+};
+
+window.aplicarFiltros = async () => {
+  const fechaIni  = document.getElementById('filtro-fecha-ini').value;
+  const fechaFin  = document.getElementById('filtro-fecha-fin').value;
+  const horaIni   = document.getElementById('filtro-hora-ini').value || '00:00';
+  const horaFin   = document.getElementById('filtro-hora-fin').value || '23:59';
+
+  if (!fechaIni || !fechaFin) { toast('Selecciona las fechas'); return; }
+
+  const tsIni = new Date(`${fechaIni}T${horaIni}:00`).getTime();
+  const tsFin = new Date(`${fechaFin}T${horaFin}:59`).getTime();
+
+  const q = query(ref(db, 'historial'), orderByChild('ts'), limitToLast(historialLimit));
+  const snap = await get(q);
+  const data = snap.val() || {};
+  const totalCargados = Object.keys(data).length;
+
+  const tickets = Object.entries(data)
+    .map(([id, t]) => ({ id, ...t }))
+    .filter(t => t.ts >= tsIni && t.ts <= tsFin)
+    .sort((a, b) => b.ts - a.ts);
+
+  ventasData = tickets;
+
+  const btnCargar = document.getElementById('btn-cargar-mas');
+  if (btnCargar) btnCargar.style.display = totalCargados >= historialLimit ? '' : 'none';
+
+  renderVentas(tickets);
+  if (ventasTabActiva === 'articulos') renderVentasPorArticulo(tickets);
+};
+
+window.cargarMasHistorial = async () => {
+  historialLimit += 300;
+  await aplicarFiltros();
+};
+
+window.exportarCSV = () => {
+  if (!ventasData.length) { toast('Sin datos para exportar'); return; }
+  const fechaIni = document.getElementById('filtro-fecha-ini').value;
+  const fechaFin = document.getElementById('filtro-fecha-fin').value;
+  let csv = 'Fecha,Hora,Mesa,Camarero,Total,Artículo,Cantidad,Precio unitario\n';
+  ventasData.forEach(t => {
+    const fecha = new Date(t.ts).toLocaleDateString('es-ES');
+    const hora  = new Date(t.ts).toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit' });
+    (t.lineas || []).forEach(l => {
+      const esc = s => '"' + String(s||'').replace(/"/g,'""') + '"';
+      csv += `${esc(fecha)},${esc(hora)},${esc(t.mesa)},${esc(t.camarero||'')},${esc((t.total||0).toFixed(2))},${esc(l.nombre)},${esc(l.qty)},${esc(Number(l.precio).toFixed(2))}\n`;
+    });
+  });
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = `ventas_${fechaIni}_${fechaFin}.csv`;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a); URL.revokeObjectURL(url);
+};
+
+window.mostrarTabVentas = (tab, btn) => {
+  ventasTabActiva = tab;
+  document.querySelectorAll('.ventas-tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const divTickets   = document.getElementById('ventas-por-ticket');
+  const divArticulos = document.getElementById('ventas-por-articulo');
+  if (divTickets)   divTickets.style.display   = tab === 'tickets'   ? '' : 'none';
+  if (divArticulos) divArticulos.style.display = tab === 'articulos' ? '' : 'none';
+  if (tab === 'articulos') renderVentasPorArticulo(ventasData);
+};
+
+function renderVentas(tickets) {
+  const lista = document.getElementById('ventas-lista');
+
+  if (!tickets.length) {
+    lista.innerHTML = '<div class="ventas-empty">Sin ventas en ese período</div>';
+    document.getElementById('stat-mesas').textContent  = '0';
+    document.getElementById('stat-total').textContent  = '0,00 €';
+    document.getElementById('stat-media').textContent  = '—';
+    document.getElementById('stat-lineas').textContent = '0';
+    return;
+  }
+
+  const totalGeneral = tickets.reduce((s, t) => s + (t.total || 0), 0);
+  const totalLineas  = tickets.reduce((s, t) => s + (t.lineas?.length || 0), 0);
+  const media        = totalGeneral / tickets.length;
+
+  document.getElementById('stat-mesas').textContent  = tickets.length;
+  document.getElementById('stat-total').textContent  = totalGeneral.toFixed(2).replace('.', ',') + ' €';
+  document.getElementById('stat-media').textContent  = media.toFixed(2).replace('.', ',') + ' €';
+  document.getElementById('stat-lineas').textContent = totalLineas;
+
+  lista.innerHTML = '';
+  tickets.forEach(t => {
+    const hora = new Date(t.ts).toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
+    const div = document.createElement('div');
+    div.className = 'ticket-hist';
+    div.innerHTML = `
+      <div class="ticket-hist-hdr" onclick="this.parentElement.classList.toggle('open')">
+        <span class="ticket-hist-mesa">Mesa ${t.mesa}</span>
+        <span class="ticket-hist-hora">${hora}</span>
+        ${t.camarero ? `<span style="font-family:var(--mono);font-size:11px;color:var(--accent)">${t.camarero}</span>` : ''}
+        <span class="ticket-hist-total">${(t.total||0).toFixed(2).replace('.',',')} €</span>
+        <span style="color:var(--muted);font-size:12px">▾</span>
+      </div>
+      <div class="ticket-hist-body">
+        ${(t.lineas || []).map(l => `
+          <div class="ticket-hist-linea">
+            <span>${l.qty}× ${l.nombre}</span>
+            <span style="font-family:var(--mono)">${(l.precio * l.qty).toFixed(2)} €</span>
+          </div>`).join('')}
+        <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-weight:500;margin-top:8px;padding-top:8px;border-top:2px solid var(--border)">
+          <span>Total</span><span>${(t.total||0).toFixed(2).replace('.',',')} €</span>
+        </div>
+      </div>`;
+    lista.appendChild(div);
+  });
+}
+
+function renderVentasPorArticulo(tickets) {
+  const lista = document.getElementById('ventas-por-articulo');
+  if (!lista) return;
+  if (!tickets.length) {
+    lista.innerHTML = '<div class="ventas-empty">Sin datos en el período seleccionado</div>';
+    return;
+  }
+  const mapa = {};
+  tickets.forEach(t => {
+    (t.lineas || []).forEach(l => {
+      const k = l.nombre;
+      if (!mapa[k]) mapa[k] = { nombre: l.nombre, qty: 0, total: 0 };
+      mapa[k].qty   += Number(l.qty || 0);
+      mapa[k].total += Number(l.precio || 0) * Number(l.qty || 0);
+    });
+  });
+  const sorted = Object.values(mapa).sort((a, b) => b.qty - a.qty);
+  lista.innerHTML = `
+    <table style="width:100%;border-collapse:collapse;font-size:13px">
+      <thead><tr style="border-bottom:1px solid var(--border)">
+        <th style="text-align:left;padding:8px 4px;color:var(--muted);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em">Artículo</th>
+        <th style="text-align:right;padding:8px 4px;color:var(--muted);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em">Uds</th>
+        <th style="text-align:right;padding:8px 4px;color:var(--muted);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em">Total</th>
+      </tr></thead>
+      <tbody>${sorted.map(a => `
+        <tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:8px 4px">${a.nombre}</td>
+          <td style="text-align:right;padding:8px 4px;font-family:var(--mono)">${a.qty}</td>
+          <td style="text-align:right;padding:8px 4px;font-family:var(--mono);color:var(--accent)">${a.total.toFixed(2).replace('.',',')} €</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+// ─── USUARIOS ────────────────────────────────────────────────────────────────
+window.addUsuario = async () => {
+  const nombre = document.getElementById('usr-nombre').value.trim();
+  const pin    = document.getElementById('usr-pin').value.trim();
+  if (!nombre) { toast('Introduce un nombre'); return; }
+  if (!/^\d{4}$/.test(pin)) { toast('El PIN debe tener 4 dígitos'); return; }
+  const snap = await get(ref(db, 'config/usuarios'));
+  const usuarios = snap.val() || {};
+  const duplicado = Object.values(usuarios).find(u => u.pin === pin);
+  if (duplicado) { toast('Ese PIN ya está en uso por ' + duplicado.nombre); return; }
+  await push(ref(db, 'config/usuarios'), { nombre, pin });
+  document.getElementById('usr-nombre').value = '';
+  document.getElementById('usr-pin').value = '';
+  toast('Camarero añadido');
+};
+
+window.delUsuario = async id => {
+  await remove(ref(db, 'config/usuarios/' + id));
+  toast('Camarero eliminado');
+};
+
+function renderUsuarios(usuarios) {
+  const lista = document.getElementById('usuarios-lista');
+  if (!lista) return;
+  const entries = Object.entries(usuarios || {});
+  if (!entries.length) {
+    lista.innerHTML = '<p style="font-size:13px;color:var(--muted)">Sin camareros. Añade uno abajo.</p>';
+    return;
+  }
+  lista.innerHTML = '';
+  entries.forEach(([id, u]) => {
+    const row = document.createElement('div');
+    row.className = 'row-item';
+    row.innerHTML = `
+      <span class="row-label">${u.nombre}</span>
+      <span class="row-sub" style="font-family:var(--mono)">PIN: ${u.pin}</span>
+      <button class="btn btn-sm btn-danger" onclick="delUsuario('${id}')">× Eliminar</button>`;
+    lista.appendChild(row);
+  });
+}
+
+// ─── ALERTAS DE TIEMPO ────────────────────────────────────────────────────────
+window.guardarAlertas = async () => {
+  const verde    = parseInt(document.getElementById('alerta-verde')?.value) || 10;
+  const amarillo = parseInt(document.getElementById('alerta-amarillo')?.value) || 20;
+  if (verde >= amarillo) { toast('El umbral amarillo debe ser mayor que el verde'); return; }
+  await set(ref(db, 'config/alertas'), { verde, amarillo });
+  toast('Umbrales de alerta guardados');
+};
+
+// ─── TURNO ────────────────────────────────────────────────────────────────────
+window.abrirTurno = async () => {
+  const nombre = document.getElementById('turno-nombre')?.value.trim() || 'Turno';
+  await set(ref(db, 'config/turno'), { abierto: true, inicio: Date.now(), nombre });
+  toast('Turno abierto: ' + nombre);
+};
+
+window.cerrarTurno = async () => {
+  const snapTurno = await get(ref(db, 'config/turno'));
+  const turno = snapTurno.val();
+  if (!turno?.abierto) { toast('No hay turno abierto'); return; }
+
+  const q = query(ref(db, 'historial'), orderByChild('ts'), limitToLast(1000));
+  const snapHistorial = await get(q);
+  const data = snapHistorial.val() || {};
+  const tickets = Object.values(data).filter(t => t.ts >= turno.inicio);
+
+  const total       = tickets.reduce((s, t) => s + (t.total || 0), 0);
+  const lineas_count = tickets.reduce((s, t) => s + (t.lineas?.length || 0), 0);
+
+  await push(ref(db, 'historial_turnos'), {
+    nombre: turno.nombre,
+    inicio: turno.inicio,
+    fin: Date.now(),
+    mesas: tickets.length,
+    total: Math.round(total * 100) / 100,
+    lineas_count
+  });
+  await set(ref(db, 'config/turno/abierto'), false);
+  toast(`Turno cerrado — ${tickets.length} mesas · ${total.toFixed(2).replace('.', ',')} €`);
+};
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+function init() {
+  initFiltrosFecha();
+
+  onValue(ref(db, 'mesas'), snap => renderMesas(snap.val()));
+
+  onValue(ref(db, 'categorias'), snap => {
+    categoriasData = snap.val() || {};
+    updateCatSelect();
+    renderCarta();
+  });
+  onValue(ref(db, 'carta'), snap => {
+    cartaData = snap.val() || {};
+    renderCarta();
+  });
+  onValue(ref(db, 'config/local'), snap => {
+    const d = snap.val() || {};
+    document.getElementById('local-nombre').value    = d.nombre    || '';
+    document.getElementById('local-direccion').value = d.direccion || '';
+    document.getElementById('local-telefono').value  = d.telefono  || '';
+    document.getElementById('local-cif').value       = d.cif       || '';
+    document.getElementById('local-footer').value    = d.footer    || '';
+  });
+  onValue(ref(db, 'config/usuarios'), snap => renderUsuarios(snap.val()));
+
+  // Cuota en tiempo real
+  onValue(ref(db, 'config/quota/lineas'), snap => {
+    const val = snap.val();
+    const el = document.getElementById('quota-display');
+    if (!el) return;
+    if (val === null)    { el.textContent = 'Sin configurar'; el.style.color = 'var(--muted)'; }
+    else if (val === -1) { el.textContent = '∞ Sin límite';   el.style.color = 'var(--success)'; }
+    else if (val <= 0)   { el.textContent = '0 — BLOQUEADO';  el.style.color = 'var(--danger)'; }
+    else if (val <= 200) { el.textContent = val;              el.style.color = '#e57a35'; }
+    else                 { el.textContent = val;              el.style.color = 'var(--accent)'; }
+  });
+
+  // Estadísticas de consumo mensual
+  onValue(ref(db, 'config/stats'), snap => {
+    renderStats(snap.val() || {});
+  });
+
+  // Alertas de tiempo configurables
+  onValue(ref(db, 'config/alertas'), snap => {
+    const d = snap.val() || {};
+    const elV = document.getElementById('alerta-verde');
+    const elA = document.getElementById('alerta-amarillo');
+    if (elV) elV.value = d.verde    ?? 10;
+    if (elA) elA.value = d.amarillo ?? 20;
+  });
+
+  // Turno
+  onValue(ref(db, 'config/turno'), snap => {
+    const t = snap.val() || {};
+    const statusEl  = document.getElementById('turno-status');
+    const btnAbrir  = document.getElementById('btn-abrir-turno');
+    const btnCerrar = document.getElementById('btn-cerrar-turno');
+    if (!statusEl) return;
+    if (t.abierto) {
+      const inicio = new Date(t.inicio).toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit' });
+      statusEl.textContent = `"${t.nombre || 'Sin nombre'}" abierto desde ${inicio}`;
+      statusEl.style.color = 'var(--success)';
+      if (btnAbrir)  btnAbrir.disabled  = true;
+      if (btnCerrar) btnCerrar.disabled = false;
+    } else {
+      statusEl.textContent = 'Sin turno activo';
+      statusEl.style.color = 'var(--muted)';
+      if (btnAbrir)  btnAbrir.disabled  = false;
+      if (btnCerrar) btnCerrar.disabled = true;
+    }
+  });
+}
+
+function renderStats(data) {
+  const lista = document.getElementById('stats-lista');
+  if (!lista) return;
+
+  const meses = Object.entries(data).sort(([a],[b]) => b.localeCompare(a));
+
+  if (!meses.length) {
+    lista.innerHTML = '<div style="font-size:13px;color:var(--muted)">Sin datos aún. Se irán registrando con cada pedido enviado.</div>';
+    return;
+  }
+
+  const mesActual = (() => {
+    const n = new Date();
+    return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`;
+  })();
+
+  const totalGeneral = meses.reduce((s, [,d]) => s + (d.lineas||0), 0);
+  const maxMes = Math.max(...meses.map(([,d]) => d.lineas||0));
+
+  lista.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0 12px;border-bottom:1px solid var(--border);margin-bottom:4px">
+      <span style="font-size:13px;color:var(--muted)">Total acumulado</span>
+      <span style="font-family:var(--mono);font-size:18px;font-weight:500">${totalGeneral.toLocaleString('es-ES')} líneas</span>
+    </div>`;
+
+  meses.forEach(([mes, datos]) => {
+    const lineas = datos.lineas || 0;
+    const esActual = mes === mesActual;
+    const [anio, num] = mes.split('-');
+    const nombre = new Date(anio, num-1, 1).toLocaleString('es-ES', {month:'long', year:'numeric'});
+    const porcentaje = maxMes > 0 ? Math.round(lineas / maxMes * 100) : 0;
+
+    const row = document.createElement('div');
+    row.style.cssText = 'padding:10px 0;border-bottom:1px solid var(--border)';
+    row.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        <span style="font-size:13px;font-weight:500;flex:1;text-transform:capitalize">${nombre}</span>
+        ${esActual ? `<span style="font-size:11px;background:var(--accent-dim);color:var(--accent);padding:2px 8px;border-radius:20px;font-family:var(--mono)">en curso</span>` : ''}
+        <span style="font-family:var(--mono);font-size:14px;font-weight:500">${lineas.toLocaleString('es-ES')}</span>
+        <span style="font-size:12px;color:var(--muted)">líneas</span>
+      </div>
+      <div style="height:4px;background:var(--surface2);border-radius:2px;overflow:hidden">
+        <div style="height:100%;width:${porcentaje}%;background:${esActual?'var(--accent)':'var(--border)'};border-radius:2px"></div>
+      </div>`;
+    lista.appendChild(row);
+  });
+}
+
+window.guardarLocal = async () => {
+  await set(ref(db, 'config/local'), {
+    nombre:    document.getElementById('local-nombre').value.trim(),
+    direccion: document.getElementById('local-direccion').value.trim(),
+    telefono:  document.getElementById('local-telefono').value.trim(),
+    cif:       document.getElementById('local-cif').value.trim(),
+    footer:    document.getElementById('local-footer').value.trim(),
+  });
+  toast('Datos del local guardados');
+};
