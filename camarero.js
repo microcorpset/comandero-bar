@@ -1037,7 +1037,7 @@ function renderTicket(pedidos) {
     return '<div class="ticket-linea ticket-linea-edit' + (esDescuento ? ' ticket-descuento' : '') + '">' +
       '<div style="flex:1">' +
         '<div>' + (esDescuento ? '' : l.qtyCuenta + 'x ') + l.nombre + '</div>' +
-        (notaVisible ? '<div style="font-size:11px;color:var(--muted);font-style:italic">-> ' + notaVisible + '</div>' : '') +
+        (notaVisible ? '<div class="no-print" style="font-size:11px;color:var(--muted);font-style:italic">-> ' + notaVisible + '</div>' : '') +
         (l.verificado ? '<span class="nota-verificado no-print">Verificado</span>' : '') +
       '</div>' +
       controlesEdicion +
