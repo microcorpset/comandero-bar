@@ -1307,6 +1307,6 @@ window.show = v => {
   const btnCats = document.getElementById('btn-cats');
   if (btnCats) btnCats.style.display = (v === 'carta' && window.innerWidth < 768) ? 'flex' : 'none';
   const filterBar = document.getElementById('cat-filter-bar');
-  if (filterBar) filterBar.style.display = (v === 'carta' && window.innerWidth < 768) ? '' : 'none';
+  if (filterBar) filterBar.style.display = (v === 'carta' && window.innerWidth < 768) ? 'block' : 'none';
   cerrarCatsPanel();
 };
