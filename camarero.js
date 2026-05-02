@@ -583,29 +583,74 @@ function cambiarQty(artId, delta) {
 }
 
 function abrirVarianteModal(artId, art) {
-  document.getElementById('modal-title').textContent = art.nombre;
-  const modalBody = document.getElementById('modal-body');
-  modalBody.innerHTML = '<div style="font-size:12px;color:var(--muted);margin-bottom:10px">Selecciona la variante:</div>' +
-    '<div style="display:flex;flex-direction:column;gap:8px">' +
-    art.variantes.map((v, i) =>
-      `<button data-varid="${artId}" data-varidx="${i}"
-        style="display:flex;justify-content:space-between;padding:12px 16px;border-radius:12px;border:1px solid var(--border);background:var(--surface3);cursor:pointer;font-size:14px;color:var(--text);width:100%">
-        <span>${v.nombre}</span>
-        <span style="font-family:var(--mono)">${Number(v.precio).toFixed(2)} €</span>
-      </button>`
-    ).join('') + '</div>';
-  const acts = document.getElementById('modal-actions');
-  acts.innerHTML = '<button class="modal-btn" onclick="document.getElementById(\'modal-overlay\').classList.remove(\'open\')">Cancelar</button>';
-  modalBody.addEventListener('click', e => {
-    const btn = e.target.closest('[data-varid]');
-    if (!btn) return;
-    document.getElementById('modal-overlay').classList.remove('open');
-    seleccionarVariante(btn.dataset.varid, parseInt(btn.dataset.varidx));
-  }, { once: true });
+  let selIdx = null;
+  let qty = 1;
+
+  const modalTitle = document.getElementById('modal-title');
+  const modalBody  = document.getElementById('modal-body');
+  const acts       = document.getElementById('modal-actions');
+  modalTitle.textContent = art.nombre;
+
+  function render() {
+    modalBody.innerHTML =
+      '<div style="font-size:12px;color:var(--muted);margin-bottom:10px">Elige variante y cantidad:</div>' +
+      '<div style="display:flex;flex-direction:column;gap:8px">' +
+      art.variantes.map((v, i) => {
+        const sel = selIdx === i;
+        return (
+          `<div style="border-radius:12px;border:1px solid ${sel ? 'var(--accent2)' : 'var(--border)'};overflow:hidden;background:${sel ? 'rgba(61,122,255,.06)' : 'var(--surface3)'}">` +
+          `<button data-varidx="${i}" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;width:100%;background:none;border:none;cursor:pointer;font-size:14px;color:${sel ? 'var(--accent2)' : 'var(--text)'}">` +
+          `<span>${v.nombre}</span>` +
+          `<span style="font-family:var(--mono)">${Number(v.precio).toFixed(2)} €</span>` +
+          `</button>` +
+          (sel
+            ? `<div style="display:flex;align-items:center;gap:10px;border-top:1px solid rgba(61,122,255,.2);padding:8px 16px">` +
+              `<span style="font-size:12px;color:var(--muted);flex:1">Cantidad:</span>` +
+              `<button id="vqty-minus" style="width:32px;height:32px;border-radius:8px 0 0 8px;border:1px solid var(--border);background:var(--surface3);font-size:18px;cursor:pointer">−</button>` +
+              `<span id="vqty-num" style="width:36px;height:32px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:14px;font-weight:700;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:#fff">${qty}</span>` +
+              `<button id="vqty-plus" style="width:32px;height:32px;border-radius:0 8px 8px 0;border:1px solid var(--border);background:var(--surface3);font-size:18px;cursor:pointer">＋</button>` +
+              `</div>`
+            : '') +
+          `</div>`
+        );
+      }).join('') + '</div>';
+
+    acts.innerHTML =
+      '<button class="modal-btn" id="vbtn-cancel">Cancelar</button>' +
+      `<button class="modal-btn primary" id="vbtn-add"${selIdx === null ? ' disabled' : ''}>` +
+        (selIdx !== null ? `Añadir ${qty}` : 'Añadir') +
+      `</button>`;
+
+    document.getElementById('vbtn-cancel').onclick = () =>
+      document.getElementById('modal-overlay').classList.remove('open');
+
+    const btnAdd = document.getElementById('vbtn-add');
+    if (btnAdd && selIdx !== null) {
+      btnAdd.onclick = () => {
+        document.getElementById('modal-overlay').classList.remove('open');
+        seleccionarVariante(artId, selIdx, qty);
+      };
+    }
+
+    modalBody.querySelectorAll('[data-varidx]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        selIdx = parseInt(btn.dataset.varidx);
+        qty = 1;
+        render();
+      });
+    });
+
+    const minus = document.getElementById('vqty-minus');
+    const plus  = document.getElementById('vqty-plus');
+    if (minus) minus.addEventListener('click', e => { e.stopPropagation(); if (qty > 1) { qty--; render(); } });
+    if (plus)  plus.addEventListener('click',  e => { e.stopPropagation(); qty++; render(); });
+  }
+
+  render();
   document.getElementById('modal-overlay').classList.add('open');
 }
 
-window.seleccionarVariante = (artId, variantIdx) => {
+window.seleccionarVariante = (artId, variantIdx, qty = 1) => {
   const art = cartaData[artId];
   if (!art?.variantes?.[variantIdx]) return;
   const variante = art.variantes[variantIdx];
@@ -613,7 +658,7 @@ window.seleccionarVariante = (artId, variantIdx) => {
   const artConVariante = { ...art, precio: variante.precio, nombre: art.nombre + ' (' + variante.nombre + ')' };
   const prev = carrito[carritoKey]?.qty || 0;
   const nota = carrito[carritoKey]?.nota || '';
-  carrito[carritoKey] = { art: artConVariante, qty: prev + 1, nota };
+  carrito[carritoKey] = { art: artConVariante, qty: prev + qty, nota };
   updateQtyDisplay();
   updateUI();
   if (document.getElementById('drawer').classList.contains('open')) renderDrawer();
