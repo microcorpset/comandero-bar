@@ -12,7 +12,7 @@ if (!_dominiosPermitidos.some(d => location.hostname === d || location.hostname.
 
 import { authReady, db } from './firebase.js';
 import {
-  ref, set, push, remove, onValue, get, update, query, orderByChild, limitToLast
+  ref, set, push, remove, onValue, get, update
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 await authReady;
@@ -67,7 +67,6 @@ let mesasData     = {};
 let cartaData     = {};
 let categoriasData = {};
 let ventasData    = [];        // para CSV y dashboard por artículo
-let historialLimit = 300;      // paginación historial
 let ventasTabActiva = 'tickets';
 
 const ALERGENOS_EU = [
@@ -437,54 +436,84 @@ function parseFechaHoraTicket(fecha, hora = '00:00') {
 }
 
 function normalizarTicketVenta(id, ticket = {}) {
-  const tsNum = Number(ticket.ts);
+  const base = ticket && typeof ticket === 'object' ? ticket : {};
+  const tsNum = Number(base.ts);
   const ts = Number.isFinite(tsNum) && tsNum > 0
     ? tsNum
-    : parseFechaHoraTicket(ticket.fecha, ticket.hora);
-  return { id, ...ticket, ts };
+    : parseFechaHoraTicket(base.fecha, base.hora);
+  return { id, ...base, ts };
+}
+
+async function cargarHistorialVentas() {
+  const snap = await get(ref(db, 'historial'));
+  const data = snap.val() || {};
+  return Object.entries(data)
+    .map(([id, t]) => normalizarTicketVenta(id, t))
+    .filter(t => Number.isFinite(t.ts))
+    .sort((a, b) => b.ts - a.ts);
+}
+
+async function prepararFiltrosVentasIniciales() {
+  initFiltrosFecha();
+  document.getElementById('filtro-hora-ini').value = '00:00';
+  document.getElementById('filtro-hora-fin').value = '23:59';
+
+  const ultimo = (await cargarHistorialVentas())[0];
+
+  if (!ultimo) return;
+
+  const hoy = new Date();
+  const hoyLocal = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
+  const ultimoLocal = new Date(ultimo.ts);
+  const ultimaFecha = `${ultimoLocal.getFullYear()}-${String(ultimoLocal.getMonth() + 1).padStart(2, '0')}-${String(ultimoLocal.getDate()).padStart(2, '0')}`;
+
+  if (ultimaFecha !== hoyLocal) {
+    document.getElementById('filtro-fecha-ini').value = ultimaFecha;
+    document.getElementById('filtro-fecha-fin').value = ultimaFecha;
+  }
 }
 
 window.resetFiltros = () => {
   initFiltrosFecha();
   document.getElementById('filtro-hora-ini').value = '00:00';
   document.getElementById('filtro-hora-fin').value = '23:59';
-  historialLimit = 300;
   aplicarFiltros();
 };
 
 window.aplicarFiltros = async () => {
-  const fechaIni  = document.getElementById('filtro-fecha-ini').value;
-  const fechaFin  = document.getElementById('filtro-fecha-fin').value;
-  const horaIni   = document.getElementById('filtro-hora-ini').value || '00:00';
-  const horaFin   = document.getElementById('filtro-hora-fin').value || '23:59';
+  try {
+    const fechaIni  = document.getElementById('filtro-fecha-ini').value;
+    const fechaFin  = document.getElementById('filtro-fecha-fin').value;
+    const horaIni   = document.getElementById('filtro-hora-ini').value || '00:00';
+    const horaFin   = document.getElementById('filtro-hora-fin').value || '23:59';
 
-  if (!fechaIni || !fechaFin) { toast('Selecciona las fechas'); return; }
+    if (!fechaIni || !fechaFin) { toast('Selecciona las fechas'); return; }
 
-  const tsIni = new Date(`${fechaIni}T${horaIni}:00`).getTime();
-  const tsFin = new Date(`${fechaFin}T${horaFin}:59`).getTime();
+    const tsIni = new Date(`${fechaIni}T${horaIni}:00`).getTime();
+    const tsFin = new Date(`${fechaFin}T${horaFin}:59`).getTime();
 
-  const q = query(ref(db, 'historial'), orderByChild('ts'), limitToLast(historialLimit));
-  const snap = await get(q);
-  const data = snap.val() || {};
-  const totalCargados = Object.keys(data).length;
+    const tickets = (await cargarHistorialVentas())
+      .filter(t => t.ts >= tsIni && t.ts <= tsFin)
+      .sort((a, b) => b.ts - a.ts);
 
-  const tickets = Object.entries(data)
-    .map(([id, t]) => normalizarTicketVenta(id, t))
-    .filter(t => Number.isFinite(t.ts))
-    .filter(t => t.ts >= tsIni && t.ts <= tsFin)
-    .sort((a, b) => b.ts - a.ts);
+    ventasData = tickets;
 
-  ventasData = tickets;
+    const btnCargar = document.getElementById('btn-cargar-mas');
+    if (btnCargar) btnCargar.style.display = 'none';
 
-  const btnCargar = document.getElementById('btn-cargar-mas');
-  if (btnCargar) btnCargar.style.display = totalCargados >= historialLimit ? '' : 'none';
-
-  renderVentas(tickets);
-  if (ventasTabActiva === 'articulos') renderVentasPorArticulo(tickets);
+    renderVentas(tickets);
+    if (ventasTabActiva === 'articulos') renderVentasPorArticulo(tickets);
+  } catch (err) {
+    console.error('Error al filtrar ventas', err);
+    ventasData = [];
+    renderVentas([]);
+    const listaArt = document.getElementById('ventas-por-articulo');
+    if (listaArt) listaArt.innerHTML = '<div class="ventas-empty">No se pudieron cargar las ventas</div>';
+    toast('No se pudieron cargar las ventas');
+  }
 };
 
 window.cargarMasHistorial = async () => {
-  historialLimit += 300;
   await aplicarFiltros();
 };
 
@@ -665,10 +694,7 @@ window.cerrarTurno = async () => {
   const turno = snapTurno.val();
   if (!turno?.abierto) { toast('No hay turno abierto'); return; }
 
-  const q = query(ref(db, 'historial'), orderByChild('ts'), limitToLast(1000));
-  const snapHistorial = await get(q);
-  const data = snapHistorial.val() || {};
-  const tickets = Object.values(data).filter(t => t.ts >= turno.inicio);
+  const tickets = (await cargarHistorialVentas()).filter(t => t.ts >= turno.inicio);
 
   const total       = tickets.reduce((s, t) => s + (t.total || 0), 0);
   const lineas_count = tickets.reduce((s, t) => s + (t.lineas?.length || 0), 0);
@@ -686,9 +712,14 @@ window.cerrarTurno = async () => {
 };
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
-function init() {
-  initFiltrosFecha();
-  aplicarFiltros();
+async function init() {
+  try {
+    await prepararFiltrosVentasIniciales();
+    aplicarFiltros();
+  } catch (err) {
+    console.error('Error preparando ventas', err);
+    renderVentas([]);
+  }
 
   onValue(ref(db, 'mesas'), snap => renderMesas(snap.val()));
 
