@@ -459,7 +459,11 @@
   }
 
   /* Zone grouping */
-  .zona-group { margin-bottom: 1.5rem; }
+  .mesas-grid.zonas-layout{
+    grid-template-columns:minmax(0,1fr);
+    gap:18px;
+  }
+  .zona-group { width:100%; }
   .zona-nombre {
     font-family: var(--mono); font-size: 10px; text-transform: uppercase;
     letter-spacing: .12em; color: var(--muted); margin-bottom: .6rem; padding: 0 4px;
@@ -678,4 +682,3 @@
 <script type="module" src="camarero.js"></script>
 </body>
 </html>
-
