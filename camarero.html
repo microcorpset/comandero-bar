@@ -177,6 +177,11 @@
   .toggle-thumb{width:14px;height:14px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
   .toggle-track.on .toggle-thumb{left:16px}
   .quota-badge{display:none;font-family:var(--mono);font-size:10px;padding:5px 10px;border-radius:999px;border:1px solid;white-space:nowrap;flex-shrink:0}
+  .sync-badge{
+    display:none;font-family:var(--mono);font-size:10px;padding:5px 10px;border-radius:999px;
+    border:1px solid rgba(217,119,6,.26);background:rgba(217,119,6,.12);color:var(--warn);
+    white-space:nowrap;flex-shrink:0
+  }
 
   #view-mesas,#view-carta,#view-ticket{margin-top:14px}
   .page-head{
@@ -604,6 +609,7 @@
       <div class="toggle-track" id="txt-track"><div class="toggle-thumb"></div></div>
       <span>TXT</span>
     </label>
+    <span class="sync-badge" id="sync-badge"></span>
     <span class="quota-badge" id="quota-badge"></span>
     <button class="btn-carrito" id="btn-carrito" onclick="abrirDrawer()">
       Lista <span id="carrito-label">0</span>
