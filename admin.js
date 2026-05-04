@@ -979,6 +979,8 @@ async function init() {
     document.getElementById('local-ticket-margin-y').value = d.ticketMarginY ?? 3;
     document.getElementById('local-barra-font-size').value = d.barraFontSize || 9;
     document.getElementById('local-cocina-font-size').value = d.cocinaFontSize || 9;
+    document.getElementById('local-barra-uppercase').value = String(d.barraUppercase === true);
+    document.getElementById('local-cocina-uppercase').value = String(d.cocinaUppercase === true);
     document.getElementById('local-ticket-print-mode').value = d.ticketPrintMode || 'browser';
     document.getElementById('local-ticket-print-service-id').value = d.ticketPrintServiceId || PRINT_SERVICE_ID;
   });
@@ -1103,6 +1105,8 @@ window.guardarLocal = async () => {
     ticketMarginY: parseFloat(document.getElementById('local-ticket-margin-y').value) || 3,
     barraFontSize: parseFloat(document.getElementById('local-barra-font-size').value) || 9,
     cocinaFontSize: parseFloat(document.getElementById('local-cocina-font-size').value) || 9,
+    barraUppercase: document.getElementById('local-barra-uppercase').value === 'true',
+    cocinaUppercase: document.getElementById('local-cocina-uppercase').value === 'true',
     ticketPrintMode: document.getElementById('local-ticket-print-mode').value || 'browser',
     ticketPrintServiceId: document.getElementById('local-ticket-print-service-id').value.trim() || PRINT_SERVICE_ID,
   });
