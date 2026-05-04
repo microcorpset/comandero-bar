@@ -381,7 +381,7 @@ function resumenMesaActual(id) {
 function renderMesas() {
   const grid = document.getElementById('mesas-grid');
   const entries = Object.entries(mesasData)
-    .sort(([,a],[,b]) => (a.orden?999)-(b.orden?999) || a.nombre.localeCompare(b.nombre,'es',{numeric:true}));
+    .sort(([,a],[,b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre,'es',{numeric:true}));
 
   if (!entries.length) {
     grid.classList.remove('zonas-layout');
@@ -957,8 +957,8 @@ function getTicketPaperConfig(configLocal) {
   const paper = String(configLocal?.ticketPaper || configLocal?.papelTicket || '58mm').toLowerCase();
   const fontSize = Number(configLocal?.ticketFontSize || (paper.includes('80') ? 10 : 9));
   const uppercase = configLocal?.ticketUppercase === true;
-  const marginX = Number(configLocal?.ticketMarginX ? 3);
-  const marginY = Number(configLocal?.ticketMarginY ? 3);
+  const marginX = Number(configLocal?.ticketMarginX ?? 3);
+  const marginY = Number(configLocal?.ticketMarginY ?? 3);
   if (paper.includes('80')) {
     return { paper: '80mm', width: '80mm', bodyWidth: '72mm', chars: 48, fontSize, uppercase, marginX, marginY };
   }
@@ -1105,7 +1105,7 @@ function generarTXTComanda(nombreMesa, lineas, configLocal) {
 let quotaActual = null;
 
 onValue(ref(db, 'config/quota/lineas'), snap => {
-  quotaActual = snap.val() ? null;
+  quotaActual = snap.val() ?? null;
   renderQuotaBadge();
 });
 
