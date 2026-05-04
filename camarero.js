@@ -807,40 +807,109 @@ const iframeComanda = document.createElement('iframe');
 iframeComanda.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;border:none';
 document.body.appendChild(iframeComanda);
 
-function generarPDFComanda(nombreMesa, lineas, configLocal) {
-  const ahora = new Date();
-  const hora  = ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
-  const fecha = ahora.toLocaleDateString('es-ES');
-  const cabecera = configLocal?.nombre ? `<div class="local">${configLocal.nombre}${configLocal.direccion ? `<br><span>${configLocal.direccion}</span>` : ''}</div>` : '';
-  const rows = lineas.map(l => `
-    <tr>
-      <td class="qty">${l.qty}×</td>
-      <td class="nombre">${l.nombre}${l.nota ? `<br><span class="nota">↳ ${l.nota}</span>` : ''}</td>
-      <td class="precio">${(l.precio * l.qty).toFixed(2)}€</td>
-    </tr>`).join('');
+function getTicketPaperConfig(configLocal) {
+  const paper = String(configLocal?.ticketPaper || configLocal?.papelTicket || '58mm').toLowerCase();
+  if (paper.includes('80')) {
+    return { paper: '80mm', width: '80mm', bodyWidth: '72mm', chars: 48 };
+  }
+  return { paper: '58mm', width: '58mm', bodyWidth: '50mm', chars: 32 };
+}
+
+function wrapTicketLine(text, maxChars) {
+  const clean = String(text || '').replace(/\s+/g, ' ').trim();
+  if (!clean) return [''];
+  const out = [];
+  let rest = clean;
+  while (rest.length > maxChars) {
+    let cut = rest.lastIndexOf(' ', maxChars);
+    if (cut < 1) cut = maxChars;
+    out.push(rest.slice(0, cut).trim());
+    rest = rest.slice(cut).trim();
+  }
+  if (rest) out.push(rest);
+  return out;
+}
+
+function renderTicketRowsHTML(lineas, maxChars, conPrecio) {
+  const nameChars = conPrecio ? Math.max(14, maxChars - 12) : Math.max(20, maxChars - 4);
+  return lineas.map(l => {
+    const nombreLineas = wrapTicketLine(l.nombre, nameChars);
+    const primera = nombreLineas.shift() || '';
+    const totalTxt = conPrecio ? `${(Number(l.precio) * Number(l.qty)).toFixed(2)}€` : '';
+    const extras = [];
+    nombreLineas.forEach(n => extras.push(`<div class="ticket-subline">${n}</div>`));
+    if (l.nota) extras.push(`<div class="ticket-note">-> ${l.nota}</div>`);
+
+    return `
+      <div class="print-line">
+        <div class="print-line-top">
+          <span class="print-qty">${l.qty}x</span>
+          <span class="print-name">${primera}</span>
+          ${conPrecio ? `<span class="print-price">${totalTxt}</span>` : ''}
+        </div>
+        ${extras.join('')}
+      </div>`;
+  }).join('');
+}
+
+function abrirImpresionTicket({ titulo, subtitulo, lineas, configLocal, mostrarPrecio = false, mostrarTotal = false, total = 0, pie = '' }) {
+  const paperCfg = getTicketPaperConfig(configLocal);
+  const cabecera = configLocal?.nombre
+    ? `<div class="local">${configLocal.nombre}${configLocal.direccion ? `<br><span>${configLocal.direccion}</span>` : ''}</div>`
+    : '';
+  const rows = renderTicketRowsHTML(lineas, paperCfg.chars, mostrarPrecio);
+  const totalHtml = mostrarTotal
+    ? `<div class="print-total"><span>Total</span><span>${fmtEu(total)}</span></div>`
+    : '';
+  const footerHtml = pie
+    ? `<div class="print-footer">${pie}</div>`
+    : '';
+
   const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:monospace;font-size:13px;width:72mm;padding:4mm}
+    @page{size:${paperCfg.width} auto;margin:0}
+    body{font-family:monospace;font-size:13px;width:${paperCfg.bodyWidth};padding:3mm;color:#111}
     .local{font-size:11px;color:#555;border-bottom:1px dashed #ccc;padding-bottom:5px;margin-bottom:8px}
     .local span{font-size:10px}
     h2{font-size:15px;font-weight:bold;margin-bottom:2px}
     .sub{font-size:10px;color:#777;margin-bottom:10px}
-    table{width:100%;border-collapse:collapse}
-    tr{border-bottom:1px solid #eee}tr:last-child{border-bottom:none}
-    td{padding:4px 2px;vertical-align:top}
-    .qty{font-weight:bold;white-space:nowrap;padding-right:5px}
-    .precio{text-align:right;white-space:nowrap;padding-left:5px}
-    .nota{font-size:10px;color:#666;font-style:italic}
-    @media print{body{width:100%;padding:0}}
+    .print-line{padding:4px 0;border-bottom:1px solid #eee}
+    .print-line:last-of-type{border-bottom:none}
+    .print-line-top{display:flex;gap:6px;align-items:flex-start}
+    .print-qty{font-weight:bold;white-space:nowrap}
+    .print-name{flex:1;min-width:0}
+    .print-price{text-align:right;white-space:nowrap;padding-left:6px}
+    .ticket-subline{padding-left:24px}
+    .ticket-note{padding-left:24px;font-size:10px;color:#666;font-style:italic}
+    .print-total{display:flex;justify-content:space-between;border-top:1px dashed #999;margin-top:8px;padding-top:8px;font-weight:bold}
+    .print-footer{text-align:center;font-size:11px;color:#666;margin-top:10px;padding-top:8px;border-top:1px dashed #ccc}
+    @media print{body{width:${paperCfg.bodyWidth};padding:0}}
   </style></head><body>
   ${cabecera}
-  <h2>Mesa ${nombreMesa}</h2>
-  <div class="sub">${fecha} · ${hora}</div>
-  <table>${rows}</table>
-  <script>window.onload=()=>{window.print()}<\/script>
+  <h2>${titulo}</h2>
+  <div class="sub">${subtitulo}</div>
+  ${rows}
+  ${totalHtml}
+  ${footerHtml}
+  <script>window.onload=()=>setTimeout(()=>window.print(),60)<\/script>
   </body></html>`;
+
   iframeComanda.srcdoc = html;
+}
+
+function generarPDFComanda(nombreMesa, lineas, configLocal) {
+  const ahora = new Date();
+  const hora  = ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  const fecha = ahora.toLocaleDateString('es-ES');
+  abrirImpresionTicket({
+    titulo: `Mesa ${nombreMesa}`,
+    subtitulo: `${fecha} · ${hora}`,
+    lineas,
+    configLocal,
+    mostrarPrecio: false,
+    mostrarTotal: false
+  });
 }
 
 function generarTXTComanda(nombreMesa, lineas, configLocal) {
@@ -855,10 +924,7 @@ function generarTXTComanda(nombreMesa, lineas, configLocal) {
   txt += sep + '\n';
   txt += `Mesa ${nombreMesa}\n${fecha}  ${hora}\n${sep}\n`;
   lineas.forEach(l => {
-    const precio    = (l.precio * l.qty).toFixed(2) + 'EUR';
-    const izq       = `${l.qty}x ${l.nombre}`;
-    const nEspacios = Math.max(1, 32 - izq.length - precio.length);
-    txt += izq + ' '.repeat(nEspacios) + precio + '\n';
+    txt += `${l.qty}x ${l.nombre}\n`;
     if (l.nota) txt += `   -> ${l.nota}\n`;
   });
   txt += sep + '\n';
@@ -1003,6 +1069,25 @@ window.verCuenta = async () => {
   show('ticket');
 };
 
+function imprimirTicketFinal(lineasServidas, total) {
+  const fecha = new Date().toLocaleString('es-ES', { dateStyle:'short', timeStyle:'short' });
+  abrirImpresionTicket({
+    titulo: `Mesa ${mesaNombre}`,
+    subtitulo: fecha,
+    lineas: lineasServidas.map(l => ({
+      nombre: l.nombre,
+      qty: l.qtyCuenta,
+      precio: Number(l.precio),
+      nota: limpiarNotaTicket(l.nota)
+    })),
+    configLocal,
+    mostrarPrecio: true,
+    mostrarTotal: true,
+    total,
+    pie: configLocal?.footer || ''
+  });
+}
+
 function aplanarPedidos(pedidos) {
   const lineas = [];
   Object.entries(pedidos).forEach(([envioId, envio]) => {
@@ -1130,7 +1215,7 @@ function renderTicket(pedidos) {
     } else if (e.target.classList.contains('btn-quitar-linea')) {
       await quitarDelTicket(parseInt(e.target.dataset.idx));
     } else if (e.target.classList.contains('btn-print') || e.target.classList.contains('no-print-btn')) {
-      window.print();
+      imprimirTicketFinal(lineasServidas, total);
     } else if (e.target.classList.contains('btn-refresh')) {
       await cargarTicketActual();
     } else if (e.target.classList.contains('btn-cerrar')) {

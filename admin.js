@@ -928,6 +928,7 @@ async function init() {
     document.getElementById('local-telefono').value  = d.telefono  || '';
     document.getElementById('local-cif').value       = d.cif       || '';
     document.getElementById('local-footer').value    = d.footer    || '';
+    document.getElementById('local-ticket-paper').value = d.ticketPaper || d.papelTicket || '58mm';
   });
   onValue(ref(db, 'historial'), snap => {
     historialVentasCache = normalizarHistorialVentasData(snap.val() || {});
@@ -1042,6 +1043,7 @@ window.guardarLocal = async () => {
     telefono:  document.getElementById('local-telefono').value.trim(),
     cif:       document.getElementById('local-cif').value.trim(),
     footer:    document.getElementById('local-footer').value.trim(),
+    ticketPaper: document.getElementById('local-ticket-paper').value || '58mm',
   });
   toast('Datos del local guardados');
 };

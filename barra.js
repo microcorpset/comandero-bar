@@ -285,9 +285,7 @@ function generarTXT(mesaNombre, lineas) {
   txt += `${fecha}  ${hora}\n${sep}\n`;
 
   lineas.forEach(l => {
-    const precio = (l.precio * l.qty).toFixed(2) + 'EUR';
-    const izq = `${l.qty}x ${l.nombre}`;
-    txt += izq + ' '.repeat(Math.max(1, 32 - izq.length - precio.length)) + precio + '\n';
+    txt += `${l.qty}x ${l.nombre}\n`;
     if (l.nota) txt += `   -> ${l.nota}\n`;
   });
 
@@ -317,7 +315,6 @@ function imprimirComanda(mesaNombre, lineas) {
         ${l.nombre}
         ${l.nota ? `<br><span class="nota">↳ ${limpiarNotaSistema(l.nota)}</span>` : ''}
       </td>
-      <td class="precio">${(Number(l.precio) * Number(l.qty)).toFixed(2)}€</td>
     </tr>
   `).join('');
 
@@ -334,7 +331,6 @@ function imprimirComanda(mesaNombre, lineas) {
       tr:last-child { border-bottom: none; }
       td { padding: 4px 2px; vertical-align: top; }
       .qty { font-weight: bold; white-space: nowrap; padding-right: 5px; }
-      .precio { text-align: right; white-space: nowrap; padding-left: 5px; }
       .nota { font-size: 10px; color: #666; font-style: italic; }
       @media print { body { width: 100%; padding: 0; } }
     </style>
