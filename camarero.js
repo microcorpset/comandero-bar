@@ -233,7 +233,7 @@ onValue(ref(db, '.info/connected'), snap => {
 
 // â”€â”€ HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function fmtEu(n) {
-  return Number(n || 0).toFixed(2).replace('.', ',') + ' â‚¬';
+  return Number(n || 0).toFixed(2).replace('.', ',') + ' €';
 }
 
 function cargarColaOffline() {
@@ -437,7 +437,7 @@ function crearMesaBtn(id, m) {
     const pedidoTxt = pendientesLocal.length === 1 ? '1 pedido guardado' : `${pendientesLocal.length} pedidos guardados`;
     const udsTxt = udsPend ? ` | ${udsPend} uds` : '';
     claseAlerta = firebaseConnected ? 'alerta-warn' : 'alerta-danger';
-    alertaInfo = `<span class="mesa-alerta-info">â˜ ${pedidoTxt}${udsTxt}</span>`;
+    alertaInfo = `<span class="mesa-alerta-info">Pendiente local ${pedidoTxt}${udsTxt}</span>`;
   }
 
   const div = document.createElement('div');
@@ -464,7 +464,7 @@ function abrirMesa(id, nombre, ocupada) {
   document.getElementById('btn-cuenta').style.display = (ocupada || pedidosPendientesMesa(id).length) ? '' : 'none';
   show('carta');
   if (cartaReady && catsReady) renderCarta();
-  else document.getElementById('carta-body').innerHTML = '<div class="loading">Cargando cartaâ€¦</div>';
+  else document.getElementById('carta-body').innerHTML = '<div class="loading">Cargando carta...</div>';
   updateUI();
 }
 
@@ -530,10 +530,10 @@ function renderCarta() {
           <div class="art-nombre">${art.nombre}${variantesLabel}</div>
           ${agotado ? '<div style="font-size:10px;color:var(--danger);font-family:var(--mono)">Agotado</div>' : ''}
         </div>
-        <span class="art-precio">${Number(art.precio).toFixed(2)} â‚¬</span>
+        <span class="art-precio">${Number(art.precio).toFixed(2)} €</span>
         ${alergenosBtn}
         <div class="qty-ctrl">
-          <button class="qty-btn" data-id="${artId}" data-d="-1" ${agotado?'disabled':''}>âˆ’</button>
+          <button class="qty-btn" data-id="${artId}" data-d="-1" ${agotado?'disabled':''}>-</button>
           <span class="qty-num" id="qty-${artId}">0</span>
           <button class="qty-btn" data-id="${artId}" data-d="1" ${agotado?'disabled':''}>+</button>
         </div>
@@ -547,7 +547,7 @@ function renderCarta() {
         alergDiv.id = 'alerg-' + artId;
         alergDiv.className = 'alergenos-panel';
         alergDiv.style.display = 'none';
-        alergDiv.textContent = 'âš  ' + art.alergenos.join(' Â· ');
+        alergDiv.textContent = '⚠ ' + art.alergenos.join(' · ');
         wrap.appendChild(alergDiv);
       }
 
@@ -738,14 +738,14 @@ function abrirVarianteModal(artId, art) {
           `<div style="border-radius:12px;border:1px solid ${sel ? 'var(--accent2)' : 'var(--border)'};overflow:hidden;background:${sel ? 'rgba(61,122,255,.06)' : 'var(--surface3)'}">` +
           `<button data-varidx="${i}" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;width:100%;background:none;border:none;cursor:pointer;font-size:14px;color:${sel ? 'var(--accent2)' : 'var(--text)'}">` +
           `<span>${v.nombre}</span>` +
-          `<span style="font-family:var(--mono)">${Number(v.precio).toFixed(2)} â‚¬</span>` +
+          `<span style="font-family:var(--mono)">${Number(v.precio).toFixed(2)} €</span>` +
           `</button>` +
           (sel
             ? `<div style="display:flex;align-items:center;gap:10px;border-top:1px solid rgba(61,122,255,.2);padding:8px 16px">` +
               `<span style="font-size:12px;color:var(--muted);flex:1">Cantidad:</span>` +
-              `<button id="vqty-minus" style="width:32px;height:32px;border-radius:8px 0 0 8px;border:1px solid var(--border);background:var(--surface3);font-size:18px;cursor:pointer">âˆ’</button>` +
+              `<button id="vqty-minus" style="width:32px;height:32px;border-radius:8px 0 0 8px;border:1px solid var(--border);background:var(--surface3);font-size:18px;cursor:pointer">-</button>` +
               `<span id="vqty-num" style="width:36px;height:32px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:14px;font-weight:700;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:#fff">${qty}</span>` +
-              `<button id="vqty-plus" style="width:32px;height:32px;border-radius:0 8px 8px 0;border:1px solid var(--border);background:var(--surface3);font-size:18px;cursor:pointer">ï¼‹</button>` +
+              `<button id="vqty-plus" style="width:32px;height:32px;border-radius:0 8px 8px 0;border:1px solid var(--border);background:var(--surface3);font-size:18px;cursor:pointer">+</button>` +
               `</div>`
             : '') +
           `</div>`
@@ -755,7 +755,7 @@ function abrirVarianteModal(artId, art) {
     acts.innerHTML =
       '<button class="modal-btn" id="vbtn-cancel">Cancelar</button>' +
       `<button class="modal-btn primary" id="vbtn-add"${selIdx === null ? ' disabled' : ''}>` +
-        (selIdx !== null ? `AÃ±adir ${qty}` : 'AÃ±adir') +
+        (selIdx !== null ? `Añadir ${qty}` : 'Añadir') +
       `</button>`;
 
     document.getElementById('vbtn-cancel').onclick = () =>
@@ -853,12 +853,12 @@ function updateUI() {
   if (n > 0) {
     btnC.classList.add('tiene');
     document.getElementById('carrito-count').textContent = totalUds;
-    document.getElementById('carrito-label').textContent = total.toFixed(2).replace('.', ',') + ' â‚¬';
+      document.getElementById('carrito-label').textContent = total.toFixed(2).replace('.', ',') + ' €';
   } else {
     btnC.classList.remove('tiene');
   }
 
-  document.getElementById('drawer-total').textContent = total.toFixed(2).replace('.', ',') + ' â‚¬';
+  document.getElementById('drawer-total').textContent = total.toFixed(2).replace('.', ',') + ' €';
   document.getElementById('btn-enviar-drawer').disabled = n === 0;
   renderEstadoSync();
 }
@@ -892,11 +892,11 @@ function renderDrawer() {
     main.innerHTML = `
       <span class="ri-nombre">${art.nombre}</span>
       <div class="ri-qty-ctrl">
-        <button class="ri-qty-btn" onclick="drawerCambiarQty('${carritoKey}',-1)">âˆ’</button>
+      <button class="ri-qty-btn" onclick="drawerCambiarQty('${carritoKey}',-1)">-</button>
         <span class="ri-qty-num" id="dqty-${carritoKey}">${qty}</span>
         <button class="ri-qty-btn" onclick="drawerCambiarQty('${carritoKey}',1)">+</button>
       </div>
-      <span class="ri-precio" id="dprecio-${carritoKey}">${(Number(art.precio) * qty).toFixed(2)} â‚¬</span>`;
+      <span class="ri-precio" id="dprecio-${carritoKey}">${(Number(art.precio) * qty).toFixed(2)} €</span>`;
     wrap.appendChild(main);
 
     const notaRow = document.createElement('div');
@@ -924,7 +924,7 @@ window.drawerCambiarQty = (carritoKey, delta) => {
     const precioEl = document.getElementById('dprecio-' + carritoKey);
     if (carrito[carritoKey]) {
       if (qtyEl)    qtyEl.textContent = carrito[carritoKey].qty;
-      if (precioEl) precioEl.textContent = (Number(carrito[carritoKey].art.precio) * carrito[carritoKey].qty).toFixed(2) + ' â‚¬';
+      if (precioEl) precioEl.textContent = (Number(carrito[carritoKey].art.precio) * carrito[carritoKey].qty).toFixed(2) + ' €';
     } else {
       renderDrawer();
     }
@@ -1222,16 +1222,16 @@ window.enviarPedido = async () => {
   if (quotaActual !== null && quotaActual !== -1) {
     if (quotaActual <= 0) {
       showModal({
-        title: 'Limite de pedidos alcanzado',
-        body: 'Se han agotado las lineas de pedido incluidas en el plan. Contacta con el administrador.',
+      title: 'Límite de pedidos alcanzado',
+      body: 'Se han agotado las líneas de pedido incluidas en el plan. Contacta con el administrador.',
         buttons: [{ label: 'Entendido', style: 'primary' }]
       });
       return;
     }
     if (quotaActual < nLineas) {
       showModal({
-        title: 'Lineas insuficientes',
-        body: 'Quedan ' + quotaActual + ' lineas y el pedido tiene ' + nLineas + '. Reduce el pedido o contacta con el administrador.',
+        title: 'Líneas insuficientes',
+        body: 'Quedan ' + quotaActual + ' líneas y el pedido tiene ' + nLineas + '. Reduce el pedido o contacta con el administrador.',
         buttons: [{ label: 'Entendido', style: 'primary' }]
       });
       return;
@@ -1271,8 +1271,8 @@ window.enviarPedido = async () => {
   const restante = quotaActual;
   if (enviadoAhora && restante !== null && restante !== -1 && restante > 0 && restante <= 100) {
     setTimeout(() => showModal({
-      title: 'Pocas lineas restantes',
-      body: 'Quedan ' + restante + ' lineas disponibles.',
+      title: 'Pocas líneas restantes',
+      body: 'Quedan ' + restante + ' líneas disponibles.',
       buttons: [{ label: 'Entendido' }]
     }), 800);
   }
