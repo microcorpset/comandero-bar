@@ -499,7 +499,7 @@ function renderCarta() {
   cats.forEach(([catId, cat]) => {
     const arts = Object.entries(cartaData)
       .filter(([,a]) => a.catId === catId)
-      .sort(([,a],[,b]) => (a.orden ? 999) - (b.orden ? 999) || a.nombre.localeCompare(b.nombre, 'es'));
+      .sort(([,a],[,b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre, 'es'));
     if (!arts.length) return;
 
     const section = document.createElement('div');
