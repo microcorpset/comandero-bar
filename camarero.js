@@ -184,12 +184,12 @@ window.abrirNotaModal = (artId, nombreArt) => {
   // Buscar nota del carrito: puede ser artId simple o primer variant key
   const carritoKey = Object.keys(carrito).find(k => k === artId || k.startsWith(artId + '__v')) || artId;
   const notaActual = carrito[carritoKey]?.nota || '';
-  showModal({ title: 'ðŸ“ ' + nombreArt, body: '', buttons: [] });
+  showModal({ title: '📝 ' + nombreArt, body: '', buttons: [] });
   const modalBody = document.getElementById('modal-body');
   modalBody.innerHTML = '';
   const inp = document.createElement('input');
   inp.type = 'text'; inp.value = notaActual;
-  inp.placeholder = 'ej: poco hecho, sin cebollaâ€¦';
+  inp.placeholder = 'ej: poco hecho, sin cebolla…';
   inp.style.cssText = 'width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;font-family:var(--sans);color:var(--text);outline:none';
   inp.addEventListener('keydown', e => { if (e.key === 'Enter') guardarNota(); });
   modalBody.appendChild(inp);
