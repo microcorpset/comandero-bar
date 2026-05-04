@@ -977,6 +977,10 @@ async function init() {
     document.getElementById('local-ticket-uppercase').value = String(d.ticketUppercase === true);
     document.getElementById('local-ticket-margin-x').value = d.ticketMarginX ?? 3;
     document.getElementById('local-ticket-margin-y').value = d.ticketMarginY ?? 3;
+    document.getElementById('local-barra-font-size').value = d.barraFontSize || 9;
+    document.getElementById('local-cocina-font-size').value = d.cocinaFontSize || 9;
+    document.getElementById('local-ticket-print-mode').value = d.ticketPrintMode || 'browser';
+    document.getElementById('local-ticket-print-service-id').value = d.ticketPrintServiceId || PRINT_SERVICE_ID;
   });
   onValue(ref(db, 'historial'), snap => {
     historialVentasCache = normalizarHistorialVentasData(snap.val() || {});
@@ -1097,19 +1101,13 @@ window.guardarLocal = async () => {
     ticketUppercase: document.getElementById('local-ticket-uppercase').value === 'true',
     ticketMarginX: parseFloat(document.getElementById('local-ticket-margin-x').value) || 3,
     ticketMarginY: parseFloat(document.getElementById('local-ticket-margin-y').value) || 3,
+    barraFontSize: parseFloat(document.getElementById('local-barra-font-size').value) || 9,
+    cocinaFontSize: parseFloat(document.getElementById('local-cocina-font-size').value) || 9,
     ticketPrintMode: document.getElementById('local-ticket-print-mode').value || 'browser',
     ticketPrintServiceId: document.getElementById('local-ticket-print-service-id').value.trim() || PRINT_SERVICE_ID,
   });
   toast('Datos del local guardados');
 };
-
-onValue(ref(db, 'config/local'), snap => {
-  const d = snap.val() || {};
-  const printModeEl = document.getElementById('local-ticket-print-mode');
-  const serviceIdEl = document.getElementById('local-ticket-print-service-id');
-  if (printModeEl) printModeEl.value = d.ticketPrintMode || 'browser';
-  if (serviceIdEl) serviceIdEl.value = d.ticketPrintServiceId || PRINT_SERVICE_ID;
-});
 
 window.marcarPendientesComoImpresas = async () => {
   const pedidos = (await get(ref(db, 'pedidos'))).val() || {};
