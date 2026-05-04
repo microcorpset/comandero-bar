@@ -517,7 +517,7 @@ function renderCarta() {
 
       // AlÃ©rgenos: botÃ³n compacto si los hay
       const alergenosBtn = art.alergenos?.length
-        ? `<button class="btn-alergenos" data-artid="${artId}" title="Ver alÃ©rgenos">âš </button>`
+        ? `<button class="btn-alergenos" data-artid="${artId}" title="Ver alérgenos">!</button>`
         : '';
 
       // Variantes: indicador
@@ -537,8 +537,8 @@ function renderCarta() {
           <span class="qty-num" id="qty-${artId}">0</span>
           <button class="qty-btn" data-id="${artId}" data-d="1" ${agotado?'disabled':''}>+</button>
         </div>
-        <button class="btn-nota" id="btnnota-${artId}" title="AÃ±adir nota"
-          onclick="abrirNotaModal('${artId}','${art.nombre.replace(/'/g,"\\'")}')" ${agotado?'disabled':''}>ðŸ“</button>`;
+        <button class="btn-nota" id="btnnota-${artId}" title="Añadir nota"
+          onclick="abrirNotaModal('${artId}','${art.nombre.replace(/'/g,"\\'")}')" ${agotado?'disabled':''}>N</button>`;
       wrap.appendChild(mainRow);
 
       // Panel de alÃ©rgenos (oculto por defecto)
@@ -547,7 +547,7 @@ function renderCarta() {
         alergDiv.id = 'alerg-' + artId;
         alergDiv.className = 'alergenos-panel';
         alergDiv.style.display = 'none';
-        alergDiv.textContent = '⚠ ' + art.alergenos.join(' · ');
+        alergDiv.textContent = '! ' + art.alergenos.join(' · ');
         wrap.appendChild(alergDiv);
       }
 
@@ -845,8 +845,8 @@ function updateUI() {
   const totalUds = Object.values(carrito).reduce((s, {qty}) => s + qty, 0);
   const total = Object.values(carrito).reduce((s, {art, qty}) => s + Number(art.precio) * qty, 0);
 
-  document.getElementById('res-lineas').textContent = n ? `${totalUds} ud${totalUds > 1 ? 's' : ''}` : 'Sin artÃ­culos';
-  document.getElementById('res-total').textContent = total.toFixed(2).replace('.', ',') + ' â‚¬';
+  document.getElementById('res-lineas').textContent = n ? `${totalUds} ud${totalUds > 1 ? 's' : ''}` : 'Sin artículos';
+  document.getElementById('res-total').textContent = total.toFixed(2).replace('.', ',') + ' €';
   document.getElementById('btn-enviar').disabled = n === 0;
 
   const btnC = document.getElementById('btn-carrito');
@@ -880,7 +880,7 @@ function renderDrawer() {
   document.getElementById('drawer-title').textContent = mesaNombre ? 'Mesa ' + mesaNombre : 'Pedido';
 
   const items = Object.entries(carrito);
-  if (!items.length) { body.innerHTML = '<div class="drawer-empty">Sin artÃ­culos aÃºn</div>'; return; }
+  if (!items.length) { body.innerHTML = '<div class="drawer-empty">Sin artículos aún</div>'; return; }
 
   body.innerHTML = '';
   items.forEach(([carritoKey, {art, qty, nota}]) => {
@@ -904,7 +904,7 @@ function renderDrawer() {
     notaRow.innerHTML = `
       <span class="ri-nota-label">Nota:</span>
       <input class="ri-nota-input" type="text"
-        placeholder="ej: poco hecho, sin cebollaâ€¦"
+        placeholder="ej: poco hecho, sin cebolla..."
         value="${(nota || '').replace(/"/g, '&quot;')}"
         oninput="drawerNota('${carritoKey}', this.value)" />`;
     wrap.appendChild(notaRow);
@@ -1428,7 +1428,7 @@ function renderTicket(pedidos) {
 
   if (!lineasServidas.length) {
     document.getElementById('ticket-card').innerHTML =
-      '<div class="ticket-edit-hint">No hay artÃ­culos servidos aÃºn</div>' +
+      '<div class="ticket-edit-hint">No hay artículos servidos aún</div>' +
       '<div class="ticket-total"><span>Total</span><span>' + fmtEu(0) + '</span></div>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:1rem">' +
         '<button class="btn-transferir no-print" style="flex:1;background:none;color:var(--muted);border:1px solid var(--border);border-radius:12px;padding:10px;font-family:var(--mono);font-size:13px;cursor:pointer">Transferir</button>' +
