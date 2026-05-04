@@ -1097,6 +1097,69 @@ window.guardarLocal = async () => {
     ticketUppercase: document.getElementById('local-ticket-uppercase').value === 'true',
     ticketMarginX: parseFloat(document.getElementById('local-ticket-margin-x').value) || 3,
     ticketMarginY: parseFloat(document.getElementById('local-ticket-margin-y').value) || 3,
+    ticketPrintMode: document.getElementById('local-ticket-print-mode').value || 'browser',
+    ticketPrintServiceId: document.getElementById('local-ticket-print-service-id').value.trim() || PRINT_SERVICE_ID,
   });
   toast('Datos del local guardados');
+};
+
+onValue(ref(db, 'config/local'), snap => {
+  const d = snap.val() || {};
+  const printModeEl = document.getElementById('local-ticket-print-mode');
+  const serviceIdEl = document.getElementById('local-ticket-print-service-id');
+  if (printModeEl) printModeEl.value = d.ticketPrintMode || 'browser';
+  if (serviceIdEl) serviceIdEl.value = d.ticketPrintServiceId || PRINT_SERVICE_ID;
+});
+
+window.marcarPendientesComoImpresas = async () => {
+  const pedidos = (await get(ref(db, 'pedidos'))).val() || {};
+  const printJobs = (await get(ref(db, 'print_jobs'))).val() || {};
+  const serviceKey = PRINT_SERVICE_ID.replace(/[.#$/\[\]]+/g, '_');
+  const now = Date.now();
+  const updates = {};
+  let totalColas = 0;
+  let totalTickets = 0;
+
+  Object.entries(pedidos).forEach(([mesaId, envios]) => {
+    Object.entries(envios || {}).forEach(([envioId, envio]) => {
+      const lineas = Object.values(envio.lineas || {});
+      const tieneBarra = lineas.some(l => l.estado === 'pendiente' && (l.destino === 'barra' || l.destino === 'ambos'));
+      const tieneCocina = lineas.some(l => l.estado === 'pendiente' && (l.destino === 'cocina' || l.destino === 'ambos'));
+
+      if (tieneBarra) {
+        updates[`pedidos/${mesaId}/${envioId}/_printService/barra/${serviceKey}`] = {
+          printedAt: now,
+          serviceId: PRINT_SERVICE_ID,
+          manualSkip: true
+        };
+        totalColas++;
+      }
+      if (tieneCocina) {
+        updates[`pedidos/${mesaId}/${envioId}/_printService/cocina/${serviceKey}`] = {
+          printedAt: now,
+          serviceId: PRINT_SERVICE_ID,
+          manualSkip: true
+        };
+        totalColas++;
+      }
+    });
+  });
+
+  Object.entries(printJobs).forEach(([jobId, job]) => {
+    const status = String(job?.status || 'pending');
+    const serviceId = String(job?.serviceId || PRINT_SERVICE_ID);
+    if (status !== 'pending' || serviceId !== PRINT_SERVICE_ID) return;
+    updates[`print_jobs/${jobId}/status`] = 'skipped';
+    updates[`print_jobs/${jobId}/skippedAt`] = now;
+    updates[`print_jobs/${jobId}/skippedBy`] = 'admin';
+    totalTickets++;
+  });
+
+  if (!totalColas && !totalTickets) {
+    toast('No habÃ­a pendientes del servicio para marcar');
+    return;
+  }
+
+  await update(ref(db), updates);
+  toast(`Marcadas ${totalColas} colas y ${totalTickets} tickets como impresos`);
 };

@@ -1088,8 +1088,77 @@ window.verCuenta = async () => {
   show('ticket');
 };
 
-function imprimirTicketFinal(lineasServidas, total) {
+function actualizarEstadoBotonTicket(texto, restaurar = true) {
+  const btn = document.querySelector('#ticket-card .btn-print');
+  if (!btn) return;
+  const previo = btn.dataset.prevText || btn.textContent || 'Imprimir ticket';
+  if (!btn.dataset.prevText) btn.dataset.prevText = previo;
+  btn.textContent = texto;
+  if (restaurar) {
+    setTimeout(() => {
+      btn.textContent = btn.dataset.prevText || 'Imprimir ticket';
+      delete btn.dataset.prevText;
+    }, 1800);
+  }
+}
+
+async function enviarTicketFinalAServicio(lineasServidas, total) {
+  const paperCfg = getTicketPaperConfig(configLocal);
+  const serviceId = String(configLocal?.ticketPrintServiceId || 'local-print-service-1').trim() || 'local-print-service-1';
+  const payload = {
+    kind: 'ticket_final',
+    status: 'pending',
+    createdAt: Date.now(),
+    serviceId,
+    requestedBy: camareroActual || '',
+    mesaId: mesaId || '',
+    mesaNombre: mesaNombre || '',
+    local: {
+      nombre: configLocal?.nombre || '',
+      direccion: configLocal?.direccion || '',
+      telefono: configLocal?.telefono || '',
+      cif: configLocal?.cif || '',
+      footer: configLocal?.footer || ''
+    },
+    format: {
+      paper: paperCfg.paper,
+      fontSize: paperCfg.fontSize,
+      uppercase: paperCfg.uppercase === true
+    },
+    total: Math.round(Number(total || 0) * 100) / 100,
+    lines: lineasServidas.map(l => ({
+      nombre: l.nombre,
+      qty: Number(l.qtyCuenta || 0),
+      precio: Math.round(Number(l.precio || 0) * 100) / 100,
+      nota: limpiarNotaTicket(l.nota)
+    }))
+  };
+  await push(ref(db, 'print_jobs'), payload);
+}
+
+async function imprimirTicketFinal(lineasServidas, total) {
+  const mode = String(configLocal?.ticketPrintMode || 'browser');
   const fecha = new Date().toLocaleString('es-ES', { dateStyle:'short', timeStyle:'short' });
+
+  if (mode === 'service' || mode === 'both') {
+    try {
+      await enviarTicketFinalAServicio(lineasServidas, total);
+      actualizarEstadoBotonTicket(mode === 'both' ? 'Enviado al servicio + local' : 'Enviado al servicio');
+    } catch (err) {
+      console.error('Error enviando ticket al servicio', err);
+      showModal({
+        title: 'Error de impresiÃ³n remota',
+        body: 'No se pudo enviar el ticket al servicio Python. Puedes reintentarlo o usar el modo navegador.',
+        buttons: [{ label: 'Cerrar', style: 'primary' }]
+      });
+      if (mode === 'service') return;
+    }
+  }
+
+  if (mode === 'service') {
+    return;
+  }
+
   abrirImpresionTicket({
     titulo: `Mesa ${mesaNombre}`,
     subtitulo: fecha,
@@ -1235,7 +1304,7 @@ function renderTicket(pedidos) {
     } else if (e.target.classList.contains('btn-quitar-linea')) {
       await quitarDelTicket(parseInt(e.target.dataset.idx));
     } else if (e.target.classList.contains('btn-print') || e.target.classList.contains('no-print-btn')) {
-      imprimirTicketFinal(lineasServidas, total);
+      await imprimirTicketFinal(lineasServidas, total);
     } else if (e.target.classList.contains('btn-refresh')) {
       await cargarTicketActual();
     } else if (e.target.classList.contains('btn-cerrar')) {
