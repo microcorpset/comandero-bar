@@ -1,4 +1,4 @@
-﻿// Proteccion de dominio
+﻿// ── Protección de dominio ─────────────────────────────────────────────────────
 const _dominiosPermitidos = [
   'microcorpset.github.io',
   'localhost',
@@ -9,15 +9,17 @@ if (!_dominiosPermitidos.some(d => location.hostname === d || location.hostname.
   throw new Error('Dominio no autorizado');
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+
 import { authReady, db } from './firebase.js';
 import { ref, onValue, push, set, remove, get, update }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 await authReady;
 
-// Estado global
-// carrito: key -> { art, qty, nota }
-// key es artId para articulos simples, artId__v{idx} para variantes
+// ─── Estado global ────────────────────────────────────────────────────────────
+// carrito: key → { art, qty, nota }
+// key es artId para artículos simples, artId__v{idx} para variantes
 let mesaId = null, mesaNombre = null;
 let carrito = {};
 let mesasData = {}, cartaData = {}, categoriasData = {};
@@ -36,7 +38,7 @@ let syncTimer = null;
 
 normalizarColaOffline();
 
-// Usuarios / PIN multi-camarero
+// ── Usuarios / PIN multi-camarero ─────────────────────────────────────────────
 const PIN_SESSION  = 'cam_auth';
 const USER_SESSION = 'cam_user';
 let usuariosData   = {};
@@ -96,7 +98,7 @@ document.getElementById('pin-pad').addEventListener('click', e => {
   else if (k !== '') pinKey(k);
 });
 
-// Modal
+// ── Modal ─────────────────────────────────────────────────────────────────────
 function showModal({ title, body, buttons }) {
   document.getElementById('modal-title').textContent = title;
   document.getElementById('modal-body').textContent = body;
@@ -124,7 +126,7 @@ document.querySelector('.resumen-info')?.addEventListener('click', () => {
   if (window.innerWidth <= 640 && mesaId) abrirDrawer();
 });
 
-// Toggles PDF / TXT / wake
+// ── Toggles PDF / TXT / wake ──────────────────────────────────────────────────
 const PRINT_KEY = 'camarero_pdf';
 let autoPDF = localStorage.getItem(PRINT_KEY) === 'true';
 const printTrack = document.getElementById('print-track');
@@ -167,21 +169,27 @@ document.addEventListener('visibilitychange', () => {
   }
 });
 window.addEventListener('focus', () => programarSyncCola(120));
-window.addEventListener('online', () => programarSyncCola(120));
-window.addEventListener('online', () => { browserOnline = true; renderEstadoSync(); });
-window.addEventListener('offline', () => { browserOnline = false; renderEstadoSync(); });
+window.addEventListener('online', () => {
+  browserOnline = true;
+  renderEstadoSync();
+  programarSyncCola(120);
+});
+window.addEventListener('offline', () => {
+  browserOnline = false;
+  renderEstadoSync();
+});
 
-// Modal de nota
+// ── Modal de nota ─────────────────────────────────────────────────────────────
 window.abrirNotaModal = (artId, nombreArt) => {
   // Buscar nota del carrito: puede ser artId simple o primer variant key
   const carritoKey = Object.keys(carrito).find(k => k === artId || k.startsWith(artId + '__v')) || artId;
   const notaActual = carrito[carritoKey]?.nota || '';
-  showModal({ title: 'Nota: ' + nombreArt, body: '', buttons: [] });
+  showModal({ title: 'ðŸ“ ' + nombreArt, body: '', buttons: [] });
   const modalBody = document.getElementById('modal-body');
   modalBody.innerHTML = '';
   const inp = document.createElement('input');
   inp.type = 'text'; inp.value = notaActual;
-  inp.placeholder = 'ej: poco hecho, sin cebolla...';
+  inp.placeholder = 'ej: poco hecho, sin cebollaâ€¦';
   inp.style.cssText = 'width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;font-family:var(--sans);color:var(--text);outline:none';
   inp.addEventListener('keydown', e => { if (e.key === 'Enter') guardarNota(); });
   modalBody.appendChild(inp);
@@ -209,7 +217,7 @@ window.abrirNotaModal = (artId, nombreArt) => {
   }
 };
 
-// Listeners Firebase
+// ── Listeners Firebase ────────────────────────────────────────────────────────
 onValue(ref(db, 'mesas'), snap => { mesasData = snap.val() || {}; renderMesas(); });
 onValue(ref(db, 'categorias'), snap => { categoriasData = snap.val() || {}; catsReady = true; if (cartaReady && mesaId) renderCarta(); });
 onValue(ref(db, 'carta'), snap => { cartaData = snap.val() || {}; cartaReady = true; if (catsReady && mesaId) renderCarta(); });
@@ -230,9 +238,9 @@ onValue(ref(db, '.info/connected'), snap => {
   if (firebaseConnected) programarSyncCola(120);
 });
 
-// Helpers
+// ── Helpers ───────────────────────────────────────────────────────────────────
 function fmtEu(n) {
-  return Number(n || 0).toFixed(2).replace('.', ',') + ' €';
+  return Number(n || 0).toFixed(2).replace('.', ',') + ' â‚¬';
 }
 
 function cargarColaOffline() {
@@ -318,8 +326,8 @@ function renderEstadoSync() {
   if (!browserOnline || !firebaseConnected) {
     banner.style.display = 'flex';
     banner.textContent = total
-      ? `Sin conexion - ${total} pedido${total > 1 ? 's' : ''} guardado${total > 1 ? 's' : ''} para sincronizar`
-      : 'Sin conexion - los cambios se sincronizaran al reconectar';
+      ? `Sin conexiÃ³n - ${total} pedido${total > 1 ? 's' : ''} guardado${total > 1 ? 's' : ''} para sincronizar`
+      : 'Sin conexiÃ³n - los cambios se sincronizarÃ¡n al reconectar';
     return;
   }
   if (total) {
@@ -363,11 +371,11 @@ function resumenMesaActual(id) {
   return `<strong>${uds} uds</strong> | <strong>${fmtEu(total)}</strong>`;
 }
 
-// Mesas con colores y zonas
+// ── Mesas con colores y zonas ─────────────────────────────────────────────────
 function renderMesas() {
   const grid = document.getElementById('mesas-grid');
   const entries = Object.entries(mesasData)
-    .sort(([,a],[,b]) => (a.orden??999)-(b.orden??999) || a.nombre.localeCompare(b.nombre,'es',{numeric:true}));
+    .sort(([,a],[,b]) => (a.orden?999)-(b.orden?999) || a.nombre.localeCompare(b.nombre,'es',{numeric:true}));
 
   if (!entries.length) {
     grid.classList.remove('zonas-layout');
@@ -463,7 +471,7 @@ function abrirMesa(id, nombre, ocupada) {
   document.getElementById('btn-cuenta').style.display = (ocupada || pedidosPendientesMesa(id).length) ? '' : 'none';
   show('carta');
   if (cartaReady && catsReady) renderCarta();
-  else document.getElementById('carta-body').innerHTML = '<div class="loading">Cargando carta...</div>';
+  else document.getElementById('carta-body').innerHTML = '<div class="loading">Cargando cartaâ€¦</div>';
   updateUI();
 }
 
@@ -475,17 +483,17 @@ window.volverMesas = () => {
   if (Object.keys(mesasData).length) renderMesas();
 };
 
-// Carta
+// ── Carta ─────────────────────────────────────────────────────────────────────
 function renderCarta() {
   const body = document.getElementById('carta-body');
   const cats = Object.entries(categoriasData).sort(([,a],[,b]) => a.nombre.localeCompare(b.nombre, 'es'));
-  if (!cats.length) { body.innerHTML = '<div class="loading">Sin categorias.</div>'; return; }
+  if (!cats.length) { body.innerHTML = '<div class="loading">Sin categorÃ­as.</div>'; return; }
   body.innerHTML = '';
 
   cats.forEach(([catId, cat]) => {
     const arts = Object.entries(cartaData)
       .filter(([,a]) => a.catId === catId)
-      .sort(([,a],[,b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre, 'es'));
+      .sort(([,a],[,b]) => (a.orden ? 999) - (b.orden ? 999) || a.nombre.localeCompare(b.nombre, 'es'));
     if (!arts.length) return;
 
     const section = document.createElement('div');
@@ -498,7 +506,7 @@ function renderCarta() {
     toggle.innerHTML = `
       <span class="cat-nombre-label">${cat.nombre}</span>
       <span class="cat-count" id="catcount-${catId}"></span>
-      <span class="cat-arrow">▾</span>`;
+      <span class="cat-arrow">â–¾</span>`;
     toggle.addEventListener('click', () => toggleCat(section));
     section.appendChild(toggle);
 
@@ -514,9 +522,9 @@ function renderCarta() {
       const mainRow = document.createElement('div');
       mainRow.className = 'art-main';
 
-      // Alergenos: boton compacto si los hay
+      // AlÃ©rgenos: botÃ³n compacto si los hay
       const alergenosBtn = art.alergenos?.length
-        ? `<button class="btn-alergenos" data-artid="${artId}" title="Ver alérgenos">!</button>`
+        ? `<button class="btn-alergenos" data-artid="${artId}" title="Ver alÃ©rgenos">âš </button>`
         : '';
 
       // Variantes: indicador
@@ -529,24 +537,24 @@ function renderCarta() {
           <div class="art-nombre">${art.nombre}${variantesLabel}</div>
           ${agotado ? '<div style="font-size:10px;color:var(--danger);font-family:var(--mono)">Agotado</div>' : ''}
         </div>
-        <span class="art-precio">${Number(art.precio).toFixed(2)} €</span>
+        <span class="art-precio">${Number(art.precio).toFixed(2)} â‚¬</span>
         ${alergenosBtn}
         <div class="qty-ctrl">
-          <button class="qty-btn" data-id="${artId}" data-d="-1" ${agotado?'disabled':''}>-</button>
+          <button class="qty-btn" data-id="${artId}" data-d="-1" ${agotado?'disabled':''}>âˆ’</button>
           <span class="qty-num" id="qty-${artId}">0</span>
           <button class="qty-btn" data-id="${artId}" data-d="1" ${agotado?'disabled':''}>+</button>
         </div>
         <button class="btn-nota" id="btnnota-${artId}" title="Añadir nota"
-          onclick="abrirNotaModal('${artId}','${art.nombre.replace(/'/g,"\\'")}')" ${agotado?'disabled':''}>N</button>`;
+          onclick="abrirNotaModal('${artId}','${art.nombre.replace(/'/g,"\\'")}')" ${agotado?'disabled':''}>📝</button>`;
       wrap.appendChild(mainRow);
 
-      // Panel de alergenos (oculto por defecto)
+      // Panel de alÃ©rgenos (oculto por defecto)
       if (art.alergenos?.length) {
         const alergDiv = document.createElement('div');
         alergDiv.id = 'alerg-' + artId;
         alergDiv.className = 'alergenos-panel';
         alergDiv.style.display = 'none';
-        alergDiv.textContent = '! ' + art.alergenos.join(' · ');
+        alergDiv.textContent = 'âš  ' + art.alergenos.join(' Â· ');
         wrap.appendChild(alergDiv);
       }
 
@@ -565,10 +573,10 @@ function renderCarta() {
     if (alergBtn) toggleAlergenos(alergBtn.dataset.artid);
   };
 
-  // Rellenar selector de categorias en movil
+  // Rellenar selector de categorÃ­as en mÃ³vil
   const catSel = document.getElementById('cat-filter-sel');
   if (catSel) {
-    catSel.innerHTML = '<option value="">Todas las categorias</option>';
+    catSel.innerHTML = '<option value="">Todas las categorÃ­as</option>';
     cats.forEach(([catId, cat]) => {
       const arts = Object.entries(cartaData).filter(([,a]) => a.catId === catId);
       if (!arts.length) return;
@@ -576,7 +584,7 @@ function renderCarta() {
     });
   }
 
-  // Panel de categorias (popup movil)
+  // Panel de categorÃ­as (popup mÃ³vil)
   const panel = document.getElementById('cats-panel');
   if (panel) {
     panel.innerHTML = '';
@@ -639,7 +647,7 @@ function renderCarta() {
   updateUI();
 }
 
-// Filtrar carta por categoria en movil
+// Filtrar carta por categorÃ­a en mÃ³vil
 window.filtrarCategoria = (catId) => {
   if (!catId) {
     document.querySelectorAll('.cat-section').forEach(s => {
@@ -680,18 +688,18 @@ function toggleCat(section) {
   items.style.maxHeight = collapsed ? '0' : '4000px';
 }
 
-// Carrito
+// ── Carrito ───────────────────────────────────────────────────────────────────
 function cambiarQty(artId, delta) {
   const art = cartaData[artId];
   if (!art) return;
 
-  // Articulo con variantes: mostrar modal al sumar
+  // ArtÃ­culo con variantes: mostrar modal al sumar
   if (delta > 0 && art.variantes?.length) {
     abrirVarianteModal(artId, art);
     return;
   }
 
-  // Articulo con variantes: restar la ultima variante anadida
+  // ArtÃ­culo con variantes: restar la Ãºltima variante aÃ±adida
   if (delta < 0 && art.variantes?.length) {
     const varKeys = Object.keys(carrito).filter(k => k.startsWith(artId + '__v'));
     if (varKeys.length) {
@@ -707,7 +715,7 @@ function cambiarQty(artId, delta) {
     return;
   }
 
-  // Articulo simple
+  // ArtÃ­culo simple
   const prev = carrito[artId]?.qty || 0;
   const nota = carrito[artId]?.nota || '';
   const next = Math.max(0, prev + delta);
@@ -737,14 +745,14 @@ function abrirVarianteModal(artId, art) {
           `<div style="border-radius:12px;border:1px solid ${sel ? 'var(--accent2)' : 'var(--border)'};overflow:hidden;background:${sel ? 'rgba(61,122,255,.06)' : 'var(--surface3)'}">` +
           `<button data-varidx="${i}" style="display:flex;justify-content:space-between;align-items:center;padding:12px 16px;width:100%;background:none;border:none;cursor:pointer;font-size:14px;color:${sel ? 'var(--accent2)' : 'var(--text)'}">` +
           `<span>${v.nombre}</span>` +
-          `<span style="font-family:var(--mono)">${Number(v.precio).toFixed(2)} €</span>` +
+          `<span style="font-family:var(--mono)">${Number(v.precio).toFixed(2)} â‚¬</span>` +
           `</button>` +
           (sel
             ? `<div style="display:flex;align-items:center;gap:10px;border-top:1px solid rgba(61,122,255,.2);padding:8px 16px">` +
               `<span style="font-size:12px;color:var(--muted);flex:1">Cantidad:</span>` +
-              `<button id="vqty-minus" style="width:32px;height:32px;border-radius:8px 0 0 8px;border:1px solid var(--border);background:var(--surface3);font-size:18px;cursor:pointer">-</button>` +
+              `<button id="vqty-minus" style="width:32px;height:32px;border-radius:8px 0 0 8px;border:1px solid var(--border);background:var(--surface3);font-size:18px;cursor:pointer">âˆ’</button>` +
               `<span id="vqty-num" style="width:36px;height:32px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:14px;font-weight:700;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:#fff">${qty}</span>` +
-              `<button id="vqty-plus" style="width:32px;height:32px;border-radius:0 8px 8px 0;border:1px solid var(--border);background:var(--surface3);font-size:18px;cursor:pointer">+</button>` +
+              `<button id="vqty-plus" style="width:32px;height:32px;border-radius:0 8px 8px 0;border:1px solid var(--border);background:var(--surface3);font-size:18px;cursor:pointer">ï¼‹</button>` +
               `</div>`
             : '') +
           `</div>`
@@ -754,7 +762,7 @@ function abrirVarianteModal(artId, art) {
     acts.innerHTML =
       '<button class="modal-btn" id="vbtn-cancel">Cancelar</button>' +
       `<button class="modal-btn primary" id="vbtn-add"${selIdx === null ? ' disabled' : ''}>` +
-        (selIdx !== null ? `Añadir ${qty}` : 'Añadir') +
+        (selIdx !== null ? `AÃ±adir ${qty}` : 'AÃ±adir') +
       `</button>`;
 
     document.getElementById('vbtn-cancel').onclick = () =>
@@ -808,7 +816,7 @@ window.actualizarNota = (artId, valor) => {
 };
 
 function updateQtyDisplay() {
-  // Para cada articulo de la carta, sumar todas las entradas del carrito
+  // Para cada artÃ­culo de la carta, sumar todas las entradas del carrito
   Object.keys(cartaData).forEach(id => {
     const el = document.getElementById('qty-' + id);
     if (!el) return;
@@ -824,7 +832,7 @@ function updateQtyDisplay() {
     }
   });
 
-  // Contador por categoria
+  // Contador por categorÃ­a
   Object.entries(categoriasData).forEach(([catId]) => {
     const el = document.getElementById('catcount-' + catId);
     if (!el) return;
@@ -844,24 +852,25 @@ function updateUI() {
   const totalUds = Object.values(carrito).reduce((s, {qty}) => s + qty, 0);
   const total = Object.values(carrito).reduce((s, {art, qty}) => s + Number(art.precio) * qty, 0);
 
-  document.getElementById('res-lineas').textContent = n ? `${totalUds} ud${totalUds > 1 ? 's' : ''}` : 'Sin artículos';
-  document.getElementById('res-total').textContent = total.toFixed(2).replace('.', ',') + ' €';
+  document.getElementById('res-lineas').textContent = n ? `${totalUds} ud${totalUds > 1 ? 's' : ''}` : 'Sin artÃ­culos';
+  document.getElementById('res-total').textContent = total.toFixed(2).replace('.', ',') + ' â‚¬';
   document.getElementById('btn-enviar').disabled = n === 0;
 
   const btnC = document.getElementById('btn-carrito');
   if (n > 0) {
     btnC.classList.add('tiene');
     document.getElementById('carrito-count').textContent = totalUds;
-      document.getElementById('carrito-label').textContent = total.toFixed(2).replace('.', ',') + ' €';
+    document.getElementById('carrito-label').textContent = total.toFixed(2).replace('.', ',') + ' â‚¬';
   } else {
     btnC.classList.remove('tiene');
   }
 
-  document.getElementById('drawer-total').textContent = total.toFixed(2).replace('.', ',') + ' €';
+  document.getElementById('drawer-total').textContent = total.toFixed(2).replace('.', ',') + ' â‚¬';
   document.getElementById('btn-enviar-drawer').disabled = n === 0;
   renderEstadoSync();
 }
 
+// ── Drawer ────────────────────────────────────────────────────────────────────
 window.abrirDrawer = () => {
   renderDrawer();
   document.getElementById('drawer').classList.add('open');
@@ -878,7 +887,7 @@ function renderDrawer() {
   document.getElementById('drawer-title').textContent = mesaNombre ? 'Mesa ' + mesaNombre : 'Pedido';
 
   const items = Object.entries(carrito);
-  if (!items.length) { body.innerHTML = '<div class="drawer-empty">Sin artículos aún</div>'; return; }
+  if (!items.length) { body.innerHTML = '<div class="drawer-empty">Sin artÃ­culos aÃºn</div>'; return; }
 
   body.innerHTML = '';
   items.forEach(([carritoKey, {art, qty, nota}]) => {
@@ -890,11 +899,11 @@ function renderDrawer() {
     main.innerHTML = `
       <span class="ri-nombre">${art.nombre}</span>
       <div class="ri-qty-ctrl">
-      <button class="ri-qty-btn" onclick="drawerCambiarQty('${carritoKey}',-1)">-</button>
+        <button class="ri-qty-btn" onclick="drawerCambiarQty('${carritoKey}',-1)">âˆ’</button>
         <span class="ri-qty-num" id="dqty-${carritoKey}">${qty}</span>
         <button class="ri-qty-btn" onclick="drawerCambiarQty('${carritoKey}',1)">+</button>
       </div>
-      <span class="ri-precio" id="dprecio-${carritoKey}">${(Number(art.precio) * qty).toFixed(2)} €</span>`;
+      <span class="ri-precio" id="dprecio-${carritoKey}">${(Number(art.precio) * qty).toFixed(2)} â‚¬</span>`;
     wrap.appendChild(main);
 
     const notaRow = document.createElement('div');
@@ -902,7 +911,7 @@ function renderDrawer() {
     notaRow.innerHTML = `
       <span class="ri-nota-label">Nota:</span>
       <input class="ri-nota-input" type="text"
-        placeholder="ej: poco hecho, sin cebolla..."
+        placeholder="ej: poco hecho, sin cebollaâ€¦"
         value="${(nota || '').replace(/"/g, '&quot;')}"
         oninput="drawerNota('${carritoKey}', this.value)" />`;
     wrap.appendChild(notaRow);
@@ -922,7 +931,7 @@ window.drawerCambiarQty = (carritoKey, delta) => {
     const precioEl = document.getElementById('dprecio-' + carritoKey);
     if (carrito[carritoKey]) {
       if (qtyEl)    qtyEl.textContent = carrito[carritoKey].qty;
-      if (precioEl) precioEl.textContent = (Number(carrito[carritoKey].art.precio) * carrito[carritoKey].qty).toFixed(2) + ' €';
+      if (precioEl) precioEl.textContent = (Number(carrito[carritoKey].art.precio) * carrito[carritoKey].qty).toFixed(2) + ' â‚¬';
     } else {
       renderDrawer();
     }
@@ -933,7 +942,7 @@ window.drawerNota = (carritoKey, valor) => {
   if (carrito[carritoKey]) carrito[carritoKey].nota = valor.trim();
 };
 
-// Impresion
+// ── Impresión ─────────────────────────────────────────────────────────────────
 const iframeComanda = document.createElement('iframe');
 iframeComanda.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;border:none';
 document.body.appendChild(iframeComanda);
@@ -942,8 +951,8 @@ function getTicketPaperConfig(configLocal) {
   const paper = String(configLocal?.ticketPaper || configLocal?.papelTicket || '58mm').toLowerCase();
   const fontSize = Number(configLocal?.ticketFontSize || (paper.includes('80') ? 10 : 9));
   const uppercase = configLocal?.ticketUppercase === true;
-  const marginX = Number(configLocal?.ticketMarginX ?? 3);
-  const marginY = Number(configLocal?.ticketMarginY ?? 3);
+  const marginX = Number(configLocal?.ticketMarginX ? 3);
+  const marginY = Number(configLocal?.ticketMarginY ? 3);
   if (paper.includes('80')) {
     return { paper: '80mm', width: '80mm', bodyWidth: '72mm', chars: 48, fontSize, uppercase, marginX, marginY };
   }
@@ -970,7 +979,7 @@ function renderTicketRowsHTML(lineas, maxChars, conPrecio) {
   return lineas.map(l => {
     const nombreLineas = wrapTicketLine(l.nombre, nameChars);
     const primera = nombreLineas.shift() || '';
-    const totalTxt = conPrecio ? `${(Number(l.precio) * Number(l.qty)).toFixed(2)} €` : '';
+    const totalTxt = conPrecio ? `${(Number(l.precio) * Number(l.qty)).toFixed(2)}â‚¬` : '';
     const extras = [];
     nombreLineas.forEach(n => extras.push(`<div class="ticket-subline">${n}</div>`));
     if (l.nota) extras.push(`<div class="ticket-note">-> ${l.nota}</div>`);
@@ -1053,7 +1062,7 @@ function generarPDFComanda(nombreMesa, lineas, configLocal) {
   const fecha = ahora.toLocaleDateString('es-ES');
   abrirImpresionTicket({
     titulo: `Mesa ${nombreMesa}`,
-    subtitulo: `${fecha} · ${hora}`,
+    subtitulo: `${fecha} Â· ${hora}`,
     lineas,
     configLocal,
     mostrarPrecio: false,
@@ -1086,11 +1095,11 @@ function generarTXTComanda(nombreMesa, lineas, configLocal) {
   document.body.removeChild(a); URL.revokeObjectURL(url);
 }
 
-// Cuota
+// ── Cuota ─────────────────────────────────────────────────────────────────────
 let quotaActual = null;
 
 onValue(ref(db, 'config/quota/lineas'), snap => {
-  quotaActual = snap.val() ?? null;
+  quotaActual = snap.val() ? null;
   renderQuotaBadge();
 });
 
@@ -1100,16 +1109,16 @@ function renderQuotaBadge() {
   if (quotaActual === null || quotaActual === -1) { badge.style.display = 'none'; return; }
   if (quotaActual <= 0) {
     badge.style.cssText = 'display:inline-flex;background:rgba(229,53,53,.12);color:#e53535;border-color:rgba(229,53,53,.3)';
-    badge.textContent = 'Sin lineas';
+    badge.textContent = 'âš  Sin lÃ­neas';
   } else if (quotaActual <= 200) {
     badge.style.cssText = 'display:inline-flex;background:rgba(229,150,53,.12);color:#e57a35;border-color:rgba(229,150,53,.3)';
-    badge.textContent = quotaActual + ' lineas restantes';
+    badge.textContent = 'âš  ' + quotaActual + ' lÃ­neas restantes';
   } else {
     badge.style.display = 'none';
   }
 }
 
-// Log de modificaciones
+// ── Log de modificaciones ─────────────────────────────────────────────────────
 async function logAccion(mesaId, envioId, accion, detalle) {
   try {
     await push(ref(db, `pedidos/${mesaId}/${envioId}/log`), {
@@ -1118,7 +1127,7 @@ async function logAccion(mesaId, envioId, accion, detalle) {
   } catch(e) {}
 }
 
-// Enviar pedido
+// ── Enviar pedido ─────────────────────────────────────────────────────────────
 function crearPayloadPedidoDesdeCarrito() {
   const envioTs = Date.now();
   const envioId = envioTs + '_' + mesaId;
@@ -1134,7 +1143,6 @@ function crearPayloadPedidoDesdeCarrito() {
     };
     lineasImprimir.push({ nombre: art.nombre, precio: Number(art.precio), qty, nota: nota || '' });
   });
-
 
   return {
     envioId,
@@ -1160,7 +1168,7 @@ async function registrarPedidoEnFirebase(payload) {
     lineas: payload.lineas
   });
 
-  await logAccion(payload.mesaId, payload.envioId, 'enviado', `${payload.nLineas} lineas`);
+  await logAccion(payload.mesaId, payload.envioId, 'enviado', `${payload.nLineas} líneas`);
 
   if (payload.quotaSnapshot !== null && payload.quotaSnapshot !== -1) {
     const quotaRef = ref(db, 'config/quota/lineas');
@@ -1220,8 +1228,8 @@ window.enviarPedido = async () => {
   if (quotaActual !== null && quotaActual !== -1) {
     if (quotaActual <= 0) {
       showModal({
-      title: 'Límite de pedidos alcanzado',
-      body: 'Se han agotado las líneas de pedido incluidas en el plan. Contacta con el administrador.',
+        title: 'Límite de pedidos alcanzado',
+        body: 'Se han agotado las líneas de pedido incluidas en el plan. Contacta con el administrador.',
         buttons: [{ label: 'Entendido', style: 'primary' }]
       });
       return;
@@ -1229,7 +1237,7 @@ window.enviarPedido = async () => {
     if (quotaActual < nLineas) {
       showModal({
         title: 'Líneas insuficientes',
-        body: 'Quedan ' + quotaActual + ' líneas y el pedido tiene ' + nLineas + '. Reduce el pedido o contacta con el administrador.',
+        body: `Quedan ${quotaActual} líneas y el pedido tiene ${nLineas}. Reduce el pedido o contacta con el administrador.`,
         buttons: [{ label: 'Entendido', style: 'primary' }]
       });
       return;
@@ -1238,8 +1246,8 @@ window.enviarPedido = async () => {
 
   const btn1 = document.getElementById('btn-enviar');
   const btn2 = document.getElementById('btn-enviar-drawer');
-  btn1.disabled = true; btn1.textContent = '...';
-  btn2.disabled = true; btn2.textContent = '...';
+  btn1.disabled = true; btn1.textContent = '…';
+  btn2.disabled = true; btn2.textContent = '…';
 
   const payload = crearPayloadPedidoDesdeCarrito();
   document.getElementById('btn-cuenta').style.display = '';
@@ -1260,9 +1268,9 @@ window.enviarPedido = async () => {
       await sincronizarPedidosPendientes();
       enviadoAhora = !pedidosPendientes().some(item => item.envioId === payload.envioId);
     }
-  } catch(e) {}
+  } catch (e) {}
 
-  btn1.textContent = enviadoAhora ? 'OK Enviado' : 'Guardado offline';
+  btn1.textContent = enviadoAhora ? '✓ Enviado' : 'Guardado offline';
   btn1.disabled = false;
   btn2.textContent = 'Enviar pedido';
 
@@ -1270,15 +1278,14 @@ window.enviarPedido = async () => {
   if (enviadoAhora && restante !== null && restante !== -1 && restante > 0 && restante <= 100) {
     setTimeout(() => showModal({
       title: 'Pocas líneas restantes',
-      body: 'Quedan ' + restante + ' líneas disponibles.',
+      body: `Quedan ${restante} líneas disponibles.`,
       buttons: [{ label: 'Entendido' }]
     }), 800);
   }
 
   setTimeout(() => { btn1.textContent = 'Enviar'; updateUI(); }, 1800);
 };
-
-// Cuenta / ticket
+// ── Cuenta / ticket ───────────────────────────────────────────────────────────
 async function cargarTicketActual() {
   if (!mesaId) return;
   const snap = await get(ref(db, 'pedidos/' + mesaId));
@@ -1352,7 +1359,7 @@ async function imprimirTicketFinal(lineasServidas, total) {
     } catch (err) {
       console.error('Error enviando ticket al servicio', err);
       showModal({
-        title: 'Error de impresion remota',
+        title: 'Error de impresiÃ³n remota',
         body: 'No se pudo enviar el ticket al servicio Python. Puedes reintentarlo o usar el modo navegador.',
         buttons: [{ label: 'Cerrar', style: 'primary' }]
       });
@@ -1406,8 +1413,8 @@ function qtyMaxEnCuenta(linea) {
 function limpiarNotaTicket(nota) {
   return (nota || '')
     .replace(/Comprobar/g, '').replace(/Verificado/g, '')
-    .replace(/⚠️/g, '').replace(/✅/g, '')
-    .replace(/·/g, '').replace(/\s+/g, ' ').trim();
+    .replace(/âš ï¸/g, '').replace(/âœ…/g, '')
+    .replace(/Ã‚Â·/g, '').replace(/\s+/g, ' ').trim();
 }
 
 function renderTicket(pedidos) {
@@ -1426,7 +1433,7 @@ function renderTicket(pedidos) {
 
   if (!lineasServidas.length) {
     document.getElementById('ticket-card').innerHTML =
-      '<div class="ticket-edit-hint">No hay artículos servidos aún</div>' +
+      '<div class="ticket-edit-hint">No hay artÃ­culos servidos aÃºn</div>' +
       '<div class="ticket-total"><span>Total</span><span>' + fmtEu(0) + '</span></div>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:1rem">' +
         '<button class="btn-transferir no-print" style="flex:1;background:none;color:var(--muted);border:1px solid var(--border);border-radius:12px;padding:10px;font-family:var(--mono);font-size:13px;cursor:pointer">Transferir</button>' +
@@ -1476,7 +1483,7 @@ function renderTicket(pedidos) {
   }).join('');
 
   const textoHint = ticketEditMode
-    ? 'Modo edicion: ajusta cantidades sin reenviar nada a barra o cocina'
+    ? 'Modo ediciÃ³n: ajusta cantidades sin reenviar nada a barra o cocina'
     : 'Cuenta actual: ' + totalUds + ' uds | ' + fmtEu(total);
 
   document.getElementById('ticket-card').innerHTML =
@@ -1492,7 +1499,7 @@ function renderTicket(pedidos) {
     '<div class="ticket-total"><span>Total</span><span>' + fmtEu(total) + '</span></div>' +
     pie +
     '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:1rem">' +
-      '<button class="btn-descuento no-print" style="flex:1;background:rgba(53,199,119,.1);color:var(--success);border:1px solid rgba(53,199,119,.3);border-radius:12px;padding:10px;font-family:var(--mono);font-size:13px;cursor:pointer">+ Descuento</button>' +
+      '<button class="btn-descuento no-print" style="flex:1;background:rgba(53,199,119,.1);color:var(--success);border:1px solid rgba(53,199,119,.3);border-radius:12px;padding:10px;font-family:var(--mono);font-size:13px;cursor:pointer">ï¼‹ Descuento</button>' +
       '<button class="btn-partir no-print" style="flex:1;background:none;color:var(--accent2);border:1px solid rgba(61,122,255,.3);border-radius:12px;padding:10px;font-family:var(--mono);font-size:13px;cursor:pointer">Partir cuenta</button>' +
       '<button class="btn-transferir no-print" style="flex:1;background:none;color:var(--muted);border:1px solid var(--border);border-radius:12px;padding:10px;font-family:var(--mono);font-size:13px;cursor:pointer">Transferir</button>' +
     '</div>' +
@@ -1538,7 +1545,7 @@ async function editarCantidadTicket(i, delta) {
   const path = 'pedidos/' + mesaId + '/' + l.envioId + '/lineas/' + l.artId + '/qtyTicket';
   if (nuevaQty === qtyMaxEnCuenta(l)) await set(ref(db, path), null);
   else await set(ref(db, path), nuevaQty);
-  await logAccion(mesaId, l.envioId, 'cantidad_editada', `${l.artId}: ${l.qtyCuenta}->${nuevaQty}`);
+  await logAccion(mesaId, l.envioId, 'cantidad_editada', `${l.artId}: ${l.qtyCuenta}â†’${nuevaQty}`);
   await cargarTicketActual();
 }
 
@@ -1547,12 +1554,12 @@ async function quitarDelTicket(i) {
   if (!l) return;
   const { envioId, artId } = l;
   const notaBase = (l.nota || '')
-    .replace(/\s*·?\s*⚠️\s*Comprobar/g, '').replace(/\s*·?\s*✅\s*Verificado/g, '').trim();
+    .replace(/\s*Â·?\s*âš ï¸\s*Comprobar/g, '').replace(/\s*Â·?\s*âœ…\s*Verificado/g, '').trim();
   const updates = {
     [`pedidos/${mesaId}/${envioId}/lineas/${artId}/verificado`]: false,
     [`pedidos/${mesaId}/${envioId}/lineas/${artId}/qtyServida`]: null,
     [`pedidos/${mesaId}/${envioId}/lineas/${artId}/qtyTicket`]: null,
-    [`pedidos/${mesaId}/${envioId}/lineas/${artId}/nota`]: (notaBase ? notaBase + ' · ' : '') + '⚠️ Comprobar',
+    [`pedidos/${mesaId}/${envioId}/lineas/${artId}/nota`]: (notaBase ? notaBase + ' Â· ' : '') + 'âš ï¸ Comprobar',
   };
   if (l.estado === 'servido') updates[`pedidos/${mesaId}/${envioId}/lineas/${artId}/estado`] = 'pendiente';
   await update(ref(db), updates);
@@ -1560,15 +1567,15 @@ async function quitarDelTicket(i) {
   await cargarTicketActual();
 }
 
-// Descuento manual
+// ── Descuento manual ──────────────────────────────────────────────────────────
 function abrirDescuentoModal() {
-  document.getElementById('modal-title').textContent = '+ Anadir descuento';
+  document.getElementById('modal-title').textContent = 'ï¼‹ AÃ±adir descuento';
   const modalBody = document.getElementById('modal-body');
   modalBody.innerHTML = `
     <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
-      <input type="text" id="desc-nombre" placeholder="Descripcion (ej: Invitacion, Descuento 10%)"
+      <input type="text" id="desc-nombre" placeholder="DescripciÃ³n (ej: InvitaciÃ³n, Descuento 10%)"
         style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;color:var(--text);outline:none" />
-      <input type="number" id="desc-importe" placeholder="Importe a descontar €" min="0.01" step="0.01"
+      <input type="number" id="desc-importe" placeholder="Importe a descontar â‚¬" min="0.01" step="0.01"
         style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;color:var(--text);outline:none" />
     </div>`;
   const acts = document.getElementById('modal-actions');
@@ -1602,7 +1609,7 @@ function abrirDescuentoModal() {
   setTimeout(() => document.getElementById('desc-nombre')?.focus(), 80);
 }
 
-// Partir cuenta
+// ── Partir cuenta ─────────────────────────────────────────────────────────────
 function abrirPartirCuentaModal(totalActual) {
   document.getElementById('modal-title').textContent = 'Partir cuenta';
   const modalBody = document.getElementById('modal-body');
@@ -1634,7 +1641,7 @@ function abrirPartirCuentaModal(totalActual) {
   setTimeout(() => inp.focus(), 80);
 }
 
-// Transferir mesa
+// ── Transferir mesa ───────────────────────────────────────────────────────────
 function abrirTransferirMesaModal() {
   const mesasLibres = Object.entries(mesasData).filter(([id, m]) => m.estado === 'libre' && id !== mesaId);
   if (!mesasLibres.length) {
@@ -1684,11 +1691,11 @@ async function transferirMesa(mesaDestId) {
   await cargarTicketActual();
 }
 
-// Cerrar mesa
+// ── Cerrar mesa ───────────────────────────────────────────────────────────────
 window.cerrarMesa = async () => {
   showModal({
     title: 'Cerrar mesa ' + mesaNombre,
-    body: 'Se borraran todos los pedidos de esta mesa. ¿Continuar?',
+    body: 'Se borrarÃ¡n todos los pedidos de esta mesa. Â¿Continuar?',
     buttons: [
       { label: 'Cancelar' },
       { label: 'Cerrar mesa', style: 'danger', action: async () => {
@@ -1716,7 +1723,7 @@ window.cerrarMesa = async () => {
             ts: ahora.getTime(), fecha: ahora.toLocaleDateString('es-ES'),
             hora: ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
             total: Math.round(total * 100) / 100, lineas
-        });
+          });
         }
 
         await remove(ref(db, 'pedidos/' + mesaId));
@@ -1729,7 +1736,7 @@ window.cerrarMesa = async () => {
   });
 };
 
-// Show / navegacion
+// ── Show / navegación ─────────────────────────────────────────────────────────
 renderEstadoSync();
 programarSyncCola(250);
 setInterval(() => {
