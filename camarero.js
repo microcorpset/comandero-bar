@@ -809,10 +809,12 @@ document.body.appendChild(iframeComanda);
 
 function getTicketPaperConfig(configLocal) {
   const paper = String(configLocal?.ticketPaper || configLocal?.papelTicket || '58mm').toLowerCase();
+  const fontSize = Number(configLocal?.ticketFontSize || (paper.includes('80') ? 10 : 9));
+  const uppercase = configLocal?.ticketUppercase === true;
   if (paper.includes('80')) {
-    return { paper: '80mm', width: '80mm', bodyWidth: '72mm', chars: 48 };
+    return { paper: '80mm', width: '80mm', bodyWidth: '72mm', chars: 48, fontSize, uppercase };
   }
-  return { paper: '58mm', width: '58mm', bodyWidth: '50mm', chars: 32 };
+  return { paper: '58mm', width: '58mm', bodyWidth: '50mm', chars: 32, fontSize, uppercase };
 }
 
 function wrapTicketLine(text, maxChars) {
@@ -852,11 +854,22 @@ function renderTicketRowsHTML(lineas, maxChars, conPrecio) {
   }).join('');
 }
 
-function abrirImpresionTicket({ titulo, subtitulo, lineas, configLocal, mostrarPrecio = false, mostrarTotal = false, total = 0, pie = '' }) {
+function escapeHtml(text) {
+  return String(text || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function abrirImpresionTicket({ titulo, subtitulo, lineas, configLocal, mostrarPrecio = false, mostrarTotal = false, total = 0, pie = '', mostrarLogo = false }) {
   const paperCfg = getTicketPaperConfig(configLocal);
-  const cabecera = configLocal?.nombre
-    ? `<div class="local">${configLocal.nombre}${configLocal.direccion ? `<br><span>${configLocal.direccion}</span>` : ''}</div>`
+  const logoHtml = mostrarLogo && configLocal?.ticketLogoUrl
+    ? `<div class="ticket-logo-wrap"><img class="ticket-logo" src="${escapeHtml(configLocal.ticketLogoUrl)}" alt="Logo" /></div>`
     : '';
+  const cabecera = (configLocal?.nombre || configLocal?.direccion || configLocal?.telefono || configLocal?.cif)
+    ? `<div class="local">${logoHtml}${configLocal?.nombre ? `<div class="local-name">${configLocal.nombre}</div>` : ''}${configLocal?.direccion ? `<div class="local-line">${configLocal.direccion}</div>` : ''}${configLocal?.telefono ? `<div class="local-line">${configLocal.telefono}</div>` : ''}${configLocal?.cif ? `<div class="local-line">${configLocal.cif}</div>` : ''}</div>`
+    : logoHtml;
   const rows = renderTicketRowsHTML(lineas, paperCfg.chars, mostrarPrecio);
   const totalHtml = mostrarTotal
     ? `<div class="print-total"><span>Total</span><span>${fmtEu(total)}</span></div>`
@@ -869,11 +882,14 @@ function abrirImpresionTicket({ titulo, subtitulo, lineas, configLocal, mostrarP
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     @page{size:${paperCfg.width} auto;margin:0}
-    body{font-family:monospace;font-size:13px;width:${paperCfg.bodyWidth};padding:3mm;color:#111}
-    .local{font-size:11px;color:#555;border-bottom:1px dashed #ccc;padding-bottom:5px;margin-bottom:8px}
-    .local span{font-size:10px}
-    h2{font-size:15px;font-weight:bold;margin-bottom:2px}
-    .sub{font-size:10px;color:#777;margin-bottom:10px}
+    body{font-family:monospace;font-size:${paperCfg.fontSize}px;width:${paperCfg.bodyWidth};padding:3mm;color:#111;${paperCfg.uppercase ? 'text-transform:uppercase;' : ''}}
+    .local{text-align:center;color:#555;border-bottom:1px dashed #ccc;padding-bottom:6px;margin-bottom:8px}
+    .local-name{font-size:${paperCfg.fontSize + 3}px;font-weight:bold;letter-spacing:.02em}
+    .local-line{font-size:${Math.max(9, paperCfg.fontSize - 1)}px;line-height:1.35}
+    .ticket-logo-wrap{text-align:center;margin-bottom:6px}
+    .ticket-logo{max-width:100%;max-height:${paperCfg.paper === '80mm' ? '70px' : '52px'};object-fit:contain}
+    h2{font-size:${paperCfg.fontSize + 4}px;font-weight:bold;margin-bottom:2px;text-align:center}
+    .sub{font-size:${Math.max(9, paperCfg.fontSize - 1)}px;color:#777;margin-bottom:10px;text-align:center}
     .print-line{padding:4px 0;border-bottom:1px solid #eee}
     .print-line:last-of-type{border-bottom:none}
     .print-line-top{display:flex;gap:6px;align-items:flex-start}
@@ -908,7 +924,8 @@ function generarPDFComanda(nombreMesa, lineas, configLocal) {
     lineas,
     configLocal,
     mostrarPrecio: false,
-    mostrarTotal: false
+    mostrarTotal: false,
+    mostrarLogo: false
   });
 }
 
@@ -1084,7 +1101,8 @@ function imprimirTicketFinal(lineasServidas, total) {
     mostrarPrecio: true,
     mostrarTotal: true,
     total,
-    pie: configLocal?.footer || ''
+    pie: configLocal?.footer || '',
+    mostrarLogo: true
   });
 }
 

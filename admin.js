@@ -928,7 +928,10 @@ async function init() {
     document.getElementById('local-telefono').value  = d.telefono  || '';
     document.getElementById('local-cif').value       = d.cif       || '';
     document.getElementById('local-footer').value    = d.footer    || '';
+    document.getElementById('local-ticket-logo').value = d.ticketLogoUrl || '';
     document.getElementById('local-ticket-paper').value = d.ticketPaper || d.papelTicket || '58mm';
+    document.getElementById('local-ticket-font-size').value = d.ticketFontSize || 9;
+    document.getElementById('local-ticket-uppercase').value = String(d.ticketUppercase === true);
   });
   onValue(ref(db, 'historial'), snap => {
     historialVentasCache = normalizarHistorialVentasData(snap.val() || {});
@@ -1043,7 +1046,10 @@ window.guardarLocal = async () => {
     telefono:  document.getElementById('local-telefono').value.trim(),
     cif:       document.getElementById('local-cif').value.trim(),
     footer:    document.getElementById('local-footer').value.trim(),
+    ticketLogoUrl: document.getElementById('local-ticket-logo').value.trim(),
     ticketPaper: document.getElementById('local-ticket-paper').value || '58mm',
+    ticketFontSize: parseFloat(document.getElementById('local-ticket-font-size').value) || 9,
+    ticketUppercase: document.getElementById('local-ticket-uppercase').value === 'true',
   });
   toast('Datos del local guardados');
 };
