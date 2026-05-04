@@ -28,6 +28,7 @@ let ticketEditMode = false;
 let pedidosData = {};
 let alertasConfig = { verde: 10, amarillo: 20 };
 let firebaseConnected = true;
+let browserOnline = navigator.onLine;
 
 const OFFLINE_QUEUE_KEY = 'camarero_offline_queue_v1';
 let offlineQueue = cargarColaOffline();
@@ -168,6 +169,8 @@ document.addEventListener('visibilitychange', () => {
 });
 window.addEventListener('focus', () => programarSyncCola(120));
 window.addEventListener('online', () => programarSyncCola(120));
+window.addEventListener('online', () => { browserOnline = true; renderEstadoSync(); });
+window.addEventListener('offline', () => { browserOnline = false; renderEstadoSync(); });
 
 // â”€â”€ Modal de nota â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 window.abrirNotaModal = (artId, nombreArt) => {
@@ -313,7 +316,7 @@ function renderEstadoSync() {
   }
 
   if (!banner) return;
-  if (!firebaseConnected) {
+  if (!browserOnline || !firebaseConnected) {
     banner.style.display = 'flex';
     banner.textContent = total
       ? `Sin conexion - ${total} pedido${total > 1 ? 's' : ''} guardado${total > 1 ? 's' : ''} para sincronizar`
@@ -1181,7 +1184,7 @@ async function registrarPedidoEnFirebase(payload) {
 }
 
 async function sincronizarPedidosPendientes() {
-  if (syncEnCurso || !pedidosPendientes().length || !firebaseConnected) return;
+  if (syncEnCurso || !pedidosPendientes().length || !firebaseConnected || !browserOnline) return;
   syncEnCurso = true;
   renderEstadoSync();
 
@@ -1255,8 +1258,10 @@ window.enviarPedido = async () => {
 
   let enviadoAhora = false;
   try {
-    await sincronizarPedidosPendientes();
-    enviadoAhora = !pedidosPendientes().some(item => item.envioId === payload.envioId);
+    if (browserOnline && firebaseConnected) {
+      await sincronizarPedidosPendientes();
+      enviadoAhora = !pedidosPendientes().some(item => item.envioId === payload.envioId);
+    }
   } catch(e) {}
 
   btn1.textContent = enviadoAhora ? 'OK Enviado' : 'Guardado offline';
