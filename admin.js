@@ -1154,7 +1154,7 @@ window.marcarPendientesComoImpresas = async () => {
   });
 
   if (!totalColas && !totalTickets) {
-    toast('No habÃ­a pendientes del servicio para marcar');
+    toast('No había pendientes del servicio para marcar');
     return;
   }
 

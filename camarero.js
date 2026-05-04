@@ -1147,7 +1147,7 @@ async function imprimirTicketFinal(lineasServidas, total) {
     } catch (err) {
       console.error('Error enviando ticket al servicio', err);
       showModal({
-        title: 'Error de impresiÃ³n remota',
+        title: 'Error de impresión remota',
         body: 'No se pudo enviar el ticket al servicio Python. Puedes reintentarlo o usar el modo navegador.',
         buttons: [{ label: 'Cerrar', style: 'primary' }]
       });
