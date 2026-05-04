@@ -44,16 +44,21 @@ const USER_SESSION = 'cam_user';
 let usuariosData   = {};
 let camareroActual = sessionStorage.getItem(USER_SESSION) || '';
 let pinBuffer      = '';
+let usuariosReady  = false;
 
-get(ref(db, 'config/usuarios')).then(s => {
+const usuariosReadyPromise = get(ref(db, 'config/usuarios')).then(s => {
   usuariosData = s.val() || {};
   if (!Object.keys(usuariosData).length) {
-    get(ref(db, 'config/pins/camarero')).then(p => {
+    return get(ref(db, 'config/pins/camarero')).then(p => {
       if (p.val()) usuariosData['_default'] = { nombre: 'Camarero', pin: p.val() };
       else         usuariosData['_default'] = { nombre: 'Camarero', pin: '1234' };
     });
   }
-}).catch(() => { usuariosData['_default'] = { nombre: 'Camarero', pin: '1234' }; });
+}).catch(() => {
+  usuariosData['_default'] = { nombre: 'Camarero', pin: '1234' };
+}).finally(() => {
+  usuariosReady = true;
+});
 
 if (sessionStorage.getItem(PIN_SESSION) === '1' && camareroActual) {
   document.getElementById('pin-screen').style.display = 'none';
@@ -75,7 +80,8 @@ function updatePinDots(error) {
     dot.className = 'pin-dot'+(i<pinBuffer.length?(error?' error':' filled'):'');
   }
 }
-function verificarPin() {
+async function verificarPin() {
+  if (!usuariosReady) await usuariosReadyPromise;
   const match = Object.values(usuariosData).find(u => u.pin === pinBuffer);
   if (match) {
     camareroActual = match.nombre;
