@@ -1,4 +1,4 @@
-﻿// â”€â”€ PROTECCIÃ“N DE DOMINIO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+﻿// Proteccion de dominio
 const _dominiosPermitidos = [
   'microcorpset.github.io',
   'localhost',
@@ -8,7 +8,6 @@ if (!_dominiosPermitidos.some(d => location.hostname === d || location.hostname.
   document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:monospace;color:#888">Acceso no autorizado</div>';
   throw new Error('Dominio no autorizado');
 }
-// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 import { authReady, db } from './firebase.js';
 import { ref, onValue, push, set, remove, get, update }
@@ -16,9 +15,9 @@ import { ref, onValue, push, set, remove, get, update }
 
 await authReady;
 
-// â”€â”€â”€ ESTADO GLOBAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-// carrito: key â†’ { art, qty, nota }
-// key es artId para artÃ­culos simples, artId__v{idx} para variantes
+// Estado global
+// carrito: key -> { art, qty, nota }
+// key es artId para articulos simples, artId__v{idx} para variantes
 let mesaId = null, mesaNombre = null;
 let carrito = {};
 let mesasData = {}, cartaData = {}, categoriasData = {};
@@ -37,7 +36,7 @@ let syncTimer = null;
 
 normalizarColaOffline();
 
-// â”€â”€ USUARIOS / PIN multi-camarero â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Usuarios / PIN multi-camarero
 const PIN_SESSION  = 'cam_auth';
 const USER_SESSION = 'cam_user';
 let usuariosData   = {};
@@ -97,7 +96,7 @@ document.getElementById('pin-pad').addEventListener('click', e => {
   else if (k !== '') pinKey(k);
 });
 
-// â”€â”€ MODAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Modal
 function showModal({ title, body, buttons }) {
   document.getElementById('modal-title').textContent = title;
   document.getElementById('modal-body').textContent = body;
@@ -125,7 +124,7 @@ document.querySelector('.resumen-info')?.addEventListener('click', () => {
   if (window.innerWidth <= 640 && mesaId) abrirDrawer();
 });
 
-// â”€â”€ TOGGLES PDF / TXT / WAKE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Toggles PDF / TXT / wake
 const PRINT_KEY = 'camarero_pdf';
 let autoPDF = localStorage.getItem(PRINT_KEY) === 'true';
 const printTrack = document.getElementById('print-track');
@@ -172,17 +171,17 @@ window.addEventListener('online', () => programarSyncCola(120));
 window.addEventListener('online', () => { browserOnline = true; renderEstadoSync(); });
 window.addEventListener('offline', () => { browserOnline = false; renderEstadoSync(); });
 
-// â”€â”€ Modal de nota â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Modal de nota
 window.abrirNotaModal = (artId, nombreArt) => {
   // Buscar nota del carrito: puede ser artId simple o primer variant key
   const carritoKey = Object.keys(carrito).find(k => k === artId || k.startsWith(artId + '__v')) || artId;
   const notaActual = carrito[carritoKey]?.nota || '';
-  showModal({ title: 'ðŸ“ ' + nombreArt, body: '', buttons: [] });
+  showModal({ title: 'Nota: ' + nombreArt, body: '', buttons: [] });
   const modalBody = document.getElementById('modal-body');
   modalBody.innerHTML = '';
   const inp = document.createElement('input');
   inp.type = 'text'; inp.value = notaActual;
-  inp.placeholder = 'ej: poco hecho, sin cebollaâ€¦';
+  inp.placeholder = 'ej: poco hecho, sin cebolla...';
   inp.style.cssText = 'width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;font-family:var(--sans);color:var(--text);outline:none';
   inp.addEventListener('keydown', e => { if (e.key === 'Enter') guardarNota(); });
   modalBody.appendChild(inp);
@@ -210,7 +209,7 @@ window.abrirNotaModal = (artId, nombreArt) => {
   }
 };
 
-// â”€â”€ LISTENERS FIREBASE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Listeners Firebase
 onValue(ref(db, 'mesas'), snap => { mesasData = snap.val() || {}; renderMesas(); });
 onValue(ref(db, 'categorias'), snap => { categoriasData = snap.val() || {}; catsReady = true; if (cartaReady && mesaId) renderCarta(); });
 onValue(ref(db, 'carta'), snap => { cartaData = snap.val() || {}; cartaReady = true; if (catsReady && mesaId) renderCarta(); });
@@ -231,7 +230,7 @@ onValue(ref(db, '.info/connected'), snap => {
   if (firebaseConnected) programarSyncCola(120);
 });
 
-// â”€â”€ HELPERS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Helpers
 function fmtEu(n) {
   return Number(n || 0).toFixed(2).replace('.', ',') + ' €';
 }
@@ -364,7 +363,7 @@ function resumenMesaActual(id) {
   return `<strong>${uds} uds</strong> | <strong>${fmtEu(total)}</strong>`;
 }
 
-// â”€â”€ MESAS CON COLORES Y ZONAS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Mesas con colores y zonas
 function renderMesas() {
   const grid = document.getElementById('mesas-grid');
   const entries = Object.entries(mesasData)
@@ -476,11 +475,11 @@ window.volverMesas = () => {
   if (Object.keys(mesasData).length) renderMesas();
 };
 
-// â”€â”€ CARTA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Carta
 function renderCarta() {
   const body = document.getElementById('carta-body');
   const cats = Object.entries(categoriasData).sort(([,a],[,b]) => a.nombre.localeCompare(b.nombre, 'es'));
-  if (!cats.length) { body.innerHTML = '<div class="loading">Sin categorÃ­as.</div>'; return; }
+  if (!cats.length) { body.innerHTML = '<div class="loading">Sin categorias.</div>'; return; }
   body.innerHTML = '';
 
   cats.forEach(([catId, cat]) => {
@@ -499,7 +498,7 @@ function renderCarta() {
     toggle.innerHTML = `
       <span class="cat-nombre-label">${cat.nombre}</span>
       <span class="cat-count" id="catcount-${catId}"></span>
-      <span class="cat-arrow">â–¾</span>`;
+      <span class="cat-arrow">▾</span>`;
     toggle.addEventListener('click', () => toggleCat(section));
     section.appendChild(toggle);
 
@@ -515,7 +514,7 @@ function renderCarta() {
       const mainRow = document.createElement('div');
       mainRow.className = 'art-main';
 
-      // AlÃ©rgenos: botÃ³n compacto si los hay
+      // Alergenos: boton compacto si los hay
       const alergenosBtn = art.alergenos?.length
         ? `<button class="btn-alergenos" data-artid="${artId}" title="Ver alérgenos">!</button>`
         : '';
@@ -541,7 +540,7 @@ function renderCarta() {
           onclick="abrirNotaModal('${artId}','${art.nombre.replace(/'/g,"\\'")}')" ${agotado?'disabled':''}>N</button>`;
       wrap.appendChild(mainRow);
 
-      // Panel de alÃ©rgenos (oculto por defecto)
+      // Panel de alergenos (oculto por defecto)
       if (art.alergenos?.length) {
         const alergDiv = document.createElement('div');
         alergDiv.id = 'alerg-' + artId;
@@ -566,10 +565,10 @@ function renderCarta() {
     if (alergBtn) toggleAlergenos(alergBtn.dataset.artid);
   };
 
-  // Rellenar selector de categorÃ­as en mÃ³vil
+  // Rellenar selector de categorias en movil
   const catSel = document.getElementById('cat-filter-sel');
   if (catSel) {
-    catSel.innerHTML = '<option value="">Todas las categorÃ­as</option>';
+    catSel.innerHTML = '<option value="">Todas las categorias</option>';
     cats.forEach(([catId, cat]) => {
       const arts = Object.entries(cartaData).filter(([,a]) => a.catId === catId);
       if (!arts.length) return;
@@ -577,7 +576,7 @@ function renderCarta() {
     });
   }
 
-  // Panel de categorÃ­as (popup mÃ³vil)
+  // Panel de categorias (popup movil)
   const panel = document.getElementById('cats-panel');
   if (panel) {
     panel.innerHTML = '';
@@ -640,7 +639,7 @@ function renderCarta() {
   updateUI();
 }
 
-// Filtrar carta por categorÃ­a en mÃ³vil
+// Filtrar carta por categoria en movil
 window.filtrarCategoria = (catId) => {
   if (!catId) {
     document.querySelectorAll('.cat-section').forEach(s => {
@@ -681,18 +680,18 @@ function toggleCat(section) {
   items.style.maxHeight = collapsed ? '0' : '4000px';
 }
 
-// â”€â”€ CARRITO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Carrito
 function cambiarQty(artId, delta) {
   const art = cartaData[artId];
   if (!art) return;
 
-  // ArtÃ­culo con variantes: mostrar modal al sumar
+  // Articulo con variantes: mostrar modal al sumar
   if (delta > 0 && art.variantes?.length) {
     abrirVarianteModal(artId, art);
     return;
   }
 
-  // ArtÃ­culo con variantes: restar la Ãºltima variante aÃ±adida
+  // Articulo con variantes: restar la ultima variante anadida
   if (delta < 0 && art.variantes?.length) {
     const varKeys = Object.keys(carrito).filter(k => k.startsWith(artId + '__v'));
     if (varKeys.length) {
@@ -708,7 +707,7 @@ function cambiarQty(artId, delta) {
     return;
   }
 
-  // ArtÃ­culo simple
+  // Articulo simple
   const prev = carrito[artId]?.qty || 0;
   const nota = carrito[artId]?.nota || '';
   const next = Math.max(0, prev + delta);
@@ -809,7 +808,7 @@ window.actualizarNota = (artId, valor) => {
 };
 
 function updateQtyDisplay() {
-  // Para cada artÃ­culo de la carta, sumar todas las entradas del carrito
+  // Para cada articulo de la carta, sumar todas las entradas del carrito
   Object.keys(cartaData).forEach(id => {
     const el = document.getElementById('qty-' + id);
     if (!el) return;
@@ -825,7 +824,7 @@ function updateQtyDisplay() {
     }
   });
 
-  // Contador por categorÃ­a
+  // Contador por categoria
   Object.entries(categoriasData).forEach(([catId]) => {
     const el = document.getElementById('catcount-' + catId);
     if (!el) return;
@@ -863,7 +862,6 @@ function updateUI() {
   renderEstadoSync();
 }
 
-// â”€â”€ DRAWER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 window.abrirDrawer = () => {
   renderDrawer();
   document.getElementById('drawer').classList.add('open');
@@ -935,7 +933,7 @@ window.drawerNota = (carritoKey, valor) => {
   if (carrito[carritoKey]) carrito[carritoKey].nota = valor.trim();
 };
 
-// â”€â”€ IMPRESIÃ“N â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Impresion
 const iframeComanda = document.createElement('iframe');
 iframeComanda.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;border:none';
 document.body.appendChild(iframeComanda);
@@ -972,7 +970,7 @@ function renderTicketRowsHTML(lineas, maxChars, conPrecio) {
   return lineas.map(l => {
     const nombreLineas = wrapTicketLine(l.nombre, nameChars);
     const primera = nombreLineas.shift() || '';
-    const totalTxt = conPrecio ? `${(Number(l.precio) * Number(l.qty)).toFixed(2)}â‚¬` : '';
+    const totalTxt = conPrecio ? `${(Number(l.precio) * Number(l.qty)).toFixed(2)} €` : '';
     const extras = [];
     nombreLineas.forEach(n => extras.push(`<div class="ticket-subline">${n}</div>`));
     if (l.nota) extras.push(`<div class="ticket-note">-> ${l.nota}</div>`);
@@ -1055,7 +1053,7 @@ function generarPDFComanda(nombreMesa, lineas, configLocal) {
   const fecha = ahora.toLocaleDateString('es-ES');
   abrirImpresionTicket({
     titulo: `Mesa ${nombreMesa}`,
-    subtitulo: `${fecha} Â· ${hora}`,
+    subtitulo: `${fecha} · ${hora}`,
     lineas,
     configLocal,
     mostrarPrecio: false,
@@ -1088,7 +1086,7 @@ function generarTXTComanda(nombreMesa, lineas, configLocal) {
   document.body.removeChild(a); URL.revokeObjectURL(url);
 }
 
-// â”€â”€ CUOTA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Cuota
 let quotaActual = null;
 
 onValue(ref(db, 'config/quota/lineas'), snap => {
@@ -1102,16 +1100,16 @@ function renderQuotaBadge() {
   if (quotaActual === null || quotaActual === -1) { badge.style.display = 'none'; return; }
   if (quotaActual <= 0) {
     badge.style.cssText = 'display:inline-flex;background:rgba(229,53,53,.12);color:#e53535;border-color:rgba(229,53,53,.3)';
-    badge.textContent = 'âš  Sin lÃ­neas';
+    badge.textContent = 'Sin lineas';
   } else if (quotaActual <= 200) {
     badge.style.cssText = 'display:inline-flex;background:rgba(229,150,53,.12);color:#e57a35;border-color:rgba(229,150,53,.3)';
-    badge.textContent = 'âš  ' + quotaActual + ' lÃ­neas restantes';
+    badge.textContent = quotaActual + ' lineas restantes';
   } else {
     badge.style.display = 'none';
   }
 }
 
-// â”€â”€ LOG DE MODIFICACIONES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Log de modificaciones
 async function logAccion(mesaId, envioId, accion, detalle) {
   try {
     await push(ref(db, `pedidos/${mesaId}/${envioId}/log`), {
@@ -1120,7 +1118,7 @@ async function logAccion(mesaId, envioId, accion, detalle) {
   } catch(e) {}
 }
 
-// â”€â”€ ENVIAR PEDIDO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Enviar pedido
 function crearPayloadPedidoDesdeCarrito() {
   const envioTs = Date.now();
   const envioId = envioTs + '_' + mesaId;
@@ -1162,7 +1160,7 @@ async function registrarPedidoEnFirebase(payload) {
     lineas: payload.lineas
   });
 
-  await logAccion(payload.mesaId, payload.envioId, 'enviado', `${payload.nLineas} lÃ­neas`);
+  await logAccion(payload.mesaId, payload.envioId, 'enviado', `${payload.nLineas} lineas`);
 
   if (payload.quotaSnapshot !== null && payload.quotaSnapshot !== -1) {
     const quotaRef = ref(db, 'config/quota/lineas');
@@ -1280,7 +1278,7 @@ window.enviarPedido = async () => {
   setTimeout(() => { btn1.textContent = 'Enviar'; updateUI(); }, 1800);
 };
 
-// â”€â”€ CUENTA / TICKET â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Cuenta / ticket
 async function cargarTicketActual() {
   if (!mesaId) return;
   const snap = await get(ref(db, 'pedidos/' + mesaId));
@@ -1354,7 +1352,7 @@ async function imprimirTicketFinal(lineasServidas, total) {
     } catch (err) {
       console.error('Error enviando ticket al servicio', err);
       showModal({
-        title: 'Error de impresiÃ³n remota',
+        title: 'Error de impresion remota',
         body: 'No se pudo enviar el ticket al servicio Python. Puedes reintentarlo o usar el modo navegador.',
         buttons: [{ label: 'Cerrar', style: 'primary' }]
       });
@@ -1408,8 +1406,8 @@ function qtyMaxEnCuenta(linea) {
 function limpiarNotaTicket(nota) {
   return (nota || '')
     .replace(/Comprobar/g, '').replace(/Verificado/g, '')
-    .replace(/âš ï¸/g, '').replace(/âœ…/g, '')
-    .replace(/Ã‚Â·/g, '').replace(/\s+/g, ' ').trim();
+    .replace(/⚠️/g, '').replace(/✅/g, '')
+    .replace(/·/g, '').replace(/\s+/g, ' ').trim();
 }
 
 function renderTicket(pedidos) {
@@ -1478,7 +1476,7 @@ function renderTicket(pedidos) {
   }).join('');
 
   const textoHint = ticketEditMode
-    ? 'Modo ediciÃ³n: ajusta cantidades sin reenviar nada a barra o cocina'
+    ? 'Modo edicion: ajusta cantidades sin reenviar nada a barra o cocina'
     : 'Cuenta actual: ' + totalUds + ' uds | ' + fmtEu(total);
 
   document.getElementById('ticket-card').innerHTML =
@@ -1494,7 +1492,7 @@ function renderTicket(pedidos) {
     '<div class="ticket-total"><span>Total</span><span>' + fmtEu(total) + '</span></div>' +
     pie +
     '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:1rem">' +
-      '<button class="btn-descuento no-print" style="flex:1;background:rgba(53,199,119,.1);color:var(--success);border:1px solid rgba(53,199,119,.3);border-radius:12px;padding:10px;font-family:var(--mono);font-size:13px;cursor:pointer">ï¼‹ Descuento</button>' +
+      '<button class="btn-descuento no-print" style="flex:1;background:rgba(53,199,119,.1);color:var(--success);border:1px solid rgba(53,199,119,.3);border-radius:12px;padding:10px;font-family:var(--mono);font-size:13px;cursor:pointer">+ Descuento</button>' +
       '<button class="btn-partir no-print" style="flex:1;background:none;color:var(--accent2);border:1px solid rgba(61,122,255,.3);border-radius:12px;padding:10px;font-family:var(--mono);font-size:13px;cursor:pointer">Partir cuenta</button>' +
       '<button class="btn-transferir no-print" style="flex:1;background:none;color:var(--muted);border:1px solid var(--border);border-radius:12px;padding:10px;font-family:var(--mono);font-size:13px;cursor:pointer">Transferir</button>' +
     '</div>' +
@@ -1540,7 +1538,7 @@ async function editarCantidadTicket(i, delta) {
   const path = 'pedidos/' + mesaId + '/' + l.envioId + '/lineas/' + l.artId + '/qtyTicket';
   if (nuevaQty === qtyMaxEnCuenta(l)) await set(ref(db, path), null);
   else await set(ref(db, path), nuevaQty);
-  await logAccion(mesaId, l.envioId, 'cantidad_editada', `${l.artId}: ${l.qtyCuenta}â†’${nuevaQty}`);
+  await logAccion(mesaId, l.envioId, 'cantidad_editada', `${l.artId}: ${l.qtyCuenta}->${nuevaQty}`);
   await cargarTicketActual();
 }
 
@@ -1549,12 +1547,12 @@ async function quitarDelTicket(i) {
   if (!l) return;
   const { envioId, artId } = l;
   const notaBase = (l.nota || '')
-    .replace(/\s*Â·?\s*âš ï¸\s*Comprobar/g, '').replace(/\s*Â·?\s*âœ…\s*Verificado/g, '').trim();
+    .replace(/\s*·?\s*⚠️\s*Comprobar/g, '').replace(/\s*·?\s*✅\s*Verificado/g, '').trim();
   const updates = {
     [`pedidos/${mesaId}/${envioId}/lineas/${artId}/verificado`]: false,
     [`pedidos/${mesaId}/${envioId}/lineas/${artId}/qtyServida`]: null,
     [`pedidos/${mesaId}/${envioId}/lineas/${artId}/qtyTicket`]: null,
-    [`pedidos/${mesaId}/${envioId}/lineas/${artId}/nota`]: (notaBase ? notaBase + ' Â· ' : '') + 'âš ï¸ Comprobar',
+    [`pedidos/${mesaId}/${envioId}/lineas/${artId}/nota`]: (notaBase ? notaBase + ' · ' : '') + '⚠️ Comprobar',
   };
   if (l.estado === 'servido') updates[`pedidos/${mesaId}/${envioId}/lineas/${artId}/estado`] = 'pendiente';
   await update(ref(db), updates);
@@ -1562,15 +1560,15 @@ async function quitarDelTicket(i) {
   await cargarTicketActual();
 }
 
-// â”€â”€ DESCUENTO MANUAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Descuento manual
 function abrirDescuentoModal() {
-  document.getElementById('modal-title').textContent = 'ï¼‹ AÃ±adir descuento';
+  document.getElementById('modal-title').textContent = '+ Anadir descuento';
   const modalBody = document.getElementById('modal-body');
   modalBody.innerHTML = `
     <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
-      <input type="text" id="desc-nombre" placeholder="DescripciÃ³n (ej: InvitaciÃ³n, Descuento 10%)"
+      <input type="text" id="desc-nombre" placeholder="Descripcion (ej: Invitacion, Descuento 10%)"
         style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;color:var(--text);outline:none" />
-      <input type="number" id="desc-importe" placeholder="Importe a descontar â‚¬" min="0.01" step="0.01"
+      <input type="number" id="desc-importe" placeholder="Importe a descontar €" min="0.01" step="0.01"
         style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;color:var(--text);outline:none" />
     </div>`;
   const acts = document.getElementById('modal-actions');
@@ -1604,7 +1602,7 @@ function abrirDescuentoModal() {
   setTimeout(() => document.getElementById('desc-nombre')?.focus(), 80);
 }
 
-// â”€â”€ PARTIR CUENTA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Partir cuenta
 function abrirPartirCuentaModal(totalActual) {
   document.getElementById('modal-title').textContent = 'Partir cuenta';
   const modalBody = document.getElementById('modal-body');
@@ -1636,7 +1634,7 @@ function abrirPartirCuentaModal(totalActual) {
   setTimeout(() => inp.focus(), 80);
 }
 
-// â”€â”€ TRANSFERIR MESA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Transferir mesa
 function abrirTransferirMesaModal() {
   const mesasLibres = Object.entries(mesasData).filter(([id, m]) => m.estado === 'libre' && id !== mesaId);
   if (!mesasLibres.length) {
@@ -1686,11 +1684,11 @@ async function transferirMesa(mesaDestId) {
   await cargarTicketActual();
 }
 
-// â”€â”€ CERRAR MESA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Cerrar mesa
 window.cerrarMesa = async () => {
   showModal({
     title: 'Cerrar mesa ' + mesaNombre,
-    body: 'Se borrarÃ¡n todos los pedidos de esta mesa. Â¿Continuar?',
+    body: 'Se borraran todos los pedidos de esta mesa. ¿Continuar?',
     buttons: [
       { label: 'Cancelar' },
       { label: 'Cerrar mesa', style: 'danger', action: async () => {
@@ -1718,7 +1716,7 @@ window.cerrarMesa = async () => {
             ts: ahora.getTime(), fecha: ahora.toLocaleDateString('es-ES'),
             hora: ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
             total: Math.round(total * 100) / 100, lineas
-          });
+        });
         }
 
         await remove(ref(db, 'pedidos/' + mesaId));
@@ -1731,7 +1729,7 @@ window.cerrarMesa = async () => {
   });
 };
 
-// â”€â”€ SHOW / NAVEGACIÃ“N â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Show / navegacion
 renderEstadoSync();
 programarSyncCola(250);
 setInterval(() => {
