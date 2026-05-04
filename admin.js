@@ -20,6 +20,7 @@ await authReady;
 // ─── CONTRASEÑA ──────────────────────────────────────────────────────────────
 const ADMIN_PWD_DEFAULT = 'admin1234';
 const ADMIN_PWD_PATH = 'config/admin/password';
+const PRINT_SERVICE_ID = 'local-print-service-1';
 
 window.checkLogin = async () => {
   const pwd = document.getElementById('pwd-input').value;
@@ -797,6 +798,48 @@ window.guardarAlertas = async () => {
   toast('Umbrales de alerta guardados');
 };
 
+window.marcarPendientesComoImpresas = async () => {
+  const snap = await get(ref(db, 'pedidos'));
+  const pedidos = snap.val() || {};
+  const serviceKey = PRINT_SERVICE_ID.replace(/[.#$/\[\]]+/g, '_');
+  const now = Date.now();
+  const updates = {};
+  let totalMarcadas = 0;
+
+  Object.entries(pedidos).forEach(([mesaId, envios]) => {
+    Object.entries(envios || {}).forEach(([envioId, envio]) => {
+      const lineas = Object.values(envio.lineas || {});
+      const tieneBarra = lineas.some(l => l.estado === 'pendiente' && (l.destino === 'barra' || l.destino === 'ambos'));
+      const tieneCocina = lineas.some(l => l.estado === 'pendiente' && (l.destino === 'cocina' || l.destino === 'ambos'));
+
+      if (tieneBarra) {
+        updates[`pedidos/${mesaId}/${envioId}/_printService/barra/${serviceKey}`] = {
+          printedAt: now,
+          serviceId: PRINT_SERVICE_ID,
+          manualSkip: true
+        };
+        totalMarcadas++;
+      }
+      if (tieneCocina) {
+        updates[`pedidos/${mesaId}/${envioId}/_printService/cocina/${serviceKey}`] = {
+          printedAt: now,
+          serviceId: PRINT_SERVICE_ID,
+          manualSkip: true
+        };
+        totalMarcadas++;
+      }
+    });
+  });
+
+  if (!totalMarcadas) {
+    toast('No había comandas pendientes para marcar');
+    return;
+  }
+
+  await update(ref(db), updates);
+  toast(`Marcadas ${totalMarcadas} colas de impresión como impresas`);
+};
+
 // ─── TURNO ────────────────────────────────────────────────────────────────────
 window.abrirTurno = async () => {
   const nombre = document.getElementById('turno-nombre')?.value.trim() || 'Turno';
@@ -932,6 +975,8 @@ async function init() {
     document.getElementById('local-ticket-paper').value = d.ticketPaper || d.papelTicket || '58mm';
     document.getElementById('local-ticket-font-size').value = d.ticketFontSize || 9;
     document.getElementById('local-ticket-uppercase').value = String(d.ticketUppercase === true);
+    document.getElementById('local-ticket-margin-x').value = d.ticketMarginX ?? 3;
+    document.getElementById('local-ticket-margin-y').value = d.ticketMarginY ?? 3;
   });
   onValue(ref(db, 'historial'), snap => {
     historialVentasCache = normalizarHistorialVentasData(snap.val() || {});
@@ -1050,6 +1095,8 @@ window.guardarLocal = async () => {
     ticketPaper: document.getElementById('local-ticket-paper').value || '58mm',
     ticketFontSize: parseFloat(document.getElementById('local-ticket-font-size').value) || 9,
     ticketUppercase: document.getElementById('local-ticket-uppercase').value === 'true',
+    ticketMarginX: parseFloat(document.getElementById('local-ticket-margin-x').value) || 3,
+    ticketMarginY: parseFloat(document.getElementById('local-ticket-margin-y').value) || 3,
   });
   toast('Datos del local guardados');
 };

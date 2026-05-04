@@ -811,10 +811,12 @@ function getTicketPaperConfig(configLocal) {
   const paper = String(configLocal?.ticketPaper || configLocal?.papelTicket || '58mm').toLowerCase();
   const fontSize = Number(configLocal?.ticketFontSize || (paper.includes('80') ? 10 : 9));
   const uppercase = configLocal?.ticketUppercase === true;
+  const marginX = Number(configLocal?.ticketMarginX ?? 3);
+  const marginY = Number(configLocal?.ticketMarginY ?? 3);
   if (paper.includes('80')) {
-    return { paper: '80mm', width: '80mm', bodyWidth: '72mm', chars: 48, fontSize, uppercase };
+    return { paper: '80mm', width: '80mm', bodyWidth: '72mm', chars: 48, fontSize, uppercase, marginX, marginY };
   }
-  return { paper: '58mm', width: '58mm', bodyWidth: '50mm', chars: 32, fontSize, uppercase };
+  return { paper: '58mm', width: '58mm', bodyWidth: '50mm', chars: 32, fontSize, uppercase, marginX, marginY };
 }
 
 function wrapTicketLine(text, maxChars) {
@@ -882,7 +884,7 @@ function abrirImpresionTicket({ titulo, subtitulo, lineas, configLocal, mostrarP
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     @page{size:${paperCfg.width} auto;margin:0}
-    body{font-family:monospace;font-size:${paperCfg.fontSize}px;width:${paperCfg.bodyWidth};padding:3mm;color:#111;${paperCfg.uppercase ? 'text-transform:uppercase;' : ''}}
+    body{font-family:monospace;font-size:${paperCfg.fontSize}px;width:${paperCfg.bodyWidth};padding:${paperCfg.marginY}mm ${paperCfg.marginX}mm;color:#111;${paperCfg.uppercase ? 'text-transform:uppercase;' : ''}}
     .local{text-align:center;color:#555;border-bottom:1px dashed #ccc;padding-bottom:6px;margin-bottom:8px}
     .local-name{font-size:${paperCfg.fontSize + 3}px;font-weight:bold;letter-spacing:.02em}
     .local-line{font-size:${Math.max(9, paperCfg.fontSize - 1)}px;line-height:1.35}
@@ -900,7 +902,7 @@ function abrirImpresionTicket({ titulo, subtitulo, lineas, configLocal, mostrarP
     .ticket-note{padding-left:24px;font-size:10px;color:#666;font-style:italic}
     .print-total{display:flex;justify-content:space-between;border-top:1px dashed #999;margin-top:8px;padding-top:8px;font-weight:bold}
     .print-footer{text-align:center;font-size:11px;color:#666;margin-top:10px;padding-top:8px;border-top:1px dashed #ccc}
-    @media print{body{width:${paperCfg.bodyWidth};padding:0}}
+    @media print{body{width:${paperCfg.bodyWidth};padding:${paperCfg.marginY}mm ${paperCfg.marginX}mm}}
   </style></head><body>
   ${cabecera}
   <h2>${titulo}</h2>
