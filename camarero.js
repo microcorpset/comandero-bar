@@ -1229,7 +1229,7 @@ function abrirImpresionTicket({ titulo, subtitulo, lineas, configLocal, mostrarP
     .ticket-note{padding-left:24px;font-size:10px;color:#333;font-style:italic}
     .print-total{display:flex;justify-content:space-between;border-top:1px dashed #666;margin-top:8px;padding-top:8px;font-weight:bold;color:#000}
     .print-footer{text-align:center;font-size:11px;color:#333;margin-top:10px;padding-top:8px;border-top:1px dashed #999}
-    @media print{body{width:${paperCfg.bodyWidth};padding:${paperCfg.marginY}mm ${paperCfg.marginX}mm}*{color:#000!important}}
+    @media print{body{width:${paperCfg.bodyWidth};padding:${paperCfg.marginY}mm ${paperCfg.marginX}mm}*{color:#000!important;border-color:#000!important}}
   </style></head><body>
   ${cabecera}
   <h2>${titulo}</h2>
@@ -1472,7 +1472,8 @@ async function enviarTicketFinalAServicio(lineasServidas, total) {
       direccion: configLocal?.direccion || '',
       telefono: configLocal?.telefono || '',
       cif: configLocal?.cif || '',
-      footer: configLocal?.footer || ''
+      footer: configLocal?.footer || '',
+      logoUrl: configLocal?.ticketLogoUrl || ''
     },
     format: {
       paper: paperCfg.paper,
