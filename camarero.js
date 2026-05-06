@@ -1212,24 +1212,24 @@ function abrirImpresionTicket({ titulo, subtitulo, lineas, configLocal, mostrarP
     *{box-sizing:border-box;margin:0;padding:0}
     @page{size:${paperCfg.width} auto;margin:0}
     body{font-family:monospace;font-size:${paperCfg.fontSize}px;width:${paperCfg.bodyWidth};padding:${paperCfg.marginY}mm ${paperCfg.marginX}mm;color:#111;${paperCfg.uppercase ? 'text-transform:uppercase;' : ''}}
-    .local{text-align:center;color:#555;border-bottom:1px dashed #ccc;padding-bottom:6px;margin-bottom:8px}
-    .local-name{font-size:${paperCfg.fontSize + 3}px;font-weight:bold;letter-spacing:.02em}
-    .local-line{font-size:${Math.max(9, paperCfg.fontSize - 1)}px;line-height:1.35}
+    .local{text-align:center;color:#111;border-bottom:1px dashed #999;padding-bottom:6px;margin-bottom:8px}
+    .local-name{font-size:${paperCfg.fontSize + 3}px;font-weight:bold;letter-spacing:.02em;color:#000}
+    .local-line{font-size:${Math.max(9, paperCfg.fontSize - 1)}px;line-height:1.35;color:#111}
     .ticket-logo-wrap{text-align:center;margin-bottom:6px}
     .ticket-logo{max-width:100%;max-height:${paperCfg.paper === '80mm' ? '70px' : '52px'};object-fit:contain}
-    h2{font-size:${paperCfg.fontSize + 4}px;font-weight:bold;margin-bottom:2px;text-align:center}
-    .sub{font-size:${Math.max(9, paperCfg.fontSize - 1)}px;color:#777;margin-bottom:10px;text-align:center}
-    .print-line{padding:4px 0;border-bottom:1px solid #eee}
+    h2{font-size:${paperCfg.fontSize + 4}px;font-weight:bold;margin-bottom:2px;text-align:center;color:#000}
+    .sub{font-size:${Math.max(9, paperCfg.fontSize - 1)}px;color:#333;margin-bottom:10px;text-align:center}
+    .print-line{padding:4px 0;border-bottom:1px solid #ccc}
     .print-line:last-of-type{border-bottom:none}
     .print-line-top{display:flex;gap:6px;align-items:flex-start}
     .print-qty{font-weight:bold;white-space:nowrap}
     .print-name{flex:1;min-width:0}
     .print-price{text-align:right;white-space:nowrap;padding-left:6px}
     .ticket-subline{padding-left:24px}
-    .ticket-note{padding-left:24px;font-size:10px;color:#666;font-style:italic}
-    .print-total{display:flex;justify-content:space-between;border-top:1px dashed #999;margin-top:8px;padding-top:8px;font-weight:bold}
-    .print-footer{text-align:center;font-size:11px;color:#666;margin-top:10px;padding-top:8px;border-top:1px dashed #ccc}
-    @media print{body{width:${paperCfg.bodyWidth};padding:${paperCfg.marginY}mm ${paperCfg.marginX}mm}}
+    .ticket-note{padding-left:24px;font-size:10px;color:#333;font-style:italic}
+    .print-total{display:flex;justify-content:space-between;border-top:1px dashed #666;margin-top:8px;padding-top:8px;font-weight:bold;color:#000}
+    .print-footer{text-align:center;font-size:11px;color:#333;margin-top:10px;padding-top:8px;border-top:1px dashed #999}
+    @media print{body{width:${paperCfg.bodyWidth};padding:${paperCfg.marginY}mm ${paperCfg.marginX}mm}*{color:#000!important}}
   </style></head><body>
   ${cabecera}
   <h2>${titulo}</h2>
