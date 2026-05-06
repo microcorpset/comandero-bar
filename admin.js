@@ -4,7 +4,9 @@ const _dominiosPermitidos = [
   'localhost',
   '127.0.0.1'
 ];
-if (!_dominiosPermitidos.some(d => location.hostname === d || location.hostname.endsWith('.' + d))) {
+const _accesoWebNormal = location.protocol === 'https:' || location.protocol === 'http:';
+const _accesoLocalArchivo = location.protocol === 'file:' && !location.hostname;
+if (!_accesoWebNormal && !_accesoLocalArchivo && !_dominiosPermitidos.some(d => location.hostname === d || location.hostname.endsWith('.' + d))) {
   document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:monospace;color:#888">Acceso no autorizado</div>';
   throw new Error('Dominio no autorizado');
 }
@@ -41,6 +43,8 @@ window.checkLogin = async () => {
 document.getElementById('pwd-input').addEventListener('keydown', e => {
   if (e.key === 'Enter') window.checkLogin();
 });
+
+normalizePrinterServiceCopy();
 
 window.changePwd = async () => {
   const v = document.getElementById('new-pwd').value.trim();
@@ -82,6 +86,31 @@ function getConfiguredServiceMaxAgeMinutes() {
 function syncServiceMaxAgeLabel(minutes = getConfiguredServiceMaxAgeMinutes()) {
   const label = document.getElementById('service-max-age-label');
   if (label) label.textContent = `${minutes} min`;
+}
+
+function normalizePrinterServiceCopy() {
+  const liveState = document.getElementById('printer-service-live-state');
+  const liveMeta = document.getElementById('printer-service-live-meta');
+  const liveSeen = document.getElementById('printer-service-live-seen');
+  const liveAction = document.getElementById('printer-service-live-action');
+  const serviceMaxAgeLabel = document.querySelector('label[for="local-service-max-age"]');
+  const helperPills = Array.from(document.querySelectorAll('.helper-pill'));
+  const serviceButtons = Array.from(document.querySelectorAll('button[onclick*="setPrinterServiceDesiredState"]'));
+
+  if (liveState) liveState.textContent = 'Sin conexion';
+  if (liveMeta) liveMeta.textContent = 'Esperando senal del servicio';
+  if (liveSeen) liveSeen.textContent = '-';
+  if (liveAction) liveAction.textContent = '-';
+  if (serviceMaxAgeLabel) serviceMaxAgeLabel.textContent = 'Antiguedad maxima para imprimir (min)';
+
+  helperPills.forEach(pill => {
+    if (pill.textContent.includes('service-max-age-label') || pill.innerHTML.includes('service-max-age-label')) {
+      pill.innerHTML = 'El servicio no imprimira comandas ni tickets con mas de <strong id="service-max-age-label">15 min</strong> de antiguedad.';
+    }
+  });
+
+  if (serviceButtons[0]) serviceButtons[0].textContent = 'Activar impresion';
+  if (serviceButtons[1]) serviceButtons[1].textContent = 'Pausar impresion';
 }
 
 function formatServiceSeenText(ts) {
@@ -1388,6 +1417,51 @@ function renderPrinterServiceStatus() {
   if (status.lastError) {
     actionEl.textContent = 'Error reciente';
     metaEl.textContent = `${metaEl.textContent} · ${String(status.lastError).slice(0, 80)}`;
+  } else if (status.lastAction) {
+    actionEl.textContent = String(status.lastAction);
+  } else {
+    actionEl.textContent = '-';
+  }
+}
+
+function renderPrinterServiceStatus() {
+  const stateEl = document.getElementById('printer-service-live-state');
+  const metaEl = document.getElementById('printer-service-live-meta');
+  const seenEl = document.getElementById('printer-service-live-seen');
+  const actionEl = document.getElementById('printer-service-live-action');
+  if (!stateEl || !metaEl || !seenEl || !actionEl) return;
+
+  const serviceId = getConfiguredPrintServiceId();
+  const status = printerServiceStatusCache[safeServiceKey(serviceId)] || {};
+  const desiredState = localConfigCache.serviceDesiredState === 'paused' ? 'paused' : 'active';
+  const lastSeenAt = Number(status.lastSeenAt || 0);
+  const isOnline = !!lastSeenAt && (Date.now() - lastSeenAt) <= SERVICE_HEARTBEAT_TIMEOUT_MS;
+  const runtimeState = String(status.state || (desiredState === 'paused' ? 'paused' : 'idle'));
+
+  let title = 'Sin conexion';
+  let meta = 'Esperando senal del servicio';
+
+  if (isOnline && runtimeState === 'paused') {
+    title = 'En pausa';
+    meta = 'Servicio conectado pero detenido por control remoto';
+  } else if (isOnline && runtimeState === 'active') {
+    title = 'Activo';
+    meta = 'Servicio conectado y listo para imprimir';
+  } else if (isOnline) {
+    title = 'Conectado';
+    meta = 'Servicio encendido sin trabajos recientes';
+  } else if (runtimeState === 'paused') {
+    title = 'Pausado sin conexion';
+    meta = 'La ultima orden conocida era pausa';
+  }
+
+  stateEl.textContent = title;
+  metaEl.textContent = `${meta} | objetivo ${desiredState === 'paused' ? 'pausa' : 'activo'}`;
+  seenEl.textContent = formatServiceSeenText(lastSeenAt);
+
+  if (status.lastError) {
+    actionEl.textContent = 'Error reciente';
+    metaEl.textContent = `${metaEl.textContent} | ${String(status.lastError).slice(0, 80)}`;
   } else if (status.lastAction) {
     actionEl.textContent = String(status.lastAction);
   } else {
