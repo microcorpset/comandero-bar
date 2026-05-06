@@ -4,9 +4,7 @@ const _dominiosPermitidos = [
   'localhost',
   '127.0.0.1'
 ];
-const _accesoWebNormal = location.protocol === 'https:' || location.protocol === 'http:';
-const _accesoLocalArchivo = location.protocol === 'file:' && !location.hostname;
-if (!_accesoWebNormal && !_accesoLocalArchivo && !_dominiosPermitidos.some(d => location.hostname === d || location.hostname.endsWith('.' + d))) {
+if (!_dominiosPermitidos.some(d => location.hostname === d || location.hostname.endsWith('.' + d))) {
   document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:monospace;color:#888">Acceso no autorizado</div>';
   throw new Error('Dominio no autorizado');
 }
@@ -23,8 +21,6 @@ await authReady;
 const ADMIN_PWD_DEFAULT = 'admin1234';
 const ADMIN_PWD_PATH = 'config/admin/password';
 const PRINT_SERVICE_ID = 'local-print-service-1';
-const DEFAULT_SERVICE_MAX_AGE_MINUTES = 15;
-const SERVICE_HEARTBEAT_TIMEOUT_MS = 45000;
 
 window.checkLogin = async () => {
   const pwd = document.getElementById('pwd-input').value;
@@ -43,8 +39,6 @@ window.checkLogin = async () => {
 document.getElementById('pwd-input').addEventListener('keydown', e => {
   if (e.key === 'Enter') window.checkLogin();
 });
-
-normalizePrinterServiceCopy();
 
 window.changePwd = async () => {
   const v = document.getElementById('new-pwd').value.trim();
@@ -69,155 +63,6 @@ function toast(msg) {
   setTimeout(() => t.classList.remove('show'), 2200);
 }
 
-function safeServiceKey(serviceId) {
-  return String(serviceId || PRINT_SERVICE_ID).replace(/[.#$/\[\]]+/g, '_');
-}
-
-function getConfiguredPrintServiceId() {
-  const inputValue = document.getElementById('local-ticket-print-service-id')?.value?.trim();
-  return inputValue || localConfigCache.ticketPrintServiceId || PRINT_SERVICE_ID;
-}
-
-function getConfiguredServiceMaxAgeMinutes() {
-  const value = parseInt(localConfigCache.serviceMaxAgeMinutes, 10);
-  return Number.isFinite(value) && value > 0 ? value : DEFAULT_SERVICE_MAX_AGE_MINUTES;
-}
-
-function syncServiceMaxAgeLabel(minutes = getConfiguredServiceMaxAgeMinutes()) {
-  const label = document.getElementById('service-max-age-label');
-  if (label) label.textContent = `${minutes} min`;
-}
-
-function normalizePrinterServiceCopy() {
-  const liveState = document.getElementById('printer-service-live-state');
-  const liveMeta = document.getElementById('printer-service-live-meta');
-  const liveSeen = document.getElementById('printer-service-live-seen');
-  const liveAction = document.getElementById('printer-service-live-action');
-  const serviceMaxAgeLabel = document.querySelector('label[for="local-service-max-age"]');
-  const helperPills = Array.from(document.querySelectorAll('.helper-pill'));
-  const serviceButtons = Array.from(document.querySelectorAll('button[onclick*="setPrinterServiceDesiredState"]'));
-
-  if (liveState) liveState.textContent = 'Sin conexion';
-  if (liveMeta) liveMeta.textContent = 'Esperando senal del servicio';
-  if (liveSeen) liveSeen.textContent = '-';
-  if (liveAction) liveAction.textContent = '-';
-  if (serviceMaxAgeLabel) serviceMaxAgeLabel.textContent = 'Antiguedad maxima para imprimir (min)';
-
-  helperPills.forEach(pill => {
-    if (pill.textContent.includes('service-max-age-label') || pill.innerHTML.includes('service-max-age-label')) {
-      pill.innerHTML = 'El servicio no imprimira comandas ni tickets con mas de <strong id="service-max-age-label">15 min</strong> de antiguedad.';
-    }
-  });
-
-  if (serviceButtons[0]) serviceButtons[0].textContent = 'Activar impresion';
-  if (serviceButtons[1]) serviceButtons[1].textContent = 'Pausar impresion';
-}
-
-function formatServiceSeenText(ts) {
-  if (!ts) return '—';
-  return new Date(ts).toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
-}
-
-function renderPrinterServiceStatus() {
-  const stateEl = document.getElementById('printer-service-live-state');
-  const metaEl = document.getElementById('printer-service-live-meta');
-  const seenEl = document.getElementById('printer-service-live-seen');
-  const actionEl = document.getElementById('printer-service-live-action');
-  if (!stateEl || !metaEl || !seenEl || !actionEl) return;
-
-  const serviceId = getConfiguredPrintServiceId();
-  const status = printerServiceStatusCache[safeServiceKey(serviceId)] || {};
-  const desiredState = localConfigCache.serviceDesiredState === 'paused' ? 'paused' : 'active';
-  const lastSeenAt = Number(status.lastSeenAt || 0);
-  const isOnline = !!lastSeenAt && (Date.now() - lastSeenAt) <= SERVICE_HEARTBEAT_TIMEOUT_MS;
-  const runtimeState = String(status.state || (desiredState === 'paused' ? 'paused' : 'idle'));
-
-  let title = 'Sin conexión';
-  let meta = 'Esperando señal del servicio';
-
-  if (isOnline && runtimeState === 'paused') {
-    title = 'En pausa';
-    meta = 'Servicio conectado pero detenido por control remoto';
-  } else if (isOnline && runtimeState === 'active') {
-    title = 'Activo';
-    meta = 'Servicio conectado y listo para imprimir';
-  } else if (isOnline) {
-    title = 'Conectado';
-    meta = 'Servicio encendido sin trabajos recientes';
-  } else if (runtimeState === 'paused') {
-    title = 'Pausado sin conexión';
-    meta = 'La última orden conocida era pausa';
-  }
-
-  stateEl.textContent = title;
-  metaEl.textContent = `${meta} · objetivo ${desiredState === 'paused' ? 'pausa' : 'activo'}`;
-  seenEl.textContent = formatServiceSeenText(lastSeenAt);
-
-  if (status.lastError) {
-    actionEl.textContent = 'Error reciente';
-    metaEl.textContent = `${metaEl.textContent} · ${String(status.lastError).slice(0, 80)}`;
-  } else if (status.lastAction) {
-    actionEl.textContent = String(status.lastAction);
-  } else {
-    actionEl.textContent = '—';
-  }
-}
-
-async function markPendingPrintsAsHandled() {
-  const pedidos = (await get(ref(db, 'pedidos'))).val() || {};
-  const printJobs = (await get(ref(db, 'print_jobs'))).val() || {};
-  const serviceId = getConfiguredPrintServiceId();
-  const serviceKey = safeServiceKey(serviceId);
-  const now = Date.now();
-  const updates = {};
-  let totalColas = 0;
-  let totalTickets = 0;
-
-  Object.entries(pedidos).forEach(([mesaId, envios]) => {
-    Object.entries(envios || {}).forEach(([envioId, envio]) => {
-      const lineas = Object.values(envio.lineas || {});
-      const tieneBarra = lineas.some(l => l.estado === 'pendiente' && (l.destino === 'barra' || l.destino === 'ambos'));
-      const tieneCocina = lineas.some(l => l.estado === 'pendiente' && (l.destino === 'cocina' || l.destino === 'ambos'));
-
-      if (tieneBarra) {
-        updates[`pedidos/${mesaId}/${envioId}/_printService/barra/${serviceKey}`] = {
-          printedAt: now,
-          serviceId,
-          manualSkip: true
-        };
-        totalColas++;
-      }
-      if (tieneCocina) {
-        updates[`pedidos/${mesaId}/${envioId}/_printService/cocina/${serviceKey}`] = {
-          printedAt: now,
-          serviceId,
-          manualSkip: true
-        };
-        totalColas++;
-      }
-    });
-  });
-
-  Object.entries(printJobs).forEach(([jobId, job]) => {
-    const status = String(job?.status || 'pending');
-    const jobServiceId = String(job?.serviceId || PRINT_SERVICE_ID);
-    if (status !== 'pending' || jobServiceId !== serviceId) return;
-    updates[`print_jobs/${jobId}/status`] = 'skipped';
-    updates[`print_jobs/${jobId}/skippedAt`] = now;
-    updates[`print_jobs/${jobId}/skippedBy`] = 'admin';
-    updates[`print_jobs/${jobId}/skipReason`] = 'manual_admin_skip';
-    totalTickets++;
-  });
-
-  if (!totalColas && !totalTickets) {
-    toast('No había pendientes del servicio para marcar');
-    return;
-  }
-
-  await update(ref(db), updates);
-  toast(`Marcadas ${totalColas} colas y ${totalTickets} tickets como impresos`);
-}
-
 // ─── MÓDULO: DATOS GLOBALES ───────────────────────────────────────────────────
 let mesasData     = {};
 let cartaData     = {};
@@ -227,8 +72,6 @@ let ventasTabActiva = 'tickets';
 let historialVentasCache = [];
 let historialVentasCargado = false;
 let turnoActualCache = {};
-let localConfigCache = {};
-let printerServiceStatusCache = {};
 
 const ALERGENOS_EU = [
   'Gluten','Crustáceos','Huevo','Pescado','Cacahuetes','Soja','Lácteos',
@@ -1123,7 +966,6 @@ async function init() {
   });
   onValue(ref(db, 'config/local'), snap => {
     const d = snap.val() || {};
-    localConfigCache = d;
     document.getElementById('local-nombre').value    = d.nombre    || '';
     document.getElementById('local-direccion').value = d.direccion || '';
     document.getElementById('local-telefono').value  = d.telefono  || '';
@@ -1141,14 +983,6 @@ async function init() {
     document.getElementById('local-cocina-uppercase').value = String(d.cocinaUppercase === true);
     document.getElementById('local-ticket-print-mode').value = d.ticketPrintMode || 'browser';
     document.getElementById('local-ticket-print-service-id').value = d.ticketPrintServiceId || PRINT_SERVICE_ID;
-    document.getElementById('local-service-max-age').value = d.serviceMaxAgeMinutes || DEFAULT_SERVICE_MAX_AGE_MINUTES;
-    document.getElementById('local-service-desired-state').value = d.serviceDesiredState === 'paused' ? 'paused' : 'active';
-    syncServiceMaxAgeLabel(d.serviceMaxAgeMinutes || DEFAULT_SERVICE_MAX_AGE_MINUTES);
-    renderPrinterServiceStatus();
-  });
-  onValue(ref(db, 'service_status'), snap => {
-    printerServiceStatusCache = snap.val() || {};
-    renderPrinterServiceStatus();
   });
   onValue(ref(db, 'historial'), snap => {
     historialVentasCache = normalizarHistorialVentasData(snap.val() || {});
@@ -1257,8 +1091,6 @@ function renderStats(data) {
 }
 
 window.guardarLocal = async () => {
-  const serviceMaxAgeMinutes = parseInt(document.getElementById('local-service-max-age').value, 10) || DEFAULT_SERVICE_MAX_AGE_MINUTES;
-  const serviceDesiredState = document.getElementById('local-service-desired-state').value === 'paused' ? 'paused' : 'active';
   await set(ref(db, 'config/local'), {
     nombre:    document.getElementById('local-nombre').value.trim(),
     direccion: document.getElementById('local-direccion').value.trim(),
@@ -1277,17 +1109,7 @@ window.guardarLocal = async () => {
     cocinaUppercase: document.getElementById('local-cocina-uppercase').value === 'true',
     ticketPrintMode: document.getElementById('local-ticket-print-mode').value || 'browser',
     ticketPrintServiceId: document.getElementById('local-ticket-print-service-id').value.trim() || PRINT_SERVICE_ID,
-    serviceMaxAgeMinutes: Math.min(180, Math.max(1, serviceMaxAgeMinutes)),
-    serviceDesiredState,
   });
-  localConfigCache = {
-    ...localConfigCache,
-    serviceMaxAgeMinutes: Math.min(180, Math.max(1, serviceMaxAgeMinutes)),
-    serviceDesiredState,
-    ticketPrintServiceId: document.getElementById('local-ticket-print-service-id').value.trim() || PRINT_SERVICE_ID,
-  };
-  syncServiceMaxAgeLabel(localConfigCache.serviceMaxAgeMinutes);
-  renderPrinterServiceStatus();
   toast('Datos del local guardados');
 };
 
@@ -1343,128 +1165,3 @@ window.marcarPendientesComoImpresas = async () => {
   await update(ref(db), updates);
   toast(`Marcadas ${totalColas} colas y ${totalTickets} tickets como impresos`);
 };
-
-window.marcarPendientesComoImpresas = async () => {
-  await markPendingPrintsAsHandled();
-};
-
-window.setPrinterServiceDesiredState = async desiredState => {
-  const nextState = desiredState === 'paused' ? 'paused' : 'active';
-  await update(ref(db, 'config/local'), {
-    serviceDesiredState: nextState,
-    ticketPrintServiceId: getConfiguredPrintServiceId(),
-    serviceMaxAgeMinutes: getConfiguredServiceMaxAgeMinutes(),
-  });
-  localConfigCache = {
-    ...localConfigCache,
-    serviceDesiredState: nextState,
-  };
-  const select = document.getElementById('local-service-desired-state');
-  if (select) select.value = nextState;
-  renderPrinterServiceStatus();
-  toast(nextState === 'paused' ? 'Servicio en pausa' : 'Servicio activado');
-};
-
-document.getElementById('local-service-max-age')?.addEventListener('input', e => {
-  const value = parseInt(e.target.value, 10) || DEFAULT_SERVICE_MAX_AGE_MINUTES;
-  syncServiceMaxAgeLabel(Math.min(180, Math.max(1, value)));
-});
-
-document.getElementById('local-ticket-print-service-id')?.addEventListener('input', () => {
-  renderPrinterServiceStatus();
-});
-
-function formatServiceSeenText(ts) {
-  if (!ts) return '-';
-  return new Date(ts).toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
-}
-
-function renderPrinterServiceStatus() {
-  const stateEl = document.getElementById('printer-service-live-state');
-  const metaEl = document.getElementById('printer-service-live-meta');
-  const seenEl = document.getElementById('printer-service-live-seen');
-  const actionEl = document.getElementById('printer-service-live-action');
-  if (!stateEl || !metaEl || !seenEl || !actionEl) return;
-
-  const serviceId = getConfiguredPrintServiceId();
-  const status = printerServiceStatusCache[safeServiceKey(serviceId)] || {};
-  const desiredState = localConfigCache.serviceDesiredState === 'paused' ? 'paused' : 'active';
-  const lastSeenAt = Number(status.lastSeenAt || 0);
-  const isOnline = !!lastSeenAt && (Date.now() - lastSeenAt) <= SERVICE_HEARTBEAT_TIMEOUT_MS;
-  const runtimeState = String(status.state || (desiredState === 'paused' ? 'paused' : 'idle'));
-
-  let title = 'Sin conexion';
-  let meta = 'Esperando senal del servicio';
-
-  if (isOnline && runtimeState === 'paused') {
-    title = 'En pausa';
-    meta = 'Servicio conectado pero detenido por control remoto';
-  } else if (isOnline && runtimeState === 'active') {
-    title = 'Activo';
-    meta = 'Servicio conectado y listo para imprimir';
-  } else if (isOnline) {
-    title = 'Conectado';
-    meta = 'Servicio encendido sin trabajos recientes';
-  } else if (runtimeState === 'paused') {
-    title = 'Pausado sin conexion';
-    meta = 'La ultima orden conocida era pausa';
-  }
-
-  stateEl.textContent = title;
-  metaEl.textContent = `${meta} · objetivo ${desiredState === 'paused' ? 'pausa' : 'activo'}`;
-  seenEl.textContent = formatServiceSeenText(lastSeenAt);
-
-  if (status.lastError) {
-    actionEl.textContent = 'Error reciente';
-    metaEl.textContent = `${metaEl.textContent} · ${String(status.lastError).slice(0, 80)}`;
-  } else if (status.lastAction) {
-    actionEl.textContent = String(status.lastAction);
-  } else {
-    actionEl.textContent = '-';
-  }
-}
-
-function renderPrinterServiceStatus() {
-  const stateEl = document.getElementById('printer-service-live-state');
-  const metaEl = document.getElementById('printer-service-live-meta');
-  const seenEl = document.getElementById('printer-service-live-seen');
-  const actionEl = document.getElementById('printer-service-live-action');
-  if (!stateEl || !metaEl || !seenEl || !actionEl) return;
-
-  const serviceId = getConfiguredPrintServiceId();
-  const status = printerServiceStatusCache[safeServiceKey(serviceId)] || {};
-  const desiredState = localConfigCache.serviceDesiredState === 'paused' ? 'paused' : 'active';
-  const lastSeenAt = Number(status.lastSeenAt || 0);
-  const isOnline = !!lastSeenAt && (Date.now() - lastSeenAt) <= SERVICE_HEARTBEAT_TIMEOUT_MS;
-  const runtimeState = String(status.state || (desiredState === 'paused' ? 'paused' : 'idle'));
-
-  let title = 'Sin conexion';
-  let meta = 'Esperando senal del servicio';
-
-  if (isOnline && runtimeState === 'paused') {
-    title = 'En pausa';
-    meta = 'Servicio conectado pero detenido por control remoto';
-  } else if (isOnline && runtimeState === 'active') {
-    title = 'Activo';
-    meta = 'Servicio conectado y listo para imprimir';
-  } else if (isOnline) {
-    title = 'Conectado';
-    meta = 'Servicio encendido sin trabajos recientes';
-  } else if (runtimeState === 'paused') {
-    title = 'Pausado sin conexion';
-    meta = 'La ultima orden conocida era pausa';
-  }
-
-  stateEl.textContent = title;
-  metaEl.textContent = `${meta} | objetivo ${desiredState === 'paused' ? 'pausa' : 'activo'}`;
-  seenEl.textContent = formatServiceSeenText(lastSeenAt);
-
-  if (status.lastError) {
-    actionEl.textContent = 'Error reciente';
-    metaEl.textContent = `${metaEl.textContent} | ${String(status.lastError).slice(0, 80)}`;
-  } else if (status.lastAction) {
-    actionEl.textContent = String(status.lastAction);
-  } else {
-    actionEl.textContent = '-';
-  }
-}

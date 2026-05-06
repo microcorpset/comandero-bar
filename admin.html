@@ -1029,24 +1029,6 @@
             </div>
           </div>
           <div class="card-body">
-            <div class="metric-strip" style="margin-bottom:1rem">
-              <div class="metric-mini">
-                <strong id="printer-service-live-state">Sin conexiÃ³n</strong>
-                <span id="printer-service-live-meta">Esperando seÃ±al del servicio</span>
-              </div>
-              <div class="metric-mini">
-                <strong id="printer-service-live-seen">â€”</strong>
-                <span>Ãšltima conexiÃ³n</span>
-              </div>
-              <div class="metric-mini">
-                <strong id="printer-service-live-action">â€”</strong>
-                <span>Ãšltima acciÃ³n</span>
-              </div>
-            </div>
-            <div class="add-row" style="margin-bottom:.75rem">
-              <button class="btn btn-success" onclick="setPrinterServiceDesiredState('active')">Activar impresiÃ³n</button>
-              <button class="btn" onclick="setPrinterServiceDesiredState('paused')">Pausar impresiÃ³n</button>
-            </div>
             <div class="add-row">
               <button class="btn" onclick="marcarPendientesComoImpresas()">Marcar pendientes como impresos</button>
             </div>
@@ -1340,22 +1322,6 @@
                   <label for="local-ticket-print-service-id">ID del servicio Python</label>
                   <input type="text" id="local-ticket-print-service-id" placeholder="local-print-service-1" />
                 </div>
-              </div>
-              <div class="form-row" style="margin-top:10px">
-                <div class="field-stack" style="flex:1">
-                  <label for="local-service-max-age">AntigÃ¼edad mÃ¡xima para imprimir (min)</label>
-                  <input type="number" id="local-service-max-age" min="1" max="180" step="1" value="15" />
-                </div>
-                <div class="field-stack" style="flex:1">
-                  <label for="local-service-desired-state">Estado del servicio</label>
-                  <select id="local-service-desired-state">
-                    <option value="active">Activo</option>
-                    <option value="paused">En pausa</option>
-                  </select>
-                </div>
-              </div>
-              <div class="helper-pill" style="margin-top:.75rem">
-                El servicio no imprimirÃ¡ comandas ni tickets con mÃ¡s de <strong id="service-max-age-label">15 min</strong> de antigÃ¼edad.
               </div>
               <div class="add-row">
                 <button class="btn btn-success" onclick="guardarLocal()">Guardar datos</button>
