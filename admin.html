@@ -1303,6 +1303,18 @@
                 <input type="text" id="local-ticket-logo" placeholder="URL o data:image del logo" />
               </div>
               <div class="field-stack" style="margin-top:10px">
+                <label for="local-ticket-header-offset" style="display:flex;justify-content:space-between">
+                  <span>Ajuste centrado cabecera/eslogan (Python)</span>
+                  <span id="local-ticket-header-offset-val" style="font-family:var(--mono);color:var(--accent2)">0</span>
+                </label>
+                <input type="range" id="local-ticket-header-offset" min="-60" max="60" step="1" value="0"
+                  style="width:100%;accent-color:var(--accent2)"
+                  oninput="document.getElementById('local-ticket-header-offset-val').textContent=this.value" />
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:2px">
+                  <span>← Izquierda</span><span>Derecha →</span>
+                </div>
+              </div>
+              <div class="field-stack" style="margin-top:10px">
                 <label for="local-ticket-paper">Papel del ticket</label>
                 <select id="local-ticket-paper">
                   <option value="58mm">58 mm</option>

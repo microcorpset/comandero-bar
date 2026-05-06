@@ -1162,6 +1162,9 @@ async function init() {
     document.getElementById('local-ticket-paper').value = d.ticketPaper || d.papelTicket || '58mm';
     document.getElementById('local-ticket-font-size').value = d.ticketFontSize || 9;
     document.getElementById('local-ticket-uppercase').value = String(d.ticketUppercase === true);
+    const off = Number(d.ticketHeaderOffset ?? 0);
+    document.getElementById('local-ticket-header-offset').value = off;
+    document.getElementById('local-ticket-header-offset-val').textContent = off;
     document.getElementById('local-ticket-margin-x').value = d.ticketMarginX ?? 3;
     document.getElementById('local-ticket-margin-y').value = d.ticketMarginY ?? 3;
     document.getElementById('local-barra-font-size').value = d.barraFontSize || 9;
@@ -1292,6 +1295,7 @@ window.guardarLocal = async () => {
     ticketPaper: document.getElementById('local-ticket-paper').value || '58mm',
     ticketFontSize: parseFloat(document.getElementById('local-ticket-font-size').value) || 9,
     ticketUppercase: document.getElementById('local-ticket-uppercase').value === 'true',
+    ticketHeaderOffset: parseInt(document.getElementById('local-ticket-header-offset').value) || 0,
     ticketMarginX: parseFloat(document.getElementById('local-ticket-margin-x').value) || 3,
     ticketMarginY: parseFloat(document.getElementById('local-ticket-margin-y').value) || 3,
     barraFontSize: parseFloat(document.getElementById('local-barra-font-size').value) || 9,

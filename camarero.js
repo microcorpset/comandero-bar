@@ -1478,7 +1478,8 @@ async function enviarTicketFinalAServicio(lineasServidas, total) {
     format: {
       paper: paperCfg.paper,
       fontSize: paperCfg.fontSize,
-      uppercase: paperCfg.uppercase === true
+      uppercase: paperCfg.uppercase === true,
+      headerOffset: Number(configLocal?.ticketHeaderOffset ?? 0)
     },
     total: Math.round(Number(total || 0) * 100) / 100,
     lines: lineasServidas.map(l => ({
