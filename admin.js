@@ -217,93 +217,139 @@ window.delMesa = async (id, e) => {
 };
 
 // ─── PLANO ───────────────────────────────────────────────────────────────────
-function renderPlanoEditor() {
-  const lista = document.getElementById('plano-editor-lista');
-  const preview = document.getElementById('plano-preview-wrap');
-  if (!lista || !preview) return;
+let adminPlanoMesaSel = null; // id de la mesa seleccionada para colocar
 
+function renderPlanoEditor() {
+  const gridEl    = document.getElementById('admin-plano-grid');
+  const sidebarEl = document.getElementById('plano-sidebar');
+  if (!gridEl || !sidebarEl) return;
+
+  const cols = planoCfgAdmin.cols;
+  const rows = planoCfgAdmin.rows;
   const entries = Object.entries(mesasData)
     .sort(([,a],[,b]) => (a.orden??999)-(b.orden??999) || a.nombre.localeCompare(b.nombre,'es',{numeric:true}));
 
-  lista.innerHTML = '';
+  // ── Sidebar ───────────────────────────────────────────────────────────────
+  sidebarEl.innerHTML = '';
   entries.forEach(([id, m]) => {
-    const p = m.plano;
-    const row = document.createElement('div');
-    row.className = 'row-item';
-    row.style.flexWrap = 'wrap';
-    const posInfo = p
-      ? `<span class="row-sub" style="font-family:var(--mono);font-size:11px">X${p.x} Y${p.y} ${p.w}×${p.h} ${p.shape==='circle'?'⬤':'▬'}</span>`
-      : `<span class="row-sub" style="font-size:11px;opacity:.5">sin ubicar</span>`;
-    row.innerHTML = `
-      <span class="row-label" style="font-family:var(--mono);font-size:14px;min-width:60px">${m.nombre}</span>
-      ${posInfo}
-      <button class="btn btn-sm" onclick="editarPlanoMesa('${id}')">📍</button>`;
-    lista.appendChild(row);
-
-    // Formulario inline oculto
-    const form = document.createElement('div');
-    form.id = 'plano-form-' + id;
-    form.style.cssText = 'display:none;width:100%;padding:10px 0 6px;gap:8px;flex-wrap:wrap;align-items:flex-end';
-    form.style.display = 'none';
-    const shape = p?.shape || 'rect';
-    form.innerHTML = `
-      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;width:100%">
-        <label style="font-size:11px;display:flex;flex-direction:column;gap:3px">Col X<input type="number" id="pi-x-${id}" min="1" max="${planoCfgAdmin.cols}" value="${p?.x||1}" style="width:52px;padding:5px 7px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:var(--mono)"></label>
-        <label style="font-size:11px;display:flex;flex-direction:column;gap:3px">Fila Y<input type="number" id="pi-y-${id}" min="1" max="${planoCfgAdmin.rows}" value="${p?.y||1}" style="width:52px;padding:5px 7px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:var(--mono)"></label>
-        <label style="font-size:11px;display:flex;flex-direction:column;gap:3px">Ancho<input type="number" id="pi-w-${id}" min="1" max="${planoCfgAdmin.cols}" value="${p?.w||2}" style="width:52px;padding:5px 7px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:var(--mono)"></label>
-        <label style="font-size:11px;display:flex;flex-direction:column;gap:3px">Alto<input type="number" id="pi-h-${id}" min="1" max="${planoCfgAdmin.rows}" value="${p?.h||2}" style="width:52px;padding:5px 7px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:var(--mono)"></label>
-        <label style="font-size:11px;display:flex;flex-direction:column;gap:3px">Forma
-          <select id="pi-s-${id}" style="padding:5px 7px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text)">
-            <option value="rect"${shape==='rect'?' selected':''}>Rectángulo</option>
-            <option value="circle"${shape==='circle'?' selected':''}>Círculo</option>
-          </select>
-        </label>
-        <button class="btn btn-sm btn-success" onclick="guardarPlanoMesa('${id}')">Guardar</button>
-        <button class="btn btn-sm btn-danger" onclick="quitarPlanoMesa('${id}')">Quitar</button>
-      </div>`;
-    lista.appendChild(form);
+    const btn = document.createElement('button');
+    const isPlaced = !!m.plano;
+    btn.className = 'plano-sidebar-btn' + (isPlaced ? ' placed' : '') + (adminPlanoMesaSel === id ? ' selected' : '');
+    btn.title = isPlaced ? `Col ${m.plano.x} Fil ${m.plano.y} — ${m.plano.w}×${m.plano.h}` : 'Sin ubicar';
+    btn.innerHTML = `${m.nombre}${isPlaced ? ' <span style="opacity:.5;font-size:10px">✓</span>' : ''}`;
+    btn.onclick = () => {
+      adminPlanoMesaSel = adminPlanoMesaSel === id ? null : id;
+      renderPlanoEditor();
+    };
+    sidebarEl.appendChild(btn);
   });
 
-  // Mini preview del plano
-  const cols = planoCfgAdmin.cols;
-  const rows = planoCfgAdmin.rows;
-  const ubicadas = entries.filter(([,m]) => m.plano);
-  const mesasHTML = ubicadas.map(([,m]) => {
-    const p = m.plano;
-    const circle = p.shape === 'circle' ? ' circle' : '';
-    return `<div class="plano-mesa libre${circle}" style="grid-column:${p.x}/span ${p.w};grid-row:${p.y}/span ${p.h};font-size:9px">
-      <span style="font-weight:600;font-size:9px;text-align:center">${m.nombre}</span>
-    </div>`;
-  }).join('');
-  preview.innerHTML = ubicadas.length
-    ? `<div style="font-size:11px;color:var(--muted);margin-bottom:6px">Vista previa del plano</div>
-       <div class="plano-grid" style="--plano-cols:${cols};--plano-rows:${rows};max-height:240px">${mesasHTML}</div>`
-    : `<div style="font-size:12px;color:var(--muted);padding:8px 0">Sin mesas ubicadas aún. Asigna posiciones usando el botón 📍</div>`;
+  // ── Grid ──────────────────────────────────────────────────────────────────
+  gridEl.style.setProperty('--plano-cols', cols);
+  gridEl.style.setProperty('--plano-rows', rows);
+  // Forzar el aspect-ratio de filas también vía grid-template-rows
+  gridEl.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+  gridEl.innerHTML = '';
+
+  // Celdas de fondo (auto-placement)
+  for (let r = 1; r <= rows; r++) {
+    for (let c = 1; c <= cols; c++) {
+      const cell = document.createElement('div');
+      cell.className = 'plano-admin-cell';
+      cell.dataset.type = 'cell';
+      cell.dataset.col  = c;
+      cell.dataset.row  = r;
+      gridEl.appendChild(cell);
+    }
+  }
+
+  // Mesas colocadas (explicit placement, encima de las celdas)
+  entries.filter(([,m]) => m.plano).forEach(([id, m]) => {
+    const p   = m.plano;
+    const div = document.createElement('div');
+    div.className = 'plano-admin-mesa' +
+      (p.shape === 'circle' ? ' circle' : '') +
+      (adminPlanoMesaSel === id ? ' selected' : '');
+    div.dataset.type = 'mesa';
+    div.dataset.id   = id;
+    div.style.gridColumn = `${p.x} / span ${p.w}`;
+    div.style.gridRow    = `${p.y} / span ${p.h}`;
+    div.textContent = m.nombre;
+    gridEl.appendChild(div);
+  });
+
+  // Delegación de clicks en el grid
+  gridEl.onclick = e => {
+    const mesa = e.target.closest('[data-type="mesa"]');
+    const cell = e.target.closest('[data-type="cell"]');
+    if (mesa) {
+      // Seleccionar o deseleccionar la mesa pulsada
+      adminPlanoMesaSel = adminPlanoMesaSel === mesa.dataset.id ? null : mesa.dataset.id;
+      renderPlanoEditor();
+    } else if (cell && adminPlanoMesaSel) {
+      const m = mesasData[adminPlanoMesaSel];
+      if (!m) return;
+      const col   = parseInt(cell.dataset.col);
+      const row   = parseInt(cell.dataset.row);
+      const prevP = m.plano;
+      const w     = prevP?.w || 2;
+      const h     = prevP?.h || 2;
+      const shape = prevP?.shape || 'rect';
+      // Actualización optimista local
+      mesasData[adminPlanoMesaSel].plano = { x: col, y: row, w, h, shape };
+      renderPlanoEditor();
+      // Guardar en Firebase
+      set(ref(db, `mesas/${adminPlanoMesaSel}/plano`), { x: col, y: row, w, h, shape })
+        .then(() => toast('Mesa ubicada'));
+    }
+  };
+
+  // ── Controles de la mesa seleccionada ────────────────────────────────────
+  const ctrl = document.getElementById('plano-mesa-controls');
+  if (!ctrl) return;
+  if (!adminPlanoMesaSel || !mesasData[adminPlanoMesaSel]) {
+    ctrl.style.display = 'none';
+    return;
+  }
+  const selId = adminPlanoMesaSel;
+  const selM  = mesasData[selId];
+  const p     = selM.plano;
+  ctrl.style.display = 'flex';
+  ctrl.innerHTML = `
+    <strong style="font-family:var(--mono);font-size:13px;margin-right:4px">${selM.nombre}</strong>
+    <label class="plano-ctrl-label">Ancho
+      <input class="plano-ctrl-input" type="number" id="pctrl-w" min="1" max="${cols}" value="${p?.w||2}">
+    </label>
+    <label class="plano-ctrl-label">Alto
+      <input class="plano-ctrl-input" type="number" id="pctrl-h" min="1" max="${rows}" value="${p?.h||2}">
+    </label>
+    <label class="plano-ctrl-label">Forma
+      <select class="plano-ctrl-sel" id="pctrl-s">
+        <option value="rect"${p?.shape!=='circle'?' selected':''}>Rect</option>
+        <option value="circle"${p?.shape==='circle'?' selected':''}>Círculo</option>
+      </select>
+    </label>
+    <button class="btn btn-sm btn-success" onclick="guardarPlanoDesdeControles()">Aplicar</button>
+    <button class="btn btn-sm btn-danger" onclick="quitarPlanoMesa('${selId}')">Quitar del plano</button>`;
 }
 
-window.editarPlanoMesa = id => {
-  // Cierra todos los formularios abiertos
-  document.querySelectorAll('[id^="plano-form-"]').forEach(f => f.style.display = 'none');
-  const form = document.getElementById('plano-form-' + id);
-  if (form) form.style.display = form.style.display === 'none' ? 'flex' : 'none';
-};
-
-window.guardarPlanoMesa = async id => {
-  const x = parseInt(document.getElementById('pi-x-' + id)?.value) || 1;
-  const y = parseInt(document.getElementById('pi-y-' + id)?.value) || 1;
-  const w = Math.max(1, parseInt(document.getElementById('pi-w-' + id)?.value) || 2);
-  const h = Math.max(1, parseInt(document.getElementById('pi-h-' + id)?.value) || 2);
-  const shape = document.getElementById('pi-s-' + id)?.value || 'rect';
-  await set(ref(db, 'mesas/' + id + '/plano'), { x, y, w, h, shape });
-  const form = document.getElementById('plano-form-' + id);
-  if (form) form.style.display = 'none';
+window.guardarPlanoDesdeControles = async () => {
+  if (!adminPlanoMesaSel) return;
+  const m = mesasData[adminPlanoMesaSel];
+  if (!m?.plano) { toast('Primero ubica la mesa pulsando en el plano'); return; }
+  const w     = Math.max(1, parseInt(document.getElementById('pctrl-w')?.value) || 2);
+  const h     = Math.max(1, parseInt(document.getElementById('pctrl-h')?.value) || 2);
+  const shape = document.getElementById('pctrl-s')?.value || 'rect';
+  const { x, y } = m.plano;
+  mesasData[adminPlanoMesaSel].plano = { x, y, w, h, shape };
+  renderPlanoEditor();
+  await set(ref(db, `mesas/${adminPlanoMesaSel}/plano`), { x, y, w, h, shape });
   toast('Posición guardada');
 };
 
 window.quitarPlanoMesa = async id => {
   await remove(ref(db, 'mesas/' + id + '/plano'));
-  const form = document.getElementById('plano-form-' + id);
-  if (form) form.style.display = 'none';
+  if (adminPlanoMesaSel === id) adminPlanoMesaSel = null;
   toast('Mesa quitada del plano');
 };
 

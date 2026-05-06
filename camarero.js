@@ -557,8 +557,8 @@ function renderPlano() {
     const circle = p.shape === 'circle' ? ' circle' : '';
     const syncBadge = queuedMesas.has(id) ? ' ⏳' : '';
     return `<div class="plano-mesa ${clase}${circle}"
-      style="grid-column:${p.x}/span ${p.w};grid-row:${p.y}/span ${p.h}"
-      onclick="abrirMesa('${id}','${m.nombre.replace(/'/g,"\\'")}',${ocupada})">
+      data-id="${id}" data-nombre="${m.nombre.replace(/"/g,'&quot;')}" data-ocupada="${ocupada}"
+      style="grid-column:${p.x}/span ${p.w};grid-row:${p.y}/span ${p.h}">
       <span class="plano-mesa-nombre">${m.nombre}${syncBadge}</span>
       <span class="plano-mesa-estado">${ocupada ? 'ocupada' : 'libre'}</span>
     </div>`;
@@ -571,6 +571,12 @@ function renderPlano() {
   contenedor.innerHTML = tabsHTML +
     `<div class="plano-wrap"><div class="plano-grid" style="--plano-cols:${cols};--plano-rows:${rows}">${mesasHTML}</div></div>` +
     sinUbicarHTML;
+
+  contenedor.onclick = e => {
+    const mesa = e.target.closest('.plano-mesa[data-id]');
+    if (!mesa) return;
+    abrirMesa(mesa.dataset.id, mesa.dataset.nombre, mesa.dataset.ocupada === 'true');
+  };
 }
 
 function abrirMesa(id, nombre, ocupada) {
