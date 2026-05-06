@@ -380,7 +380,7 @@
   .plano-mesa.alerta-warn .plano-mesa-tiempo{color:var(--warn)}
   .plano-mesa.alerta-danger .plano-mesa-tiempo{color:var(--danger)}
   .plano-mesa-nombre{font-weight:700;font-size:12px;line-height:1.2;text-align:center}
-  .plano-mesa-estado{font-size:9px;color:var(--muted);line-height:1}
+  .plano-mesa-estado{font-size:9px;color:var(--muted);line-height:1;display:none}
   .plano-mesa.ocupada .plano-mesa-estado{color:var(--accent2)}
   .plano-mesa-alerta{font-size:8px;color:var(--muted);text-align:center;line-height:1.2;margin-top:1px}
   .plano-mesa.alerta-ok .plano-mesa-alerta{color:#22c55e}
@@ -389,7 +389,12 @@
   .plano-mesa-resumen{font-size:8px;color:var(--muted);text-align:center;line-height:1.2}
   .plano-mesa-resumen strong{color:var(--text)}
   .plano-mesa-sync{font-size:9px;margin-left:2px}
+  .plano-mesa-extra{display:none;font-size:8px;text-align:center;width:100%}
   .plano-sinubicar{font-size:11px;color:var(--muted);margin-top:10px;padding:0 2px}
+  @media(min-width:600px){
+    .plano-mesa-estado{display:block}
+    .plano-mesa-extra{display:contents}
+  }
 
   .mesas-links{
     margin-top:14px;
@@ -682,6 +687,7 @@
     <div class="vista-toggle">
       <button id="btn-vista-grid" class="vista-toggle-btn active" onclick="toggleVistaPlano('grid')">Grid</button>
       <button id="btn-vista-plano" class="vista-toggle-btn" onclick="toggleVistaPlano('plano')">Plano</button>
+      <button id="btn-plano-info" class="vista-toggle-btn" style="display:none;margin-left:auto" onclick="togglePlanoInfoMode()">⏳ Pendientes</button>
     </div>
     <div class="mesas-grid" id="mesas-grid"><div class="loading">Cargando...</div></div>
     <div id="plano-contenedor" style="display:none"></div>

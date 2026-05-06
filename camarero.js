@@ -26,7 +26,8 @@ let cartaReady = false, catsReady = false;
 let configLocal = {};
 let ticketEditMode = false;
 let ticketSimplificado = false;
-let mesasViewMode = localStorage.getItem('mesas_view_mode') || 'grid';
+let mesasViewMode  = localStorage.getItem('mesas_view_mode')   || 'grid';
+let planoInfoMode  = localStorage.getItem('plano_info_mode')  || 'resumen';
 let planoCfg = { cols: 16, rows: 12 };
 let planoZonaActiva = null;
 let pedidosData = {};
@@ -332,6 +333,11 @@ if (mesasViewMode === 'plano') {
   if (btnPlano) btnPlano.classList.add('active');
   if (gridEl)   gridEl.style.display = 'none';
   if (planoEl)  planoEl.style.display = '';
+  const btnInfo = document.getElementById('btn-plano-info');
+  if (btnInfo) {
+    btnInfo.style.display = '';
+    btnInfo.textContent = planoInfoMode === 'resumen' ? '⏳ Pendientes' : '💰 Totales';
+  }
 }
 
 // ── LISTENERS FIREBASE ────────────────────────────────────────────────────────
@@ -346,7 +352,7 @@ onValue(ref(db, 'pedidos'), snap => {
     if (!pedidosData[mid]) pedidosData[mid] = {};
     Object.assign(pedidosData[mid], envios);
   });
-  renderMesas();
+  mesasViewMode === 'grid' ? renderMesas() : renderPlano();
 });
 onValue(ref(db, 'config/alertas'), snap => {
   const d = snap.val();
@@ -488,7 +494,20 @@ window.toggleVistaPlano = modo => {
   document.getElementById('btn-vista-plano').classList.toggle('active', modo === 'plano');
   document.getElementById('mesas-grid').style.display = modo === 'grid' ? '' : 'none';
   document.getElementById('plano-contenedor').style.display = modo === 'plano' ? '' : 'none';
+  const btnInfo = document.getElementById('btn-plano-info');
+  if (btnInfo) {
+    btnInfo.style.display = modo === 'plano' ? '' : 'none';
+    btnInfo.textContent = planoInfoMode === 'resumen' ? '⏳ Pendientes' : '💰 Totales';
+  }
   modo === 'grid' ? renderMesas() : renderPlano();
+};
+
+window.togglePlanoInfoMode = () => {
+  planoInfoMode = planoInfoMode === 'resumen' ? 'pendientes' : 'resumen';
+  localStorage.setItem('plano_info_mode', planoInfoMode);
+  const btn = document.getElementById('btn-plano-info');
+  if (btn) btn.textContent = planoInfoMode === 'resumen' ? '⏳ Pendientes' : '💰 Totales';
+  renderPlano();
 };
 
 window.seleccionarZonaPlano = zona => {
@@ -530,20 +549,21 @@ function calcularInfoMesa(id, m) {
 
   // Pendientes
   if (!lineasPend.length)
-    return { clase: 'ocupada', alertaHTML: '', tiempoHTML, resumen };
+    return { clase: 'ocupada', alertaHTML: '', tiempoHTML, tiempoPendHTML: '', resumen };
 
-  const masAntigua = lineasPend.reduce((min, l) => l._tsMesa < min._tsMesa ? l : min, lineasPend[0]);
-  const minsPend   = Math.max(0, Math.floor((Date.now() - (masAntigua._tsMesa || Date.now())) / 60000));
+  const masAntigua  = lineasPend.reduce((min, l) => l._tsMesa < min._tsMesa ? l : min, lineasPend[0]);
+  const minsPend    = Math.max(0, Math.floor((Date.now() - (masAntigua._tsMesa || Date.now())) / 60000));
   const minsPendTxt = minsPend === 0 ? '<1m' : `${minsPend}m`;
-  const dest = masAntigua.destino === 'cocina' ? '&#127869;' : masAntigua.destino === 'barra' ? '&#127866;' : '&#127866;&#127869;';
-  const pendTxt = lineasPend.length === 1 ? '1 pend' : `${lineasPend.length} pend`;
-  const alertaHTML = `<span class="plano-mesa-alerta">${dest} ${pendTxt} · ${minsPendTxt}</span>`;
+  const dest        = masAntigua.destino === 'cocina' ? '&#127869;' : masAntigua.destino === 'barra' ? '&#127866;' : '&#127866;&#127869;';
+  const pendTxt     = lineasPend.length === 1 ? '1 pend' : `${lineasPend.length} pend`;
+  const alertaHTML  = `<span class="plano-mesa-alerta">${dest} ${pendTxt} · ${minsPendTxt}</span>`;
+  const tiempoPendHTML = `<span class="plano-mesa-tiempo">${minsPendTxt} &#9203;</span>`;
 
   let clase = 'alerta-ok';
   if      (minsPend >= alertasConfig.amarillo) clase = 'alerta-danger';
   else if (minsPend >= alertasConfig.verde)    clase = 'alerta-warn';
 
-  return { clase, alertaHTML, tiempoHTML, resumen };
+  return { clase, alertaHTML, tiempoHTML, tiempoPendHTML, resumen };
 }
 
 function renderPlano() {
@@ -583,19 +603,27 @@ function renderPlano() {
   const mesasHTML = ubicadas.map(([id, m]) => {
     const p = m.plano;
     const ocupada = m.estado === 'ocupada' || localOcupada.has(id);
-    const { clase, alertaHTML, tiempoHTML, resumen } = calcularInfoMesa(id, m);
+    const { clase, alertaHTML, tiempoHTML, tiempoPendHTML, resumen } = calcularInfoMesa(id, m);
     const circle = p.shape === 'circle' ? ' circle' : '';
     const syncBadge = queuedMesas.has(id) ? '<span class="plano-mesa-sync">⏳</span>' : '';
     const resumenHTML = resumen && resumen !== 'Sin consumo'
       ? `<span class="plano-mesa-resumen">${resumen}</span>` : '';
+
+    // Contenido principal según modo (siempre visible)
+    const topHTML  = planoInfoMode === 'resumen' ? tiempoHTML      : (tiempoPendHTML || tiempoHTML);
+    const mainHTML = planoInfoMode === 'resumen' ? resumenHTML     : (alertaHTML || resumenHTML);
+    // Extra visible solo en pantalla ancha (lo contrario del modo activo)
+    const extraHTML = planoInfoMode === 'resumen'
+      ? alertaHTML
+      : (tiempoHTML ? tiempoHTML + resumenHTML : resumenHTML);
+
     return `<div class="plano-mesa ${clase}${circle}"
       data-id="${id}" data-nombre="${m.nombre.replace(/"/g,'&quot;')}" data-ocupada="${ocupada}"
       style="grid-column:${p.x}/span ${p.w};grid-row:${p.y}/span ${p.h}">
-      ${tiempoHTML}
+      ${topHTML}
       <span class="plano-mesa-nombre">${m.nombre}${syncBadge}</span>
-      <span class="plano-mesa-estado">${ocupada ? 'ocupada' : 'libre'}</span>
-      ${alertaHTML}
-      ${resumenHTML}
+      ${mainHTML}
+      <span class="plano-mesa-extra">${extraHTML}</span>
     </div>`;
   }).join('');
 
