@@ -496,24 +496,54 @@ window.seleccionarZonaPlano = zona => {
   renderPlano();
 };
 
-function calcularClaseAlertaMesa(id, m) {
+function calcularInfoMesa(id, m) {
   const ocupada = m.estado === 'ocupada' || localOcupada.has(id);
-  if (!ocupada) return 'libre';
-  if (!pedidosData[id]) return 'ocupada';
+  if (!ocupada) return { clase: 'libre', alertaHTML: '', tiempoHTML: '', resumen: '' };
+
+  const data = pedidosData[id];
+  if (!data) return { clase: 'ocupada', alertaHTML: '', tiempoHTML: '', resumen: '' };
+
+  // Tiempo desde primera comanda
+  let minTs = Infinity;
   let lineasPend = [];
-  Object.values(pedidosData[id]).forEach(envio => {
+  Object.values(data).forEach(envio => {
     const envioTs = Number(envio.ts) || 0;
+    if (envioTs > 0 && envioTs < minTs) minTs = envioTs;
     const ls = envio.lineas || { _: envio };
     Object.values(ls).forEach(l => {
-      if (l.estado === 'pendiente') lineasPend.push({ _tsMesa: Number(l.ts) || envioTs });
+      if (l.estado === 'pendiente')
+        lineasPend.push({ destino: l.destino, _tsMesa: Number(l.ts) || envioTs });
     });
   });
-  if (!lineasPend.length) return 'ocupada';
+
+  const minsOcupada = minTs < Infinity
+    ? Math.max(0, Math.floor((Date.now() - minTs) / 60000))
+    : 0;
+  const horas = Math.floor(minsOcupada / 60);
+  const minResto = minsOcupada % 60;
+  const tiempoHTML = minsOcupada > 0
+    ? `<span class="plano-mesa-tiempo">${horas > 0 ? horas + 'h ' : ''}${minResto}m</span>`
+    : '';
+
+  // Resumen (uds | total)
+  const resumen = resumenMesaActual(id);
+
+  // Pendientes
+  if (!lineasPend.length)
+    return { clase: 'ocupada', alertaHTML: '', tiempoHTML, resumen };
+
   const masAntigua = lineasPend.reduce((min, l) => l._tsMesa < min._tsMesa ? l : min, lineasPend[0]);
-  const mins = Math.max(0, Math.floor((Date.now() - (masAntigua._tsMesa || Date.now())) / 60000));
-  if (mins >= alertasConfig.amarillo) return 'alerta-danger';
-  if (mins >= alertasConfig.verde)    return 'alerta-warn';
-  return 'alerta-ok';
+  const minsPend   = Math.max(0, Math.floor((Date.now() - (masAntigua._tsMesa || Date.now())) / 60000));
+  const minsPendTxt = minsPend === 0 ? '<1m' : `${minsPend}m`;
+  const dest = masAntigua.destino === 'cocina' ? '&#127869;' : masAntigua.destino === 'barra' ? '&#127866;' : '&#127866;&#127869;';
+  const pendTxt = lineasPend.length === 1 ? '1 pend' : `${lineasPend.length} pend`;
+  const alertaHTML = `<span class="plano-mesa-alerta">${dest} ${pendTxt} · ${minsPendTxt}</span>`;
+
+  let clase = 'alerta-ok';
+  if      (minsPend >= alertasConfig.amarillo) clase = 'alerta-danger';
+  else if (minsPend >= alertasConfig.verde)    clase = 'alerta-warn';
+
+  return { clase, alertaHTML, tiempoHTML, resumen };
 }
 
 function renderPlano() {
@@ -553,14 +583,19 @@ function renderPlano() {
   const mesasHTML = ubicadas.map(([id, m]) => {
     const p = m.plano;
     const ocupada = m.estado === 'ocupada' || localOcupada.has(id);
-    const clase = calcularClaseAlertaMesa(id, m);
+    const { clase, alertaHTML, tiempoHTML, resumen } = calcularInfoMesa(id, m);
     const circle = p.shape === 'circle' ? ' circle' : '';
-    const syncBadge = queuedMesas.has(id) ? ' ⏳' : '';
+    const syncBadge = queuedMesas.has(id) ? '<span class="plano-mesa-sync">⏳</span>' : '';
+    const resumenHTML = resumen && resumen !== 'Sin consumo'
+      ? `<span class="plano-mesa-resumen">${resumen}</span>` : '';
     return `<div class="plano-mesa ${clase}${circle}"
       data-id="${id}" data-nombre="${m.nombre.replace(/"/g,'&quot;')}" data-ocupada="${ocupada}"
       style="grid-column:${p.x}/span ${p.w};grid-row:${p.y}/span ${p.h}">
+      ${tiempoHTML}
       <span class="plano-mesa-nombre">${m.nombre}${syncBadge}</span>
       <span class="plano-mesa-estado">${ocupada ? 'ocupada' : 'libre'}</span>
+      ${alertaHTML}
+      ${resumenHTML}
     </div>`;
   }).join('');
 

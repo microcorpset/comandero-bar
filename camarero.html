@@ -366,7 +366,7 @@
   .plano-mesa{
     border-radius:8px;display:flex;flex-direction:column;align-items:center;
     justify-content:center;cursor:pointer;font-family:var(--mono);
-    transition:transform .1s;padding:3px;overflow:hidden;
+    transition:transform .1s;padding:4px 3px;overflow:hidden;gap:1px;
     border:1px solid var(--border);
     background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.03))
   }
@@ -376,9 +376,19 @@
   .plano-mesa.alerta-warn{border-color:var(--warn);background:rgba(217,119,6,.06)}
   .plano-mesa.alerta-danger{border-color:var(--danger);background:rgba(226,77,77,.06)}
   .plano-mesa.circle{border-radius:50%}
-  .plano-mesa-nombre{font-weight:600;font-size:11px;line-height:1.2;text-align:center}
-  .plano-mesa-estado{font-size:9px;color:var(--muted)}
+  .plano-mesa-tiempo{font-size:8px;color:var(--muted);font-weight:500;letter-spacing:.02em;line-height:1}
+  .plano-mesa.alerta-warn .plano-mesa-tiempo{color:var(--warn)}
+  .plano-mesa.alerta-danger .plano-mesa-tiempo{color:var(--danger)}
+  .plano-mesa-nombre{font-weight:700;font-size:12px;line-height:1.2;text-align:center}
+  .plano-mesa-estado{font-size:9px;color:var(--muted);line-height:1}
   .plano-mesa.ocupada .plano-mesa-estado{color:var(--accent2)}
+  .plano-mesa-alerta{font-size:8px;color:var(--muted);text-align:center;line-height:1.2;margin-top:1px}
+  .plano-mesa.alerta-ok .plano-mesa-alerta{color:#22c55e}
+  .plano-mesa.alerta-warn .plano-mesa-alerta{color:var(--warn)}
+  .plano-mesa.alerta-danger .plano-mesa-alerta{color:var(--danger)}
+  .plano-mesa-resumen{font-size:8px;color:var(--muted);text-align:center;line-height:1.2}
+  .plano-mesa-resumen strong{color:var(--text)}
+  .plano-mesa-sync{font-size:9px;margin-left:2px}
   .plano-sinubicar{font-size:11px;color:var(--muted);margin-top:10px;padding:0 2px}
 
   .mesas-links{
