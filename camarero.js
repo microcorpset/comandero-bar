@@ -361,6 +361,7 @@ onValue(ref(db, 'config/alertas'), snap => {
 onValue(ref(db, 'config/plano'), snap => {
   const d = snap.val();
   if (d) planoCfg = { cols: Number(d.cols) || 16, rows: Number(d.rows) || 12 };
+  if (mesasViewMode === 'plano' && Object.keys(mesasData).length) renderPlano();
 });
 
 // Banner offline + trigger sync on reconnect
@@ -617,20 +618,21 @@ function renderPlano() {
     const circle    = p.shape === 'circle' ? ' circle' : '';
     const syncBadge = queuedMesas.has(id) ? '<span class="plano-mesa-sync">⏳</span>' : '';
 
-    // Narrow: 3 líneas según modo
+    // Narrow: 3 líneas según modo (ocultas en pantallas anchas)
     const topHTML  = planoInfoMode === 'resumen' ? tiempoHTML    : (tiempoPendHTML || tiempoHTML);
     const mainHTML = planoInfoMode === 'resumen' ? totalHTML      : iconHTML;
-    // Wide: info complementaria del otro modo
+    // Wide: igual que grid → resumen (uds+total) + alerta (pendientes)
     const resumenHTML = resumen && resumen !== 'Sin consumo'
       ? `<span class="plano-mesa-resumen">${resumen}</span>` : '';
-    const extraHTML = planoInfoMode === 'resumen' ? alertaHTML : (tiempoHTML + resumenHTML);
+    const extraHTML = resumenHTML + alertaHTML;
+    const shortCard = p.h === 1 ? ' short' : '';
 
-    return `<div class="plano-mesa ${clase}${circle}"
+    return `<div class="plano-mesa ${clase}${circle}${shortCard}"
       data-id="${id}" data-nombre="${m.nombre.replace(/"/g,'&quot;')}" data-ocupada="${ocupada}"
       style="grid-column:${p.x}/span ${p.w};grid-row:${p.y}/span ${p.h}">
-      ${topHTML}
+      <span class="plano-narrow-only">${topHTML}</span>
       <span class="plano-mesa-nombre">${m.nombre}${syncBadge}</span>
-      ${mainHTML}
+      <span class="plano-narrow-only">${mainHTML}</span>
       <span class="plano-mesa-extra">${extraHTML}</span>
     </div>`;
   }).join('');

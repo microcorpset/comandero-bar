@@ -390,9 +390,14 @@
   .plano-mesa-resumen strong{color:var(--text)}
   .plano-mesa-sync{font-size:9px;margin-left:2px}
   .plano-mesa-extra{display:none;font-size:8px;text-align:center;width:100%}
+  .plano-narrow-only{display:contents}
+  .plano-mesa.short{padding:2px 3px;gap:0}
+  .plano-mesa.short .plano-narrow-only{display:none}
+  .plano-mesa.short .plano-mesa-nombre{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%;text-align:center}
   .plano-sinubicar{font-size:11px;color:var(--muted);margin-top:10px;padding:0 2px}
   @media(min-width:600px){
     #btn-plano-info{display:none!important}
+    .plano-narrow-only{display:none}
     .plano-mesa-estado{display:block}
     .plano-mesa-extra{display:contents}
     .plano-mesa{gap:3px;padding:6px 4px}
