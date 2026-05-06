@@ -517,10 +517,20 @@ window.seleccionarZonaPlano = zona => {
 
 function calcularInfoMesa(id, m) {
   const ocupada = m.estado === 'ocupada' || localOcupada.has(id);
-  if (!ocupada) return { clase: 'libre', alertaHTML: '', tiempoHTML: '', resumen: '' };
+  const empty = { clase: 'libre', alertaHTML: '', iconHTML: '', tiempoHTML: '', tiempoPendHTML: '', resumen: '', totalHTML: '' };
+  if (!ocupada) return empty;
 
   const data = pedidosData[id];
-  if (!data) return { clase: 'ocupada', alertaHTML: '', tiempoHTML: '', resumen: '' };
+  if (!data) return { ...empty, clase: 'ocupada' };
+
+  // Total solo en euros (sin uds) para vista compacta
+  const lineasResumen = aplanarPedidos(data).filter(l => l.estado !== 'cancelado' && l.destino !== 'descuento');
+  const totalVal = lineasResumen.reduce((s, l) => s + Number(l.precio || 0) * qtyResumenMesa(l), 0);
+  const totalHTML = lineasResumen.length
+    ? `<span class="plano-mesa-resumen">${fmtEu(totalVal)}</span>` : '';
+
+  // Resumen completo (uds | total) para vista ancha
+  const resumen = resumenMesaActual(id);
 
   // Tiempo desde primera comanda
   let minTs = Infinity;
@@ -535,35 +545,35 @@ function calcularInfoMesa(id, m) {
     });
   });
 
-  const minsOcupada = minTs < Infinity
-    ? Math.max(0, Math.floor((Date.now() - minTs) / 60000))
-    : 0;
-  const horas = Math.floor(minsOcupada / 60);
+  const minsOcupada = minTs < Infinity ? Math.max(0, Math.floor((Date.now() - minTs) / 60000)) : 0;
+  const horas    = Math.floor(minsOcupada / 60);
   const minResto = minsOcupada % 60;
   const tiempoHTML = minsOcupada > 0
-    ? `<span class="plano-mesa-tiempo">${horas > 0 ? horas + 'h ' : ''}${minResto}m</span>`
-    : '';
+    ? `<span class="plano-mesa-tiempo">${horas > 0 ? horas + 'h ' : ''}${minResto}m</span>` : '';
 
-  // Resumen (uds | total)
-  const resumen = resumenMesaActual(id);
-
-  // Pendientes
   if (!lineasPend.length)
-    return { clase: 'ocupada', alertaHTML: '', tiempoHTML, tiempoPendHTML: '', resumen };
+    return { clase: 'ocupada', alertaHTML: '', iconHTML: '', tiempoHTML, tiempoPendHTML: '', resumen, totalHTML };
 
   const masAntigua  = lineasPend.reduce((min, l) => l._tsMesa < min._tsMesa ? l : min, lineasPend[0]);
   const minsPend    = Math.max(0, Math.floor((Date.now() - (masAntigua._tsMesa || Date.now())) / 60000));
   const minsPendTxt = minsPend === 0 ? '<1m' : `${minsPend}m`;
-  const dest        = masAntigua.destino === 'cocina' ? '&#127869;' : masAntigua.destino === 'barra' ? '&#127866;' : '&#127866;&#127869;';
-  const pendTxt     = lineasPend.length === 1 ? '1 pend' : `${lineasPend.length} pend`;
-  const alertaHTML  = `<span class="plano-mesa-alerta">${dest} ${pendTxt} · ${minsPendTxt}</span>`;
-  const tiempoPendHTML = `<span class="plano-mesa-tiempo">${minsPendTxt} &#9203;</span>`;
+
+  // Icono(s) de destino únicos entre todos los pendientes
+  const destinos = [...new Set(lineasPend.map(l => l.destino))];
+  const iconoDestino = destinos.includes('ambos')
+    ? '&#127866;&#127869;'
+    : destinos.map(d => d === 'cocina' ? '&#127869;' : '&#127866;').join('');
+
+  const pendTxt    = lineasPend.length === 1 ? '1 pend' : `${lineasPend.length} pend`;
+  const alertaHTML = `<span class="plano-mesa-alerta">${iconoDestino} ${pendTxt} · ${minsPendTxt}</span>`;
+  const iconHTML   = `<span class="plano-mesa-alerta" style="font-size:13px;line-height:1">${iconoDestino}</span>`;
+  const tiempoPendHTML = `<span class="plano-mesa-tiempo">${minsPendTxt}</span>`;
 
   let clase = 'alerta-ok';
   if      (minsPend >= alertasConfig.amarillo) clase = 'alerta-danger';
   else if (minsPend >= alertasConfig.verde)    clase = 'alerta-warn';
 
-  return { clase, alertaHTML, tiempoHTML, tiempoPendHTML, resumen };
+  return { clase, alertaHTML, iconHTML, tiempoHTML, tiempoPendHTML, resumen, totalHTML };
 }
 
 function renderPlano() {
@@ -603,19 +613,17 @@ function renderPlano() {
   const mesasHTML = ubicadas.map(([id, m]) => {
     const p = m.plano;
     const ocupada = m.estado === 'ocupada' || localOcupada.has(id);
-    const { clase, alertaHTML, tiempoHTML, tiempoPendHTML, resumen } = calcularInfoMesa(id, m);
-    const circle = p.shape === 'circle' ? ' circle' : '';
+    const { clase, alertaHTML, iconHTML, tiempoHTML, tiempoPendHTML, resumen, totalHTML } = calcularInfoMesa(id, m);
+    const circle    = p.shape === 'circle' ? ' circle' : '';
     const syncBadge = queuedMesas.has(id) ? '<span class="plano-mesa-sync">⏳</span>' : '';
+
+    // Narrow: 3 líneas según modo
+    const topHTML  = planoInfoMode === 'resumen' ? tiempoHTML    : (tiempoPendHTML || tiempoHTML);
+    const mainHTML = planoInfoMode === 'resumen' ? totalHTML      : iconHTML;
+    // Wide: info complementaria del otro modo
     const resumenHTML = resumen && resumen !== 'Sin consumo'
       ? `<span class="plano-mesa-resumen">${resumen}</span>` : '';
-
-    // Contenido principal según modo (siempre visible)
-    const topHTML  = planoInfoMode === 'resumen' ? tiempoHTML      : (tiempoPendHTML || tiempoHTML);
-    const mainHTML = planoInfoMode === 'resumen' ? resumenHTML     : (alertaHTML || resumenHTML);
-    // Extra visible solo en pantalla ancha (lo contrario del modo activo)
-    const extraHTML = planoInfoMode === 'resumen'
-      ? alertaHTML
-      : (tiempoHTML ? tiempoHTML + resumenHTML : resumenHTML);
+    const extraHTML = planoInfoMode === 'resumen' ? alertaHTML : (tiempoHTML + resumenHTML);
 
     return `<div class="plano-mesa ${clase}${circle}"
       data-id="${id}" data-nombre="${m.nombre.replace(/"/g,'&quot;')}" data-ocupada="${ocupada}"
