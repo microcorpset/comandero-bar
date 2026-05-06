@@ -584,6 +584,11 @@
     color: var(--muted);
   }
 
+  /* ── Mini preview plano (admin) ── */
+  .plano-grid{display:grid;grid-template-columns:repeat(var(--plano-cols,16),1fr);grid-template-rows:repeat(var(--plano-rows,12),1fr);gap:3px;width:100%;aspect-ratio:var(--plano-cols,16)/var(--plano-rows,12);background:rgba(255,255,255,.03);border-radius:10px;padding:5px;border:1px solid var(--border)}
+  .plano-mesa{border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.06)}
+  .plano-mesa.circle{border-radius:50%}
+
   .destino-btns { display: flex; gap: 8px; flex-wrap: wrap; }
 
   .dest-btn {
@@ -1018,6 +1023,30 @@
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+        <div class="card" style="margin-top:1rem">
+          <div class="card-header">
+            <div>
+              <div class="card-kicker">Distribución</div>
+              <div class="card-title">Plano del local</div>
+              <p class="card-desc">Configura la posición de cada mesa en el plano del local. El camarero puede cambiar a vista de plano desde la pantalla de mesas.</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="form-grid" style="max-width:280px;margin-bottom:1.2rem">
+              <div class="field-stack">
+                <label for="plano-cols">Columnas del grid</label>
+                <input type="number" id="plano-cols" min="4" max="30" value="16" onchange="guardarPlanoGrid()" />
+              </div>
+              <div class="field-stack">
+                <label for="plano-rows">Filas del grid</label>
+                <input type="number" id="plano-rows" min="4" max="20" value="12" onchange="guardarPlanoGrid()" />
+              </div>
+            </div>
+            <div class="card-kicker" style="margin-bottom:.6rem">Posición por mesa</div>
+            <div id="plano-editor-lista"></div>
+            <div id="plano-preview-wrap" style="margin-top:1.2rem"></div>
           </div>
         </div>
         <div class="card" style="margin-top:1rem">
