@@ -217,7 +217,8 @@ window.delMesa = async (id, e) => {
 };
 
 // ─── PLANO ───────────────────────────────────────────────────────────────────
-let adminPlanoMesaSel = null; // id de la mesa seleccionada para colocar
+let adminPlanoMesaSel = null;
+let adminPlanoZona    = null;
 
 function renderPlanoEditor() {
   const gridEl    = document.getElementById('admin-plano-grid');
@@ -226,8 +227,33 @@ function renderPlanoEditor() {
 
   const cols = planoCfgAdmin.cols;
   const rows = planoCfgAdmin.rows;
-  const entries = Object.entries(mesasData)
+  const allEntries = Object.entries(mesasData)
     .sort(([,a],[,b]) => (a.orden??999)-(b.orden??999) || a.nombre.localeCompare(b.nombre,'es',{numeric:true}));
+
+  // ── Tabs de zona ─────────────────────────────────────────────────────────
+  const hayZonas = allEntries.some(([,m]) => m.zona && m.zona.trim());
+  const zonas    = hayZonas
+    ? [...new Set(allEntries.map(([,m]) => m.zona?.trim() || 'Sin zona'))]
+    : null;
+  if (hayZonas && (!adminPlanoZona || !zonas.includes(adminPlanoZona)))
+    adminPlanoZona = zonas[0];
+
+  const tabsEl = document.getElementById('plano-zona-tabs');
+  if (tabsEl) {
+    tabsEl.style.display = hayZonas ? 'flex' : 'none';
+    if (hayZonas) {
+      tabsEl.innerHTML = zonas.map(z =>
+        `<button class="plano-sidebar-btn${z === adminPlanoZona ? ' selected' : ''}"
+          style="padding:5px 14px" onclick="selectAdminZona('${z.replace(/'/g,"\\'")}')">
+          ${z}
+        </button>`
+      ).join('');
+    }
+  }
+
+  const entries = hayZonas
+    ? allEntries.filter(([,m]) => (m.zona?.trim() || 'Sin zona') === adminPlanoZona)
+    : allEntries;
 
   // ── Sidebar ───────────────────────────────────────────────────────────────
   sidebarEl.innerHTML = '';
@@ -246,19 +272,20 @@ function renderPlanoEditor() {
 
   // ── Grid ──────────────────────────────────────────────────────────────────
   gridEl.style.setProperty('--plano-cols', cols);
-  gridEl.style.setProperty('--plano-rows', rows);
-  // Forzar el aspect-ratio de filas también vía grid-template-rows
-  gridEl.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+  gridEl.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  gridEl.style.gridTemplateRows    = `repeat(${rows}, 1fr)`;
   gridEl.innerHTML = '';
 
-  // Celdas de fondo (auto-placement)
+  // Celdas de fondo con posición EXPLÍCITA (evita imprecisión por auto-placement)
   for (let r = 1; r <= rows; r++) {
     for (let c = 1; c <= cols; c++) {
       const cell = document.createElement('div');
-      cell.className = 'plano-admin-cell';
-      cell.dataset.type = 'cell';
-      cell.dataset.col  = c;
-      cell.dataset.row  = r;
+      cell.className       = 'plano-admin-cell';
+      cell.dataset.type    = 'cell';
+      cell.dataset.col     = c;
+      cell.dataset.row     = r;
+      cell.style.gridColumn = c;
+      cell.style.gridRow    = r;
       gridEl.appendChild(cell);
     }
   }
@@ -358,6 +385,12 @@ window.guardarPlanoGrid = async () => {
   const rows = Math.max(4, parseInt(document.getElementById('plano-rows')?.value) || 12);
   await set(ref(db, 'config/plano'), { cols, rows });
   toast('Tamaño del plano guardado');
+};
+
+window.selectAdminZona = zona => {
+  adminPlanoZona    = zona;
+  adminPlanoMesaSel = null;
+  renderPlanoEditor();
 };
 
 // ─── CARTA ───────────────────────────────────────────────────────────────────
