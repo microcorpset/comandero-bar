@@ -1497,7 +1497,15 @@ function renderTicket(pedidos) {
     } else if (e.target.classList.contains('btn-quitar-linea')) {
       await quitarDelTicket(parseInt(e.target.dataset.idx));
     } else if (e.target.classList.contains('btn-print') || e.target.classList.contains('no-print-btn')) {
-      await imprimirTicketFinal(lineasServidas, total);
+      const lineasImprimir = ticketSimplificado
+        ? Object.values(lineasServidas.reduce((acc, l) => {
+            const k = l.artId + '||' + l.nombre;
+            if (!acc[k]) acc[k] = { ...l, qtyCuenta: 0 };
+            acc[k].qtyCuenta += l.qtyCuenta;
+            return acc;
+          }, {}))
+        : lineasServidas;
+      await imprimirTicketFinal(lineasImprimir, total);
     } else if (e.target.classList.contains('btn-refresh')) {
       await cargarTicketActual();
     } else if (e.target.classList.contains('btn-cerrar')) {
