@@ -1172,6 +1172,7 @@ async function init() {
     document.getElementById('local-barra-uppercase').value = String(d.barraUppercase === true);
     document.getElementById('local-cocina-uppercase').value = String(d.cocinaUppercase === true);
     document.getElementById('local-ticket-print-mode').value = d.ticketPrintMode || 'browser';
+    document.getElementById('local-comanda-auto-servir').value = String(d.comandaAutoServir === true);
     document.getElementById('local-ticket-print-service-id').value = d.ticketPrintServiceId || PRINT_SERVICE_ID;
   });
   onValue(ref(db, 'historial'), snap => {
@@ -1304,6 +1305,7 @@ window.guardarLocal = async () => {
     cocinaUppercase: document.getElementById('local-cocina-uppercase').value === 'true',
     ticketPrintMode: document.getElementById('local-ticket-print-mode').value || 'browser',
     ticketPrintServiceId: document.getElementById('local-ticket-print-service-id').value.trim() || PRINT_SERVICE_ID,
+    comandaAutoServir: document.getElementById('local-comanda-auto-servir').value === 'true',
   });
   toast('Datos del local guardados');
 };
