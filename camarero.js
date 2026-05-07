@@ -656,6 +656,7 @@ function renderPlano() {
 
 function abrirMesa(id, nombre, ocupada) {
   mesaId = id; mesaNombre = nombre; carrito = {};
+  ticketPreciosCustom = {}; ticketPreciosMode = false;
   document.getElementById('topbar-mesa').textContent = 'Mesa ' + nombre;
   document.getElementById('topbar-mesa').style.display = '';
   document.getElementById('btn-cuenta').style.display = ocupada ? '' : 'none';
@@ -1164,8 +1165,15 @@ function wrapTicketLine(text, maxChars) {
 }
 
 function renderTicketRowsHTML(lineas, maxChars, conPrecio) {
-  const nameChars = conPrecio ? Math.max(10, maxChars - 16) : Math.max(20, maxChars - 4);
-  return lineas.map(l => {
+  const nameChars = conPrecio ? Math.max(10, maxChars - 14) : Math.max(20, maxChars - 4);
+  const headerHtml = conPrecio
+    ? `<div class="print-line-top print-header">
+        <span class="print-qty">Ud.</span>
+        <span class="print-name">Artículo</span>
+        <div class="print-prices-group"><span class="print-unit-price">Precio</span><span class="print-price">Importe</span></div>
+      </div>`
+    : '';
+  const rowsHtml = lineas.map(l => {
     const nombreLineas = wrapTicketLine(l.nombre, nameChars);
     const primera = nombreLineas.shift() || '';
     const qty = Number(l.qty);
@@ -1182,12 +1190,12 @@ function renderTicketRowsHTML(lineas, maxChars, conPrecio) {
         <div class="print-line-top">
           <span class="print-qty">${qty}</span>
           <span class="print-name">${primera}</span>
-          ${conPrecio ? `<span class="print-unit-price">${udTxt}</span>` : ''}
-          ${conPrecio ? `<span class="print-price">${totalTxt}</span>` : ''}
+          ${conPrecio ? `<div class="print-prices-group"><span class="print-unit-price">${udTxt}</span><span class="print-price">${totalTxt}</span></div>` : ''}
         </div>
         ${extras.join('')}
       </div>`;
   }).join('');
+  return headerHtml + rowsHtml;
 }
 
 function escapeHtml(text) {
@@ -1222,7 +1230,7 @@ function abrirImpresionTicket({ titulo, subtitulo, lineas, configLocal, mostrarP
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     @page{size:${paperCfg.width} auto;margin:0}
-    body{font-family:monospace;font-size:${paperCfg.fontSize}px;width:${paperCfg.bodyWidth};padding:${paperCfg.marginY}mm ${paperCfg.marginX}mm;color:#111;${paperCfg.uppercase ? 'text-transform:uppercase;' : ''}}
+    body{font-family:monospace;font-size:${paperCfg.fontSize}px;width:${paperCfg.width};padding:${paperCfg.marginY}mm ${paperCfg.marginX}mm;color:#111;${paperCfg.uppercase ? 'text-transform:uppercase;' : ''}}
     .local{text-align:center;color:#111;border-bottom:1px dashed #999;padding-bottom:6px;margin-bottom:8px}
     .local-name{font-size:${paperCfg.fontSize + 3}px;font-weight:bold;letter-spacing:.02em;color:#000}
     .local-line{font-size:${Math.max(9, paperCfg.fontSize - 1)}px;line-height:1.35;color:#111}
@@ -1233,15 +1241,17 @@ function abrirImpresionTicket({ titulo, subtitulo, lineas, configLocal, mostrarP
     .print-line{padding:4px 0;border-bottom:1px solid #ccc}
     .print-line:last-of-type{border-bottom:none}
     .print-line-top{display:flex;gap:6px;align-items:flex-start}
-    .print-qty{font-weight:bold;white-space:nowrap}
+    .print-qty{font-weight:bold;white-space:nowrap;min-width:1.2em}
     .print-name{flex:1;min-width:0}
-    .print-unit-price{text-align:right;white-space:nowrap;padding-left:4px;color:#555}
-    .print-price{text-align:right;white-space:nowrap;padding-left:4px;font-weight:bold}
+    .print-prices-group{display:flex;gap:2px;white-space:nowrap}
+    .print-unit-price{text-align:right;white-space:nowrap;color:#555;min-width:4.5em}
+    .print-price{text-align:right;white-space:nowrap;font-weight:bold;min-width:4.5em}
+    .print-header{font-size:${Math.max(8, paperCfg.fontSize - 1)}px;color:#666;border-bottom:1px solid #999;padding-bottom:3px;margin-bottom:2px}
     .ticket-subline{padding-left:24px}
     .ticket-note{padding-left:24px;font-size:10px;color:#333;font-style:italic}
     .print-total{display:flex;justify-content:space-between;border-top:1px dashed #666;margin-top:8px;padding-top:8px;font-weight:bold;color:#000}
     .print-footer{text-align:center;font-size:11px;color:#333;margin-top:10px;padding-top:8px;border-top:1px dashed #999}
-    @media print{body{width:${paperCfg.bodyWidth};padding:${paperCfg.marginY}mm ${paperCfg.marginX}mm}*{color:#000!important;border-color:#000!important}}
+    @media print{body{width:${paperCfg.width};padding:${paperCfg.marginY}mm ${paperCfg.marginX}mm}*{color:#000!important;border-color:#000!important}}
   </style></head><body>
   ${cabecera}
   <h2>${titulo}</h2>
@@ -1450,7 +1460,6 @@ async function cargarTicketActual() {
 window.verCuenta = async () => {
   if (!mesaId) return;
   ticketPreciosMode = false;
-  ticketPreciosCustom = {};
   const btn = document.getElementById('btn-edit-ticket');
   if (btn) btn.textContent = ticketEditMode ? 'Listo' : 'Editar cuenta';
   await cargarTicketActual();
@@ -1632,6 +1641,16 @@ function renderTicket(pedidos) {
 
   window._tLineas = lineasServidas;
 
+  // Cargar precioTicket guardados en Firebase al cache local (sin sobreescribir ediciones en curso)
+  lineasServidas.forEach(l => {
+    if (l.precioTicket !== undefined && l.precioTicket !== null) {
+      const clave = l.artId + '||' + l.nombre;
+      if (ticketPreciosCustom[clave] === undefined) {
+        ticketPreciosCustom[clave] = Number(l.precioTicket);
+      }
+    }
+  });
+
   if (!lineasServidas.length) {
     document.getElementById('ticket-card').innerHTML =
       '<div class="ticket-edit-hint">No hay artículos servidos aún</div>' +
@@ -1680,17 +1699,27 @@ function renderTicket(pedidos) {
       const pUd = ticketPreciosCustom[clave] !== undefined ? ticketPreciosCustom[clave] : Number(l.precio);
       const pTotal = pUd * l.qtyCuenta;
       const precioCustom = ticketPreciosCustom[clave] !== undefined;
-      const colPrecioUd = esDescuento ? '' :
-        ticketPreciosMode
-          ? '<input type="number" min="0" step="0.01" class="input-precio-custom no-print" data-clave="' + clave + '" value="' + pUd.toFixed(2) + '"' +
-            ' style="width:64px;padding:4px 6px;border:1px solid var(--accent2);border-radius:6px;font-size:13px;font-family:var(--mono);background:var(--surface);color:var(--text);text-align:right">'
-          : '<span style="font-size:12px;color:' + (precioCustom ? 'var(--accent2)' : 'var(--muted)') + ';margin-right:4px">' + fmtEu(pUd) + '</span>';
+      const preciosCol = esDescuento
+        ? '<div style="display:flex;gap:4px">' +
+            '<span style="min-width:52px"></span>' +
+            '<span class="ticket-linea-precio" style="color:var(--success);min-width:52px;text-align:right">' + fmtEu(pTotal) + '</span>' +
+          '</div>'
+        : ticketPreciosMode
+          ? '<div class="no-print" style="display:flex;gap:4px;align-items:center">' +
+              '<input type="number" min="0" step="0.01" class="input-precio-custom" data-clave="' + clave + '" value="' + pUd.toFixed(2) + '"' +
+              ' style="width:60px;min-width:60px;padding:3px 5px;border:1px solid var(--accent2);border-radius:6px;font-size:13px;font-family:var(--mono);background:var(--surface);color:var(--text);text-align:right">' +
+              '<span class="ticket-linea-precio" style="min-width:52px;text-align:right">' + fmtEu(pTotal) + '</span>' +
+            '</div>'
+          : '<div style="display:flex;gap:4px">' +
+              '<span style="min-width:52px;text-align:right;font-size:12px;color:' + (precioCustom ? 'var(--accent2)' : 'var(--muted)') + '">' + fmtEu(pUd) + '</span>' +
+              '<span class="ticket-linea-precio" style="min-width:52px;text-align:right">' + fmtEu(pTotal) + '</span>' +
+            '</div>';
       return '<div class="ticket-linea ticket-linea-edit' + (esDescuento ? ' ticket-descuento' : '') + '">' +
+        (esDescuento ? '<span style="min-width:24px"></span>' : '<span style="min-width:24px;font-weight:bold">' + l.qtyCuenta + '</span>') +
         '<div style="flex:1">' +
-          '<div>' + (esDescuento ? '' : l.qtyCuenta + ' ') + l.nombre + '</div>' +
+          '<div>' + l.nombre + '</div>' +
         '</div>' +
-        colPrecioUd +
-        '<span class="ticket-linea-precio" style="' + (esDescuento ? 'color:var(--success)' : '') + '">' + fmtEu(pTotal) + '</span>' +
+        preciosCol +
       '</div>';
     }).join('');
   } else {
@@ -1711,19 +1740,25 @@ function renderTicket(pedidos) {
         ? new Date(l.envioTs).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
         : null;
       const metaLinea = [horaLinea, l.envioCamarero].filter(Boolean).join(' · ');
-      const colPrecioUd = (!esDescuento && l.qtyCuenta > 1)
-        ? '<span style="font-size:12px;color:var(--muted);margin-right:4px">' + fmtEu(pUd) + '</span>'
-        : '';
+      const preciosCol = esDescuento
+        ? '<div style="display:flex;gap:4px">' +
+            '<span style="min-width:52px"></span>' +
+            '<span class="ticket-linea-precio" style="color:var(--success);min-width:52px;text-align:right">' + fmtEu(pTotal) + '</span>' +
+          '</div>'
+        : '<div style="display:flex;gap:4px">' +
+            (l.qtyCuenta > 1 ? '<span style="min-width:52px;text-align:right;font-size:12px;color:var(--muted)">' + fmtEu(pUd) + '</span>' : '<span style="min-width:52px"></span>') +
+            '<span class="ticket-linea-precio" style="min-width:52px;text-align:right">' + fmtEu(pTotal) + '</span>' +
+          '</div>';
       return '<div class="ticket-linea ticket-linea-edit' + (esDescuento ? ' ticket-descuento' : '') + '">' +
+        (esDescuento ? '<span style="min-width:24px"></span>' : '<span style="min-width:24px;font-weight:bold">' + l.qtyCuenta + '</span>') +
         '<div style="flex:1">' +
-          '<div>' + (esDescuento ? '' : l.qtyCuenta + ' ') + l.nombre + '</div>' +
+          '<div>' + l.nombre + '</div>' +
           (metaLinea ? '<div class="ticket-linea-meta no-print">' + metaLinea + '</div>' : '') +
           (notaVisible ? '<div class="no-print" style="font-size:11px;color:var(--muted);font-style:italic">-> ' + notaVisible + '</div>' : '') +
           (l.verificado ? '<span class="nota-verificado no-print">Verificado</span>' : '') +
         '</div>' +
         controlesEdicion +
-        colPrecioUd +
-        '<span class="ticket-linea-precio" style="' + (esDescuento ? 'color:var(--success)' : '') + '">' + fmtEu(pTotal) + '</span>' +
+        preciosCol +
         (!esDescuento && !ticketEditMode ? '<button class="btn-quitar-linea" data-idx="' + i + '" title="Devolver a barra/cocina">x</button>' : '') +
       '</div>';
     }).join('');
@@ -1744,6 +1779,12 @@ function renderTicket(pedidos) {
       '</div>' +
     '</div>' +
     '<div class="ticket-edit-hint">' + textoHint + '</div>' +
+    '<div class="ticket-linea" style="font-size:11px;color:var(--muted);border-bottom:1px solid var(--border);padding-bottom:4px;margin-bottom:2px">' +
+      '<span style="min-width:24px;font-weight:600">Ud.</span>' +
+      '<span style="flex:1;font-weight:600">Artículo</span>' +
+      '<span style="font-size:10px;margin-right:4px;min-width:52px;text-align:right">Precio</span>' +
+      '<span style="font-weight:600;min-width:52px;text-align:right">Importe</span>' +
+    '</div>' +
     lineasHTML +
     '<div class="ticket-total"><span>Total</span><span>' + fmtEu(total) + '</span></div>' +
     pie +
@@ -1795,10 +1836,25 @@ function renderTicket(pedidos) {
       showCobrarModal(total, lineasImprimir);
     } else if (e.target.classList.contains('btn-precios')) {
       if (ticketPreciosMode) {
+        // Recoger valores de inputs al guardar
         card.querySelectorAll('.input-precio-custom').forEach(inp => {
           const v = parseFloat(inp.value);
           if (!isNaN(v) && v >= 0) ticketPreciosCustom[inp.dataset.clave] = v;
         });
+        // Persistir precioTicket en Firebase para cada línea afectada
+        const writes = [];
+        for (const l of (window._tLineas || [])) {
+          const clave = l.artId + '||' + l.nombre;
+          if (ticketPreciosCustom[clave] !== undefined) {
+            const nuevoP = ticketPreciosCustom[clave];
+            const precioOriginal = Number(l.precio);
+            // Si vuelve al precio original, borra el override (null)
+            const val = Math.abs(nuevoP - precioOriginal) < 0.001 ? null : nuevoP;
+            if (val === null) delete ticketPreciosCustom[clave];
+            writes.push(set(ref(db, `pedidos/${mesaId}/${l.envioId}/lineas/${l.artId}/precioTicket`), val));
+          }
+        }
+        await Promise.all(writes);
       }
       ticketPreciosMode = !ticketPreciosMode;
       renderTicket(pedidos);
