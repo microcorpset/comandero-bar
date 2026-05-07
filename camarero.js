@@ -1227,8 +1227,8 @@ function abrirImpresionTicket({ titulo, subtitulo, lineas, configLocal, mostrarP
     .print-price{text-align:right;white-space:nowrap;padding-left:6px}
     .ticket-subline{padding-left:24px}
     .ticket-note{padding-left:24px;font-size:10px;color:#333;font-style:italic}
-    .print-total{display:flex;justify-content:space-between;border-top:1px dashed #666;margin-top:8px;padding-top:8px;font-weight:bold;color:#000}
-    .print-footer{text-align:center;font-size:11px;color:#333;margin-top:10px;padding-top:8px;border-top:1px dashed #999}
+    .print-total{display:flex;justify-content:space-between;margin-top:10px;padding:4px 0;font-size:${paperCfg.fontSize + 2}px;font-weight:bold;color:#000}
+    .print-footer{text-align:center;font-size:11px;color:#333;margin-top:8px;padding-top:10px;border-top:1px dashed #999}
     @media print{body{width:${paperCfg.bodyWidth};padding:${paperCfg.marginY}mm ${paperCfg.marginX}mm}*{color:#000!important;border-color:#000!important}}
   </style></head><body>
   ${cabecera}
