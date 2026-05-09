@@ -1372,7 +1372,9 @@ window.enviarPedido = async () => {
   const envioId  = envioTs + '_' + mesaId;
   const lineasObj = {};
 
-  const estadoInicial = configLocal?.comandaAutoServir ? 'servido' : 'pendiente';
+  // La comanda debe nacer pendiente para que barra/cocina o el servicio Python
+  // puedan verla e imprimirla. El auto-servicio se aplica despues, no al crearla.
+  const estadoInicial = 'pendiente';
   Object.entries(carrito).forEach(([carritoKey, {art, qty, nota}]) => {
     const artId = carritoKey.split('__')[0];
     lineasObj[carritoKey] = {
