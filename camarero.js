@@ -1089,10 +1089,10 @@ function renderDrawer() {
 
     const main = document.createElement('div');
     main.className = 'ri-main';
-    main.innerHTML = `
+      main.innerHTML = `
       <span class="ri-nombre${notaVisible ? ' abierta' : ''}${nota ? ' con-nota' : ''}" onclick="drawerToggleNota('${carritoKey}')">
         <span class="ri-nombre-text">${art.nombre}</span>
-        <span class="ri-nombre-toggle">${notaVisible ? 'Nota −' : 'Nota +'}</span>
+        <span class="ri-nombre-toggle">${notaVisible ? '▾' : '▸'}</span>
       </span>
       <div class="ri-qty-ctrl">
         <button class="ri-qty-btn" onclick="drawerCambiarQty('${carritoKey}',-1)">−</button>
