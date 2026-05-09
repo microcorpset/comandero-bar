@@ -1372,11 +1372,12 @@ window.enviarPedido = async () => {
   const envioId  = envioTs + '_' + mesaId;
   const lineasObj = {};
 
+  const estadoInicial = configLocal?.comandaAutoServir ? 'servido' : 'pendiente';
   Object.entries(carrito).forEach(([carritoKey, {art, qty, nota}]) => {
     const artId = carritoKey.split('__')[0];
     lineasObj[carritoKey] = {
       artId, nombre: art.nombre, precio: Number(art.precio),
-      qty, destino: art.destino, estado: 'pendiente',
+      qty, destino: art.destino, estado: estadoInicial,
       nota: nota || '', camarero: camareroActual
     };
     lineasImprimir.push({ nombre: art.nombre, precio: Number(art.precio), qty, nota: nota || '' });
