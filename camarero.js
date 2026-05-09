@@ -28,6 +28,7 @@ let ticketEditMode = false;
 let ticketSimplificado = true;
 let ticketPreciosMode = false;
 let ticketPreciosCustom = {};
+let drawerNotasAbiertas = new Set();
 let mesasViewMode  = localStorage.getItem('mesas_view_mode')   || 'grid';
 let planoInfoMode  = localStorage.getItem('plano_info_mode')  || 'resumen';
 let planoCfg = { cols: 16, rows: 12 };
@@ -1081,13 +1082,18 @@ function renderDrawer() {
 
   body.innerHTML = '';
   items.forEach(([carritoKey, {art, qty, nota}]) => {
+    const notaAbierta = drawerNotasAbiertas.has(carritoKey);
+    const notaVisible = !!nota || notaAbierta;
     const wrap = document.createElement('div');
     wrap.className = 'ri-wrap';
 
     const main = document.createElement('div');
     main.className = 'ri-main';
     main.innerHTML = `
-      <span class="ri-nombre">${art.nombre}</span>
+      <span class="ri-nombre${notaVisible ? ' abierta' : ''}${nota ? ' con-nota' : ''}" onclick="drawerToggleNota('${carritoKey}')">
+        <span class="ri-nombre-text">${art.nombre}</span>
+        <span class="ri-nombre-toggle">${notaVisible ? 'Nota −' : 'Nota +'}</span>
+      </span>
       <div class="ri-qty-ctrl">
         <button class="ri-qty-btn" onclick="drawerCambiarQty('${carritoKey}',-1)">−</button>
         <span class="ri-qty-num" id="dqty-${carritoKey}">${qty}</span>
@@ -1096,13 +1102,13 @@ function renderDrawer() {
       <span class="ri-precio" id="dprecio-${carritoKey}">${(Number(art.precio) * qty).toFixed(2)} €</span>`;
     wrap.appendChild(main);
 
-    const notaRow = document.createElement('div');
-    notaRow.className = 'ri-nota-row';
-    notaRow.innerHTML = `
-      <span class="ri-nota-label">Nota:</span>
-      <input class="ri-nota-input" type="text"
-        placeholder="ej: poco hecho, sin cebolla…"
-        value="${(nota || '').replace(/"/g, '&quot;')}"
+      const notaRow = document.createElement('div');
+    notaRow.className = 'ri-nota-row' + (notaVisible ? '' : ' oculta');
+      notaRow.innerHTML = `
+        <span class="ri-nota-label">Nota:</span>
+        <input class="ri-nota-input" type="text"
+          placeholder="ej: poco hecho, sin cebolla…"
+          value="${(nota || '').replace(/"/g, '&quot;')}"
         oninput="drawerNota('${carritoKey}', this.value)" />`;
     wrap.appendChild(notaRow);
     body.appendChild(wrap);
@@ -1113,7 +1119,10 @@ window.drawerCambiarQty = (carritoKey, delta) => {
   if (carrito[carritoKey]) {
     const prev = carrito[carritoKey].qty;
     const next = Math.max(0, prev + delta);
-    if (next === 0) delete carrito[carritoKey];
+    if (next === 0) {
+      delete carrito[carritoKey];
+      drawerNotasAbiertas.delete(carritoKey);
+    }
     else carrito[carritoKey].qty = next;
     updateQtyDisplay();
     updateUI();
@@ -1126,10 +1135,20 @@ window.drawerCambiarQty = (carritoKey, delta) => {
       renderDrawer();
     }
   }
+  };
+
+window.drawerToggleNota = carritoKey => {
+  if (!carrito[carritoKey]) return;
+  if (drawerNotasAbiertas.has(carritoKey)) drawerNotasAbiertas.delete(carritoKey);
+  else drawerNotasAbiertas.add(carritoKey);
+  renderDrawer();
 };
 
 window.drawerNota = (carritoKey, valor) => {
-  if (carrito[carritoKey]) carrito[carritoKey].nota = valor.trim();
+  if (carrito[carritoKey]) {
+    carrito[carritoKey].nota = valor.trim();
+    if (carrito[carritoKey].nota) drawerNotasAbiertas.add(carritoKey);
+  }
 };
 
 // ── IMPRESIÓN ─────────────────────────────────────────────────────────────────
@@ -1398,8 +1417,9 @@ window.enviarPedido = async () => {
     }
     if (autoPDF) generarPDFComanda(mesaNombre, lineasImprimir, configLocal);
     if (autoTXT) generarTXTComanda(mesaNombre, lineasImprimir, configLocal);
-    carrito = {};
-    cerrarDrawer();
+      carrito = {};
+      drawerNotasAbiertas.clear();
+      cerrarDrawer();
     updateQtyDisplay();
     updateUI();
     btn1.textContent = '📥 En cola'; btn1.disabled = false;
@@ -1444,8 +1464,9 @@ window.enviarPedido = async () => {
   if (autoPDF) generarPDFComanda(mesaNombre, lineasImprimir, configLocal);
   if (autoTXT) generarTXTComanda(mesaNombre, lineasImprimir, configLocal);
 
-  carrito = {};
-  cerrarDrawer();
+    carrito = {};
+    drawerNotasAbiertas.clear();
+    cerrarDrawer();
   updateQtyDisplay();
   updateUI();
   btn1.textContent = '✓ Enviado'; btn1.disabled = false;
