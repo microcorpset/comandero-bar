@@ -1972,7 +1972,7 @@ function renderTicket(pedidos) {
     } else if (e.target.classList.contains('btn-cerrar')) {
       cerrarMesa();
     } else if (e.target.classList.contains('btn-descuento')) {
-      abrirDescuentoModal();
+      abrirDescuentoModal(total);
     } else if (e.target.classList.contains('btn-partir')) {
       abrirPartirCuentaModal(total);
     } else if (e.target.classList.contains('btn-transferir')) {
@@ -2030,27 +2030,70 @@ async function quitarDelTicket(i) {
 }
 
 // ── DESCUENTO MANUAL ──────────────────────────────────────────────────────────
-function abrirDescuentoModal() {
+function abrirDescuentoModal(totalActual = 0) {
   document.getElementById('modal-title').textContent = '＋ Añadir descuento';
   const modalBody = document.getElementById('modal-body');
   modalBody.innerHTML = `
     <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
-      <input type="text" id="desc-nombre" placeholder="Descripción (ej: Invitación, Descuento 10%)"
+      <select id="desc-tipo"
+        style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;color:var(--text);outline:none">
+        <option value="importe">Descuento por importe fijo</option>
+        <option value="porcentaje">Descuento por porcentaje</option>
+      </select>
+      <input type="text" id="desc-nombre" placeholder="Descripción opcional"
         style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;color:var(--text);outline:none" />
-      <input type="number" id="desc-importe" placeholder="Importe a descontar €" min="0.01" step="0.01"
+      <input type="number" id="desc-valor" placeholder="Importe a descontar €" min="0.01" step="0.01"
         style="width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:14px;color:var(--text);outline:none" />
+      <div id="desc-ayuda" style="font-size:12px;color:var(--muted)">
+        Total actual: ${fmtEu(totalActual)}. Se descontará el importe indicado.
+      </div>
     </div>`;
   const acts = document.getElementById('modal-actions');
   acts.innerHTML = '';
+  const tipoEl = () => document.getElementById('desc-tipo');
+  const valorEl = () => document.getElementById('desc-valor');
+  const ayudaEl = () => document.getElementById('desc-ayuda');
+  function syncDescuentoUI() {
+    const tipo = tipoEl()?.value || 'importe';
+    const valor = valorEl();
+    const ayuda = ayudaEl();
+    if (!valor || !ayuda) return;
+    if (tipo === 'porcentaje') {
+      valor.placeholder = 'Porcentaje %';
+      valor.min = '0.01';
+      valor.max = '100';
+      valor.step = '0.01';
+      const pct = parseFloat(valor.value);
+      const importe = !isNaN(pct) && pct > 0 ? Math.round(totalActual * pct) / 100 : 0;
+      ayuda.textContent = `Total actual: ${fmtEu(totalActual)}. Descuento estimado: ${importe > 0 ? fmtEu(importe) : '—'}.`;
+    } else {
+      valor.placeholder = 'Importe a descontar €';
+      valor.min = '0.01';
+      valor.removeAttribute('max');
+      valor.step = '0.01';
+      ayuda.textContent = `Total actual: ${fmtEu(totalActual)}. Se descontará el importe indicado.`;
+    }
+  }
   const btnC = document.createElement('button');
   btnC.className = 'modal-btn'; btnC.textContent = 'Cancelar';
   btnC.onclick = () => document.getElementById('modal-overlay').classList.remove('open');
   const btnOk = document.createElement('button');
   btnOk.className = 'modal-btn primary'; btnOk.textContent = 'Aplicar';
   btnOk.onclick = async () => {
-    const nombre  = document.getElementById('desc-nombre')?.value.trim();
-    const importe = parseFloat(document.getElementById('desc-importe')?.value);
-    if (!nombre || isNaN(importe) || importe <= 0) return;
+    const tipo = tipoEl()?.value || 'importe';
+    const nombreInput = document.getElementById('desc-nombre')?.value.trim();
+    const valor = parseFloat(valorEl()?.value);
+    if (isNaN(valor) || valor <= 0) return;
+    let importe = valor;
+    let nombre = nombreInput;
+    if (tipo === 'porcentaje') {
+      if (valor > 100) return;
+      importe = Math.round(totalActual * valor) / 100;
+      if (!(importe > 0)) return;
+      if (!nombre) nombre = `Descuento ${valor.toFixed(valor % 1 === 0 ? 0 : 2).replace('.', ',')}%`;
+    } else {
+      if (!nombre) nombre = 'Descuento';
+    }
     document.getElementById('modal-overlay').classList.remove('open');
     const ts       = Date.now();
     const envioId  = 'desc_' + ts;
@@ -2068,7 +2111,10 @@ function abrirDescuentoModal() {
   };
   acts.appendChild(btnC); acts.appendChild(btnOk);
   document.getElementById('modal-overlay').classList.add('open');
-  setTimeout(() => document.getElementById('desc-nombre')?.focus(), 80);
+  document.getElementById('desc-tipo')?.addEventListener('change', syncDescuentoUI);
+  document.getElementById('desc-valor')?.addEventListener('input', syncDescuentoUI);
+  syncDescuentoUI();
+  setTimeout(() => document.getElementById('desc-valor')?.focus(), 80);
 }
 
 // ── PARTIR CUENTA ─────────────────────────────────────────────────────────────
