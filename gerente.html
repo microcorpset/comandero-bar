@@ -299,6 +299,18 @@
     gap: 18px;
   }
 
+  .stack-right {
+    align-content: start;
+  }
+
+  .quick-dock {
+    position: sticky;
+    top: 14px;
+    z-index: 5;
+    display: grid;
+    gap: 12px;
+  }
+
   .card {
     padding: 20px;
   }
@@ -357,15 +369,8 @@
     display: none;
   }
 
-  .sticky-card {
-    position: sticky;
-    top: 14px;
-    z-index: 4;
-  }
-
   .turno-quick-card {
     padding: 16px 18px;
-    margin-bottom: 18px;
   }
 
   .turno-quick-card .card-head {
@@ -382,11 +387,57 @@
   }
 
   .compact-mobile-toggle {
-    display: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 84px;
+    padding: 7px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-family: var(--mono);
   }
 
   .compact-mobile-summary {
     display: none;
+  }
+
+  .compact-mobile-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 0;
+    padding: 0 2px 8px;
+  }
+
+  .compact-mobile-title {
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .compact-mobile-toggle::after {
+    content: "Abrir";
+  }
+
+  .compact-mobile-card:not(.collapsed-mobile) .compact-mobile-toggle::after {
+    content: "Cerrar";
+  }
+
+  .compact-mobile-card.collapsed-mobile .compact-mobile-body {
+    display: none;
+  }
+
+  .compact-mobile-card.collapsed-mobile .compact-mobile-summary {
+    display: block;
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 11px;
+    line-height: 1.35;
+    font-family: var(--mono);
+    max-width: calc(100vw - 130px);
   }
 
   .metrics {
@@ -697,8 +748,15 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .turno-quick-card {
+    .stack-right {
+      order: -1;
+    }
+
+    .quick-dock {
       top: 8px;
+    }
+
+    .turno-quick-card {
       padding: 14px;
     }
   }
@@ -1029,35 +1087,8 @@
         </div>
       </div>
 
-      <section class="card sticky-card turno-quick-card">
-        <div class="card-head">
-          <div>
-            <div class="eyebrow">Turno activo</div>
-            <h3>Apertura y cierre</h3>
-            <div class="card-copy">Control rapido del turno en curso con el mismo comportamiento que ya existe en administracion.</div>
-            <div class="compact-mobile-summary" id="turno-compact-summary">Sin turno activo</div>
-          </div>
-          <button type="button" class="compact-mobile-toggle" aria-expanded="false" onclick="toggleCompactGerente('turno')"></button>
-        </div>
-
-        <div class="compact-mobile-body">
-        <div class="field" style="margin-bottom:12px">
-          <label for="turno-nombre">Nombre del turno</label>
-          <input type="text" id="turno-nombre" placeholder="Ej: Comida, Cena, Tarde">
-        </div>
-        <div class="actions turno-actions">
-          <button id="btn-abrir-turno" class="success" onclick="abrirTurnoGerente()">Abrir turno</button>
-          <button id="btn-cerrar-turno" class="danger" onclick="cerrarTurnoGerente()" disabled>Cerrar turno</button>
-        </div>
-        <div id="turno-status" style="margin-top:12px;color:var(--muted);font-family:var(--mono);font-size:13px">Sin turno activo</div>
-        <div id="turno-resumen-actual" style="margin-top:14px">
-          <div class="empty">No hay turno activo.</div>
-        </div>
-        </div>
-      </section>
-
       <div class="grid">
-        <div class="stack">
+        <div class="stack stack-left">
           <section class="card collapsible-card" id="card-ventas">
             <div class="card-head">
               <div class="card-head-main">
@@ -1148,62 +1179,6 @@
                 <div class="metric"><strong id="audit-stat-paginas">-</strong><span>Paginas</span></div>
               </div>
 
-              <div class="audit-filtros-wrap">
-              <div class="compact-mobile-head">
-                <div class="compact-mobile-title">Filtro</div>
-                <button type="button" class="compact-mobile-toggle" aria-expanded="false" onclick="toggleCompactGerente('audit-filter')"></button>
-              </div>
-              <div class="audit-filtros-body">
-              <div class="filters">
-                <div class="field">
-                  <label for="audit-fecha-ini">Fecha desde</label>
-                  <input type="date" id="audit-fecha-ini">
-                </div>
-                <div class="field">
-                  <label for="audit-fecha-fin">Fecha hasta</label>
-                  <input type="date" id="audit-fecha-fin">
-                </div>
-                <div class="field">
-                  <label for="audit-hora-ini">Hora desde</label>
-                  <input type="time" id="audit-hora-ini" value="00:00">
-                </div>
-                <div class="field">
-                  <label for="audit-hora-fin">Hora hasta</label>
-                  <input type="time" id="audit-hora-fin" value="23:59">
-                </div>
-                <div class="field">
-                  <label for="audit-camarero">Camarero</label>
-                  <select id="audit-camarero"><option value="">- Todos -</option></select>
-                </div>
-                <div class="field">
-                  <label for="audit-accion">Accion</label>
-                  <select id="audit-accion">
-                    <option value="">- Todas -</option>
-                    <option value="articulo_agregado">Articulos añadidos</option>
-                    <option value="articulo_eliminado">Articulos eliminados</option>
-                    <option value="cantidad_editada">Cantidades editadas</option>
-                    <option value="descuento_aplicado">Descuentos aplicados</option>
-                    <option value="ticket_impreso">Tickets impresos</option>
-                    <option value="ticket_cobrado">Cobros</option>
-                    <option value="factura_emitida">Facturas emitidas</option>
-                    <option value="mesa_cerrada">Mesas cerradas</option>
-                    <option value="mesa_transferida">Mesas transferidas</option>
-                  </select>
-                </div>
-                <div class="field">
-                  <label for="audit-mesa">Mesa</label>
-                  <input type="text" id="audit-mesa" placeholder="Ej: 5">
-                </div>
-              </div>
-
-              <div class="actions" style="margin-bottom:14px">
-                <button class="primary" onclick="aplicarFiltrosAuditoriaGerente()">Aplicar</button>
-                <button onclick="resetFiltrosAuditoriaGerente()">Reset</button>
-                <button onclick="exportarAuditoriaGerenteCSV()">Exportar CSV</button>
-              </div>
-              </div>
-              </div>
-
               <div class="audit-head">
                 <div>Fecha / Hora</div>
                 <div>Camarero</div>
@@ -1226,7 +1201,90 @@
           </section>
         </div>
 
-        <div class="stack">
+        <div class="stack stack-right">
+          <div class="quick-dock">
+            <section class="card turno-quick-card">
+              <div class="card-head">
+                <div>
+                  <div class="eyebrow">Turno activo</div>
+                  <h3>Apertura y cierre</h3>
+                  <div class="card-copy">Control rapido del turno en curso con el mismo comportamiento que ya existe en administracion.</div>
+                  <div class="compact-mobile-summary" id="turno-compact-summary">Sin turno activo</div>
+                </div>
+                <button type="button" class="compact-mobile-toggle" aria-expanded="false" onclick="toggleCompactGerente('turno')"></button>
+              </div>
+              <div class="compact-mobile-body">
+                <div class="field" style="margin-bottom:12px">
+                  <label for="turno-nombre">Nombre del turno</label>
+                  <input type="text" id="turno-nombre" placeholder="Ej: Comida, Cena, Tarde">
+                </div>
+                <div class="actions turno-actions">
+                  <button id="btn-abrir-turno" class="success" onclick="abrirTurnoGerente()">Abrir turno</button>
+                  <button id="btn-cerrar-turno" class="danger" onclick="cerrarTurnoGerente()" disabled>Cerrar turno</button>
+                </div>
+                <div id="turno-status" style="margin-top:12px;color:var(--muted);font-family:var(--mono);font-size:13px">Sin turno activo</div>
+                <div id="turno-resumen-actual" style="margin-top:14px">
+                  <div class="empty">No hay turno activo.</div>
+                </div>
+              </div>
+            </section>
+
+            <section class="card audit-filtros-wrap">
+              <div class="compact-mobile-head">
+                <div class="compact-mobile-title">Filtro</div>
+                <button type="button" class="compact-mobile-toggle" aria-expanded="false" onclick="toggleCompactGerente('audit-filter')"></button>
+              </div>
+              <div class="audit-filtros-body compact-mobile-body">
+                <div class="filters">
+                  <div class="field">
+                    <label for="audit-fecha-ini">Fecha desde</label>
+                    <input type="date" id="audit-fecha-ini">
+                  </div>
+                  <div class="field">
+                    <label for="audit-fecha-fin">Fecha hasta</label>
+                    <input type="date" id="audit-fecha-fin">
+                  </div>
+                  <div class="field">
+                    <label for="audit-hora-ini">Hora desde</label>
+                    <input type="time" id="audit-hora-ini" value="00:00">
+                  </div>
+                  <div class="field">
+                    <label for="audit-hora-fin">Hora hasta</label>
+                    <input type="time" id="audit-hora-fin" value="23:59">
+                  </div>
+                  <div class="field">
+                    <label for="audit-camarero">Camarero</label>
+                    <select id="audit-camarero"><option value="">- Todos -</option></select>
+                  </div>
+                  <div class="field">
+                    <label for="audit-accion">Accion</label>
+                    <select id="audit-accion">
+                      <option value="">- Todas -</option>
+                      <option value="articulo_agregado">Articulos añadidos</option>
+                      <option value="articulo_eliminado">Articulos eliminados</option>
+                      <option value="cantidad_editada">Cantidades editadas</option>
+                      <option value="descuento_aplicado">Descuentos aplicados</option>
+                      <option value="ticket_impreso">Tickets impresos</option>
+                      <option value="ticket_cobrado">Cobros</option>
+                      <option value="factura_emitida">Facturas emitidas</option>
+                      <option value="mesa_cerrada">Mesas cerradas</option>
+                      <option value="mesa_transferida">Mesas transferidas</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label for="audit-mesa">Mesa</label>
+                    <input type="text" id="audit-mesa" placeholder="Ej: 5">
+                  </div>
+                </div>
+                <div class="actions" style="margin-bottom:0">
+                  <button class="primary" onclick="aplicarFiltrosAuditoriaGerente()">Aplicar</button>
+                  <button onclick="resetFiltrosAuditoriaGerente()">Reset</button>
+                  <button onclick="exportarAuditoriaGerenteCSV()">Exportar CSV</button>
+                </div>
+              </div>
+            </section>
+          </div>
+
           <section class="card collapsible-card" id="card-turnos">
             <div class="card-head">
               <div class="card-head-main">
