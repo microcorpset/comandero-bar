@@ -363,6 +363,24 @@
     z-index: 4;
   }
 
+  .turno-quick-card {
+    padding: 16px 18px;
+    margin-bottom: 18px;
+  }
+
+  .turno-quick-card .card-head {
+    margin-bottom: 12px;
+  }
+
+  .turno-quick-card .card-head h3 {
+    font-size: 20px;
+  }
+
+  .turno-quick-card .card-copy {
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
   .metrics {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -666,13 +684,14 @@
       grid-template-columns: 1fr;
     }
 
-    .sticky-card {
-      position: static;
-    }
-
     .metrics,
     .turno-stats {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .turno-quick-card {
+      top: 8px;
+      padding: 14px;
     }
   }
 
@@ -697,9 +716,48 @@
     }
 
     .metrics,
-    .turno-stats,
     .login-points {
       grid-template-columns: 1fr;
+    }
+
+    .turno-stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .turno-stat {
+      padding: 10px;
+    }
+
+    .turno-stat strong {
+      font-size: 18px;
+    }
+
+    .turno-stat span {
+      font-size: 11px;
+    }
+
+    .turno-quick-card {
+      top: 8px;
+      padding: 14px;
+    }
+
+    .turno-quick-card .card-copy {
+      display: none;
+    }
+
+    .turno-quick-card #turno-resumen-actual {
+      margin-top: 10px !important;
+    }
+
+    .turno-quick-card .turno-card {
+      border-radius: 16px;
+    }
+
+    .turno-quick-card .turno-head,
+    .turno-quick-card .turno-body {
+      padding-left: 12px;
+      padding-right: 12px;
     }
 
     .audit-head {
@@ -764,6 +822,14 @@
     #turno-status {
       line-height: 1.4;
     }
+
+    .turno-quick-card {
+      padding: 12px;
+    }
+
+    .turno-quick-card .card-head h3 {
+      font-size: 18px;
+    }
   }
 </style>
 </head>
@@ -818,6 +884,29 @@
           <div class="pill" id="topbar-ventas-pill">Ventas listas</div>
         </div>
       </div>
+
+      <section class="card sticky-card turno-quick-card">
+        <div class="card-head">
+          <div>
+            <div class="eyebrow">Turno activo</div>
+            <h3>Apertura y cierre</h3>
+            <div class="card-copy">Control rapido del turno en curso con el mismo comportamiento que ya existe en administracion.</div>
+          </div>
+        </div>
+
+        <div class="field" style="margin-bottom:12px">
+          <label for="turno-nombre">Nombre del turno</label>
+          <input type="text" id="turno-nombre" placeholder="Ej: Comida, Cena, Tarde">
+        </div>
+        <div class="actions turno-actions">
+          <button id="btn-abrir-turno" class="success" onclick="abrirTurnoGerente()">Abrir turno</button>
+          <button id="btn-cerrar-turno" class="danger" onclick="cerrarTurnoGerente()" disabled>Cerrar turno</button>
+        </div>
+        <div id="turno-status" style="margin-top:12px;color:var(--muted);font-family:var(--mono);font-size:13px">Sin turno activo</div>
+        <div id="turno-resumen-actual" style="margin-top:14px">
+          <div class="empty">No hay turno activo.</div>
+        </div>
+      </section>
 
       <div class="grid">
         <div class="stack">
@@ -984,29 +1073,6 @@
         </div>
 
         <div class="stack">
-          <section class="card sticky-card">
-            <div class="card-head">
-              <div>
-                <div class="eyebrow">Turno activo</div>
-                <h3>Apertura y cierre</h3>
-                <div class="card-copy">Control rapido del turno en curso con el mismo comportamiento que ya existe en administracion.</div>
-              </div>
-            </div>
-
-            <div class="field" style="margin-bottom:12px">
-              <label for="turno-nombre">Nombre del turno</label>
-              <input type="text" id="turno-nombre" placeholder="Ej: Comida, Cena, Tarde">
-            </div>
-            <div class="actions turno-actions">
-              <button id="btn-abrir-turno" class="success" onclick="abrirTurnoGerente()">Abrir turno</button>
-              <button id="btn-cerrar-turno" class="danger" onclick="cerrarTurnoGerente()" disabled>Cerrar turno</button>
-            </div>
-            <div id="turno-status" style="margin-top:12px;color:var(--muted);font-family:var(--mono);font-size:13px">Sin turno activo</div>
-            <div id="turno-resumen-actual" style="margin-top:14px">
-              <div class="empty">No hay turno activo.</div>
-            </div>
-          </section>
-
           <section class="card collapsible-card" id="card-turnos">
             <div class="card-head">
               <div class="card-head-main">
