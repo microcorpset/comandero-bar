@@ -566,7 +566,7 @@ window.aplicarFiltrosGerente = async () => {
 window.resetFiltrosGerente = () => {
   initFiltrosVentasHoy();
   ventasPagina = 1;
-  window.aplicarFiltrosGerente();
+  window.aplicarFiltrosComunesGerente();
 };
 
 window.exportarVentasGerenteCSV = () => {
@@ -893,10 +893,10 @@ function renderHistorialTurnos(turnosData) {
 
 function initFiltrosAuditoria() {
   const hoyKey = fechaKeyFromDate(new Date());
-  const ini = document.getElementById('audit-fecha-ini');
-  const fin = document.getElementById('audit-fecha-fin');
-  const hIni = document.getElementById('audit-hora-ini');
-  const hFin = document.getElementById('audit-hora-fin');
+  const ini = document.getElementById('filtro-fecha-ini');
+  const fin = document.getElementById('filtro-fecha-fin');
+  const hIni = document.getElementById('filtro-hora-ini');
+  const hFin = document.getElementById('filtro-hora-fin');
   if (ini && !ini.value) ini.value = hoyKey;
   if (fin && !fin.value) fin.value = hoyKey;
   if (hIni && !hIni.value) hIni.value = '00:00';
@@ -905,14 +905,15 @@ function initFiltrosAuditoria() {
 
 window.resetFiltrosAuditoriaGerente = () => {
   const hoyKey = fechaKeyFromDate(new Date());
-  document.getElementById('audit-fecha-ini').value = hoyKey;
-  document.getElementById('audit-fecha-fin').value = hoyKey;
-  document.getElementById('audit-hora-ini').value = '00:00';
-  document.getElementById('audit-hora-fin').value = '23:59';
+  document.getElementById('filtro-fecha-ini').value = hoyKey;
+  document.getElementById('filtro-fecha-fin').value = hoyKey;
+  document.getElementById('filtro-hora-ini').value = '00:00';
+  document.getElementById('filtro-hora-fin').value = '23:59';
   document.getElementById('audit-camarero').value = '';
   document.getElementById('audit-accion').value = '';
   document.getElementById('audit-mesa').value = '';
   auditPagina = 1;
+  window.aplicarFiltrosComunesGerente();
 };
 
 function poblarCamarerosAuditoria(usuarios) {
@@ -1015,13 +1016,18 @@ window.cambiarPaginaAuditoria = delta => {
   renderEventosAuditoria(auditEventos);
 };
 
+window.aplicarFiltrosComunesGerente = async () => {
+  await window.aplicarFiltrosGerente();
+  await window.aplicarFiltrosAuditoriaGerente();
+};
+
 window.aplicarFiltrosAuditoriaGerente = async () => {
   if (!auditUnlocked) return;
 
-  const fechaIni = document.getElementById('audit-fecha-ini').value;
-  const fechaFin = document.getElementById('audit-fecha-fin').value;
-  const horaIni = document.getElementById('audit-hora-ini').value || '00:00';
-  const horaFin = document.getElementById('audit-hora-fin').value || '23:59';
+  const fechaIni = document.getElementById('filtro-fecha-ini').value;
+  const fechaFin = document.getElementById('filtro-fecha-fin').value;
+  const horaIni = document.getElementById('filtro-hora-ini').value || '00:00';
+  const horaFin = document.getElementById('filtro-hora-fin').value || '23:59';
   const camFiltro = document.getElementById('audit-camarero').value || '';
   const accFiltro = document.getElementById('audit-accion').value || '';
   const mesaFiltro = (document.getElementById('audit-mesa').value || '').trim().toLowerCase();
@@ -1075,8 +1081,8 @@ window.exportarAuditoriaGerenteCSV = () => {
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  const fIni = document.getElementById('audit-fecha-ini').value;
-  const fFin = document.getElementById('audit-fecha-fin').value;
+  const fIni = document.getElementById('filtro-fecha-ini').value;
+  const fFin = document.getElementById('filtro-fecha-fin').value;
   a.href = url;
   a.download = `auditoria_gerencia_${fIni}_${fFin}.csv`;
   document.body.appendChild(a);
@@ -1127,7 +1133,6 @@ async function init() {
 
   desbloquearAuditoriaGerente();
 
-  await window.aplicarFiltrosGerente();
   poblarCamarerosAuditoria(auditUsuarios);
-  await window.aplicarFiltrosAuditoriaGerente();
+  await window.aplicarFiltrosComunesGerente();
 }

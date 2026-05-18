@@ -1117,28 +1117,7 @@
               <div class="metric"><strong id="stat-lineas">-</strong><span>Articulos</span></div>
             </div>
 
-            <div class="filters">
-              <div class="field">
-                <label for="filtro-fecha-ini">Fecha desde</label>
-                <input type="date" id="filtro-fecha-ini">
-              </div>
-              <div class="field">
-                <label for="filtro-fecha-fin">Fecha hasta</label>
-                <input type="date" id="filtro-fecha-fin">
-              </div>
-              <div class="field">
-                <label for="filtro-hora-ini">Hora desde</label>
-                <input type="time" id="filtro-hora-ini" value="00:00">
-              </div>
-              <div class="field">
-                <label for="filtro-hora-fin">Hora hasta</label>
-                <input type="time" id="filtro-hora-fin" value="23:59">
-              </div>
-            </div>
-
             <div class="actions" style="margin-bottom:14px">
-              <button class="primary" onclick="aplicarFiltrosGerente()">Filtrar</button>
-              <button onclick="resetFiltrosGerente()">Hoy</button>
               <button onclick="exportarVentasGerenteCSV()">Exportar CSV</button>
             </div>
 
@@ -1242,26 +1221,26 @@
 
             <section class="card audit-filtros-wrap">
               <div class="compact-mobile-head">
-                <div class="compact-mobile-title">Filtro</div>
+                <div class="compact-mobile-title">Filtro comun y auditoria</div>
                 <button type="button" class="compact-mobile-toggle" aria-expanded="false" onclick="toggleCompactGerente('audit-filter')"></button>
               </div>
               <div class="audit-filtros-body compact-mobile-body">
                 <div class="filters">
                   <div class="field">
-                    <label for="audit-fecha-ini">Fecha desde</label>
-                    <input type="date" id="audit-fecha-ini">
+                    <label for="filtro-fecha-ini">Fecha desde</label>
+                    <input type="date" id="filtro-fecha-ini">
                   </div>
                   <div class="field">
-                    <label for="audit-fecha-fin">Fecha hasta</label>
-                    <input type="date" id="audit-fecha-fin">
+                    <label for="filtro-fecha-fin">Fecha hasta</label>
+                    <input type="date" id="filtro-fecha-fin">
                   </div>
                   <div class="field">
-                    <label for="audit-hora-ini">Hora desde</label>
-                    <input type="time" id="audit-hora-ini" value="00:00">
+                    <label for="filtro-hora-ini">Hora desde</label>
+                    <input type="time" id="filtro-hora-ini" value="00:00">
                   </div>
                   <div class="field">
-                    <label for="audit-hora-fin">Hora hasta</label>
-                    <input type="time" id="audit-hora-fin" value="23:59">
+                    <label for="filtro-hora-fin">Hora hasta</label>
+                    <input type="time" id="filtro-hora-fin" value="23:59">
                   </div>
                   <div class="field">
                     <label for="audit-camarero">Camarero</label>
@@ -1288,7 +1267,7 @@
                   </div>
                 </div>
                 <div class="actions" style="margin-bottom:0">
-                  <button class="primary" onclick="aplicarFiltrosAuditoriaGerente()">Aplicar</button>
+                  <button class="primary" onclick="aplicarFiltrosComunesGerente()">Aplicar</button>
                   <button onclick="resetFiltrosAuditoriaGerente()">Reset</button>
                   <button onclick="exportarAuditoriaGerenteCSV()">Exportar CSV</button>
                 </div>
