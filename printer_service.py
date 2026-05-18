@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import json
 import os
 import re
@@ -16,8 +17,24 @@ from pathlib import Path
 from typing import Any
 
 
-ROOT = Path(__file__).resolve().parent
-CONFIG_PATH = ROOT / "printer-service-config.json"
+def _get_exe_dir() -> Path:
+    if getattr(sys, "frozen", False):
+        return Path(sys.executable).resolve().parent
+    return Path(__file__).resolve().parent
+
+def _get_bundle_dir() -> Path:
+    if getattr(sys, "frozen", False):
+        return Path(sys._MEIPASS)  # type: ignore[attr-defined]
+    return Path(__file__).resolve().parent
+
+EXE_DIR = _get_exe_dir()
+BUNDLE_DIR = _get_bundle_dir()
+CONFIG_PATH = EXE_DIR / "printer-service-config.json"
+
+
+def _decode_field(enc: str, key: str = "cmd25k") -> str:
+    raw = base64.b64decode(enc).decode("latin-1")
+    return "".join(chr(ord(c) ^ ord(key[i % len(key)])) for i, c in enumerate(raw))
 
 
 def now_text() -> str:
@@ -52,24 +69,57 @@ def wrap_text(text: str, max_chars: int) -> list[str]:
 EURO_SYMBOL = "\u20ac"
 
 
+def _download_logo(url: str) -> str | None:
+    if not url:
+        return None
+    try:
+        if url.startswith("data:image/"):
+            header, data = url.split(",", 1)
+            ext = ".png" if "png" in header else ".jpg"
+            img_data = base64.b64decode(data)
+            with tempfile.NamedTemporaryFile(suffix=ext, delete=False) as tmp:
+                tmp.write(img_data)
+                return tmp.name
+        if not url.startswith(("http://", "https://")):
+            log(f"Logo: URL no soportada (debe ser http/https o data:image): {url[:60]}")
+            return None
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            content_type = resp.getheader("Content-Type", "")
+            ext = ".png" if "png" in content_type else ".jpg"
+            with tempfile.NamedTemporaryFile(suffix=ext, delete=False) as tmp:
+                tmp.write(resp.read())
+                return tmp.name
+    except Exception as exc:
+        log(f"Logo: no se pudo procesar ({exc})")
+        return None
+
+
 def receipt_layout(paper: str, font_size: float) -> tuple[int, int]:
+    # Returns (max_chars, price_width) for TOTAL/header lines.
+    # max_chars scales ~inversely with font_size (Consolas GDI+ rendering).
+    # Both this function and Get-ReceiptConfig in print-receipt.ps1 must stay in sync.
+    # ceil(baseline_chars * baseline_font / font_size) — rounds up so text reaches the right edge.
+    # RightMargin (8/100 inch) provides enough buffer to absorb the ~1 char overshoot.
     is_80 = "80" in str(paper or "")
     if is_80:
-        if font_size > 11.5:
-            return 27, 9
-        if font_size > 10.5:
-            return 30, 10
-        if font_size > 9.5:
-            return 33, 10
-        return 36, 11
+        if font_size > 11.5: return 28,  9
+        if font_size > 10.5: return 31, 10
+        if font_size > 9.5:  return 34, 10
+        if font_size > 8.5:  return 37, 11
+        if font_size > 8.25: return 41, 11
+        if font_size > 7.75: return 44, 11
+        if font_size > 6.5:  return 47, 12
+        return 53, 12
 
-    if font_size > 11.5:
-        return 18, 7
-    if font_size > 10.5:
-        return 20, 8
-    if font_size > 9.5:
-        return 22, 8
-    return 24, 9
+    if font_size > 11.5: return 19, 7
+    if font_size > 10.5: return 21, 8
+    if font_size > 9.5:  return 23, 8
+    if font_size > 8.5:  return 25, 9
+    if font_size > 8.25: return 28, 9
+    if font_size > 7.75: return 30, 9
+    if font_size > 6.5:  return 31, 9
+    return 34, 9
 
 
 def json_request(base_url: str, path: str, method: str = "GET", data: Any | None = None, auth_token: str | None = None) -> Any:
@@ -178,32 +228,37 @@ class PrinterService:
         self.service_key = safe_service_key(self.service_id)
         self.poll_seconds = max(1, int(config["service"].get("poll_interval_seconds", 2)))
         self.reconnect_seconds = max(1, int(config["service"].get("reconnect_delay_seconds", self.poll_seconds)))
-        self.print_script = str((ROOT / config["service"].get("print_script", "print-receipt.ps1")).resolve())
-        self.log_file = str((ROOT / config["service"].get("log_file", "printer-service.log")).resolve())
+        self.print_script = str((BUNDLE_DIR / config["service"].get("print_script", "print-receipt.ps1")).resolve())
+        self.log_file = str((EXE_DIR / config["service"].get("log_file", "printer-service.log")).resolve())
         self.id_token = ""
         self.token_expires_at = 0.0
         self.root_state: dict[str, Any] = {}
         self.recent_role_marks: dict[str, float] = {}
         self.recent_job_marks: dict[str, float] = {}
-        self.roles = [
-            RoleConfig(
-                name=role_name,
-                enabled=bool(role_cfg.get("enabled", False)),
-                printer_name=str(role_cfg.get("printer_name", "")),
-                paper=str(role_cfg.get("paper", "58mm")),
-                font_size=float(role_cfg.get("font_size", 9)),
-                uppercase=bool(role_cfg.get("uppercase", False)),
-            )
-            for role_name, role_cfg in (config.get("roles") or {}).items()
-        ]
-        customer_cfg = config.get("customer_ticket") or {}
         self.customer_ticket_cfg = RoleConfig(
-            name="ticket_final",
-            enabled=bool(customer_cfg.get("enabled", False)),
-            printer_name=str(customer_cfg.get("printer_name", "")),
-            paper=str(customer_cfg.get("paper", "58mm")),
-            font_size=float(customer_cfg.get("font_size", 9)),
-            uppercase=bool(customer_cfg.get("uppercase", False)),
+            name="ticket_final", enabled=True, printer_name="", paper="58mm", font_size=9, uppercase=False
+        )
+        self._paused_prev: bool = False
+
+    def _build_role(self, name: str, ps_cfg: dict[str, Any], local_config: dict[str, Any]) -> RoleConfig:
+        role_data = ps_cfg.get(name) or {}
+        paper = str(role_data.get("paper") or "58mm")
+        if name == "barra":
+            font_size = float(local_config.get("barraFontSize") or role_data.get("fontSize") or 9)
+            uppercase = bool(local_config.get("barraUppercase") or role_data.get("uppercase", False))
+        elif name == "cocina":
+            font_size = float(local_config.get("cocinaFontSize") or role_data.get("fontSize") or 9)
+            uppercase = bool(local_config.get("cocinaUppercase") or role_data.get("uppercase", False))
+        else:
+            font_size = float(role_data.get("fontSize") or 9)
+            uppercase = bool(role_data.get("uppercase", False))
+        return RoleConfig(
+            name=name,
+            enabled=bool(role_data.get("enabled", True)),
+            printer_name=str(role_data.get("printerName") or ""),
+            paper=paper,
+            font_size=font_size,
+            uppercase=uppercase,
         )
 
     def ensure_auth(self, force: bool = False) -> None:
@@ -271,7 +326,7 @@ class PrinterService:
         lines.append("--------------------------------")
         return "\n".join(lines) + "\n"
 
-    def print_text(self, text: str, role_cfg: RoleConfig) -> None:
+    def print_text(self, text: str, role_cfg: RoleConfig, logo_path: str | None = None, header_offset: int = 0, qr_path: str | None = None) -> None:
         with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False, encoding="utf-8", newline="\n") as tmp:
             tmp.write(text)
             temp_path = tmp.name
@@ -294,8 +349,14 @@ class PrinterService:
             ]
             if role_cfg.printer_name:
                 args.extend(["-PrinterName", role_cfg.printer_name])
+            if logo_path and os.path.exists(logo_path):
+                args.extend(["-LogoPath", logo_path])
+            if header_offset:
+                args.extend(["-HeaderOffset", str(header_offset)])
             if role_cfg.uppercase:
                 args.append("-Uppercase")
+            if qr_path and os.path.exists(qr_path):
+                args.extend(["-QrPath", qr_path])
 
             proc = subprocess.run(args, capture_output=True, text=True, check=False)
             if proc.returncode != 0:
@@ -306,6 +367,16 @@ class PrinterService:
                 os.remove(temp_path)
             except OSError:
                 pass
+            if logo_path:
+                try:
+                    os.remove(logo_path)
+                except OSError:
+                    pass
+            if qr_path:
+                try:
+                    os.remove(qr_path)
+                except OSError:
+                    pass
 
     def mark_printed(self, mesa_id: str, envio_id: str, role: str, payload: dict[str, Any]) -> None:
         path = f"pedidos/{mesa_id}/{envio_id}/_printService/{role}/{self.service_key}"
@@ -325,9 +396,36 @@ class PrinterService:
         self.recent_job_marks = {k: ts for k, ts in self.recent_job_marks.items() if ts >= cutoff}
 
     def process_current_state(self) -> None:
+        ps_cfg = (self.root_state.get("config") or {}).get("printService") or {}
+        currently_paused = bool(ps_cfg.get("paused", False))
+
+        if currently_paused:
+            self._paused_prev = True
+            return
+
+        if self._paused_prev:
+            # Acaba de reanudarse: recarga estado limpio desde Firebase para que los
+            # "marcados como impresos" mientras estaba pausado sean visibles.
+            self._paused_prev = False
+            log("Reanudando — recargando estado desde Firebase")
+            self.root_state = self.fetch_root_state()
+            ps_cfg = (self.root_state.get("config") or {}).get("printService") or {}
+            if bool(ps_cfg.get("paused", False)):
+                return
         pedidos, mesas, local_config, print_jobs = self.get_cached_state()
-        for role in self.roles:
+        for role_name in ("barra", "cocina"):
+            role = self._build_role(role_name, ps_cfg, local_config)
             self.process_role(role, pedidos, mesas, local_config)
+        customer_cfg = self._build_role("ticketFinal", ps_cfg, local_config)
+        customer_cfg = RoleConfig(
+            name="ticket_final",
+            enabled=customer_cfg.enabled,
+            printer_name=customer_cfg.printer_name,
+            paper=customer_cfg.paper,
+            font_size=customer_cfg.font_size,
+            uppercase=customer_cfg.uppercase,
+        )
+        self.customer_ticket_cfg = customer_cfg
         self.process_print_jobs(print_jobs)
 
     def iter_stream_events(self):
@@ -403,20 +501,30 @@ class PrinterService:
     def pending_lines_for_role(self, envio: dict[str, Any], role: str) -> list[dict[str, Any]]:
         out: list[dict[str, Any]] = []
         lineas = envio.get("lineas") or {}
-        for _, linea in lineas.items():
+        for art_id, linea in lineas.items():
             destino = str(linea.get("destino") or "")
             estado = str(linea.get("estado") or "")
             if estado != "pendiente":
                 continue
             if destino not in (role, "ambos"):
                 continue
-            out.append(linea)
+            linea_copy = dict(linea)
+            linea_copy["_artId"] = art_id
+            out.append(linea_copy)
         return out
 
     def process_role(self, role_cfg: RoleConfig, pedidos: dict[str, Any], mesas: dict[str, Any], local_config: dict[str, Any]) -> None:
         if not role_cfg.enabled:
             return
         self.cleanup_recent_marks()
+
+        role_service_id = ""
+        if role_cfg.name == "barra":
+            role_service_id = str(local_config.get("barraPrintServiceId") or "").strip()
+        elif role_cfg.name == "cocina":
+            role_service_id = str(local_config.get("cocinaPrintServiceId") or "").strip()
+        if role_service_id and role_service_id != self.service_id:
+            return
 
         role_font_size = role_cfg.font_size
         if role_cfg.name == "barra":
@@ -474,79 +582,26 @@ class PrinterService:
                 },
             )
             log(f"Impreso {effective_cfg.name} mesa {mesa_nombre} envio {envio_id}")
+            if local_config.get("comandaAutoServir"):
+                for linea in lineas:
+                    art_id = linea.get("_artId")
+                    if art_id:
+                        try:
+                            json_request(self.base_url, f"pedidos/{mesa_id}/{envio_id}/lineas/{art_id}/estado", "PUT", "servido", auth_token=self.id_token)
+                        except Exception as exc:
+                            log(f"Error auto-servir artId {art_id}: {exc}")
+                log(f"Auto-servidas {len(lineas)} líneas mesa {mesa_nombre}")
 
-    def format_customer_ticket_text(self, job: dict[str, Any]) -> tuple[str, RoleConfig]:
+    def format_customer_ticket_text(self, job: dict[str, Any]) -> tuple[str, RoleConfig, str | None, int, str | None]:
         format_cfg = job.get("format") or {}
         local = job.get("local") or {}
-        paper = str(format_cfg.get("paper") or self.customer_ticket_cfg.paper or "58mm")
+        show_notes = bool(local.get("ticketShowNotes", True))
+        # El ancho fisico debe seguir la configuracion actual del servicio/impresora.
+        # Si llega un payload antiguo con otro papel, no debe forzar un ancho incorrecto.
+        paper = str(self.customer_ticket_cfg.paper or format_cfg.get("paper") or "58mm")
         font_size = float(format_cfg.get("fontSize") or self.customer_ticket_cfg.font_size or 9)
         uppercase = bool(format_cfg.get("uppercase", self.customer_ticket_cfg.uppercase))
-        printer_cfg = RoleConfig(
-            name="ticket_final",
-            enabled=self.customer_ticket_cfg.enabled,
-            printer_name=self.customer_ticket_cfg.printer_name,
-            paper=paper,
-            font_size=font_size,
-            uppercase=uppercase,
-        )
-
-        max_chars = receipt_max_chars(paper)
-        price_width = 11 if max_chars > 24 else 9
-        name_width = max(10, max_chars - price_width - 4)
-        created_at = int(job.get("createdAt") or 0)
-        created_text = datetime.fromtimestamp(created_at / 1000).strftime("%d/%m/%Y  %H:%M") if created_at else datetime.now().strftime("%d/%m/%Y  %H:%M")
-
-        lines: list[str] = []
-        local_name = str(local.get("nombre") or "").strip()
-        if local_name:
-            lines.append(f"[[LEFT_TITLE]]{local_name}")
-        for key in ("direccion", "telefono", "cif"):
-            value = str(local.get(key) or "").strip()
-            if value:
-                lines.append(f"[[LEFT_SUBTITLE]]{value}")
-
-        mesa_nombre = str(job.get("mesaNombre") or "").strip()
-        if mesa_nombre:
-            lines.append(f"[[LEFT_META]]Mesa {mesa_nombre}")
-        lines.append(f"[[LEFT_SUBTITLE]]{created_text}")
-        lines.append("-" * max_chars)
-
-        for item in job.get("lines") or []:
-            qty = int(item.get("qty") or 0)
-            name = str(item.get("nombre") or "").strip()
-            if qty <= 0 or not name:
-                continue
-            total_line = float(item.get("precio") or 0) * qty
-            total_text = f"{total_line:.2f}€".replace(".", ",")
-            wrapped_name = wrap_text(name, name_width)
-            left = f"{qty}x {wrapped_name[0]}"
-            lines.append(f"[[RAW]]{left.ljust(max_chars - price_width)}{total_text.rjust(price_width)}")
-            for extra in wrapped_name[1:]:
-                lines.append(f"[[RAW]]   {extra}")
-            note = str(item.get("nota") or "").strip()
-            if note:
-                for note_line in wrap_text(f"-> {note}", max_chars - 3):
-                    lines.append(f"[[ITALIC]]   {note_line}")
-
-        lines.append("-" * max_chars)
-        total_amount = float(job.get("total") or 0)
-        total_text = f"{total_amount:.2f}€".replace(".", ",")
-        lines.append(f"[[TOTAL]]{'TOTAL'.ljust(max_chars - price_width)}{total_text.rjust(price_width)}")
-
-        footer = str(local.get("footer") or "").strip()
-        if footer:
-            lines.append("-" * max_chars)
-            for footer_line in wrap_text(footer, max_chars):
-                lines.append(f"[[ITALIC]]{footer_line}")
-
-        return "\n".join(lines) + "\n", printer_cfg
-
-    def format_customer_ticket_text(self, job: dict[str, Any]) -> tuple[str, RoleConfig]:
-        format_cfg = job.get("format") or {}
-        local = job.get("local") or {}
-        paper = str(format_cfg.get("paper") or self.customer_ticket_cfg.paper or "58mm")
-        font_size = float(format_cfg.get("fontSize") or self.customer_ticket_cfg.font_size or 9)
-        uppercase = bool(format_cfg.get("uppercase", self.customer_ticket_cfg.uppercase))
+        header_offset = int(format_cfg.get("headerOffset") or 0)
         printer_cfg = RoleConfig(
             name="ticket_final",
             enabled=self.customer_ticket_cfg.enabled,
@@ -557,63 +612,191 @@ class PrinterService:
         )
 
         max_chars, price_width = receipt_layout(paper, font_size)
-        name_width = max(7, max_chars - price_width - 4)
+        # Fixed column widths for item lines (independent of font/paper so they're predictable):
+        #   qty_col  : 2 chars  (up to "99")
+        #   pc / tc  : 7 chars each  ("999,99€" = 7 chars incl. euro symbol)
+        #   name_col : rest of available width
+        qty_col  = 2
+        pc       = 7   # unit-price column width
+        tc       = 7   # total-price column width
+        name_col = max(5, max_chars - qty_col - 1 - pc - 1 - tc)
         created_at = int(job.get("createdAt") or 0)
         created_text = datetime.fromtimestamp(created_at / 1000).strftime("%d/%m/%Y  %H:%M") if created_at else datetime.now().strftime("%d/%m/%Y  %H:%M")
+
+        logo_url = str(local.get("logoUrl") or "").strip()
+        logo_path = _download_logo(logo_url) if logo_url else None
+        if logo_url and not logo_path:
+            log("Advertencia: logo configurado pero no se pudo cargar, se omite")
 
         lines: list[str] = []
         local_name = str(local.get("nombre") or "").strip()
         if local_name:
-            lines.append(f"[[LEFT_TITLE]]{local_name}")
+            title_chars = max(8, int(max_chars * font_size / (font_size + 3)))
+            for title_line in wrap_text(local_name, title_chars):
+                lines.append(f"[[TITLE]]{title_line}")
         for key in ("direccion", "telefono", "cif"):
             value = str(local.get(key) or "").strip()
             if value:
-                lines.append(f"[[LEFT_SUBTITLE]]{value}")
+                lines.append(f"[[SUBTITLE]]{value}")
 
         mesa_nombre = str(job.get("mesaNombre") or "").strip()
         if mesa_nombre:
-            lines.append(f"[[LEFT_META]]Mesa {mesa_nombre}")
-        lines.append(f"[[LEFT_SUBTITLE]]{created_text}")
-        lines.append("-" * max_chars)
+            lines.append("")
+            lines.append(f"[[CENTER_META]]Mesa {mesa_nombre}")
+        lines.append(f"[[SUBTITLE]]{created_text}")
+        lines.append("[[RULE]]")
+
+        # Header row aligned with item columns
+        hdr = (
+            "Ud".ljust(qty_col) + " " +
+            "Articulo".ljust(name_col) +
+            "Precio".rjust(pc) + " " +
+            "Total".rjust(tc)
+        )
+        lines.append(f"[[RAW]]{hdr}")
+        lines.append("[[RULE]]")
+
+        indent = " " * (qty_col + 1)  # continuation-line indent (under name column)
 
         for item in job.get("lines") or []:
             qty = int(item.get("qty") or 0)
             name = str(item.get("nombre") or "").strip()
             if qty <= 0 or not name:
                 continue
-            total_line = float(item.get("precio") or 0) * qty
+            unit_price = float(item.get("precio") or 0)
+            total_line = unit_price * qty
+            unit_text = f"{unit_price:.2f}{EURO_SYMBOL}".replace(".", ",")
             total_text = f"{total_line:.2f}{EURO_SYMBOL}".replace(".", ",")
-            wrapped_name = wrap_text(name, name_width)
-            left = f"{qty}x {wrapped_name[0]}"
-            lines.append(f"[[RAW]]{left.ljust(max_chars - price_width)}{total_text.rjust(price_width)}")
+            wrapped_name = wrap_text(name, name_col)
+            # First line: qty | name | unit_price | total_price
+            line_str = (
+                str(qty)[:qty_col].ljust(qty_col) + " " +
+                wrapped_name[0].ljust(name_col) +
+                unit_text.rjust(pc) + " " +
+                total_text.rjust(tc)
+            )
+            lines.append(f"[[RAW]]{line_str}")
+            # Continuation lines: indent to name column, no price columns
             for extra in wrapped_name[1:]:
-                lines.append(f"[[RAW]]   {extra}")
+                lines.append(f"[[RAW]]{indent}{extra}")
             note = str(item.get("nota") or "").strip()
-            if note:
-                for note_line in wrap_text(f"-> {note}", max_chars - 3):
-                    lines.append(f"[[ITALIC]]   {note_line}")
+            if show_notes and note:
+                note_prefix = "| -> "
+                note_wrap = wrap_text(note, max_chars - len(indent) - len(note_prefix))
+                if note_wrap:
+                    lines.append(f"[[ITALIC]]{indent}{note_prefix}{note_wrap[0]}")
+                    for extra_note in note_wrap[1:]:
+                        lines.append(f"[[ITALIC]]{indent}|    {extra_note}")
 
-        lines.append("-" * max_chars)
+        lines.append("")
+        lines.append("[[RULE]]")
         total_amount = float(job.get("total") or 0)
         total_text = f"{total_amount:.2f}{EURO_SYMBOL}".replace(".", ",")
-        lines.append(f"[[RAW]]{'TOTAL'.ljust(max_chars - price_width)}{total_text.rjust(price_width)}")
+        lines.append(f"[[TOTAL]]{'TOTAL'.ljust(max_chars - price_width)}{total_text.rjust(price_width)}")
+        cobro = job.get("cobro")
+        if cobro:
+            recibido = float(cobro.get("recibido") or 0)
+            cambio = float(cobro.get("cambio") or 0)
+            rec_text = f"{recibido:.2f}{EURO_SYMBOL}".replace(".", ",")
+            cam_text = f"{cambio:.2f}{EURO_SYMBOL}".replace(".", ",")
+            lines.append(f"[[RAW]]{'Recibido'.ljust(max_chars - price_width)}{rec_text.rjust(price_width)}")
+            lines.append(f"[[TOTAL]]{'Cambio'.ljust(max_chars - price_width)}{cam_text.rjust(price_width)}")
+        lines.append("")
+        lines.append("")
+        lines.append("")
 
         footer = str(local.get("footer") or "").strip()
         if footer:
-            lines.append("-" * max_chars)
+            dash_dot_line = ("-." * ((max_chars + 1) // 2))[:max_chars]
+            lines.append(dash_dot_line)
             for footer_line in wrap_text(footer, max_chars):
-                lines.append(f"[[ITALIC]]{footer_line}")
+                lines.append(f"[[FOOTER]]{footer_line}")
+            lines.append(dash_dot_line)
 
-        return "\n".join(lines) + "\n", printer_cfg
+        # ── Sección Verifactu ─────────────────────────────────────────────────
+        qr_path = None
+        vf = job.get("verifactu")
+        if vf and isinstance(vf, dict):
+            lines.append("[[RULE]]")
+            tipo = str(vf.get("tipo") or "")
+            serie = str(vf.get("serie") or "")
+            numero = str(vf.get("numero") or "")
+            fecha = str(vf.get("fecha") or "")
+            uuid = str(vf.get("uuid") or "")
+
+            tipo_label = {
+                "F1": "Factura Completa",
+                "F2": "Ticket Simplificado",
+                "F3": "Factura Sustitutiva",
+                "R1": "Rectificativa (Art.80.1,2,6)",
+                "R5": "Rectificativa Simplificada",
+            }.get(tipo, tipo or "Verifactu")
+
+            lines.append(f"[[SUBTITLE]]{tipo_label}")
+            if serie and numero:
+                lines.append(f"[[RAW]]{('Nº ' + serie + '-' + numero).ljust(max_chars)}")
+            if fecha:
+                lines.append(f"[[RAW]]{'Fecha:'.ljust(max_chars - len(fecha))}{fecha}")
+
+            dest = vf.get("destinatario")
+            if dest and isinstance(dest, dict):
+                nif = str(dest.get("nif") or "").strip()
+                nombre = str(dest.get("nombre") or "").strip()
+                if nif:
+                    lines.append(f"[[RAW]]{'NIF:'.ljust(max_chars - len(nif))}{nif}")
+                if nombre:
+                    for ln in wrap_text(nombre, max_chars):
+                        lines.append(f"[[RAW]]{ln}")
+                direccion = str(dest.get("direccion") or "").strip()
+                if direccion:
+                    for ln in wrap_text(direccion, max_chars):
+                        lines.append(f"[[RAW]]{ln}")
+
+            lineas_iva = vf.get("lineasIva") or []
+            if lineas_iva:
+                lines.append("")
+                lines.append(f"[[RAW]]{'Base imp.'.ljust(max_chars - 14)}{'IVA%'.rjust(6)}{'Cuota'.rjust(8)}")
+                lines.append("[[RULE]]")
+                for lv in lineas_iva:
+                    base = str(lv.get("base_imponible") or "0.00")
+                    iva = str(lv.get("tipo_impositivo") or "")
+                    cuota = str(lv.get("cuota_repercutida") or "0.00")
+                    base_e = base + "€"
+                    cuota_e = cuota + "€"
+                    iva_pct = iva + "%"
+                    row = base_e.ljust(max_chars - len(iva_pct) - len(cuota_e) - 2) + iva_pct.rjust(len(iva_pct)) + " " + cuota_e.rjust(len(cuota_e))
+                    lines.append(f"[[RAW]]{row}")
+
+            if uuid:
+                short_uuid = uuid[:36]
+                lines.append("")
+                for ln in wrap_text(short_uuid, max_chars):
+                    lines.append(f"[[RAW]]{ln}")
+
+            lines.append("")
+            lines.append(f"[[FOOTER]]Conforme RD 1007/2023 - Verifactu")
+
+            # Decode QR base64 to temp file
+            qr_b64 = str(vf.get("qr") or "").strip()
+            if qr_b64:
+                try:
+                    qr_data = base64.b64decode(qr_b64)
+                    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as qtmp:
+                        qtmp.write(qr_data)
+                        qr_path = qtmp.name
+                except Exception as exc:
+                    log(f"Advertencia: no se pudo decodificar QR Verifactu: {exc}")
+                    qr_path = None
+
+        return "\n".join(lines) + "\n", printer_cfg, logo_path, header_offset, qr_path
 
     def process_print_jobs(self, print_jobs: dict[str, Any]) -> None:
-        if not self.customer_ticket_cfg.enabled:
-            return
         self.cleanup_recent_marks()
 
         candidates: list[tuple[int, str, dict[str, Any]]] = []
         for job_id, job in (print_jobs or {}).items():
-            if str(job.get("kind") or "") != "ticket_final":
+            job_kind = str(job.get("kind") or "")
+            if job_kind not in ("ticket_final", "comanda"):
                 continue
             if str(job.get("status") or "pending") != "pending":
                 continue
@@ -627,12 +810,34 @@ class PrinterService:
         candidates.sort(key=lambda item: (item[0], item[1]))
 
         for _, job_id, job in candidates:
+            job_kind = str(job.get("kind") or "")
             mesa_nombre = str(job.get("mesaNombre") or "").strip() or "sin-mesa"
-            log(f"Imprimiendo ticket final mesa {mesa_nombre} job {job_id}")
+            log(f"Procesando job '{job_kind}' mesa {mesa_nombre} job {job_id}")
             try:
                 self.recent_job_marks[job_id] = time.time()
-                text, printer_cfg = self.format_customer_ticket_text(job)
-                self.print_text(text, printer_cfg)
+
+                if job_kind == "ticket_final":
+                    if not self.customer_ticket_cfg.enabled:
+                        log(f"Ticket final ignorado (servicio ticket deshabilitado): {job_id}")
+                        continue
+                    text, printer_cfg, logo_path, header_offset, qr_path = self.format_customer_ticket_text(job)
+                    self.print_text(text, printer_cfg, logo_path=logo_path, header_offset=header_offset, qr_path=qr_path)
+
+                elif job_kind == "comanda":
+                    ps_cfg = (self.root_state.get("config") or {}).get("printService") or {}
+                    local_config = ((self.root_state.get("config") or {}).get("local")) or {}
+                    role_name = str(job.get("rol") or "barra")
+                    role_cfg = self._build_role(role_name, ps_cfg, local_config)
+                    if not role_cfg.enabled:
+                        log(f"Comanda ignorada (rol '{role_name}' deshabilitado): {job_id}")
+                        continue
+                    envio = {"camarero": job.get("camarero") or ""}
+                    lineas = list(job.get("lineas") or [])
+                    text = self.format_receipt_text(role_cfg.name, mesa_nombre, envio, lineas)
+                    if role_cfg.uppercase:
+                        text = text.upper()
+                    self.print_text(text, role_cfg)
+
                 self.patch_print_job(
                     job_id,
                     {
@@ -641,7 +846,7 @@ class PrinterService:
                         "printedByService": self.service_id,
                     },
                 )
-                log(f"Impreso ticket final mesa {mesa_nombre} job {job_id}")
+                log(f"Impreso job '{job_kind}' mesa {mesa_nombre} job {job_id}")
             except Exception as exc:
                 self.patch_print_job(
                     job_id,
@@ -656,14 +861,11 @@ class PrinterService:
     def run(self) -> None:
         log("Servicio de impresion iniciado")
         log(f"Firebase: {self.base_url}")
-        for role in self.roles:
-            if role.enabled:
-                printer_label = role.printer_name or "predeterminada"
-                log(f"Rol {role.name}: activo, impresora {printer_label}, papel {role.paper}")
-        if self.customer_ticket_cfg.enabled:
-            printer_label = self.customer_ticket_cfg.printer_name or "predeterminada"
-            log(f"Ticket final: activo, impresora {printer_label}, papel {self.customer_ticket_cfg.paper}")
+        log("Configuracion de impresoras: se carga desde el panel de admin (config/printService)")
         self.root_state = self.fetch_root_state()
+        ps_cfg = (self.root_state.get("config") or {}).get("printService") or {}
+        if ps_cfg.get("paused", False):
+            log("Servicio en pausa (panel admin). Reanuda desde admin.html")
         self.process_current_state()
         log("Escucha en tiempo real activada")
         self.consume_stream_forever()
@@ -672,7 +874,14 @@ class PrinterService:
 def load_config() -> dict[str, Any]:
     if not CONFIG_PATH.exists():
         raise FileNotFoundError(f"No existe el archivo de configuracion: {CONFIG_PATH}")
-    return json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+    cfg = json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
+    fb = cfg.get("firebase", {})
+    if "database_url_enc" in fb and not fb.get("database_url"):
+        fb["database_url"] = _decode_field(fb["database_url_enc"])
+    if "api_key_enc" in fb and not fb.get("api_key"):
+        fb["api_key"] = _decode_field(fb["api_key_enc"])
+    cfg["firebase"] = fb
+    return cfg
 
 
 def main() -> int:
