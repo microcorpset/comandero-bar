@@ -16,11 +16,8 @@ import {
 
 await authReady;
 
-const ADMIN_PWD_DEFAULT = 'admin1234';
-const ADMIN_PWD_PATH = 'config/admin/password';
-const AUDIT_PWD_DEFAULT = 'audit1234';
-const AUDIT_PWD_PATH = 'config/audit/password';
-const AUDIT_SESSION_KEY = 'audit_unlocked_gerente';
+const GERENTE_PWD_DEFAULT = 'gerente1234';
+const GERENTE_PWD_PATH = 'config/gerente/password';
 const PRINT_SERVICE_ID = 'local-print-service-1';
 
 const SALES_PAGE_SIZE = 25;
@@ -37,7 +34,8 @@ let turnoActualCache = {};
 let auditUsuarios = {};
 let auditEventos = [];
 let auditPagina = 1;
-let auditUnlocked = false;
+let auditUnlocked = true;
+const GERENTE_SECTION_KEY = 'gerente_section_state_v1';
 
 function confirmDialog({ title, body, confirmLabel = 'Aceptar', cancelLabel = 'Cancelar', danger = false }) {
   return new Promise(resolve => {
@@ -85,6 +83,46 @@ function toast(msg) {
   el.classList.add('show');
   clearTimeout(toast._timer);
   toast._timer = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+function leerEstadoSeccionesGerente() {
+  try {
+    return JSON.parse(localStorage.getItem(GERENTE_SECTION_KEY) || '{}');
+  } catch (_) {
+    return {};
+  }
+}
+
+function guardarEstadoSeccionesGerente(state) {
+  localStorage.setItem(GERENTE_SECTION_KEY, JSON.stringify(state));
+}
+
+function aplicarEstadoSeccionGerente(section, expanded) {
+  const card = document.getElementById(`card-${section}`);
+  if (!card) return;
+  card.classList.toggle('collapsed', !expanded);
+  const btn = card.querySelector('.card-toggle');
+  if (btn) btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+}
+
+window.toggleGerenteSection = section => {
+  const state = leerEstadoSeccionesGerente();
+  const card = document.getElementById(`card-${section}`);
+  const expanded = card ? card.classList.contains('collapsed') : false;
+  state[section] = expanded;
+  guardarEstadoSeccionesGerente(state);
+  aplicarEstadoSeccionGerente(section, expanded);
+};
+
+function initGerenteSections() {
+  const defaults = {
+    ventas: true,
+    auditoria: false,
+    turnos: true,
+    notas: false
+  };
+  const state = { ...defaults, ...leerEstadoSeccionesGerente() };
+  Object.entries(state).forEach(([section, expanded]) => aplicarEstadoSeccionGerente(section, !!expanded));
 }
 
 function fmtEu(n) {
@@ -832,41 +870,12 @@ function poblarCamarerosAuditoria(usuarios) {
   if (actual && nombres.includes(actual)) sel.value = actual;
 }
 
-window.checkAuditPwdGerente = async () => {
-  const inp = document.getElementById('audit-pwd-input');
-  const err = document.getElementById('audit-pwd-error');
-  const pwd = (inp?.value || '').trim();
-  if (!pwd) {
-    if (err) err.style.display = 'block';
-    return;
-  }
-  let stored = AUDIT_PWD_DEFAULT;
-  try {
-    const snap = await get(ref(db, AUDIT_PWD_PATH));
-    if (snap.val()) stored = String(snap.val());
-  } catch (_) {}
-
-  if (pwd === stored) {
-    if (err) err.style.display = 'none';
-    inp.value = '';
-    desbloquearAuditoriaGerente();
-  } else if (err) {
-    err.style.display = 'block';
-  }
-};
-
-window.bloquearAuditoriaGerente = () => {
-  auditUnlocked = false;
-  sessionStorage.removeItem(AUDIT_SESSION_KEY);
-  document.getElementById('audit-locked').style.display = '';
-  document.getElementById('audit-unlocked').style.display = 'none';
-};
-
 function desbloquearAuditoriaGerente() {
   auditUnlocked = true;
-  sessionStorage.setItem(AUDIT_SESSION_KEY, '1');
-  document.getElementById('audit-locked').style.display = 'none';
-  document.getElementById('audit-unlocked').style.display = '';
+  const locked = document.getElementById('audit-locked');
+  const unlocked = document.getElementById('audit-unlocked');
+  if (locked) locked.style.display = 'none';
+  if (unlocked) unlocked.style.display = '';
   initFiltrosAuditoria();
   poblarCamarerosAuditoria(auditUsuarios);
   window.aplicarFiltrosAuditoriaGerente();
@@ -1014,8 +1023,8 @@ window.exportarAuditoriaGerenteCSV = () => {
 
 window.checkLogin = async () => {
   const pwd = document.getElementById('pwd-input').value;
-  const snap = await get(ref(db, ADMIN_PWD_PATH));
-  const stored = snap.val() || ADMIN_PWD_DEFAULT;
+  const snap = await get(ref(db, GERENTE_PWD_PATH));
+  const stored = snap.val() || GERENTE_PWD_DEFAULT;
   if (pwd === stored) {
     document.getElementById('login-error').style.display = 'none';
     document.getElementById('login-screen').style.display = 'none';
@@ -1030,12 +1039,9 @@ document.getElementById('pwd-input')?.addEventListener('keydown', e => {
   if (e.key === 'Enter') window.checkLogin();
 });
 
-document.getElementById('audit-pwd-input')?.addEventListener('keydown', e => {
-  if (e.key === 'Enter') window.checkAuditPwdGerente();
-});
-
 async function init() {
   await prepararFiltrosVentasIniciales();
+  initGerenteSections();
 
   onValue(ref(db, 'config/local'), snap => {
     configLocal = snap.val() || {};
@@ -1054,16 +1060,9 @@ async function init() {
     renderHistorialTurnos(snap.val() || {});
   });
 
-  if (sessionStorage.getItem(AUDIT_SESSION_KEY) === '1') {
-    auditUnlocked = true;
-    document.getElementById('audit-locked').style.display = 'none';
-    document.getElementById('audit-unlocked').style.display = '';
-    initFiltrosAuditoria();
-  }
+  desbloquearAuditoriaGerente();
 
   await window.aplicarFiltrosGerente();
-  if (auditUnlocked) {
-    poblarCamarerosAuditoria(auditUsuarios);
-    await window.aplicarFiltrosAuditoriaGerente();
-  }
+  poblarCamarerosAuditoria(auditUsuarios);
+  await window.aplicarFiltrosAuditoriaGerente();
 }

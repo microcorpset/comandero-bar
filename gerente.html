@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0e152b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Gerencia">
+<link rel="manifest" href="manifest-gerente.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/gerente-192.png">
+<link rel="apple-touch-icon" href="icons/gerente-180.png">
 <title>Comandero 2.5 - Gerencia</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -297,6 +303,10 @@
     padding: 20px;
   }
 
+  .card.collapsible-card {
+    padding-bottom: 16px;
+  }
+
   .card-head {
     display: flex;
     justify-content: space-between;
@@ -316,6 +326,41 @@
     font-size: 14px;
     line-height: 1.5;
     margin-top: 6px;
+  }
+
+  .card-head-main {
+    min-width: 0;
+  }
+
+  .card-toggle {
+    flex: 0 0 auto;
+    min-width: 72px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+
+  .card-toggle::after {
+    content: "Ocultar";
+  }
+
+  .collapsible-card.collapsed .card-toggle::after {
+    content: "Abrir";
+  }
+
+  .card-body {
+    display: block;
+  }
+
+  .collapsible-card.collapsed .card-body {
+    display: none;
+  }
+
+  .sticky-card {
+    position: sticky;
+    top: 14px;
+    z-index: 4;
   }
 
   .metrics {
@@ -611,6 +656,10 @@
       grid-template-columns: 1fr;
     }
 
+    .sticky-card {
+      position: static;
+    }
+
     .metrics,
     .turno-stats {
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -681,7 +730,7 @@
 
       <div class="login-card">
         <div class="login-logo">Comandero 2.5</div>
-        <div class="login-sub">Usa la misma contraseña principal que ya tiene el panel de administracion.</div>
+        <div class="login-sub">Usa la contraseña propia de gerencia para entrar a ventas, auditoria y turnos.</div>
         <label class="field">
           <span class="eyebrow" style="display:block;margin-bottom:8px;color:var(--muted)">Contraseña</span>
           <input type="password" id="pwd-input" placeholder="Introduce la contraseña" autocomplete="off">
@@ -708,15 +757,16 @@
 
       <div class="grid">
         <div class="stack">
-          <section class="card">
+          <section class="card collapsible-card" id="card-ventas">
             <div class="card-head">
-              <div>
+              <div class="card-head-main">
                 <div class="eyebrow">Ventas</div>
                 <h3>Tickets y resumen</h3>
                 <div class="card-copy">Filtra por fechas y revisa tickets, articulos o dias. La lista por ticket va paginada para que no se vuelva pesada.</div>
               </div>
+              <button type="button" class="card-toggle" aria-expanded="true" onclick="toggleGerenteSection('ventas')"></button>
             </div>
-
+            <div class="card-body">
             <div class="metrics">
               <div class="metric"><strong id="stat-mesas">-</strong><span>Tickets</span></div>
               <div class="metric"><strong id="stat-total">-</strong><span>Total vendido</span></div>
@@ -775,32 +825,21 @@
             <div id="ventas-por-dia" style="display:none">
               <div id="ventas-dias"></div>
             </div>
+            </div>
           </section>
 
-          <section class="card">
+          <section class="card collapsible-card collapsed" id="card-auditoria">
             <div class="card-head">
-              <div>
+              <div class="card-head-main">
                 <div class="eyebrow">Auditoria</div>
                 <h3>Registro de actividad</h3>
-                <div class="card-copy">La auditoria mantiene su contraseña propia y se muestra paginada para revisar bloques manejables.</div>
+                <div class="card-copy">La auditoria queda incluida dentro del acceso de gerencia y se muestra paginada para revisar bloques manejables.</div>
               </div>
-              <div class="audit-actions">
-                <button class="small" onclick="bloquearAuditoriaGerente()">Cerrar sesion</button>
-              </div>
+              <button type="button" class="card-toggle" aria-expanded="false" onclick="toggleGerenteSection('auditoria')"></button>
             </div>
 
-            <div id="audit-locked">
-              <div class="filters" style="grid-template-columns:minmax(0, 1fr) auto;align-items:end">
-                <div class="field">
-                  <label for="audit-pwd-input">Contraseña de auditoria</label>
-                  <input type="password" id="audit-pwd-input" placeholder="Introduce la contraseña de auditoria" autocomplete="off">
-                </div>
-                <button class="primary" onclick="checkAuditPwdGerente()">Entrar</button>
-              </div>
-              <div id="audit-pwd-error" class="error">Contraseña incorrecta</div>
-            </div>
-
-            <div id="audit-unlocked" style="display:none">
+            <div class="card-body">
+            <div id="audit-unlocked">
               <div class="metrics" style="margin-top:6px">
                 <div class="metric"><strong id="audit-stat-eventos">-</strong><span>Eventos</span></div>
                 <div class="metric"><strong id="audit-stat-eliminados">-</strong><span>Eliminaciones</span></div>
@@ -874,11 +913,12 @@
                 </div>
               </div>
             </div>
+            </div>
           </section>
         </div>
 
         <div class="stack">
-          <section class="card">
+          <section class="card sticky-card">
             <div class="card-head">
               <div>
                 <div class="eyebrow">Turno activo</div>
@@ -901,30 +941,36 @@
             </div>
           </section>
 
-          <section class="card">
+          <section class="card collapsible-card" id="card-turnos">
             <div class="card-head">
-              <div>
+              <div class="card-head-main">
                 <div class="eyebrow">Historico</div>
                 <h3>Turnos cerrados</h3>
                 <div class="card-copy">Resumen de cierres recientes para revisar fechas, duracion, tickets y total.</div>
               </div>
+              <button type="button" class="card-toggle" aria-expanded="true" onclick="toggleGerenteSection('turnos')"></button>
             </div>
+            <div class="card-body">
             <div id="turnos-lista" class="list">
               <div class="empty">Todavia no hay turnos cerrados.</div>
             </div>
+            </div>
           </section>
 
-          <section class="card">
+          <section class="card collapsible-card collapsed" id="card-notas">
             <div class="card-head">
-              <div>
+              <div class="card-head-main">
                 <div class="eyebrow">Notas</div>
                 <h3>Como se comporta esta vista</h3>
                 <div class="card-copy">No modifica <code>admin.html</code>. La reimpresion de tickets normales envia un trabajo a la misma cola de impresion que ya usa el sistema.</div>
               </div>
+              <button type="button" class="card-toggle" aria-expanded="false" onclick="toggleGerenteSection('notas')"></button>
             </div>
+            <div class="card-body">
             <div class="list">
               <div class="empty">Si Verifactu esta desactivado, aqui podras seguir reimprimiendo tickets normales del historial.</div>
               <div class="empty">La paginacion mejora la carga visual, aunque las ventas siguen leyendo el nodo <code>historial</code> completo porque ese dato hoy se guarda en una sola rama.</div>
+            </div>
             </div>
           </section>
         </div>
