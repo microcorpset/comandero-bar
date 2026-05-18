@@ -413,6 +413,16 @@
     flex-wrap: wrap;
   }
 
+  .turno-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .turno-actions button {
+    width: 100%;
+  }
+
   .tabs {
     display: flex;
     gap: 8px;
@@ -696,9 +706,63 @@
       display: none;
     }
 
+    .audit-filtros-wrap {
+      position: sticky;
+      top: 0;
+      z-index: 3;
+      margin: -4px -4px 10px;
+      padding: 4px 4px 10px;
+      background: linear-gradient(180deg, rgba(9, 16, 31, 0.98), rgba(9, 16, 31, 0.9) 82%, rgba(9, 16, 31, 0));
+      backdrop-filter: blur(10px);
+    }
+
     .audit-row {
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas:
+        "date action"
+        "staff mesa"
+        "detail detail";
+      gap: 6px 10px;
+      padding: 12px;
+    }
+
+    .audit-row .audit-col:nth-child(1) {
+      grid-area: date;
+    }
+
+    .audit-row .audit-col:nth-child(2) {
+      grid-area: staff;
+    }
+
+    .audit-row .audit-col:nth-child(3) {
+      grid-area: mesa;
+      justify-self: end;
+      text-align: right;
+    }
+
+    .audit-row .audit-col:nth-child(4) {
+      grid-area: action;
+      justify-self: end;
+      text-align: right;
+    }
+
+    .audit-row .audit-col:nth-child(5) {
+      grid-area: detail;
+    }
+
+    .audit-col {
+      font-size: 11px;
+      line-height: 1.35;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .turno-actions {
       grid-template-columns: 1fr;
-      gap: 8px;
+    }
+
+    #turno-status {
+      line-height: 1.4;
     }
   }
 </style>
@@ -847,6 +911,7 @@
                 <div class="metric"><strong id="audit-stat-paginas">-</strong><span>Paginas</span></div>
               </div>
 
+              <div class="audit-filtros-wrap">
               <div class="filters">
                 <div class="field">
                   <label for="audit-fecha-ini">Fecha desde</label>
@@ -894,6 +959,7 @@
                 <button onclick="resetFiltrosAuditoriaGerente()">Reset</button>
                 <button onclick="exportarAuditoriaGerenteCSV()">Exportar CSV</button>
               </div>
+              </div>
 
               <div class="audit-head">
                 <div>Fecha / Hora</div>
@@ -931,7 +997,7 @@
               <label for="turno-nombre">Nombre del turno</label>
               <input type="text" id="turno-nombre" placeholder="Ej: Comida, Cena, Tarde">
             </div>
-            <div class="actions">
+            <div class="actions turno-actions">
               <button id="btn-abrir-turno" class="success" onclick="abrirTurnoGerente()">Abrir turno</button>
               <button id="btn-cerrar-turno" class="danger" onclick="cerrarTurnoGerente()" disabled>Cerrar turno</button>
             </div>
