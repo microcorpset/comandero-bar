@@ -768,7 +768,7 @@
 
   @media (max-width: 760px) {
     #app {
-      padding-top: 122px;
+      padding-top: calc(148px + env(safe-area-inset-top, 0px));
     }
 
     .shell {
@@ -794,7 +794,7 @@
       position: fixed;
       left: 10px;
       right: 10px;
-      top: 10px;
+      top: calc(10px + env(safe-area-inset-top, 0px));
       z-index: 15;
       gap: 8px;
     }
@@ -1016,7 +1016,7 @@
 
   @media (max-width: 520px) {
     #app {
-      padding-top: 132px;
+      padding-top: calc(168px + env(safe-area-inset-top, 0px));
     }
 
     .turno-actions {
