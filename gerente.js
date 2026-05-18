@@ -19,6 +19,7 @@ await authReady;
 const GERENTE_PWD_DEFAULT = 'gerente1234';
 const GERENTE_PWD_PATH = 'config/gerente/password';
 const PRINT_SERVICE_ID = 'local-print-service-1';
+const GERENTE_COMPACT_KEY = 'gerente_compact_state_v1';
 
 const SALES_PAGE_SIZE = 25;
 const AUDIT_PAGE_SIZE = 40;
@@ -125,16 +126,67 @@ function initGerenteSections() {
   Object.entries(state).forEach(([section, expanded]) => aplicarEstadoSeccionGerente(section, !!expanded));
 }
 
+function leerEstadoCompactoGerente() {
+  try {
+    return JSON.parse(localStorage.getItem(GERENTE_COMPACT_KEY) || '{}');
+  } catch (_) {
+    return {};
+  }
+}
+
+function guardarEstadoCompactoGerente(state) {
+  localStorage.setItem(GERENTE_COMPACT_KEY, JSON.stringify(state));
+}
+
+function aplicarCompactState(target, expanded) {
+  if (target === 'turno') {
+    const card = document.querySelector('.turno-quick-card');
+    if (!card) return;
+    card.classList.toggle('compact-mobile-card', true);
+    card.classList.toggle('collapsed-mobile', !expanded);
+    const btn = card.querySelector('.compact-mobile-toggle');
+    if (btn) btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    return;
+  }
+  if (target === 'audit-filter') {
+    const wrap = document.querySelector('.audit-filtros-wrap');
+    if (!wrap) return;
+    wrap.classList.toggle('compact-mobile-card', true);
+    wrap.classList.toggle('collapsed-mobile', !expanded);
+    const btn = wrap.querySelector('.compact-mobile-toggle');
+    if (btn) btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+  }
+}
+
+window.toggleCompactGerente = target => {
+  const state = leerEstadoCompactoGerente();
+  const expanded = !(state[target] ?? false);
+  state[target] = expanded;
+  guardarEstadoCompactoGerente(state);
+  aplicarCompactState(target, expanded);
+};
+
+function initGerenteCompactBlocks() {
+  const defaults = {
+    turno: false,
+    'audit-filter': false
+  };
+  const state = { ...defaults, ...leerEstadoCompactoGerente() };
+  Object.entries(state).forEach(([key, expanded]) => aplicarCompactState(key, !!expanded));
+}
+
 function initGerenteStickyTurno() {
   const auditCard = document.getElementById('card-auditoria');
   if (!auditCard || typeof IntersectionObserver === 'undefined') return;
   const update = entry => {
     if (window.innerWidth > 760) {
       document.body.classList.remove('audit-focus');
+      document.querySelector('.turno-quick-card')?.classList.remove('auto-minimized');
       return;
     }
     const shouldHide = entry.isIntersecting && entry.boundingClientRect.top < 130;
     document.body.classList.toggle('audit-focus', shouldHide);
+    document.querySelector('.turno-quick-card')?.classList.toggle('auto-minimized', shouldHide);
   };
   const observer = new IntersectionObserver(entries => {
     const entry = entries[0];
@@ -1016,6 +1068,11 @@ window.aplicarFiltrosAuditoriaGerente = async () => {
   auditEventos = eventos;
   auditPagina = 1;
   renderEventosAuditoria(eventos);
+  if (window.innerWidth <= 760) {
+    const state = { ...leerEstadoCompactoGerente(), 'audit-filter': false };
+    guardarEstadoCompactoGerente(state);
+    aplicarCompactState('audit-filter', false);
+  }
 };
 
 window.exportarAuditoriaGerenteCSV = () => {
@@ -1067,6 +1124,7 @@ document.getElementById('pwd-input')?.addEventListener('keydown', e => {
 async function init() {
   await prepararFiltrosVentasIniciales();
   initGerenteSections();
+  initGerenteCompactBlocks();
   initGerenteStickyTurno();
 
   onValue(ref(db, 'config/local'), snap => {

@@ -381,6 +381,10 @@
     line-height: 1.4;
   }
 
+  .compact-mobile-toggle {
+    display: none;
+  }
+
   .metrics {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -746,8 +750,32 @@
       display: none;
     }
 
+    .compact-mobile-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 84px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-family: var(--mono);
+    }
+
+    .compact-mobile-toggle::after {
+      content: "Abrir";
+    }
+
+    .compact-mobile-card:not(.collapsed-mobile) .compact-mobile-toggle::after {
+      content: "Cerrar";
+    }
+
+    .compact-mobile-card.collapsed-mobile .compact-mobile-body {
+      display: none;
+    }
+
     .turno-quick-card .card-head {
-      margin-bottom: 8px;
+      margin-bottom: 0;
+      align-items: center;
     }
 
     .turno-quick-card .eyebrow {
@@ -832,11 +860,8 @@
       font-size: 12px;
     }
 
-    body.audit-focus .turno-quick-card {
-      opacity: 0;
-      transform: translateY(-8px);
-      pointer-events: none;
-      transition: opacity .18s ease, transform .18s ease;
+    body.audit-focus .turno-quick-card.auto-minimized .compact-mobile-body {
+      display: none;
     }
 
     .audit-head {
@@ -848,9 +873,30 @@
       top: 0;
       z-index: 3;
       margin: -4px -4px 10px;
-      padding: 4px 4px 10px;
+      padding: 4px 4px 8px;
       background: linear-gradient(180deg, rgba(9, 16, 31, 0.98), rgba(9, 16, 31, 0.9) 82%, rgba(9, 16, 31, 0));
       backdrop-filter: blur(10px);
+    }
+
+    .audit-filtros-wrap .compact-mobile-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 0;
+      padding: 0 2px 8px;
+    }
+
+    .audit-filtros-wrap .compact-mobile-title {
+      font-family: var(--mono);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .audit-filtros-wrap.collapsed-mobile .audit-filtros-body {
+      display: none;
     }
 
     .audit-row {
@@ -980,8 +1026,10 @@
             <h3>Apertura y cierre</h3>
             <div class="card-copy">Control rapido del turno en curso con el mismo comportamiento que ya existe en administracion.</div>
           </div>
+          <button type="button" class="compact-mobile-toggle" aria-expanded="false" onclick="toggleCompactGerente('turno')"></button>
         </div>
 
+        <div class="compact-mobile-body">
         <div class="field" style="margin-bottom:12px">
           <label for="turno-nombre">Nombre del turno</label>
           <input type="text" id="turno-nombre" placeholder="Ej: Comida, Cena, Tarde">
@@ -993,6 +1041,7 @@
         <div id="turno-status" style="margin-top:12px;color:var(--muted);font-family:var(--mono);font-size:13px">Sin turno activo</div>
         <div id="turno-resumen-actual" style="margin-top:14px">
           <div class="empty">No hay turno activo.</div>
+        </div>
         </div>
       </section>
 
@@ -1089,6 +1138,11 @@
               </div>
 
               <div class="audit-filtros-wrap">
+              <div class="compact-mobile-head">
+                <div class="compact-mobile-title">Filtro</div>
+                <button type="button" class="compact-mobile-toggle" aria-expanded="false" onclick="toggleCompactGerente('audit-filter')"></button>
+              </div>
+              <div class="audit-filtros-body">
               <div class="filters">
                 <div class="field">
                   <label for="audit-fecha-ini">Fecha desde</label>
@@ -1135,6 +1189,7 @@
                 <button class="primary" onclick="aplicarFiltrosAuditoriaGerente()">Aplicar</button>
                 <button onclick="resetFiltrosAuditoriaGerente()">Reset</button>
                 <button onclick="exportarAuditoriaGerenteCSV()">Exportar CSV</button>
+              </div>
               </div>
               </div>
 
