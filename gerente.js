@@ -158,12 +158,36 @@ function aplicarCompactState(target, expanded) {
   }
 }
 
+function updateTurnoCompactScrollState() {
+  const turnoCard = document.querySelector('.turno-quick-card');
+  const filterWrap = document.querySelector('.audit-filtros-wrap');
+  if (!turnoCard) return;
+  if (window.innerWidth > 760) {
+    document.body.classList.remove('audit-focus');
+    turnoCard.classList.remove('auto-minimized');
+    return;
+  }
+  if (!filterWrap) {
+    document.body.classList.remove('audit-focus');
+    turnoCard.classList.remove('auto-minimized');
+    return;
+  }
+  const rect = filterWrap.getBoundingClientRect();
+  const shouldMinimize = rect.top <= 124 && rect.bottom > 32;
+  document.body.classList.toggle('audit-focus', shouldMinimize);
+  turnoCard.classList.toggle('auto-minimized', shouldMinimize);
+}
+
 window.toggleCompactGerente = target => {
   const state = leerEstadoCompactoGerente();
   const expanded = !(state[target] ?? false);
   state[target] = expanded;
   guardarEstadoCompactoGerente(state);
   aplicarCompactState(target, expanded);
+  if (target === 'turno' && expanded) {
+    document.querySelector('.turno-quick-card')?.classList.remove('auto-minimized');
+    if (window.innerWidth <= 760) document.body.classList.remove('audit-focus');
+  }
 };
 
 function initGerenteCompactBlocks() {
@@ -176,30 +200,10 @@ function initGerenteCompactBlocks() {
 }
 
 function initGerenteStickyTurno() {
-  const auditCard = document.getElementById('card-auditoria');
-  if (!auditCard || typeof IntersectionObserver === 'undefined') return;
-  const update = entry => {
-    if (window.innerWidth > 760) {
-      document.body.classList.remove('audit-focus');
-      document.querySelector('.turno-quick-card')?.classList.remove('auto-minimized');
-      return;
-    }
-    const shouldHide = entry.isIntersecting && entry.boundingClientRect.top < 130;
-    document.body.classList.toggle('audit-focus', shouldHide);
-    document.querySelector('.turno-quick-card')?.classList.toggle('auto-minimized', shouldHide);
-  };
-  const observer = new IntersectionObserver(entries => {
-    const entry = entries[0];
-    if (entry) update(entry);
-  }, {
-    root: null,
-    threshold: 0,
-    rootMargin: '-120px 0px 0px 0px'
-  });
-  observer.observe(auditCard);
-  window.addEventListener('resize', () => {
-    if (window.innerWidth > 760) document.body.classList.remove('audit-focus');
-  });
+  updateTurnoCompactScrollState();
+  window.addEventListener('scroll', updateTurnoCompactScrollState, { passive: true });
+  window.addEventListener('resize', updateTurnoCompactScrollState);
+  setTimeout(updateTurnoCompactScrollState, 50);
 }
 
 function fmtEu(n) {
