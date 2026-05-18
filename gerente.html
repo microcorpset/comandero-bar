@@ -739,15 +739,37 @@
 
     .turno-quick-card {
       top: 8px;
-      padding: 14px;
+      padding: 10px 12px;
     }
 
     .turno-quick-card .card-copy {
       display: none;
     }
 
+    .turno-quick-card .card-head {
+      margin-bottom: 8px;
+    }
+
+    .turno-quick-card .eyebrow {
+      font-size: 10px;
+    }
+
+    .turno-quick-card .card-head h3 {
+      font-size: 17px;
+      margin-top: 4px;
+    }
+
+    .turno-quick-card .field label {
+      margin-bottom: 4px;
+    }
+
+    .turno-quick-card input {
+      padding: 10px 12px;
+      border-radius: 12px;
+    }
+
     .turno-quick-card #turno-resumen-actual {
-      margin-top: 10px !important;
+      margin-top: 8px !important;
     }
 
     .turno-quick-card .turno-card {
@@ -756,8 +778,65 @@
 
     .turno-quick-card .turno-head,
     .turno-quick-card .turno-body {
-      padding-left: 12px;
-      padding-right: 12px;
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+
+    .turno-quick-card .turno-stats {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .turno-quick-card .turno-stat {
+      padding: 8px 6px;
+    }
+
+    .turno-quick-card .turno-stat strong {
+      font-size: 14px;
+    }
+
+    .turno-quick-card .turno-stat span {
+      font-size: 10px;
+      line-height: 1.2;
+    }
+
+    .audit-filtros-wrap .filters {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .audit-filtros-wrap input,
+    .audit-filtros-wrap select {
+      padding: 10px 10px;
+      border-radius: 12px;
+      font-size: 13px;
+    }
+
+    .audit-filtros-wrap .field label {
+      font-size: 10px;
+      margin-bottom: 4px;
+    }
+
+    .audit-filtros-wrap .actions {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 10px !important;
+    }
+
+    .audit-filtros-wrap .actions button {
+      width: 100%;
+      padding: 9px 8px;
+      font-size: 12px;
+    }
+
+    body.audit-focus .turno-quick-card {
+      opacity: 0;
+      transform: translateY(-8px);
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease;
     }
 
     .audit-head {
@@ -828,7 +907,16 @@
     }
 
     .turno-quick-card .card-head h3 {
-      font-size: 18px;
+      font-size: 16px;
+    }
+
+    .turno-quick-card .turno-stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .audit-filtros-wrap .filters,
+    .audit-filtros-wrap .actions {
+      grid-template-columns: 1fr;
     }
   }
 </style>
