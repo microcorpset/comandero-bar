@@ -385,6 +385,10 @@
     display: none;
   }
 
+  .compact-mobile-summary {
+    display: none;
+  }
+
   .metrics {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -773,6 +777,16 @@
       display: none;
     }
 
+    .compact-mobile-card.collapsed-mobile .compact-mobile-summary {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.35;
+      font-family: var(--mono);
+      max-width: calc(100vw - 130px);
+    }
+
     .turno-quick-card .card-head {
       margin-bottom: 0;
       align-items: center;
@@ -858,10 +872,6 @@
       width: 100%;
       padding: 9px 8px;
       font-size: 12px;
-    }
-
-    body.audit-focus .turno-quick-card.auto-minimized .compact-mobile-body {
-      display: none;
     }
 
     .audit-head {
@@ -1025,6 +1035,7 @@
             <div class="eyebrow">Turno activo</div>
             <h3>Apertura y cierre</h3>
             <div class="card-copy">Control rapido del turno en curso con el mismo comportamiento que ya existe en administracion.</div>
+            <div class="compact-mobile-summary" id="turno-compact-summary">Sin turno activo</div>
           </div>
           <button type="button" class="compact-mobile-toggle" aria-expanded="false" onclick="toggleCompactGerente('turno')"></button>
         </div>

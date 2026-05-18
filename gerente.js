@@ -158,36 +158,15 @@ function aplicarCompactState(target, expanded) {
   }
 }
 
-function updateTurnoCompactScrollState() {
-  const turnoCard = document.querySelector('.turno-quick-card');
-  const filterWrap = document.querySelector('.audit-filtros-wrap');
-  if (!turnoCard) return;
-  if (window.innerWidth > 760) {
-    document.body.classList.remove('audit-focus');
-    turnoCard.classList.remove('auto-minimized');
-    return;
-  }
-  if (!filterWrap) {
-    document.body.classList.remove('audit-focus');
-    turnoCard.classList.remove('auto-minimized');
-    return;
-  }
-  const rect = filterWrap.getBoundingClientRect();
-  const shouldMinimize = rect.top <= 124 && rect.bottom > 32;
-  document.body.classList.toggle('audit-focus', shouldMinimize);
-  turnoCard.classList.toggle('auto-minimized', shouldMinimize);
-}
-
 window.toggleCompactGerente = target => {
-  const state = leerEstadoCompactoGerente();
+  const state = { turno: false, 'audit-filter': false, ...leerEstadoCompactoGerente() };
   const expanded = !(state[target] ?? false);
+  state.turno = false;
+  state['audit-filter'] = false;
   state[target] = expanded;
   guardarEstadoCompactoGerente(state);
-  aplicarCompactState(target, expanded);
-  if (target === 'turno' && expanded) {
-    document.querySelector('.turno-quick-card')?.classList.remove('auto-minimized');
-    if (window.innerWidth <= 760) document.body.classList.remove('audit-focus');
-  }
+  aplicarCompactState('turno', !!state.turno);
+  aplicarCompactState('audit-filter', !!state['audit-filter']);
 };
 
 function initGerenteCompactBlocks() {
@@ -196,14 +175,8 @@ function initGerenteCompactBlocks() {
     'audit-filter': false
   };
   const state = { ...defaults, ...leerEstadoCompactoGerente() };
-  Object.entries(state).forEach(([key, expanded]) => aplicarCompactState(key, !!expanded));
-}
-
-function initGerenteStickyTurno() {
-  updateTurnoCompactScrollState();
-  window.addEventListener('scroll', updateTurnoCompactScrollState, { passive: true });
-  window.addEventListener('resize', updateTurnoCompactScrollState);
-  setTimeout(updateTurnoCompactScrollState, 50);
+  aplicarCompactState('turno', !!state.turno);
+  aplicarCompactState('audit-filter', !!state['audit-filter']);
 }
 
 function fmtEu(n) {
@@ -826,6 +799,7 @@ async function renderResumenTurnoActual(turno = turnoActualCache) {
   const pill = document.getElementById('topbar-turno-pill');
   const btnAbrir = document.getElementById('btn-abrir-turno');
   const btnCerrar = document.getElementById('btn-cerrar-turno');
+  const compact = document.getElementById('turno-compact-summary');
   if (!cont || !status) return;
 
   if (!turno?.abierto) {
@@ -834,6 +808,7 @@ async function renderResumenTurnoActual(turno = turnoActualCache) {
     if (pill) pill.textContent = 'Sin turno activo';
     if (btnAbrir) btnAbrir.disabled = false;
     if (btnCerrar) btnCerrar.disabled = true;
+    if (compact) compact.textContent = 'Sin turno activo';
     cont.innerHTML = '<div class="empty">No hay turno activo.</div>';
     return;
   }
@@ -848,6 +823,9 @@ async function renderResumenTurnoActual(turno = turnoActualCache) {
   if (pill) pill.textContent = `${turno.nombre || 'Turno'} activo`;
   if (btnAbrir) btnAbrir.disabled = true;
   if (btnCerrar) btnCerrar.disabled = false;
+  if (compact) {
+    compact.innerHTML = `${escHtml(turno.nombre || 'Turno')} activo<br>${resumen.tickets} tickets · ${fmtEu(resumen.total)}`;
+  }
 
   cont.innerHTML = `
     <article class="turno-card">
@@ -1073,7 +1051,7 @@ window.aplicarFiltrosAuditoriaGerente = async () => {
   auditPagina = 1;
   renderEventosAuditoria(eventos);
   if (window.innerWidth <= 760) {
-    const state = { ...leerEstadoCompactoGerente(), 'audit-filter': false };
+    const state = { turno: false, 'audit-filter': false, ...leerEstadoCompactoGerente(), 'audit-filter': false };
     guardarEstadoCompactoGerente(state);
     aplicarCompactState('audit-filter', false);
   }
@@ -1129,7 +1107,6 @@ async function init() {
   await prepararFiltrosVentasIniciales();
   initGerenteSections();
   initGerenteCompactBlocks();
-  initGerenteStickyTurno();
 
   onValue(ref(db, 'config/local'), snap => {
     configLocal = snap.val() || {};
