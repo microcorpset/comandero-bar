@@ -1671,13 +1671,13 @@ function actualizarEstadoBotonTicket(texto, restaurar = true) {
 async function upsertHistorial(datos) {
   if (!mesaId) return;
   try {
-    const ventaKeySnap = await get(ref(db, `pedidos/${mesaId}/_ventaKey`));
+    const ventaKeySnap = await get(ref(db, `pedidos/${mesaId}/_meta/ventaKey`));
     const ventaKey = ventaKeySnap.val();
     if (ventaKey) {
       await set(ref(db, 'historial/' + ventaKey), datos);
     } else {
       const newRef = await push(ref(db, 'historial'), datos);
-      await set(ref(db, `pedidos/${mesaId}/_ventaKey`), newRef.key);
+      await set(ref(db, `pedidos/${mesaId}/_meta/ventaKey`), newRef.key);
     }
   } catch (_) {}
 }
