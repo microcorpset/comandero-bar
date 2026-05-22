@@ -1665,6 +1665,23 @@ function actualizarEstadoBotonTicket(texto, restaurar = true) {
   }
 }
 
+// Guarda o sobreescribe la venta de la sesión activa de la mesa en historial.
+// La primera vez hace push y almacena la clave en pedidos/{mesaId}/_ventaKey;
+// las siguientes llamadas de la misma sesión sobreescriben esa entrada.
+async function upsertHistorial(datos) {
+  if (!mesaId) return;
+  try {
+    const ventaKeySnap = await get(ref(db, `pedidos/${mesaId}/_ventaKey`));
+    const ventaKey = ventaKeySnap.val();
+    if (ventaKey) {
+      await set(ref(db, 'historial/' + ventaKey), datos);
+    } else {
+      const newRef = await push(ref(db, 'historial'), datos);
+      await set(ref(db, `pedidos/${mesaId}/_ventaKey`), newRef.key);
+    }
+  } catch (_) {}
+}
+
 async function enviarTicketFinalAServicio(lineasServidas, total, cobro = null, verifactu = null) {
   const paperCfg = getTicketPaperConfig(configLocal);
   const serviceId = String(configLocal?.ticketPrintServiceId || 'local-print-service-1').trim() || 'local-print-service-1';
@@ -1710,14 +1727,12 @@ async function enviarTicketFinalAServicio(lineasServidas, total, cobro = null, v
     const lineasHist = payload.lines.filter(l => l.qty > 0);
     if (lineasHist.length > 0) {
       const ahora = new Date();
-      try {
-        await push(ref(db, 'historial'), {
-          mesa: mesaNombre, camarero: camareroActual || '',
-          ts: ahora.getTime(), fecha: ahora.toLocaleDateString('es-ES'),
-          hora: ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
-          total: payload.total, lineas: lineasHist
-        });
-      } catch (_) {}
+      await upsertHistorial({
+        mesa: mesaNombre, camarero: camareroActual || '',
+        ts: ahora.getTime(), fecha: ahora.toLocaleDateString('es-ES'),
+        hora: ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+        total: payload.total, lineas: lineasHist
+      });
     }
   }
 
@@ -2472,7 +2487,7 @@ window.cerrarMesa = async () => {
 
         if (lineas.length > 0) {
           const ahora = new Date();
-          await push(ref(db, 'historial'), {
+          await upsertHistorial({
             mesa: mesaNombre, camarero: [...camareros].join(', '),
             ts: ahora.getTime(), fecha: ahora.toLocaleDateString('es-ES'),
             hora: ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
@@ -2585,7 +2600,7 @@ async function vfEmitirYPrint({ tipo, lineas, total, cobro = null, destinatario 
       const lineasHist = Object.values(agrupado);
       if (lineasHist.length > 0) {
         const ahora = new Date();
-        await push(ref(db, 'historial'), {
+        await upsertHistorial({
           mesa: mesaNombre, camarero: [...camareros].join(', '),
           ts: ahora.getTime(), fecha: ahora.toLocaleDateString('es-ES'),
           hora: ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
