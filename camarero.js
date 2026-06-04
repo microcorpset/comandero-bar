@@ -108,13 +108,11 @@ async function verificarPin() {
     errEl.style.display = 'block';
     
     try {
-      // Intentar obtener la IP con timeout de 5 segundos
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
-      const resp = await fetch('https://api.ipify.org?format=json', { signal: controller.signal });
-      clearTimeout(timeoutId);
+      // Promesa con timeout compatible sin AbortController
+      const ipPromise = fetch('https://api.ipify.org?format=json').then(r => r.json());
+      const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000));
       
-      const data = await resp.json();
+      const data = await Promise.race([ipPromise, timeoutPromise]);
       const ipActual = data.ip;
       
       if (ipActual !== seguridadData.wifiIP) {
@@ -409,7 +407,7 @@ onValue(ref(db, 'config/local'), snap => {
   if (mesasLinks) mesasLinks.style.display = configLocal.comandaAutoServir ? 'none' : '';
 });
 onValue(ref(db, 'config/verifacti'), snap => { configVf = snap.val() || {}; });
-onValue(ref(db, 'config/seguridad'), snap => { seguridadData = snap.val() || {}; });
+onValue(ref(db, 'config/seguridad'), snap => { seguridadData = snap.val() || {}; }, err => { console.warn("Permiso denegado en config/seguridad:", err); });
 onValue(ref(db, 'pedidos'), snap => {
   pedidosData = snap.val() || {};
   // Merge local queued orders so UI reflects offline-saved orders
