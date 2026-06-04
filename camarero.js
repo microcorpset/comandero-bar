@@ -19,6 +19,10 @@ import {
   emitirSustitutiva, emitirRectificativa, anularFactura, consultarEstado,
   labelTipoFactura
 } from './verifacti.js';
+import {
+  enqueueBrowserCommandJobs,
+  enqueueBrowserTicketJob
+} from './browser-print-bridge.js';
 
 await authReady;
 
@@ -55,6 +59,7 @@ const USER_SESSION = 'cam_user';
 let usuariosData   = {};
 let camareroActual = sessionStorage.getItem(USER_SESSION) || '';
 let pinBuffer      = '';
+let seguridadData  = {};
 
 get(ref(db, 'config/usuarios')).then(s => {
   usuariosData = s.val() || {};
@@ -86,19 +91,63 @@ function updatePinDots(error) {
     dot.className = 'pin-dot'+(i<pinBuffer.length?(error?' error':' filled'):'');
   }
 }
-function verificarPin() {
+async function verificarPin() {
   const match = Object.values(usuariosData).find(u => u.pin === pinBuffer);
-  if (match) {
-    camareroActual = match.nombre;
-    sessionStorage.setItem(PIN_SESSION, '1');
-    sessionStorage.setItem(USER_SESSION, camareroActual);
-    document.getElementById('pin-screen').style.display = 'none';
-    document.getElementById('topbar-camarero').textContent = camareroActual;
-  } else {
+  if (!match) {
     updatePinDots(true);
     document.getElementById('pin-error').style.display = 'block';
     setTimeout(() => { pinBuffer=''; updatePinDots(false); document.getElementById('pin-error').style.display='none'; }, 900);
+    return;
   }
+
+  // Validar IP si la seguridad esta habilitada en Firebase
+  if (seguridadData && seguridadData.wifiRestricted) {
+    const errEl = document.getElementById('pin-error');
+    const originalText = errEl.textContent;
+    errEl.textContent = 'Comprobando red del local...';
+    errEl.style.display = 'block';
+    
+    try {
+      // Intentar obtener la IP con timeout de 5 segundos
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      const resp = await fetch('https://api.ipify.org?format=json', { signal: controller.signal });
+      clearTimeout(timeoutId);
+      
+      const data = await resp.json();
+      const ipActual = data.ip;
+      
+      if (ipActual !== seguridadData.wifiIP) {
+        errEl.textContent = 'Acceso denegado: debes estar en la Wi-Fi del local.';
+        errEl.style.display = 'block';
+        updatePinDots(true);
+        setTimeout(() => { 
+          pinBuffer = ''; 
+          updatePinDots(false); 
+          errEl.style.display = 'none'; 
+          errEl.textContent = originalText; 
+        }, 3000);
+        return;
+      }
+    } catch (e) {
+      errEl.textContent = 'Error de conexion al validar la Wi-Fi.';
+      errEl.style.display = 'block';
+      updatePinDots(true);
+      setTimeout(() => { 
+        pinBuffer = ''; 
+        updatePinDots(false); 
+        errEl.style.display = 'none'; 
+        errEl.textContent = originalText; 
+      }, 3000);
+      return;
+    }
+  }
+
+  camareroActual = match.nombre;
+  sessionStorage.setItem(PIN_SESSION, '1');
+  sessionStorage.setItem(USER_SESSION, camareroActual);
+  document.getElementById('pin-screen').style.display = 'none';
+  document.getElementById('topbar-camarero').textContent = camareroActual;
 }
 
 document.getElementById('pin-pad').addEventListener('click', e => {
@@ -360,6 +409,7 @@ onValue(ref(db, 'config/local'), snap => {
   if (mesasLinks) mesasLinks.style.display = configLocal.comandaAutoServir ? 'none' : '';
 });
 onValue(ref(db, 'config/verifacti'), snap => { configVf = snap.val() || {}; });
+onValue(ref(db, 'config/seguridad'), snap => { seguridadData = snap.val() || {}; });
 onValue(ref(db, 'pedidos'), snap => {
   pedidosData = snap.val() || {};
   // Merge local queued orders so UI reflects offline-saved orders
@@ -1556,6 +1606,30 @@ window.enviarPedido = async () => {
 
   // ── RAMA OFFLINE: guardar en cola IndexedDB ──────────────────────────────
   if (!isFirebaseConnected) {
+    let enviadoLocal = false;
+    if (usarServidorLocal()) {
+      try {
+        enviadoLocal = await enviarComandaAServidorLocal(lineasObj);
+      } catch (err) {
+        console.warn('No se pudo enviar la comanda al servidor local', err);
+      }
+    }
+
+    if (enviadoLocal) {
+      if (autoTXT) generarTXTComanda(mesaNombre, lineasImprimir, configLocal);
+      carrito = {};
+      drawerNotasAbiertas.clear();
+      cerrarDrawer();
+      updateQtyDisplay();
+      updateUI();
+      btn1.textContent = '✓ Enviado local'; btn1.disabled = false;
+      btn2.textContent = 'Enviar pedido';
+      setTimeout(() => { btn1.textContent = 'Enviar'; updateUI(); }, 2500);
+      document.getElementById('btn-cuenta').style.display = '';
+      renderMesas();
+      return;
+    }
+
     if (idb) {
       await idbAgregar({ mesaId, mesaNombre, envioId, envioTs, camarero: camareroActual, lineasObj });
       queuedMesas.add(mesaId);
@@ -1565,6 +1639,7 @@ window.enviarPedido = async () => {
       if (!pedidosData[mesaId]) pedidosData[mesaId] = {};
       pedidosData[mesaId][envioId] = queuedPedidosLocal[mesaId][envioId];
     }
+    enviarComandaAMiniApp(lineasObj);
     if (autoTXT) generarTXTComanda(mesaNombre, lineasImprimir, configLocal);
       carrito = {};
       drawerNotasAbiertas.clear();
@@ -1588,6 +1663,16 @@ window.enviarPedido = async () => {
     ts: envioTs, camarero: camareroActual, envioId,
     lineas: lineasObj
   });
+
+  if (String(configLocal?.localNetworkMode || 'disabled') === 'mirror') {
+    try {
+      await enviarComandaAServidorLocal(lineasObj);
+    } catch (err) {
+      console.warn('No se pudo replicar la comanda al servidor local', err);
+    }
+  }
+
+  enviarComandaAMiniApp(lineasObj);
 
   // Log
   await logAccion(mesaId, envioId, 'enviado', `${nLineas} líneas`);
@@ -1739,6 +1824,107 @@ async function enviarTicketFinalAServicio(lineasServidas, total, cobro = null, v
   await push(ref(db, 'print_jobs'), payload);
 }
 
+function usarMiniAppImpresion() {
+  return configLocal?.localBrowserPrintEnabled === true;
+}
+
+function usarServidorLocal() {
+  const mode = String(configLocal?.localNetworkMode || 'disabled');
+  return mode === 'fallback' || mode === 'mirror';
+}
+
+function urlServidorLocal() {
+  return String(configLocal?.localNetworkUrl || '').trim().replace(/\/+$/, '');
+}
+
+async function postServidorLocal(path, payload) {
+  const base = urlServidorLocal();
+  if (!base) throw new Error('No hay servidor local configurado');
+  const response = await fetch(base + path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error || `HTTP ${response.status}`);
+  return data;
+}
+
+async function enviarComandaAServidorLocal(lineasObj) {
+  if (!usarServidorLocal()) return false;
+  const lineas = Object.values(lineasObj || {}).map(linea => ({
+    nombre: linea.nombre,
+    qty: Number(linea.qty || 0),
+    precio: Number(linea.precio || 0),
+    nota: linea.nota || '',
+    destino: linea.destino || 'barra'
+  }));
+  if (!lineas.length) return false;
+  await postServidorLocal('/api/orders/command', {
+    mesaId,
+    mesaNombre,
+    camarero: camareroActual || '',
+    lineas
+  });
+  return true;
+}
+
+async function enviarTicketAServidorLocal(lineasTicket, total, cobro = null) {
+  await postServidorLocal('/api/orders/ticket', {
+    mesaId,
+    mesaNombre,
+    camarero: camareroActual || '',
+    total,
+    cobro,
+    lineas: lineasTicket
+  });
+}
+
+function enviarComandaAMiniApp(lineasObj) {
+  if (!usarMiniAppImpresion()) return;
+  enqueueBrowserCommandJobs({
+    mesaId,
+    mesaNombre,
+    camarero: camareroActual || '',
+    lineasObj,
+    configLocal
+  });
+}
+
+function enviarTicketAMiniApp(lineasTicket, total, cobro = null, verifactu = null) {
+  enqueueBrowserTicketJob({
+    mesaId,
+    mesaNombre,
+    camarero: camareroActual || '',
+    total,
+    cobro,
+    lineas: lineasTicket,
+    configLocal,
+    verifactu
+  });
+}
+
+async function limpiarPrintJobsCerradosDeMesa(mesaIdObjetivo) {
+  if (!mesaIdObjetivo) return 0;
+  const snap = await get(ref(db, 'print_jobs'));
+  const printJobs = snap.val() || {};
+  const updates = {};
+  let borrados = 0;
+
+  Object.entries(printJobs).forEach(([jobId, job]) => {
+    if (!job || typeof job !== 'object') return;
+    if (String(job.mesaId || '') !== String(mesaIdObjetivo)) return;
+    const status = String(job.status || '').toLowerCase();
+    if (!['printed', 'error', 'skipped'].includes(status)) return;
+    updates[`print_jobs/${jobId}`] = null;
+    borrados++;
+  });
+
+  if (!borrados) return 0;
+  await update(ref(db), updates);
+  return borrados;
+}
+
 async function imprimirTicketFinal(lineasServidas, total, cobro = null, verifactu = null) {
   const mode = String(configLocal?.ticketPrintMode || 'browser');
   const fecha = new Date().toLocaleString('es-ES', { dateStyle:'short', timeStyle:'short' });
@@ -1774,6 +1960,29 @@ async function imprimirTicketFinal(lineasServidas, total, cobro = null, verifact
       nota: configLocal?.ticketShowNotes === false ? '' : limpiarNotaTicket(l.nota)
     }));
 
+  if (mode === 'local' || mode === 'local+browser') {
+    enviarTicketAMiniApp(lineasTicket, total, cobro, verifactu);
+    actualizarEstadoBotonTicket(mode === 'local+browser' ? 'Enviado a mini app + local' : 'Enviado a mini app');
+  }
+
+  if (mode === 'local_server' || mode === 'local_server+browser') {
+    try {
+      await enviarTicketAServidorLocal(lineasTicket, total, cobro);
+      actualizarEstadoBotonTicket(mode === 'local_server+browser' ? 'Enviado al servidor local + local' : 'Enviado al servidor local');
+    } catch (err) {
+      console.error('Error enviando ticket al servidor local', err);
+      showModal({
+        title: 'Error de impresión local',
+        body: 'No se pudo enviar el ticket al servidor local de la red.',
+        buttons: [{ label: 'Cerrar', style: 'primary' }]
+      });
+      if (mode === 'local_server') {
+        if (copiaWindow && !copiaWindow.closed) copiaWindow.close();
+        return;
+      }
+    }
+  }
+
   if (mode === 'service' || mode === 'both') {
     try {
       await enviarTicketFinalAServicio(lineasServidas, total, cobro, verifactu);
@@ -1801,6 +2010,42 @@ async function imprimirTicketFinal(lineasServidas, total, cobro = null, verifact
         configLocal,
         mostrarPrecio: true,
         mostrarTotal: true,
+        total,
+        pie: configLocal?.footer || '',
+        mostrarLogo: true,
+        cobro,
+        ventana: copiaWindow,
+        verifactu
+      });
+    }
+    return;
+  }
+
+  if (mode === 'local') {
+    if (autoPDF) {
+      abrirCopiaTicketFinal({
+        titulo: `Mesa ${mesaNombre}`,
+        subtitulo: fecha,
+        lineas: lineasTicket,
+        configLocal,
+        total,
+        pie: configLocal?.footer || '',
+        mostrarLogo: true,
+        cobro,
+        ventana: copiaWindow,
+        verifactu
+      });
+    }
+    return;
+  }
+
+  if (mode === 'local_server') {
+    if (autoPDF) {
+      abrirCopiaTicketFinal({
+        titulo: `Mesa ${mesaNombre}`,
+        subtitulo: fecha,
+        lineas: lineasTicket,
+        configLocal,
         total,
         pie: configLocal?.footer || '',
         mostrarLogo: true,
@@ -2503,6 +2748,16 @@ window.cerrarMesa = async () => {
 
         await remove(ref(db, 'pedidos/' + mesaId));
         await set(ref(db, 'mesas/' + mesaId + '/estado'), 'libre');
+        try {
+          const borrados = await limpiarPrintJobsCerradosDeMesa(mesaId);
+          if (borrados > 0) {
+            await logAuditoria(
+              'print_jobs_limpiados',
+              `Limpieza tecnica al cerrar mesa (${borrados})`,
+              { mesaId, mesa: mesaNombre, printJobs: borrados }
+            );
+          }
+        } catch (_) {}
         mesaId = null; mesaNombre = null; carrito = {};
         document.getElementById('topbar-mesa').style.display = 'none';
         show('mesas');
