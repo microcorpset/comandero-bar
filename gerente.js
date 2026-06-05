@@ -1,1 +1,1360 @@
-const D=b;(function(c,d){const C=b,e=c();while(!![]){try{const f=-parseInt(C(0x1ed))/0x1+-parseInt(C(0x189))/0x2*(parseInt(C(0xb8))/0x3)+parseInt(C(0x17f))/0x4*(-parseInt(C(0xf5))/0x5)+parseInt(C(0xe6))/0x6+parseInt(C(0x13a))/0x7*(-parseInt(C(0x175))/0x8)+-parseInt(C(0x18b))/0x9+parseInt(C(0x1ba))/0xa*(parseInt(C(0x9f))/0xb);if(f===d)break;else e['push'](e['shift']());}catch(g){e['push'](e['shift']());}}}(a,0x8416f));const _dominiosPermitidos=[D(0xfb),D(0x197),D(0xb6)];if(!_dominiosPermitidos[D(0x1b6)](c=>location['hostname']===c||location[D(0x1c8)][D(0x11b)]('.'+c))){document[D(0x1d1)][D(0x9b)]=D(0x190);throw new Error(D(0xe3));}import{authReady,db}from'./firebase.js';import{ref,set,push,onValue,get,remove}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';await authReady;const GERENTE_PWD_DEFAULT=D(0x14e),GERENTE_PWD_PATH=D(0x186),PRINT_SERVICE_ID='local-print-service-1',GERENTE_COMPACT_KEY=D(0x150),SALES_PAGE_SIZE=0x19,AUDIT_PAGE_SIZE=0x28;let configLocal={},historialVentasCache=[],historialVentasCargado=![],ventasFiltradas=[],ventasTabActiva=D(0x191),ventasPagina=0x1,turnoActualCache={},auditUsuarios={},auditEventos=[],auditPagina=0x1,auditUnlocked=!![];const GERENTE_SECTION_KEY=D(0x18a);function confirmDialog({title:c,body:d,confirmLabel:confirmLabel=D(0x193),cancelLabel:cancelLabel='Cancelar',danger:danger=![]}){return new Promise(e=>{const E=b,f=document['createElement'](E(0x207));f[E(0x185)][E(0xc2)]='position:fixed;inset:0;z-index:450;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(4,10,18,.62);backdrop-filter:blur(5px)';const g=document[E(0x100)]('div');g['style'][E(0xc2)]=E(0x101),g['innerHTML']='\x0a\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-family:var(--mono);font-size:18px;color:var(--text)\x22>'+escHtml(c)+'</div>\x0a\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-size:14px;line-height:1.5;color:var(--muted)\x22>'+d+E(0xe2)+cancelLabel+E(0xa8)+(danger?E(0xab):E(0xda))+'\x22>'+confirmLabel+E(0xf1),f['appendChild'](g);const h=i=>{const F=E;f[F(0xdd)](),e(i);};f[E(0x1d5)](E(0x203),i=>{if(i['target']===f)h(![]);}),g[E(0x1ee)](E(0x19c))['onclick']=()=>h(![]),g[E(0x1ee)](E(0xd9))[E(0xd6)]=()=>h(!![]),document[E(0x1d1)][E(0xa3)](f);});}const AUDIT_LABELS={'articulo_agregado':{'label':D(0x146),'color':D(0x170),'sensible':![]},'articulo_eliminado':{'label':D(0x94),'color':D(0x119),'sensible':!![]},'cantidad_editada':{'label':D(0xa1),'color':D(0x16e),'sensible':!![]},'descuento_aplicado':{'label':D(0x1e7),'color':D(0x16e),'sensible':!![]},'ticket_impreso':{'label':D(0xa2),'color':D(0x170),'sensible':![]},'ticket_cobrado':{'label':'Mesa\x20cobrada','color':D(0x1bb),'sensible':![]},'factura_emitida':{'label':'Factura\x20emitida','color':D(0x1bb),'sensible':![]},'mesa_cerrada':{'label':'Mesa\x20cerrada','color':D(0x12c),'sensible':![]},'mesa_transferida':{'label':D(0x14a),'color':D(0x12c),'sensible':![]}};function toast(c){const G=D,d=document[G(0xd1)]('toast');if(!d)return;d['textContent']=c,d['classList'][G(0x1e5)](G(0x109)),clearTimeout(toast[G(0x1a7)]),toast[G(0x1a7)]=setTimeout(()=>d[G(0x1fb)]['remove']('show'),0x960);}function leerEstadoSeccionesGerente(){const H=D;try{return JSON[H(0x1ad)](localStorage[H(0x164)](GERENTE_SECTION_KEY)||'{}');}catch(c){return{};}}function guardarEstadoSeccionesGerente(c){const I=D;localStorage[I(0xdc)](GERENTE_SECTION_KEY,JSON[I(0xa4)](c));}function aplicarEstadoSeccionGerente(c,d){const J=D,e=document[J(0xd1)](J(0x140)+c);if(!e)return;e[J(0x1fb)][J(0xdf)]('collapsed',!d);const f=e[J(0x1ee)](J(0x19a));if(f)f['setAttribute'](J(0x205),d?J(0x144):J(0x11a));}window[D(0x1e6)]=c=>{const K=D,d=leerEstadoSeccionesGerente(),e=document['getElementById'](K(0x140)+c),f=e?e[K(0x1fb)][K(0x187)](K(0x209)):![];d[c]=f,guardarEstadoSeccionesGerente(d),aplicarEstadoSeccionGerente(c,f);};function b(c,d){c=c-0x90;const e=a();let f=e[c];if(b['zKIVGW']===undefined){var g=function(l){const m='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=';let n='',o='';for(let p=0x0,q,r,s=0x0;r=l['charAt'](s++);~r&&(q=p%0x4?q*0x40+r:r,p++%0x4)?n+=String['fromCharCode'](0xff&q>>(-0x2*p&0x6)):0x0){r=m['indexOf'](r);}for(let t=0x0,u=n['length'];t<u;t++){o+='%'+('00'+n['charCodeAt'](t)['toString'](0x10))['slice'](-0x2);}return decodeURIComponent(o);};b['AKeyAs']=g,b['XpdbEl']={},b['zKIVGW']=!![];}const h=e[0x0],i=c+h,j=b['XpdbEl'][i];return!j?(f=b['AKeyAs'](f),b['XpdbEl'][i]=f):f=j,f;}function initGerenteSections(){const L=D,c={'ventas':!![],'auditoria':![],'turnos':!![],'notas':![]},d={...c,...leerEstadoSeccionesGerente()};Object['entries'](d)[L(0x1a2)](([e,f])=>aplicarEstadoSeccionGerente(e,!!f));}function leerEstadoCompactoGerente(){const M=D;try{return JSON['parse'](localStorage[M(0x164)](GERENTE_COMPACT_KEY)||'{}');}catch(c){return{};}}function guardarEstadoCompactoGerente(c){const N=D;localStorage[N(0xdc)](GERENTE_COMPACT_KEY,JSON['stringify'](c));}function aplicarCompactState(c,d){const O=D;if(c===O(0x123)){const e=document[O(0x1ee)](O(0x195));if(!e)return;e[O(0x1fb)][O(0xdf)]('compact-mobile-card',!![]),e[O(0x1fb)][O(0xdf)]('collapsed-mobile',!d);const f=e['querySelector'](O(0x90));if(f)f[O(0x1b9)](O(0x205),d?'true':O(0x11a));return;}if(c===O(0xc8)){const g=document[O(0x1ee)](O(0xae));if(!g)return;g[O(0x1fb)][O(0xdf)](O(0xba),!![]),g[O(0x1fb)][O(0xdf)]('collapsed-mobile',!d);const h=g[O(0x1ee)](O(0x90));if(h)h['setAttribute'](O(0x205),d?O(0x144):'false');}}window['toggleCompactGerente']=c=>{const P=D,d={'turno':![],'audit-filter':![],...leerEstadoCompactoGerente()},e=!(d[c]??![]);d[P(0x123)]=![],d[P(0xc8)]=![],d[c]=e,guardarEstadoCompactoGerente(d),aplicarCompactState(P(0x123),!!d[P(0x123)]),aplicarCompactState(P(0xc8),!!d['audit-filter']);};function initGerenteCompactBlocks(){const Q=D,c={'turno':![],'audit-filter':![]},d={...c,...leerEstadoCompactoGerente()};aplicarCompactState(Q(0x123),!!d[Q(0x123)]),aplicarCompactState(Q(0xc8),!!d[Q(0xc8)]);}function fmtEu(c){const R=D;return Number(c||0x0)[R(0x95)](0x2)[R(0xe1)]('.',',')+'\x20€';}function escHtml(c){const S=D;return String(c??'')[S(0xe1)](/&/g,S(0x1ae))[S(0xe1)](/</g,S(0x10f))[S(0xe1)](/>/g,S(0xb7))['replace'](/"/g,'&quot;');}function escCsv(c){const T=D;return'\x22'+String(c??'')[T(0xe1)](/"/g,'\x22\x22')+'\x22';}function fechaKeyLocal(c){const U=D,e=new Date(c);return e['getFullYear']()+'-'+String(e[U(0x17b)]()+0x1)[U(0xf3)](0x2,'0')+'-'+String(e[U(0xe8)]())[U(0xf3)](0x2,'0');}function a(){const aV=['twvZysb0CMfUC2zLCMLKyq','pc9ZDhjVBMC+phnWyw4+vgLJA2v0ig1LzgLVpc9ZCgfUpJWVzgL2pGOGicaGicaGicaGica8zgL2ignSyxnZpsj0DxjUBY1ZDgf0iJ48C3rYB25NpG','yxvKAxqTC3rHDc1LDMvUDg9Z','C3rHCNrZv2L0Aa','z2vYzw50zteYmZq','C3rHDc1TzxnHCW','z2vYzw50zv9JB21Wywn0x3n0yxrLx3yX','ywnJAw9U','pc9KAxy+cIaGicaGicaGpgrPDIbJBgfZCZ0IyxvKAxqTy29Sig1VBM8IpG','DhvYBM8Ty29TCgfJDc1ZDw1Tyxj5','zxjYB3i','idXZCgfUihn0EwXLpsjJB2XVCJP2yxiOls1Hy2nLBNqPo2zVBNqTzMfTAwX5oNzHCIGTlw1VBM8PiJ4','BgLUzwfZ','u2LUigv2zw50B3mGCgfYysbLEhbVCNrHCG','mJm6ntK','odbTBq','cIaGicaGicaGicaGidX0CJ4kicaGicaGicaGicaGica8Dgq+','pgrPDIbJBgfZCZ0Izw1WDhKIpLnPBIb2zw50yxmGzw4GzxnLihbLCMLVzg8Upc9KAxy+','iIbHyMLLCNrVigrLC2rLigXHCYa','DgLJA2v0tg9NB1vYBa','tw9ZDhjHBMrVia','DgfYAMv0yq','DhvYBM8TBM9TyNjL','B2jQzwn0','BM90yq','Cxr5qw50zxm','z2v0sxrLBq','kIbuqvjkrvrbicO','DMvUDgfZlwXPC3rH','yNrUlwfICMLYlxr1CM5V','yxvKAxrVCMLHlW','zMLSDhjVlwHVCMeTzMLU','zgLYzwnJAw9U','Dg9mB3DLCKnHC2u','Dgv4DenVBNrLBNq','CMvZzxrgAwX0CM9ZqxvKAxrVCMLHr2vYzw50zq','i2zMyMy2nG','DMvUDgfZlxbVCI1KAwe','DMfYkc0TAw5MBYK','ChjPBNrFAM9ICW','yxj0Awn1Bg9Z','yxvKAxqTBg9JA2vK','vhvYBM8Gzw4Gy3vYC28','mtyWDNDuzLDv','zw50CMLLCW','pgrPDIbZDhLSzt0IDgv4Dc1HBgLNBJPJzw50zxi7zM9UDc1ZAxPLoJHWEdTJB2XVCJOJndq0iJ4','pc9VChrPB24+','BgfIzwW','zMvJAge','z2v0tw9UDgG','DgLJA2v0uhjPBNrtzxj2AwnLswq','pc9ZDhjVBMC+phnWyw4+rhvYywnPB248l3nWyw4+pc9KAxy+cIaGicaGicaGica8l2rPDJ4kicaGicaGica8l2rPDJ4kicaGicaGpc9HCNrPy2XLpGOGicaG','DMvUDgfZx2DLCMvUy2LHxW','odrRvuXotLy','ihrPy2TLDhmGWRCG','y2fTyMLHCLbHz2LUyvzLBNrHCW','DgLJA2v0x21LzgLV','rw50zxi','z2v0vgLTzq','C3r5Bgu','y29UzMLNl2DLCMvUDguVCgfZC3DVCMq','y29UDgfPBNm','Bg9NAw4TzxjYB3i','mZa0Dg1xyNvK','z2vYzw50zv9Zzwn0Aw9Ux3n0yxrLx3yX','odK1mJa5m0XWAxvkyG','u2LUihr1CM5VigfJDgL2BW','BgvUz3rO','lxbYzxy','CgvKAwrVCW','pgrPDIbZDhLSzt0IzgLZCgXHEtPMBgv4o2fSAwDUlwL0zw1ZoMnLBNrLCJTQDxn0Awz5lwnVBNrLBNq6y2vUDgvYo2HLAwDODdOXmdb2AdTMB250lwzHBwLSEtPTB25VC3bHy2u7y29SB3i6iZG4oci+qwnJzxnVig5Vigf1Dg9YAxPHzg88l2rPDJ4','DgLJA2v0CW','pc9ZCgfUpGO8l2rPDJ4kpgrPDIbZDhLSzt0IzgLZCgXHEtPMBgv4o2P1C3rPzNKTy29UDgvUDdPZCgfJzs1Izxr3zwvUo21HCMDPBJOZChGGmci+cIaGphnWyw4+vMvUDgfZigvUifrHCMPLDge6pc9ZCgfUpGOGidXZCgfUpG','qwnLChrHCG','CM91BMq','lNr1CM5Vlxf1AwnRlwnHCMq','rxjYB3iGywWGzw52AwfYoIa','Bg9JywXOB3n0','lMnZDG','o21HEc13Awr0AdO','lMnHCMqTDg9Nz2XL','zgv0ywXSzq','w2rHDgeTywn0psjJyw5JzwWIxq','tM8GAgf5ihzLBNrHCYbOB3KGkgrLC2rLigXHCYa1oJaWiefnkq','iIbZDhLSzt0IBwf4lxDPzhrOoJyWBw07Bwf4lwHLAwDODdOXog1To29IAMvJDc1MAxq6y29UDgfPBIi+pc9KAxy+','zxHWB3j0yxjwzw50yxnhzxjLBNrLq1nw','kIbfrKvdveLwtYaQ','pc9ZCgfUpJWVzgL2pGO','zM9YrwfJAa','pc9KAxy+cIaGicaGicaGica8l2rPDJ4kicaGicaGicaGidXKAxyGy2XHC3m9iNr1CM5VlwjHzgDLiJ4','BwvZyxmGy29Uign1zw50yxmGywjPzxj0yxm','DgLJA2v0vxbWzxjJyxnL','Aw5UzxjxAwr0Aa','x3rPBwvY','qxj0W61JDwXV','yxvKAxqTBwvZyq','DgLJA2v0u2HVD05VDgvZ','zgLZywjSzwq','cIaG','CgfYC2u','jMfTCdS','DMfS','zgLZCgXHEq','y2LM','Dg9mB2nHBgveyxrLu3rYAw5N','DgvZDa','ywjYAxjuDxjUB0DLCMvUDgu','y2LLCNjL','C29Tzq','cIaGicaGidXKAxyGy2XHC3m9iNrPy2TLDc1SAw5LiJ4kicaGicaGica8C3bHBJ4','CgvUzgLUzW','C2v0qxr0CMLIDxrL','mtiWAxjkBhvU','DMfYkc0TC3vJy2vZCYK','yxvKAxqTy2fTyxjLCM8','pc9ZDhjVBMC+phnWyw4+qxj0Awn1Bg9Zpc9ZCgfUpJWVzgL2pGOGicaGicaGicaGpgrPDIbJBgfZCZ0IDhvYBM8TC3rHDci+phn0CM9UzZ4','DgLJA2v0C0nVDw50','zg93BMXVywq','Cxr5','C29YDa','ig1LC2fZigfUDgvZigrLignLCNjHCIbLBcb0DxjUBW','pc9ZDhjVBMC+phnWyw4+vgLJA2v0CZWVC3bHBJ48l2rPDJ4kicaGicaGicaGicaGpgrPDIbJBgfZCZ0IDhvYBM8TC3rHDci+phn0CM9UzZ4','yxbSAwnHCKzPBhrYB3nhzxjLBNrL','Dgv4Dc9JC3y7y2HHCNnLDd11DgyToa','C3rHDc10B3rHBa','igfJDgL2BW','Ag9ZDg5HBwu','tM8GAgf5ihzLBNrHCYbLBIbSysbMzwnOysbZzwXLy2nPB25Hzge','z2v0rNvSBfLLyxi','rMvJAgeSsg9YysXdyw1HCMvYBYXnzxnHlefJy2LVBIXezxrHBgXLlfrVDgfScG','A2v5zg93BG','yxvKAxrVCMLHx2DLCMvUy2LHxW','mda6mda','pc9KAxy+cIaGicaGicaGicaGidXKAxyGy2XHC3m9iNrPy2TLDc1TzxrHiJ4','DhvYBM9ZlwXPC3rH','yM9KEq','AhjLzG','cIaGica8yxj0AwnSzsbJBgfZCZ0IDhvYBM8Ty2fYzci+cIaGicaGidXKAxyGy2XHC3m9iNr1CM5VlwHLywqIpGOGicaGicaGidXKAxy+cIaGicaGicaGica8zgL2ignSyxnZpsj0DxjUBY10AxrSzsi+','zw52Aw9jza','ywrKrxzLBNrmAxn0zw5LCG','pc9KAxy+','yxvKAxq','BwvKAwe','Cxr5vgLJA2v0','pc9KAxy+cIaGicaGicaGpc9KAxy+cIaGicaGicaGpgrPDIbJBgfZCZ0IDhvYBM8TyM9KEsi+cIaGicaGicaGica8zgL2ignSyxnZpsj0DxjUBY1ZDgf0CYi+cIaGicaGicaGicaGidXKAxyGy2XHC3m9iNr1CM5Vlxn0yxqIpJXZDhjVBMC+','AM9PBG','lw5LEhq','C3rHDc1SAw5Lyxm','ihGG','DgvSzwzVBM8','DgLJA2v0rM9UDfnPEMu','zMLU','pc9KAxy+cIaGicaGicaGpc9KAxy+cIaGicaGicaGpgrPDIbJBgfZCZ0IyMfKz2uGywn0AxzLiJ5by3rPDM88l2rPDJ4kicaGicaGpc9KAxy+cIaGicaGidXKAxyGy2XHC3m9iNr1CM5VlwjVzhKIpGOGicaGicaGidXKAxyGy2XHC3m9iNr1CM5Vlxn0yxrZiJ4kicaGicaGicaGidXKAxyGy2XHC3m9iNr1CM5Vlxn0yxqIpJXZDhjVBMC+','AgLZDg9YAwfSx3r1CM5VCW','y2fTyMLHCLbHz2LUyuf1zgL0B3jPyq','ywrK','Dg9Nz2XLr2vYzw50zvnLy3rPB24','rgvZy3vLBNrVigfWBgLJywrV','zMLSDhjVlwHVCMeTAw5P','pgrPDIbJBgfZCZ0Izw1WDhKIpLnPBIbLDMvUDg9ZigvUigvSihbLCMLVzg8GBYbMAwX0CM8GC2vSzwnJAw9UywrVlJWVzgL2pG','u2LUihjLC3vSDgfKB3m','y2vYCMfYvhvYBM9hzxjLBNrL','cJXOCIbJBgfZCZ0ICNvSzsi+cJXKAxyGC3r5Bgu9iNrLEhqTywXPz246y2vUDgvYo2zVBNqTC2L6ztO4ChG7y29SB3i6iZy2nJTTyxjNAw4TDg9WoJeWChGIpKzPBIbKzsbdAwvYCMuGzguGq2fQytWVzgL2pGO8C2nYAxb0pGPKB2n1BwvUDc5NzxrfBgvTzw50qNLjzcGNyNrUlxnLCNzPy2LVjYK/lMfKzev2zw50tgLZDgvUzxiOj2nSAwnRjYWGkcKGpt4GEWOGihDPBMrVDY5Fx3nLBMruB1nLCNzPy2u/lIGPoWP9ktSkpc9Zy3jPChq+cJWVyM9KEt48l2H0BwW+','ndi3mte0BxnluxDP','CxvLCNLtzwXLy3rVCG','cIaGicaGidXHCNrPy2XLignSyxnZpsj0AwnRzxqTy2fYzci+cIaGicaGicaGpgrPDIbJBgfZCZ0IDgLJA2v0lwHLywqIpGOGicaGicaGicaGpgrPDJ4kicaGicaGicaGicaGpgrPDIbJBgfZCZ0IDgLJA2v0lxrPDgXLiJ5nzxnHia','CMvZzxrgAwX0CM9Zr2vYzw50zq','pc90zd4kicaGicaGicaGicaGica8DgqGy2XHC3m9iM51Bsi+','pc9ZCgfUpGOGicaGpc9KAxy+cIaGica','CMvKDwnL','DgLJA2v0sgvHzgvYu3vIrM9UDfnPEMu','vhvYBM8','oJaW','pc9ZCgfUpG','y2XVC2u','pc9KAxy+cIaGicaGicaGpgrPDIbJBgfZCZ0IyxvKAxqTy29SiJ4','DhvYBM8TC3rHDhvZ','y2XHC3nmAxn0','AgLZDg9YAwfS','zMXLEa','y2fTyxjLCM8','y2fUDgLKywrFzwrPDgfKyq','ChjLy2LV','x2jSyw5R','pgrPDIbZDhLSzt0IDgv4Dc1HBgLNBJPJzw50zxi7zM9UDc1ZAxPLoJHWEdTJB2XVCJOJnJy2iJ5tAw4Gyxj0W61JDwXVCYb2zw5KAwrVCZWVzgL2pG','y2XPy2S','zgvZy3vLBNrVx2fWBgLJywrV','yxjPys1LEhbHBMrLza','pc9KAxy+cJXKAxyGC3r5Bgu9iNrLEhqTywXPz246y2vUDgvYo2zVBNqTC2L6ztO4ChG7y29SB3i6iZu1nsi+','zgL2','BwvZyxndzxjYywrHCW','y29SBgfWC2vK','Ag9Yyq','lMnVBxbHy3qTBw9IAwXLlxrVz2DSzq','pgrPDIbJBgfZCZ0Izw1WDhKIpK5VigHHEsb0DxjUBYbHy3rPDM8Upc9KAxy+','pc9ZCgfUpGOGicaGica8C3bHBJ4','vM9SDMvY','qxj0Awn1Bg8GzwXPBwLUywrV','Dg9gAxHLza','yxj0Awn1Bg9FzwXPBwLUywrV','Dg90ywW','B3bLBG','BNvTzxjPyW','C2v0sg91CNm','Aw5Uzxjive1m','pgrPDIbJBgfZCZ0IDgLJA2v0lwXPBMuIpJXZCgfUpLnPBIbSAw5LyxmGz3vHCMrHzgfZpc9ZCgfUpJXZCgfUpI08l3nWyw4+pc9KAxy+','C2XPy2u','pc9ZDhjVBMC+phnWyw4+qxj0Awn1Bg9Zpc9ZCgfUpJWVzgL2pGOGicaGicaGicaGica8zgL2ignSyxnZpsj0DxjUBY1ZDgf0iJ48C3rYB25NpG','mZi1nJC4mw9iCNvRtW','BM9Uzq','q2fUDgLKywqGzwrPDgfKyq','vgLJA2v0igLTChjLC28','yxbWzw5Kq2HPBgq','C3rYAw5NAwz5','pc9KAxy+cJWVzgL2pGO8AhiGy2XHC3m9iNj1BguIpGO8zgL2ihn0EwXLpsjMB250lxnPEMu6oxb4o2zVBNqTD2vPz2H0oMjVBgq7BwfYz2LUlwjVDhrVBtO0ChGIpLjfu1vnru4GreuGq0fkqtO8l2rPDJ4kpgrPDIbZDhLSzt0IzgLZCgXHEtPMBgv4o2P1C3rPzNKTy29UDgvUDdPZCgfJzs1Izxr3zwvUo21HCMDPBJOZChGGmci+cIaGphnWyw4+vgLJA2v0CYbdB2jYywrVCZO8l3nWyw4+cIaGphnWyw4+','C3rHCNruCW','pgrPDIbZDhLSzt0IDgv4Dc1HBgLNBJPJzw50zxi7zM9UDc1ZAxPLoJHWEdTJB2XVCJOJnJy2iJ5tAw4GBgLUzwfZigD1yxjKywrHCZWVzgL2pG','pc9IDxr0B24+cIaGicaGicaGpgj1DhrVBIb0ExbLpsjIDxr0B24IigrHDgeTywn0psjVAYiGy2XHC3m9iNnTywXSia','u2LUihzLBNrHCYbMAwX0CMfKyxm','yxvKAxqTywnJAw9U','zgfUz2vY','cIaGicaGicaGpc90yM9KEt4kicaGicaGpc90ywjSzt4kicaGidWVzgL2pG','DMvUDgfZlwfYDgLJDwXVCW','lMf1zgL0lwzPBhrYB3mTD3jHCa','lxbHz2vY','qxj0Awn1Bg8','q2vYCMfYihr1CM5VignVBIbTzxnHCYbHyMLLCNrHCW','CMv2B2TLt2jQzwn0vvjm','u2vSzwnJAw9UysbSyxmGzMvJAgfZ','A2v5CW','BgLUzwfZx2nVDw50','mti3lJaUmc4X','jMD0oW','nZa0n29YtK1jBW','yxvKAxqTDw5SB2nRzwq','y29TCgfJDc1TB2jPBguTy2fYza','ChvZAa','cIaGicaGidXHCNrPy2XLignSyxnZpsjHDwrPDc1YB3CG','DgLJA2v0ugfWzxi','BwvZyq','yxbW','zgvZy3vLBNrV','u2uGy2vYCMfYB24G','y3nZvgv4Da','twvZysa','zw5Kvhm','ywjPzxj0BW','Aw5Py2LV','yxbSAwnHCKzPBhrYB3nbDwrPDg9YAwfhzxjLBNrL','yxvKAxqTzMLSDgvY','pgrPDIbJBgfZCZ0Izw1WDhKIpLnPBIbKyxrVCYbLBIbLBcbWzxjPB2rVihnLBgvJy2LVBMfKBY48l2rPDJ4','A2v5','rxjYB3iGzMLSDhjHBMrVihzLBNrHCW','pc9ZCgfUpGOGicaGicaGidXZCgfUpG','cIaGica8zgL2ihn0EwXLpsjKAxnWBgf5oMzSzxG7ANvZDgLMEs1JB250zw50oNnWywnLlwjLDhDLzw47z2fWoJeWChG7BwfYz2LUoJnWEcaWiJ4kicaGicaGphnWyw4+','ugvYBwL0zsbSyxmGDMvUDgfUyxmGzw1LCMDLBNrLCYbWyxjHihjLAw1WCMLTAxi','y29SB3i','pc9KAxy+cIaGicaGicaGica8l2rPDJ4kicaGicaGicaGidXKAxyGy2XHC3m9iNrPy2TLDc10B3rHBci+','z2v0rwXLBwvUDej5swq','o2zVBNqTD2vPz2H0oJCWmci+','mI1KAwDPDa','pg9WDgLVBIb2ywX1zt0IiJ4TifrVzg9Zic08l29WDgLVBJ4','C2vYDMLKBW','B25JBgLJAW','DhjPBq','yxvKAxqTC3rHDc1LBgLTAw5Hzg9Z','w2rHDgeTywn0psjVAYjD','C3vJy2vZCW','jYKIpLjLAw1WCMLTAxiGDgLJA2v0pc9IDxr0B24+cIaGicaGicaGica8l2rPDJ4kicaGicaGica8l2rPDJ4kicaGicaGpc9HCNrPy2XLpGOGicaG','C2v0sxrLBq','CMvTB3zL','pc9ZDhjVBMC+phnWyw4+vg90ywW8l3nWyw4+pc9KAxy+cIaGicaGicaGica8zgL2ignSyxnZpsj0DxjUBY1ZDgf0iJ48C3rYB25NpG','Dg9Nz2XL','o2nVBg9YoImXmtf9cI5Iyxj7zgLZCgXHEtPMBgv4o2DHCdO2ChG7BwfYz2LUlwjVDhrVBtOXmhb4o2P1C3rPzNKTy29UDgvUDdPJzw50zxi7zMXLEc13CMfWoNDYyxb9cI5IyxiGyNv0Dg9UE2jVCMrLCJOXChGGC29SAwqGi2fHytTIywnRz3jVDw5KoInMnwy1zJu7y29SB3i6iZeXmtTIB3jKzxiTCMfKAxvZoJK5oxb4o3bHzgrPBMC6nxb4ide0ChG7zM9UDdPPBMHLCML0o2n1CNnVCJPWB2LUDgvYo2zVBNqTC2L6ztOXmhb4FqOUCNvSzxTIB3jKzxi6BM9UztTIB3jKzxiTDg9WoJfWEcbKyxnOzwqGiZy2nJTTyxjNAw46nxb4idb9cI50B3rHBhTKAxnWBgf5oMzSzxG7ANvZDgLMEs1JB250zw50oNnWywnLlwjLDhDLzw47zM9UDc13zwLNAhq6yM9SzdTMB250lxnPEMu6mtbWEdTTyxjNAw4TDg9WoJzWEdTWywrKAw5NlxrVCdO0ChG7yM9YzgvYlxrVCdOXChGGC29SAwqGiZmZm30kqg1LzgLHihbYAw50EY5Iyxj7zgLZCgXHEtPUB25LFx0kpc9ZDhLSzt48l2HLywq+pgjVzhK+cJXKAxyGy2XHC3m9iMjHCIi+cIaGpgj1DhrVBIbVBMnSAwnRpsj3Aw5KB3CUChjPBNqOksi+sw1WCMLTAxiGlYbqrey8l2j1DhrVBJ4kica8yNv0Dg9UigLKpsjIDg4TC2vYDMLJAw8IpKvUDMLHCIbHigLTChjLC29YytWVyNv0Dg9UpGOGidXIDxr0B24GB25JBgLJAZ0ID2LUzg93lMnSB3nLkcKIpKnLCNjHCJWVyNv0Dg9UpGO8l2rPDJ4k','CMvWBgfJzq','pc9KAxy+cIaGicaGidXKAxyGC3r5Bgu9iMrPC3bSyxK6zMXLEdTQDxn0Awz5lwnVBNrLBNq6zMXLEc1LBMq7z2fWoJeWChG7zMXLEc13CMfWoNDYyxaIpGOGicaGicaGidXIDxr0B24GDhLWzt0IyNv0Dg9UiIbKyxrHlwfJDd0Iy2fUy2vSiIbJBgfZCZ0IC21HBgWIpG','rg9TAw5PBYbUBYbHDxrVCML6ywrV','Dg9mB2nHBgvtDhjPBMC','DMvUDgfZ','mZG0mZuWne9SqMLcEa','tM8GC2uGzw5JB250CM8GzwWGDgLJA2v0','z2v0rgf0zq','DMfSDwu','y2HLy2TmB2DPBG','Dg9WyMfYlxr1CM5VlxbPBgW','Bg9NAw4TC2nYzwvU','lNrHyI1IDg4','DgLJA2v0sgvHzgvYt2zMC2v0','zM9VDgvY','zgLHCW','pc9IDxr0B24+cIaGicaGidWVzgL2pG','BwvZC2fNzq','CgfKu3rHCNq','yNrUlxnLCNzPy2LV','mJiYmJKWENHswuDI','sgf5ia','y29ICM8','BwvZyxm','yxbSAwnHCKzPBhrYB3ndB211BMvZr2vYzw50zq','zMLSDhjVlwzLy2HHlwzPBG','BwLJCM9JB3jWC2v0lMDPDgH1yI5PBW','y2vPBa','pc9KAxy+cIaGicaGicaGpgrPDIbJBgfZCZ0IyxvKAxqTy29SiIbZDhLSzt0Iy29SB3i6','zxmTrvm','Bw9ZDhjHCLrHyLzLBNrHC0DLCMvUDgu','y3jLyxrLrwXLBwvUDa','D2LKDgG6BwLUkduYmhb4ldeWmcuPo2jHy2TNCM91BMq6DMfYkc0TCgfUzwWSiZeXmtGYmYK7yM9YzgvYoJfWEcbZB2XPzcb2yxiOls1IB3jKzxiSiZiZmZa0mIK7yM9YzgvYlxjHzgL1CZOYmNb4o2jVEc1ZAgfKB3C6mcaYmhb4idyWChGGCMDIysGWldaSmcWUmZuPo3bHzgrPBMC6mtHWEdTKAxnWBgf5oMzSzxG7zMXLEc1KAxjLy3rPB246y29SDw1Uo2DHCdOXnhb4','CxvLCNLtzwXLy3rVCKfSBa','Aw5JBhvKzxm','z2v0sg91CNm','y3jLyxrLt2jQzwn0vvjm','Bwf4','DMfSDwvZ','cJXKAxyGC3r5Bgu9iNrLEhqTywXPz246y2vUDgvYo2zVBNqTD2vPz2H0oMjVBgq7zM9UDc1ZAxPLoJeXChG7BwfYz2LUlxrVCdO4ChGIpKnjrvjsrsbersbdquPbierjqvjjtZWVzgL2pGO8zgL2ihn0EwXLpsj0zxH0lwfSAwDUoMnLBNrLCJTMB250lxnPEMu6ohb4o2nVBg9YoIm1ntu7BwfYz2LUlxrVCdO0ChGIpLjLCg9YDguGwJWVzgL2pGO8AhiGy2XHC3m9iNj1BguIpGO8zgL2ihn0EwXLpsjMB250lxnPEMu6ohb4o2nVBg9YoImZmZm7BwfYz2LUlwjVDhrVBtO2ChG7BgLUzs1OzwLNAhq6ms40iJ4kica8zgL2pJXZDhjVBMC+rgvZzgu6pc9ZDhjVBMC+ia','C2HVDW','pc9ZCgfUpGO8l2rPDJ4kpgrPDIbZDhLSzt0IzgLZCgXHEtPMBgv4o2P1C3rPzNKTy29UDgvUDdPZCgfJzs1Izxr3zwvUo21HCMDPBJOZChGGmci+cIaGphnWyw4+vgLJA2v0ie1LzgLVoJWVC3bHBJ4kica8C3bHBJ4','zg9JDw1LBNq','pgjYpG','zwzLy3rPDM8','y29UzMLNl2XVy2fS','jMX0oW','cIaGica8zgL2ignSyxnZpsj0ywjSzs13CMfWiJ4kicaGicaGphrHyMXLpGOGicaGicaGidX0AgvHzd4kicaGicaGicaGidX0CJ48DgG+rMvJAge8l3rOpJX0Ad5uAwnRzxrZpc90Ad48DgG+qxj0Awn1Bg9Zpc90Ad48DgG+vg90ywW8l3rOpJWVDhi+cIaGicaGicaGpc90AgvHzd4kicaGicaGica8DgjVzhK+cIaGicaGicaGica','ywXS','tM8GAgf5ihr1CM5VigfIAwvYDg8','C2vUC2LIBgu','Cxr5u2vYDMLKyq','igrLia','zxHWB3j0yxjbDwrPDg9YAwfhzxjLBNrLq1nw','Bg9JywXLq29TCgfYzq','ihrPy2TLDhmGzMLSDhjHzg9Z','DMfYkc0TzgfUz2vYkq','zMfSC2u','zw5KC1DPDgG','BwLU','r2vUzxjHBMrVignPzxjYzsbKzsbJywPHlI4U','C2v0rgf0zq','pgrPDIbZDhLSzt0IDgv4Dc1HBgLNBJPJzw50zxi7BwfYz2LUlwjVDhrVBtO0ChGIpJXPBwCGC3jJpsi','pc9KAxy+cIaGicaGicaGica8zgL2ignSyxnZpsj0AwnRzxqTywn0Aw9UCYi+cIaGicaGicaGicaGidXIDxr0B24Gy2XHC3m9iNnTywXSiIbVBMnSAwnRpsjYzwLTChjPBwLYvgLJA2v0sgLZDg9YAwfSkcC','pc9KAxy+cIaGicaGicaGica8zgL2ignSyxnZpsj0DxjUBY1TzxrHiJ5byMLLCNrVigvSia','AxngAw5PDgu','DhvYBM8','pgrPDIbZDhLSzt0IDgv4Dc1HBgLNBJPJzw50zxi7zM9UDc13zwLNAhq6yM9SzdTMB250lxnPEMu6mtfWEci+','y2fUy2vSywrV','zMLSDhjVlwzLy2HHlwLUAq','CMvTB3zLq2HPBgq','cIaGicaGidXHCNrPy2XLignSyxnZpsj0DxjUBY1JyxjKiJ4kicaGicaGica8zgL2ignSyxnZpsj0DxjUBY1OzwfKiJ4kicaGicaGicaGidXKAxy+cIaGicaGicaGicaGidXKAxyGy2XHC3m9iNr1CM5VlxrPDgXLiJ4','u2LUigrHDg9ZihbHCMeGzxHWB3j0yxi','oJu5','DgLJA2v0x2zPBMfS','DMfYkc0TBxv0zwqP','vhvYBM8GywjPzxj0BZOG','cJXKAxyGy2XHC3m9iNrVDgfSiJ48C3bHBJ5uB3rHBdWVC3bHBJ48C3bHBJ4','yxvKAxqTBgLZDge','imk3ia','DgLJA2v0sgvHzgvYtMfTzuzVBNrtAxPL','y29UzMLNl3r1CM5V','pc90zd4kicaGicaGicaGicaGpc90CJ4kicaGicaGicaGia','BM93','BwfW','yMXVy2S','q0LfuLjfierjqvjjtW','zMLSDgvY','u2vSzwnJAw9UysbLBcbYyw5NBYbKzsbMzwnOyxm','mZi4otC5Dxjjve5j','y2LLCNjLlwzLy2HH','CgfNB01LDg9KBW','pc9ZDhjVBMC+phnWyw4+vgLJA2v0ig1LzgLVpc9ZCgfUpJWVzgL2pGOGicaGicaGidWVzgL2pGOGicaGica8l2rPDJ4kicaGidWVyxj0AwnSzt4','C2HVCNq','BwvZysbJB24Gy3vLBNrHigfIAwvYDge','y2fYzc0','vdaWoJaWoJaW','ywn0AxzL','lxbHz2vYlwLUzM8','Dhj1zq','Dg9mB2nHBgvuAw1Lu3rYAw5N','qxj0Awn1Bg8GyCoXywrPzg8','BM9TyNjL','pg9WDgLVBIb2ywX1zt0I','pc9ZCgfUpGO8l2rPDJ4kpgrPDIbJBgfZCZ0IDg90ywWIpGOGidXZCgfUpLrpvefmieDftKvsquW8l3nWyw4+cIaGphnWyw4+'];a=function(){return aV;};return a();}function fechaLabelDesdeKey(c){const V=D,[e,f,g]=String(c)['split']('-')[V(0x135)](Number);return new Date(e,(f||0x1)-0x1,g||0x1)[V(0x1b2)](V(0xfe),{'day':V(0xd3),'month':'2-digit','year':V(0x99)});}function fechaKeyFromDate(c){const W=D;return c[W(0x1ca)]()+'-'+String(c[W(0x17b)]()+0x1)[W(0xf3)](0x2,'0')+'-'+String(c[W(0xe8)]())[W(0xf3)](0x2,'0');}function parseFechaHoraTicket(c,d='00:00'){const X=D;if(!c)return NaN;const e=String(c)[X(0xd7)](),f=String(d||X(0x1ce))[X(0xd7)]()[X(0x9d)](0x0,0x5);if(/^\d{4}-\d{2}-\d{2}$/[X(0x1b3)](e))return new Date(e+'T'+f+X(0x1f6))[X(0x184)]();const g=e['match'](/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);if(!g)return NaN;const [,h,i,j]=g;return new Date(j+'-'+String(i)[X(0xf3)](0x2,'0')+'-'+String(h)[X(0xf3)](0x2,'0')+'T'+f+X(0x1f6))[X(0x184)]();}function normalizarTicketVenta(c,d={}){const Y=D,e=d&&typeof d===Y(0x161)?d:{},f=Number(e['ts']),g=Number[Y(0x122)](f)&&f>0x0?f:parseFechaHoraTicket(e[Y(0x17a)],e[Y(0x20a)]);return{'id':c,...e,'ts':g};}function normalizarHistorialVentasData(c){const Z=D;return Object[Z(0x176)](c||{})['map'](([d,e])=>normalizarTicketVenta(d,e))['filter'](d=>Number['isFinite'](d['ts']))[Z(0x1c1)]((d,e)=>e['ts']-d['ts']);}function resumirTickets(c){const a0=D,d=c['reduce']((f,g)=>f+Number(g[a0(0x97)]||0x0),0x0),e=c['reduce']((f,g)=>f+(g['lineas']||[])[a0(0x1f3)]((h,i)=>h+Number(i['qty']||0x0),0x0),0x0);return{'tickets':c[a0(0x18d)],'total':d,'lineas':e,'media':c[a0(0x18d)]?d/c['length']:0x0};}function agruparVentasPorDia(c){const a1=D,d={};return c[a1(0x1a2)](e=>{const a2=a1,f=fechaKeyLocal(e['ts']);if(!d[f])d[f]={'fecha':f,'tickets':0x0,'lineas':0x0,'total':0x0};d[f]['tickets']+=0x1,d[f]['lineas']+=(e[a2(0x156)]||[])[a2(0x1f3)]((g,h)=>g+Number(h[a2(0x1c0)]||0x0),0x0),d[f][a2(0x97)]+=Number(e['total']||0x0);}),Object['values'](d)['sort']((e,f)=>f['fecha'][a1(0x117)](e[a1(0x17a)]));}async function cargarHistorialVentas(c=![]){const a3=D;if(!c&&historialVentasCargado)return historialVentasCache;const d=await get(ref(db,a3(0x1fc)));return historialVentasCache=normalizarHistorialVentasData(d[a3(0x1af)]()||{}),historialVentasCargado=!![],historialVentasCache;}function resumirMesaParaHistorial(c,d={}){const a4=D,e=Object[a4(0x107)](d||{})[a4(0x138)](j=>j&&typeof j===a4(0x161)&&!String(j[a4(0x1d4)]||'')[a4(0x14d)]('_'))['flatMap'](j=>Object['values'](j[a4(0x156)]||{})),f={},g=new Set();e['forEach'](j=>{const a5=a4;if(!j||j['estado']===a5(0x125))return;const k=j[a5(0x1d9)]!==undefined&&j[a5(0x1d9)]!==null?Number(j[a5(0x1d9)]||0x0):j['estado']===a5(0xd5)?Number(j[a5(0x1c0)]||0x0):j[a5(0x114)]!==undefined&&j[a5(0x114)]!==null?Number(j['qtyServida']||0x0):Number(j[a5(0x1c0)]||0x0);if(k<=0x0)return;if(j['camarero']&&j['destino']!==a5(0xc0))g[a5(0x1e5)](j[a5(0x1fe)]);const m=(j[a5(0x147)]||'Articulo')+'||'+Number(j[a5(0x200)]||0x0)['toFixed'](0x2)+'||'+(j[a5(0x162)]||'');!f[m]&&(f[m]={'nombre':j[a5(0x147)]||'Articulo','precio':Number(j[a5(0x200)]||0x0),'qty':0x0,'nota':j[a5(0x162)]||''}),f[m][a5(0x1c0)]+=k;});const h=Object[a4(0x107)](f),i=h[a4(0x1f3)]((j,k)=>j+Number(k[a4(0x200)]||0x0)*Number(k[a4(0x1c0)]||0x0),0x0);return{'mesa':c,'camarero':[...g][a4(0x1db)](',\x20'),'lineas':h,'total':Math[a4(0x194)](i*0x64)/0x64};}async function cerrarMesasAbiertasParaTurno(){const a6=D,[c,d]=await Promise[a6(0x111)]([get(ref(db,a6(0xf8))),get(ref(db,a6(0x18f)))]),e=c['val']()||{},f=d[a6(0x1af)]()||{},g=new Date();let h=0x0;for(const [i,j]of Object[a6(0x176)](f)){if(!j||typeof j!==a6(0x161))continue;const k=e[i]?.[a6(0x147)]||i,l=resumirMesaParaHistorial(k,j);l[a6(0x156)]['length']>0x0&&await push(ref(db,a6(0x1fc)),{'mesa':l[a6(0xbe)],'camarero':l[a6(0x1fe)],'ts':g[a6(0x184)](),'fecha':g[a6(0x1b2)]('es-ES'),'hora':g['toLocaleTimeString']('es-ES',{'hour':'2-digit','minute':a6(0xd3)}),'total':l[a6(0x97)],'lineas':l[a6(0x156)]}),await remove(ref(db,'pedidos/'+i)),await set(ref(db,'mesas/'+i+'/estado'),'libre'),h+=0x1;}return historialVentasCargado=![],{'mesasCerradas':h};}function initFiltrosVentasHoy(){const a7=D,c=new Date(),d=fechaKeyFromDate(c);document['getElementById']('filtro-fecha-ini')['value']=d,document[a7(0xd1)](a7(0xfa))['value']=d,document[a7(0xd1)](a7(0x1e8))[a7(0xe9)]=a7(0x1ce),document[a7(0xd1)](a7(0x169))['value']=a7(0x158);}async function prepararFiltrosVentasIniciales(){const a8=D;initFiltrosVentasHoy();const c=(await cargarHistorialVentas())[0x0];if(!c)return;const e=new Date(c['ts']),f=fechaKeyFromDate(e);document[a8(0xd1)]('filtro-fecha-ini')['value']=f,document['getElementById'](a8(0xfa))['value']=f;}function renderMetricasVentas(c){const a9=D,d=resumirTickets(c);document[a9(0xd1)](a9(0x14f))[a9(0x16c)]=d[a9(0x191)],document[a9(0xd1)](a9(0x1c6))[a9(0x16c)]=fmtEu(d[a9(0x97)]),document[a9(0xd1)]('stat-media')['textContent']=d['tickets']?fmtEu(d['media']):'-',document[a9(0xd1)](a9(0x1dd))[a9(0x16c)]=d['lineas'];const e=document['getElementById']('topbar-ventas-pill');if(e)e[a9(0x16c)]=c['length']?c[a9(0x18d)]+a9(0x118):a9(0xa9);}function renderPager(c,d,e,f,g=!![]){const aa=D,h=document['getElementById'](f+aa(0xaf)),i=document['getElementById'](f+aa(0x143)),j=document[aa(0xd1)](f+aa(0x18e)),k=document[aa(0xd1)](f+aa(0x1dc));if(!h||!i||!j||!k)return;const l=Math[aa(0x106)](0x1,Math[aa(0xfc)](c/d));if(g&&c<=d){h['style'][aa(0x1b0)]=aa(0xa0);return;}h[aa(0x185)]['display']=aa(0x1fd);const m=c?(e-0x1)*d+0x1:0x0,n=Math[aa(0x11c)](c,e*d);i[aa(0x16c)]=c?aa(0x15e)+m+'-'+n+aa(0x115)+c:aa(0x1ea),j['disabled']=e<=0x1,k[aa(0x1ab)]=e>=l;}function renderVentasTablaArticulos(c){const ab=D,d=document[ab(0xd1)](ab(0xad));if(!d)return;if(!c[ab(0x18d)]){d[ab(0x9b)]=ab(0xc9);return;}const e={};c[ab(0x1a2)](g=>{const ac=ab;(g[ac(0x156)]||[])[ac(0x1a2)](h=>{const ad=ac,i=String(h[ad(0x147)]||'Sin\x20nombre');if(!e[i])e[i]={'nombre':i,'qty':0x0,'total':0x0};e[i][ad(0x1c0)]+=Number(h[ad(0x1c0)]||0x0),e[i][ad(0x97)]+=Number(h['precio']||0x0)*Number(h[ad(0x1c0)]||0x0);});});const f=Object[ab(0x107)](e)[ab(0x1c1)]((g,h)=>h[ab(0x1c0)]-g[ab(0x1c0)]);d[ab(0x9b)]='\x0a\x20\x20\x20\x20<div\x20class=\x22table-wrap\x22>\x0a\x20\x20\x20\x20\x20\x20<table>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<thead>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<tr><th>Articulo</th><th>Unidades</th><th>Total</th></tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</thead>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<tbody>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20'+f[ab(0x135)](g=>'\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<tr>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td>'+escHtml(g[ab(0x147)])+ab(0x1f1)+g['qty']+ab(0x1f1)+fmtEu(g[ab(0x97)])+ab(0x133))[ab(0x1db)]('')+ab(0xac);}function renderVentasTablaDias(c){const ae=D,d=document[ae(0xd1)]('ventas-dias');if(!d)return;if(!c[ae(0x18d)]){d[ae(0x9b)]=ae(0xc9);return;}const e=agruparVentasPorDia(c);d[ae(0x9b)]=ae(0x110)+e['map'](f=>ae(0x15a)+fechaLabelDesdeKey(f[ae(0x17a)])+'</td>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<td\x20class=\x22num\x22>'+f[ae(0x191)]+ae(0x1f1)+f[ae(0x156)]+ae(0x1f1)+fmtEu(f['total'])+ae(0x133))[ae(0x1db)]('')+ae(0xac);}function renderVentasTickets(c){const af=D,d=document['getElementById'](af(0x166));if(!d)return;if(!c[af(0x18d)]){d[af(0x9b)]=af(0x15b),renderPager(0x0,SALES_PAGE_SIZE,0x1,af(0xe5));return;}const e=Math['max'](0x1,Math[af(0xfc)](c[af(0x18d)]/SALES_PAGE_SIZE));ventasPagina=Math[af(0x11c)](Math['max'](0x1,ventasPagina),e);const f=(ventasPagina-0x1)*SALES_PAGE_SIZE,g=c[af(0x9d)](f,f+SALES_PAGE_SIZE);d[af(0x9b)]=g[af(0x135)](h=>{const ag=af,i=new Date(h['ts'])[ag(0xe4)](ag(0xfe),{'dateStyle':ag(0x13e),'timeStyle':'short'}),j=(h['lineas']||[])[ag(0x135)](k=>ag(0x1b7)+Number(k[ag(0x1c0)]||0x0)+ag(0x1de)+escHtml(k[ag(0x147)]||ag(0xb0))+ag(0xcc)+fmtEu(Number(k[ag(0x200)]||0x0)*Number(k[ag(0x1c0)]||0x0))+'</span>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20')['join']('');return ag(0x1ef)+escHtml(h['mesa']||'-')+ag(0x1cf)+i+(h[ag(0x1fe)]?'\x20·\x20'+escHtml(h[ag(0x1fe)]):'')+ag(0xd0)+fmtEu(h['total']||0x0)+'</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22ticket-body\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22ticket-lines\x22>'+(j||ag(0x9c))+ag(0x120)+h['id']+ag(0xdb);})[af(0x1db)](''),renderPager(c[af(0x18d)],SALES_PAGE_SIZE,ventasPagina,'ventas');}function renderVentasSegunTab(){renderMetricasVentas(ventasFiltradas),renderVentasTickets(ventasFiltradas),renderVentasTablaArticulos(ventasFiltradas),renderVentasTablaDias(ventasFiltradas);}window[D(0xff)]=(c,d)=>{const ah=D;ventasTabActiva=c,document[ah(0x102)](ah(0xed))[ah(0x1a2)](e=>e[ah(0x1fb)][ah(0xdd)](ah(0x142))),d?.['classList'][ah(0x1e5)](ah(0x142)),document[ah(0xd1)]('ventas-por-ticket')[ah(0x185)][ah(0x1b0)]=c===ah(0x191)?'':ah(0xa0),document[ah(0xd1)]('ventas-por-articulo')['style'][ah(0x1b0)]=c===ah(0x172)?'':ah(0xa0),document['getElementById'](ah(0x16f))[ah(0x185)][ah(0x1b0)]=c===ah(0xf0)?'':ah(0xa0);},window[D(0x181)]=c=>{const ai=D,d=Math[ai(0x106)](0x1,Math[ai(0xfc)](ventasFiltradas[ai(0x18d)]/SALES_PAGE_SIZE));ventasPagina=Math[ai(0x11c)](d,Math['max'](0x1,ventasPagina+c)),renderVentasTickets(ventasFiltradas);},window[D(0x1c4)]=async()=>{const aj=D;try{const c=document[aj(0xd1)](aj(0x126))['value'],d=document[aj(0xd1)](aj(0xfa))[aj(0xe9)],e=document[aj(0xd1)](aj(0x1e8))[aj(0xe9)]||aj(0x1ce),f=document[aj(0xd1)](aj(0x169))[aj(0xe9)]||aj(0x158);if(!c||!d){toast(aj(0xb3));return;}const g=new Date(c+'T'+e+aj(0x1f6))[aj(0x184)](),h=new Date(d+'T'+f+':59')[aj(0x184)]();ventasFiltradas=(await cargarHistorialVentas())['filter'](i=>i['ts']>=g&&i['ts']<=h)[aj(0x1c1)]((i,j)=>j['ts']-i['ts']),ventasPagina=0x1,renderVentasSegunTab();}catch(i){console[aj(0x154)](aj(0xcb),i),ventasFiltradas=[],renderVentasSegunTab(),toast('No\x20se\x20pudieron\x20cargar\x20las\x20ventas');}},window[D(0x1f0)]=()=>{const ak=D;initFiltrosVentasHoy(),ventasPagina=0x1,window[ak(0xf9)]();},window[D(0x19f)]=()=>{const al=D;if(!ventasFiltradas[al(0x18d)]){toast(al(0x129));return;}let c='',d=ventasTabActiva;if(ventasTabActiva===al(0x172)){const j={};ventasFiltradas['forEach'](k=>{const am=al;(k[am(0x156)]||[])[am(0x1a2)](m=>{const an=am,n=String(m[an(0x147)]||'Sin\x20nombre');if(!j[n])j[n]={'nombre':n,'qty':0x0,'total':0x0};j[n][an(0x1c0)]+=Number(m[an(0x1c0)]||0x0),j[n][an(0x97)]+=Number(m['precio']||0x0)*Number(m[an(0x1c0)]||0x0);});}),c='Articulo,Unidades,Total\x0a',Object['values'](j)['sort']((k,l)=>l[al(0x1c0)]-k['qty'])[al(0x1a2)](k=>{const ao=al;c+=escCsv(k[ao(0x147)])+','+escCsv(k[ao(0x1c0)])+','+escCsv(k[ao(0x97)][ao(0x95)](0x2))+'\x0a';});}else ventasTabActiva===al(0xf0)?(c='Fecha,Tickets,Articulos,Total\x0a',agruparVentasPorDia(ventasFiltradas)[al(0x1a2)](k=>{const ap=al;c+=escCsv(fechaLabelDesdeKey(k[ap(0x17a)]))+','+escCsv(k['tickets'])+','+escCsv(k[ap(0x156)])+','+escCsv(k[ap(0x97)][ap(0x95)](0x2))+'\x0a';})):(d=al(0x191),c='Fecha,Hora,Mesa,Camarero,Total,Articulo,Cantidad,Precio\x20unitario\x0a',ventasFiltradas[al(0x1a2)](k=>{const aq=al,l=new Date(k['ts'])[aq(0x1b2)](aq(0xfe)),m=new Date(k['ts'])[aq(0x145)](aq(0xfe),{'hour':aq(0xd3),'minute':aq(0xd3)});(k[aq(0x156)]||[])[aq(0x1a2)](n=>{const ar=aq;c+=escCsv(l)+','+escCsv(m)+','+escCsv(k[ar(0xbe)]||'')+','+escCsv(k[ar(0x1fe)]||'')+','+escCsv(Number(k['total']||0x0)['toFixed'](0x2))+','+escCsv(n[ar(0x147)]||'')+','+escCsv(n[ar(0x1c0)]||0x0)+','+escCsv(Number(n[ar(0x200)]||0x0)[ar(0x95)](0x2))+'\x0a';});}));const e=new Blob(['\ufeff'+c],{'type':'text/csv;charset=utf-8'}),f=URL[al(0x105)](e),g=document['createElement']('a'),h=document['getElementById'](al(0x126))[al(0xe9)],i=document[al(0xd1)](al(0xfa))[al(0xe9)];g[al(0x1d2)]=f,g[al(0x1bf)]=al(0x17e)+d+'_'+h+'_'+i+al(0x198),document[al(0x1d1)][al(0xa3)](g),g[al(0x203)](),document[al(0x1d1)]['removeChild'](g),URL[al(0xb2)](f);};function buildTicketHtml(c){const as=D,d=configLocal['ticketPaper']||'80mm',e=configLocal[as(0x15d)]?as(0x11f)+escHtml(configLocal['ticketLogoUrl'])+'\x22\x20style=\x22max-width:60mm;max-height:18mm;object-fit:contain\x22></div>':'',f=[configLocal[as(0x147)]?as(0x124)+escHtml(configLocal[as(0x147)])+as(0x1d6):'',configLocal[as(0x16a)]?as(0x177)+escHtml(configLocal[as(0x16a)])+as(0x1d6):'',configLocal[as(0x1df)]?as(0x177)+escHtml(configLocal[as(0x1df)])+'</div>':'',configLocal[as(0x1b1)]?'<div\x20style=\x22text-align:center;font-size:8px;color:#444\x22>'+escHtml(configLocal['cif'])+as(0x1d6):''][as(0x1db)](''),g=(c['lineas']||[])[as(0x135)](j=>as(0xcd)+Number(j['qty']||0x0)+'\x20x\x20'+escHtml(j['nombre']||'Articulo')+'</span>\x0a\x20\x20\x20\x20\x20\x20<span>'+fmtEu(Number(j[as(0x200)]||0x0)*Number(j[as(0x1c0)]||0x0))+as(0x1f2)+(j['nota']?'<div\x20style=\x22font-size:8px;color:#666;margin-top:-1px;margin-bottom:3px\x22>'+escHtml(j[as(0x162)])+as(0x1d6):'')+as(0x1ac))[as(0x1db)](''),h=new Date(c['ts']||Date['now']())[as(0xe4)]('es-ES',{'dateStyle':'short','timeStyle':as(0x13e)}),i=configLocal[as(0xef)]?'<div\x20style=\x22text-align:center;font-size:7px;color:#777;margin-top:8px;border-top:1px\x20dashed\x20#999;padding-top:4px\x22>'+escHtml(configLocal[as(0xef)])+as(0x1d6):'';return'<!DOCTYPE\x20html><html><head><meta\x20charset=\x22UTF-8\x22>\x0a<style>\x0a*{box-sizing:border-box;margin:0;padding:0}\x0a@page{size:'+d+'\x20auto;margin:3mm}\x0abody{font-family:\x27Courier\x20New\x27,monospace;font-size:9px;width:'+d+as(0x199)+d+';color:#111}\x0a.bar{display:flex;gap:6px;margin-bottom:10px;justify-content:center;flex-wrap:wrap}\x0a.bar\x20button{border:1px\x20solid\x20#aaa;background:#f5f5f5;color:#111;border-radius:999px;padding:5px\x2014px;font:inherit;cursor:pointer;font-size:10px}\x0a.rule{border:none;border-top:1px\x20dashed\x20#666;margin:5px\x200}\x0a.total{display:flex;justify-content:space-between;font-weight:bold;font-size:10px;margin-top:6px;padding-top:4px;border-top:1px\x20solid\x20#333}\x0a@media\x20print{.bar{display:none}}\x0a</style></head><body>\x0a<div\x20class=\x22bar\x22>\x0a\x20\x20<button\x20onclick=\x22window.print()\x22>Imprimir\x20/\x20PDF</button>\x0a\x20\x20<button\x20id=\x22btn-servicio\x22>Enviar\x20a\x20impresora</button>\x0a\x20\x20<button\x20onclick=\x22window.close()\x22>Cerrar</button>\x0a</div>\x0a'+e+'\x0a'+f+'\x0a<div\x20style=\x22text-align:center;font-size:8px;margin-top:5px\x22>Mesa\x20'+escHtml(c[as(0xbe)]||'-')+as(0x206)+h+(c[as(0x1fe)]?'\x20·\x20'+escHtml(c[as(0x1fe)]):'')+'</div>\x0a<div\x20style=\x22text-align:center;font-size:7px;color:#666;margin-top:3px\x22>Reimpresion\x20desde\x20gerencia</div>\x0a<hr\x20class=\x22rule\x22>\x0a'+(g||as(0xa7))+as(0x12e)+fmtEu(c[as(0x97)]||0x0)+as(0x1a1)+i+'\x0a<script>\x0adocument.getElementById(\x27btn-servicio\x27)?.addEventListener(\x27click\x27,\x20()\x20=>\x20{\x0a\x20\x20window.__sendToService?.();\x0a});\x0a</script>\x0a</body></html>';}window['reimprimirTicketHistorial']=async c=>{const at=D,d=historialVentasCache['find'](g=>g['id']===c);if(!d){toast(at(0xe7));return;}const e=buildTicketHtml(d),f=window['open']('',at(0x201));if(!f){toast(at(0xce));return;}f['document'][at(0x98)](),f[at(0x10b)]['write'](e),f[at(0x10b)][at(0x1f8)](),f['__sendToService']=async()=>{const au=at,g=String(configLocal[au(0x17c)]||PRINT_SERVICE_ID)[au(0xd7)]()||PRINT_SERVICE_ID,h={'kind':au(0x12b),'status':'pending','createdAt':Date[au(0x134)](),'serviceId':g,'requestedBy':'gerencia-reprint','mesaId':d[au(0xbe)]||'','mesaNombre':d[au(0xbe)]||'','local':{'nombre':configLocal[au(0x147)]||'','direccion':configLocal[au(0x16a)]||'','telefono':configLocal[au(0x1df)]||'','cif':configLocal[au(0x1b1)]||'','footer':configLocal['footer']||'','logoUrl':configLocal['ticketLogoUrl']||'','ticketShowNotes':configLocal[au(0x1aa)]!==![]},'format':{'paper':configLocal['ticketPaper']||au(0x159),'fontSize':Number(configLocal['ticketFontSize']||0x9),'uppercase':configLocal[au(0x1a5)]===!![],'headerOffset':Number(configLocal[au(0xee)]||0x0)},'total':Math[au(0x194)](Number(d[au(0x97)]||0x0)*0x64)/0x64,'lines':(d[au(0x156)]||[])[au(0x135)](i=>({'nombre':i['nombre']||'','qty':Number(i['qty']||0x0),'precio':Math['round'](Number(i[au(0x200)]||0x0)*0x64)/0x64,'nota':configLocal[au(0x1aa)]===![]?'':String(i[au(0x162)]||'')})),'cobro':null,'verifactu':null};try{await push(ref(db,au(0x171)),h);const i=f[au(0x10b)][au(0xd1)](au(0xf4));i&&(i[au(0x16c)]='Enviado',i[au(0x1ab)]=!![]);}catch(j){alert(au(0x196)+j['message']);}};},window[D(0x1b4)]=async()=>{const av=D,c=document[av(0xd1)](av(0x160))?.[av(0xe9)][av(0xd7)]()||av(0x1f5);await set(ref(db,av(0x132)),{'abierto':!![],'inicio':Date[av(0x134)](),'nombre':c}),toast(av(0x12d)+c);},window[D(0x1eb)]=async()=>{const aw=D,c=await get(ref(db,'config/turno')),d=c[aw(0x1af)]();if(!d?.['abierto']){toast(aw(0x112));return;}const e=await get(ref(db,aw(0x18f))),f=Object[aw(0xb4)](e[aw(0x1af)]()||{})[aw(0x138)](i=>!String(i)[aw(0x14d)]('_'));if(f[aw(0x18d)]){const i=await confirmDialog({'title':aw(0xb1),'body':aw(0xf6)+f[aw(0x18d)]+'\x20'+(f[aw(0x18d)]===0x1?aw(0x13f):aw(0x1a4))+'.\x20Si\x20continúas,\x20se\x20generará\x20el\x20ticket\x20pendiente\x20de\x20cada\x20mesa,\x20se\x20guardará\x20en\x20ventas\x20y\x20después\x20se\x20limpiarán\x20todas\x20las\x20mesas.','confirmLabel':'Cerrar\x20turno\x20y\x20limpiar','cancelLabel':aw(0x93),'danger':!![]});if(!i)return;const j=await cerrarMesasAbiertasParaTurno();if(j[aw(0x208)])toast(aw(0xc1)+j['mesasCerradas']+aw(0x1c2));}const g=(await cargarHistorialVentas(!![]))[aw(0x138)](k=>k['ts']>=Number(d['inicio']||0x0)),h=resumirTickets(g);await push(ref(db,aw(0x1e3)),{'nombre':d[aw(0x147)],'inicio':d[aw(0xc6)],'fin':Date[aw(0x134)](),'mesas':h['tickets'],'total':Math[aw(0x194)](h[aw(0x97)]*0x64)/0x64,'lineas_count':h['lineas'],'ticket_medio':Math[aw(0x194)](h[aw(0x1d8)]*0x64)/0x64}),await set(ref(db,'config/turno'),{...d,'abierto':![],'ultimoCierre':Date['now']()}),toast('Turno\x20cerrado:\x20'+h['tickets']+aw(0x180)+fmtEu(h['total']));};async function renderResumenTurnoActual(c=turnoActualCache){const ax=D,d=document[ax(0xd1)]('turno-resumen-actual'),e=document[ax(0xd1)](ax(0x1fa)),f=document[ax(0xd1)](ax(0xeb)),g=document[ax(0xd1)](ax(0x167)),h=document['getElementById']('btn-cerrar-turno'),i=document[ax(0xd1)](ax(0x153));if(!d||!e)return;if(!c?.[ax(0xc5)]){e[ax(0x16c)]=ax(0x18c),e['style'][ax(0xcf)]='var(--muted)';if(f)f[ax(0x16c)]='Sin\x20turno\x20activo';if(g)g[ax(0x1ab)]=![];if(h)h[ax(0x1ab)]=!![];if(i)i['textContent']='Sin\x20turno\x20activo';d[ax(0x9b)]=ax(0x91);return;}const j=(await cargarHistorialVentas(!![]))[ax(0x138)](n=>n['ts']>=Number(c[ax(0xc6)]||0x0)),k=resumirTickets(j),l=new Date(c[ax(0xc6)]),m=l['toLocaleDateString']('es-ES')+ax(0x130)+l[ax(0x145)](ax(0xfe),{'hour':'2-digit','minute':ax(0xd3)});e[ax(0x16c)]='\x22'+(c[ax(0x147)]||ax(0x1f5))+ax(0x15c)+l[ax(0x145)](ax(0xfe),{'hour':'2-digit','minute':ax(0xd3)}),e['style']['color']=ax(0x1bb);if(f)f[ax(0x16c)]=(c['nombre']||ax(0x1f5))+ax(0x1c7);if(g)g[ax(0x1ab)]=!![];if(h)h[ax(0x1ab)]=![];i&&(i[ax(0x9b)]=escHtml(c['nombre']||ax(0x1f5))+'\x20activo<br>'+k[ax(0x191)]+'\x20tickets\x20·\x20'+fmtEu(k[ax(0x97)])),d[ax(0x9b)]=ax(0x1d3)+escHtml(c[ax(0x147)]||ax(0x174))+ax(0x121)+m+ax(0x1e2)+k[ax(0x191)]+'</strong><span>Tickets</span></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22turno-stat\x22><strong>'+k[ax(0x156)]+ax(0x1bd)+fmtEu(k[ax(0x97)])+ax(0xde)+(k[ax(0x191)]?fmtEu(k['media']):'-')+ax(0x13d);}function renderHistorialTurnos(c){const ay=D,d=document[ay(0xd1)](ay(0x1d0));if(!d)return;const e=Object[ay(0x176)](c||{})[ay(0x135)](([f,g])=>({'id':f,...g}))[ay(0x138)](f=>f['inicio']&&f[ay(0x1e1)])[ay(0x1c1)]((f,g)=>Number(g[ay(0x1e1)]||0x0)-Number(f[ay(0x1e1)]||0x0));if(!e[ay(0x18d)]){d[ay(0x9b)]='<div\x20class=\x22empty\x22>Todavia\x20no\x20hay\x20turnos\x20cerrados.</div>';return;}d[ay(0x9b)]=e[ay(0x135)](f=>{const az=ay,g=new Date(f[az(0xc6)]),h=new Date(f[az(0x1e1)]),i=Math[az(0x106)](0x0,Math[az(0x194)]((Number(f['fin'])-Number(f[az(0xc6)]))/0xea60)),j=Math['floor'](i/0x3c),k=i%0x3c,l=j?j+'h\x20'+String(k)[az(0xf3)](0x2,'0')+'m':k+'m',m=Number(f[az(0x182)]??Number(f[az(0x97)]||0x0)/Math['max'](0x1,Number(f['mesas']||0x0)));return az(0x128)+escHtml(f['nombre']||'Turno')+'</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22turno-meta\x22>'+g[az(0x1b2)](az(0xfe))+az(0x130)+g[az(0x145)](az(0xfe),{'hour':'2-digit','minute':az(0xd3)})+'\x20-\x20'+h[az(0x145)](az(0xfe),{'hour':az(0xd3),'minute':'2-digit'})+az(0x1a3)+fmtEu(f[az(0x97)]||0x0)+az(0x1da)+Number(f['mesas']||0x0)+az(0x1c3)+Number(f[az(0xb5)]||0x0)+az(0x9e)+fmtEu(m)+az(0x14b)+l+az(0x17d);})[ay(0x1db)]('');}function initFiltrosAuditoria(){const aA=D,c=fechaKeyFromDate(new Date()),d=document['getElementById']('filtro-fecha-ini'),e=document[aA(0xd1)]('filtro-fecha-fin'),f=document[aA(0xd1)]('filtro-hora-ini'),g=document['getElementById'](aA(0x169));if(d&&!d[aA(0xe9)])d[aA(0xe9)]=c;if(e&&!e[aA(0xe9)])e['value']=c;if(f&&!f[aA(0xe9)])f['value']=aA(0x1ce);if(g&&!g[aA(0xe9)])g['value']=aA(0x158);}window[D(0x16d)]=()=>{const aB=D,c=fechaKeyFromDate(new Date());document[aB(0xd1)]('filtro-fecha-ini')[aB(0xe9)]=c,document[aB(0xd1)](aB(0xfa))[aB(0xe9)]=c,document[aB(0xd1)](aB(0x1e8))[aB(0xe9)]=aB(0x1ce),document[aB(0xd1)](aB(0x169))[aB(0xe9)]='23:59',document[aB(0xd1)](aB(0x1bc))['value']='',document['getElementById'](aB(0xaa))['value']='',document[aB(0xd1)]('audit-mesa')['value']='',auditPagina=0x1,window[aB(0xf9)]();};function poblarCamarerosAuditoria(c){const aC=D;auditUsuarios=c||{};const d=document['getElementById'](aC(0x1bc));if(!d)return;const e=d['value'],f=Object[aC(0x107)](auditUsuarios)[aC(0x135)](g=>g?.[aC(0x147)]?String(g['nombre']):null)[aC(0x138)](Boolean)[aC(0x1c1)]((g,h)=>g['localeCompare'](h,'es'));d[aC(0x9b)]=aC(0xd4)+f['map'](g=>aC(0x148)+escHtml(g)+'\x22>'+escHtml(g)+aC(0x178))[aC(0x1db)]('');if(e&&f[aC(0x103)](e))d['value']=e;}function desbloquearAuditoriaGerente(){const aD=D;auditUnlocked=!![];const c=document['getElementById'](aD(0x173)),d=document[aD(0xd1)](aD(0xb9));if(c)c[aD(0x185)][aD(0x1b0)]=aD(0xa0);if(d)d[aD(0x185)][aD(0x1b0)]='';initFiltrosAuditoria(),poblarCamarerosAuditoria(auditUsuarios),window[aD(0xc7)]();}async function leerEventosAuditoriaRango(c,d){const aE=D,e=new Date(c+aE(0x141)),f=new Date(d+'T00:00:00');if(isNaN(e[aE(0x184)]())||isNaN(f[aE(0x184)]())||e>f)return[];const g=[],h=new Date(e);let i=0x5f;while(h<=f&&i-->0x0){const j=fechaKeyFromDate(h);try{const k=await get(ref(db,aE(0x168)+j)),l=k[aE(0x1af)]()||{};Object[aE(0x176)](l)[aE(0x1a2)](([m,n])=>{const aF=aE;if(!n||typeof n!==aF(0x161))return;g[aF(0xbb)]({'id':m,'fechaKey':j,...n});});}catch(m){}h[aE(0x11e)](h[aE(0xe8)]()+0x1);}return g;}function renderEventosAuditoria(c){const aG=D,d=document[aG(0xd1)]('audit-lista');if(!d)return;document['getElementById'](aG(0x14c))[aG(0x16c)]=c[aG(0x18d)],document[aG(0xd1)](aG(0xd8))[aG(0x16c)]=c[aG(0x138)](h=>h[aG(0x151)]===aG(0x96))['length'],document[aG(0xd1)]('audit-stat-descuentos')[aG(0x16c)]=c['filter'](h=>h[aG(0x151)]===aG(0x204)||h['accion']===aG(0x1ff)&&Number(h['qtyDespues']||0x0)<Number(h[aG(0x163)]||0x0))[aG(0x18d)];const e=Math[aG(0x106)](0x1,Math['ceil'](c[aG(0x18d)]/AUDIT_PAGE_SIZE));auditPagina=Math['min'](Math['max'](0x1,auditPagina),e),document['getElementById']('audit-stat-paginas')[aG(0x16c)]=e;if(!c['length']){d['innerHTML']=aG(0x1e9),renderPager(0x0,AUDIT_PAGE_SIZE,0x1,aG(0x1d7));return;}const f=(auditPagina-0x1)*AUDIT_PAGE_SIZE,g=c[aG(0x9d)](f,f+AUDIT_PAGE_SIZE);d[aG(0x9b)]=g[aG(0x135)](h=>{const aH=aG,i=AUDIT_LABELS[h['accion']]||{'label':h[aH(0x151)]||'-','color':aH(0x12c),'sensible':![]},j=new Date(Number(h['ts'])||0x0),k=j[aH(0x1b2)](aH(0xfe),{'day':aH(0xd3),'month':aH(0xd3),'year':aH(0xd3)}),l=h['hora']||j[aH(0x145)](aH(0xfe),{'hour':'2-digit','minute':aH(0xd3),'second':aH(0xd3)}),m=escHtml(h[aH(0x19b)]||''),n=h[aH(0x97)]!==undefined&&h[aH(0x97)]!==null&&!isNaN(Number(h[aH(0x97)]))?aH(0x155)+fmtEu(h['total'])+aH(0x1f7):'';return aH(0xbc)+(i[aH(0x113)]?'sensitive':'')+'\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22audit-col\x20mono\x22>'+k+aH(0x10c)+l+aH(0x152)+escHtml(h['camarero']||'-')+aH(0x152)+(h[aH(0xbe)]?aH(0xc3)+escHtml(h[aH(0xbe)]):'-')+aH(0xfd)+i[aH(0xcf)]+aH(0xd2)+escHtml(i[aH(0x179)])+aH(0x1f9)+m+n+'</div>\x0a\x20\x20\x20\x20\x20\x20</article>\x0a\x20\x20\x20\x20';})[aG(0x1db)](''),renderPager(c[aG(0x18d)],AUDIT_PAGE_SIZE,auditPagina,'audit');}window[D(0x1e4)]=c=>{const aI=D,d=Math[aI(0x106)](0x1,Math['ceil'](auditEventos[aI(0x18d)]/AUDIT_PAGE_SIZE));auditPagina=Math['min'](d,Math[aI(0x106)](0x1,auditPagina+c)),renderEventosAuditoria(auditEventos);},window[D(0xf9)]=async()=>{const aJ=D;await window[aJ(0x1c4)](),await window[aJ(0xc7)]();},window[D(0xc7)]=async()=>{const aK=D;if(!auditUnlocked)return;const c=document['getElementById']('filtro-fecha-ini')['value'],d=document['getElementById'](aK(0xfa))[aK(0xe9)],e=document['getElementById'](aK(0x1e8))[aK(0xe9)]||aK(0x1ce),f=document[aK(0xd1)](aK(0x169))[aK(0xe9)]||aK(0x158),g=document[aK(0xd1)](aK(0x1bc))['value']||'',h=document[aK(0xd1)]('audit-accion')['value']||'',i=(document[aK(0xd1)](aK(0x1a9))[aK(0xe9)]||'')[aK(0xd7)]()[aK(0x16b)]();if(!c||!d){toast(aK(0x139));return;}const j=document[aK(0xd1)](aK(0x12f));if(j)j['innerHTML']='<div\x20class=\x22empty\x22>Cargando...</div>';let k=await leerEventosAuditoriaRango(c,d);const l=new Date(c+'T'+e+aK(0x1f6))['getTime'](),m=new Date(d+'T'+f+aK(0x12a))['getTime']();k=k[aK(0x138)](n=>{const aL=aK,o=Number(n['ts']||0x0);if(!o||o<l||o>m)return![];if(g&&String(n[aL(0x1fe)]||'')!==g)return![];if(h&&String(n[aL(0x151)]||'')!==h)return![];if(i&&!String(n['mesa']||'')['toLowerCase']()[aL(0x103)](i))return![];return!![];})[aK(0x1c1)]((n,o)=>Number(o['ts']||0x0)-Number(n['ts']||0x0)),auditEventos=k,auditPagina=0x1,renderEventosAuditoria(k);if(window[aK(0x1a6)]<=0x2f8){const n={'turno':![],'audit-filter':![],...leerEstadoCompactoGerente(),'audit-filter':![]};guardarEstadoCompactoGerente(n),aplicarCompactState('audit-filter',![]);}},window[D(0x116)]=()=>{const aM=D;if(!auditEventos[aM(0x18d)]){toast(aM(0x157));return;}let c=aM(0x1cb);auditEventos[aM(0x1a2)](i=>{const aN=aM,j=new Date(Number(i['ts'])||0x0),k=j['toLocaleDateString']('es-ES'),l=i[aN(0x20a)]||j['toLocaleTimeString'](aN(0xfe),{'hour':aN(0xd3),'minute':aN(0xd3),'second':'2-digit'}),m=AUDIT_LABELS[i[aN(0x151)]]?.[aN(0x179)]||i[aN(0x151)]||'';c+=escCsv(k)+','+escCsv(l)+','+escCsv(i['camarero']||'')+','+escCsv(i['mesa']||'')+','+escCsv(m)+','+escCsv(i['detalle']||'')+','+escCsv(i[aN(0x97)]??'')+'\x0a';});const d=new Blob(['\ufeff'+c],{'type':aM(0x1c5)}),e=URL[aM(0x105)](d),f=document[aM(0x100)]('a'),g=document[aM(0xd1)]('filtro-fecha-ini')['value'],h=document[aM(0xd1)](aM(0xfa))[aM(0xe9)];f[aM(0x1d2)]=e,f[aM(0x1bf)]=aM(0x1cd)+g+'_'+h+aM(0x198),document[aM(0x1d1)][aM(0xa3)](f),f['click'](),document[aM(0x1d1)][aM(0x127)](f),URL[aM(0xb2)](e);},window[D(0xea)]=async()=>{const aO=D,c=document['getElementById']('pwd-input')[aO(0xe9)],d=await get(ref(db,GERENTE_PWD_PATH)),e=d['val']()||GERENTE_PWD_DEFAULT;c===e?(document['getElementById']('login-error')[aO(0x185)][aO(0x1b0)]=aO(0xa0),document[aO(0xd1)](aO(0xec))['style']['display']=aO(0xa0),document[aO(0xd1)](aO(0xbf))['style'][aO(0x1b0)]=aO(0x136),await init()):document[aO(0xd1)](aO(0x188))['style']['display']=aO(0x136);},document['getElementById']('pwd-input')?.[D(0x1d5)](D(0x1cc),c=>{const aP=D;if(c[aP(0xca)]===aP(0x183))window[aP(0xea)]();});async function init(){const aQ=D;await prepararFiltrosVentasIniciales(),initGerenteSections(),initGerenteCompactBlocks(),onValue(ref(db,aQ(0x10e)),c=>{configLocal=c['val']()||{};}),onValue(ref(db,'config/usuarios'),c=>{poblarCamarerosAuditoria(c['val']()||{});}),onValue(ref(db,aQ(0x132)),c=>{turnoActualCache=c['val']()||{},renderResumenTurnoActual(turnoActualCache);}),onValue(ref(db,aQ(0x1e3)),c=>{renderHistorialTurnos(c['val']()||{});}),desbloquearAuditoriaGerente(),poblarCamarerosAuditoria(auditUsuarios),await window['aplicarFiltrosComunesGerente']();}window['cierreCajaRapido']=async()=>{const aR=D,c=document[aR(0xd1)](aR(0x13b)),d=c?c[aR(0xe9)]:'';let f,g;if(d){const t=new Date(d+'T05:00:00'),u=new Date(t[aR(0x184)]()+0x18*0x3c*0x3c*0x3e8);f=t['getTime'](),g=u[aR(0x184)]();}else{const v=new Date(),w=new Date(v);v[aR(0x104)]()<0x5&&w[aR(0x11e)](v[aR(0xe8)]()-0x1),w[aR(0x9a)](0x5,0x0,0x0,0x0),f=w[aR(0x184)](),g=v[aR(0x184)]();}toast(aR(0x11d));const h=(await cargarHistorialVentas(!![]))[aR(0x138)](x=>x['ts']>=f&&x['ts']<=g);if(h[aR(0x18d)]===0x0){toast(d?aR(0x1c9):aR(0x19d));return;}const i=h['length'],j=h[aR(0x1f3)]((x,y)=>x+Number(y[aR(0x97)]||0x0),0x0),k=h[aR(0x138)](x=>(x[aR(0x13c)]||'')[aR(0x16b)]()==='efectivo'||x[aR(0xf7)]&&!x[aR(0x13c)])[aR(0x1f3)]((x,y)=>x+Number(y[aR(0x97)]||0x0),0x0),l=h[aR(0x138)](x=>(x[aR(0x13c)]||'')['toLowerCase']()==='tarjeta')['reduce']((x,y)=>x+Number(y[aR(0x97)]||0x0),0x0),m=i?j/ i:0x0,n={};h[aR(0x1a2)](x=>{const aS=aR;(x[aS(0x156)]||[])[aS(0x1a2)](y=>{const aT=aS,z=y[aT(0x147)]||aT(0x1a8),A=Number(y['qty']||0x0),B=Number(y[aT(0x200)]||0x0);!n[z]&&(n[z]={'nombre':z,'qty':0x0,'total':0x0}),n[z][aT(0x1c0)]+=A,n[z][aT(0x97)]+=A*B;});});const o=Object[aR(0x107)](n)['sort']((x,y)=>y['qty']-x[aR(0x1c0)]),p={'startTs':f,'endTs':g,'ticketsCount':i,'total':j,'efectivo':k,'tarjeta':l,'ticketMedio':m,'articulos':o},q=configLocal||{},r=String(q[aR(0x17c)]||PRINT_SERVICE_ID)[aR(0xd7)]()||PRINT_SERVICE_ID,s={'kind':aR(0x12b),'status':aR(0x1b8),'createdAt':Date[aR(0x134)](),'serviceId':r,'requestedBy':'gerencia-cierre','mesaId':aR(0x1b5),'mesaNombre':aR(0x137),'local':{'nombre':q[aR(0x147)]||'','direccion':q[aR(0x16a)]||'','telefono':q[aR(0x1df)]||'','cif':q[aR(0x1b1)]||'','footer':'Fin\x20de\x20Cierre\x20de\x20Caja','logoUrl':q[aR(0x15d)]||'','ticketShowNotes':![],'headerNameFontSize':Number(q[aR(0x131)]||0xc),'headerSubFontSize':Number(q[aR(0x1f4)]||0x8)},'format':{'paper':q[aR(0xbd)]||aR(0x159),'fontSize':Number(q[aR(0x1e0)]||0x9),'uppercase':q[aR(0x1a5)]===!![],'headerOffset':Number(q[aR(0xee)]||0x0)},'total':Math['round'](j*0x64)/0x64,'lines':[{'nombre':'Tickets\x20Cobrados','qty':i,'precio':0x0},{'nombre':aR(0x1a0),'qty':0x1,'precio':Math[aR(0x194)](k*0x64)/0x64},{'nombre':aR(0x165),'qty':0x1,'precio':Math['round'](l*0x64)/0x64},{'nombre':'---\x20DESGLOSE\x20ARTÍCULOS\x20---','qty':0x1,'precio':0x0},...o['map'](x=>({'nombre':x['nombre'],'qty':x[aR(0x1c0)],'precio':Math[aR(0x194)](x['total']/x[aR(0x1c0)]*0x64)/0x64}))],'cobro':null};try{await push(ref(db,aR(0x171)),s),toast('✓\x20Cierre\x20enviado\x20a\x20la\x20impresora');}catch(x){alert(aR(0x196)+x[aR(0xf2)]);}};function buildCierreCajaHtml(c){const aU=D,d=configLocal||{},e=d[aU(0xbd)]||'80mm',f=d['ticketLogoUrl']?'<div\x20style=\x22text-align:center;margin-bottom:4px\x22><img\x20src=\x22'+escHtml(d[aU(0x15d)])+aU(0x19e):'',g=[d[aU(0x147)]?aU(0x124)+escHtml(d[aU(0x147)])+'</div>':'',d['direccion']?aU(0x177)+escHtml(d['direccion'])+aU(0x1d6):'',d[aU(0x1df)]?aU(0x177)+escHtml(d[aU(0x1df)])+aU(0x1d6):'',d[aU(0x1b1)]?aU(0x177)+escHtml(d[aU(0x1b1)])+aU(0x1d6):''][aU(0x1db)](''),h=new Date()[aU(0xe4)]('es-ES'),i=new Date(c[aU(0xa6)])[aU(0xe4)](aU(0xfe)),j=new Date(c[aU(0xc4)])[aU(0xe4)](aU(0xfe)),k=c[aU(0x172)][aU(0x135)](l=>aU(0xcd)+l[aU(0x1c0)]+aU(0x1de)+escHtml(l['nombre'])+aU(0x92)+fmtEu(l[aU(0x97)])+'</span>\x0a\x20\x20\x20\x20</div>\x0a\x20\x20')[aU(0x1db)]('');return'<!DOCTYPE\x20html><html><head><meta\x20charset=\x22UTF-8\x22>\x0a<style>\x0a*{box-sizing:border-box;margin:0;padding:0}\x0a@page{size:'+e+'\x20auto;margin:3mm}\x0abody{font-family:\x27Courier\x20New\x27,monospace;font-size:9px;width:'+e+';max-width:'+e+aU(0xe0)+f+'\x0a'+g+aU(0x108)+i+'</div>\x0a\x20\x20<div><strong>Hasta:</strong>\x20'+j+'</div>\x0a\x20\x20<div><strong>Impreso:</strong>\x20'+h+aU(0xa5)+c[aU(0x1be)]+'</span>\x0a</div>\x0a<div\x20style=\x22display:flex;justify-content:space-between;margin:3px\x200\x22>\x0a\x20\x20<span>Ventas\x20en\x20Efectivo:</span>\x0a\x20\x20<span>'+fmtEu(c[aU(0x10d)])+aU(0x192)+fmtEu(c[aU(0x15f)])+aU(0x10a)+fmtEu(c['ticketMedio'])+aU(0x149)+fmtEu(c[aU(0x97)])+'</span>\x0a</div>\x0a<hr\x20class=\x22rule\x22>\x0a<div\x20style=\x22font-size:9px;font-weight:bold;margin-top:8px;margin-bottom:4px\x22>ARTÍCULOS\x20VENDIDOS:</div>\x0a'+(k||aU(0x202))+aU(0x1ec);}
+const _dominiosPermitidos = [
+  'microcorpset.github.io',
+  'localhost',
+  '127.0.0.1'
+];
+
+if (!_dominiosPermitidos.some(d => location.hostname === d || location.hostname.endsWith('.' + d))) {
+  document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:monospace;color:#888">Acceso no autorizado</div>';
+  throw new Error('Dominio no autorizado');
+}
+
+import { authReady, db } from './firebase.js';
+import {
+  ref, set, push, onValue, get, remove, query, limitToLast, orderByChild, startAt
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+await authReady;
+
+const GERENTE_PWD_DEFAULT = 'gerente1234';
+const GERENTE_PWD_PATH = 'config/gerente/password';
+const PRINT_SERVICE_ID = 'local-print-service-1';
+const GERENTE_COMPACT_KEY = 'gerente_compact_state_v1';
+
+const SALES_PAGE_SIZE = 25;
+const AUDIT_PAGE_SIZE = 40;
+
+let configLocal = {};
+let historialVentasCache = [];
+let historialVentasCargado = false;
+let ventasFiltradas = [];
+let ventasTabActiva = 'tickets';
+let ventasPagina = 1;
+
+let turnoActualCache = {};
+let auditUsuarios = {};
+let unsubscribeTurnSales = null;
+let auditEventos = [];
+let auditPagina = 1;
+let auditUnlocked = true;
+const GERENTE_SECTION_KEY = 'gerente_section_state_v1';
+
+function confirmDialog({ title, body, confirmLabel = 'Aceptar', cancelLabel = 'Cancelar', danger = false }) {
+  return new Promise(resolve => {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:450;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(4,10,18,.62);backdrop-filter:blur(5px)';
+    const card = document.createElement('div');
+    card.style.cssText = 'width:min(520px,100%);background:var(--panel,#111823);border:1px solid var(--border,#233042);border-radius:22px;box-shadow:0 20px 60px rgba(0,0,0,.35);padding:18px;display:flex;flex-direction:column;gap:14px';
+    card.innerHTML = `
+      <div style="font-family:var(--mono);font-size:18px;color:var(--text)">${escHtml(title)}</div>
+      <div style="font-size:14px;line-height:1.5;color:var(--muted)">${body}</div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap">
+        <button type="button" data-act="cancel" class="small">${cancelLabel}</button>
+        <button type="button" data-act="ok" class="small ${danger ? 'danger' : 'success'}">${confirmLabel}</button>
+      </div>`;
+    overlay.appendChild(card);
+    const close = result => {
+      overlay.remove();
+      resolve(result);
+    };
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) close(false);
+    });
+    card.querySelector('[data-act="cancel"]').onclick = () => close(false);
+    card.querySelector('[data-act="ok"]').onclick = () => close(true);
+    document.body.appendChild(overlay);
+  });
+}
+
+const AUDIT_LABELS = {
+  articulo_agregado: { label: 'Articulo añadido', color: 'var(--info)', sensible: false },
+  articulo_eliminado: { label: 'Articulo eliminado', color: 'var(--danger)', sensible: true },
+  cantidad_editada: { label: 'Cantidad editada', color: '#ffbf66', sensible: true },
+  descuento_aplicado: { label: 'Descuento aplicado', color: '#ffbf66', sensible: true },
+  ticket_impreso: { label: 'Ticket impreso', color: 'var(--info)', sensible: false },
+  ticket_cobrado: { label: 'Mesa cobrada', color: 'var(--success)', sensible: false },
+  factura_emitida: { label: 'Factura emitida', color: 'var(--success)', sensible: false },
+  mesa_cerrada: { label: 'Mesa cerrada', color: 'var(--muted)', sensible: false },
+  mesa_transferida: { label: 'Mesa transferida', color: 'var(--muted)', sensible: false }
+};
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+function leerEstadoSeccionesGerente() {
+  try {
+    return JSON.parse(localStorage.getItem(GERENTE_SECTION_KEY) || '{}');
+  } catch (_) {
+    return {};
+  }
+}
+
+function guardarEstadoSeccionesGerente(state) {
+  localStorage.setItem(GERENTE_SECTION_KEY, JSON.stringify(state));
+}
+
+function aplicarEstadoSeccionGerente(section, expanded) {
+  const card = document.getElementById(`card-${section}`);
+  if (!card) return;
+  card.classList.toggle('collapsed', !expanded);
+  const btn = card.querySelector('.card-toggle');
+  if (btn) btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+}
+
+window.toggleGerenteSection = section => {
+  const state = leerEstadoSeccionesGerente();
+  const card = document.getElementById(`card-${section}`);
+  const expanded = card ? card.classList.contains('collapsed') : false;
+  state[section] = expanded;
+  guardarEstadoSeccionesGerente(state);
+  aplicarEstadoSeccionGerente(section, expanded);
+};
+
+function initGerenteSections() {
+  const defaults = {
+    ventas: true,
+    auditoria: false,
+    turnos: true,
+    notas: false
+  };
+  const state = { ...defaults, ...leerEstadoSeccionesGerente() };
+  Object.entries(state).forEach(([section, expanded]) => aplicarEstadoSeccionGerente(section, !!expanded));
+}
+
+function leerEstadoCompactoGerente() {
+  try {
+    return JSON.parse(localStorage.getItem(GERENTE_COMPACT_KEY) || '{}');
+  } catch (_) {
+    return {};
+  }
+}
+
+function guardarEstadoCompactoGerente(state) {
+  localStorage.setItem(GERENTE_COMPACT_KEY, JSON.stringify(state));
+}
+
+function aplicarCompactState(target, expanded) {
+  if (target === 'turno') {
+    const card = document.querySelector('.turno-quick-card');
+    if (!card) return;
+    card.classList.toggle('compact-mobile-card', true);
+    card.classList.toggle('collapsed-mobile', !expanded);
+    const btn = card.querySelector('.compact-mobile-toggle');
+    if (btn) btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    return;
+  }
+  if (target === 'audit-filter') {
+    const wrap = document.querySelector('.audit-filtros-wrap');
+    if (!wrap) return;
+    wrap.classList.toggle('compact-mobile-card', true);
+    wrap.classList.toggle('collapsed-mobile', !expanded);
+    const btn = wrap.querySelector('.compact-mobile-toggle');
+    if (btn) btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+  }
+}
+
+window.toggleCompactGerente = target => {
+  const state = { turno: false, 'audit-filter': false, ...leerEstadoCompactoGerente() };
+  const expanded = !(state[target] ?? false);
+  state.turno = false;
+  state['audit-filter'] = false;
+  state[target] = expanded;
+  guardarEstadoCompactoGerente(state);
+  aplicarCompactState('turno', !!state.turno);
+  aplicarCompactState('audit-filter', !!state['audit-filter']);
+};
+
+function initGerenteCompactBlocks() {
+  const defaults = {
+    turno: false,
+    'audit-filter': false
+  };
+  const state = { ...defaults, ...leerEstadoCompactoGerente() };
+  aplicarCompactState('turno', !!state.turno);
+  aplicarCompactState('audit-filter', !!state['audit-filter']);
+}
+
+function fmtEu(n) {
+  return `${Number(n || 0).toFixed(2).replace('.', ',')} €`;
+}
+
+function escHtml(v) {
+  return String(v ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function escCsv(v) {
+  return `"${String(v ?? '').replace(/"/g, '""')}"`;
+}
+
+function fechaKeyLocal(ts) {
+  const d = new Date(ts);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function fechaLabelDesdeKey(key) {
+  const [y, m, d] = String(key).split('-').map(Number);
+  return new Date(y, (m || 1) - 1, d || 1).toLocaleDateString('es-ES', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+}
+
+function fechaKeyFromDate(d) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+function parseFechaHoraTicket(fecha, hora = '00:00') {
+  if (!fecha) return NaN;
+  const fechaTxt = String(fecha).trim();
+  const horaTxt = String(hora || '00:00').trim().slice(0, 5);
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(fechaTxt)) {
+    return new Date(`${fechaTxt}T${horaTxt}:00`).getTime();
+  }
+
+  const match = fechaTxt.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (!match) return NaN;
+
+  const [, dd, mm, yyyy] = match;
+  return new Date(`${yyyy}-${String(mm).padStart(2, '0')}-${String(dd).padStart(2, '0')}T${horaTxt}:00`).getTime();
+}
+
+function normalizarTicketVenta(id, ticket = {}) {
+  const base = ticket && typeof ticket === 'object' ? ticket : {};
+  const tsNum = Number(base.ts);
+  const ts = Number.isFinite(tsNum) && tsNum > 0 ? tsNum : parseFechaHoraTicket(base.fecha, base.hora);
+  return { id, ...base, ts };
+}
+
+function normalizarHistorialVentasData(data) {
+  return Object.entries(data || {})
+    .map(([id, t]) => normalizarTicketVenta(id, t))
+    .filter(t => Number.isFinite(t.ts))
+    .sort((a, b) => b.ts - a.ts);
+}
+
+function resumirTickets(tickets) {
+  const total = tickets.reduce((s, t) => s + Number(t.total || 0), 0);
+  const lineas = tickets.reduce((s, t) =>
+    s + (t.lineas || []).reduce((acc, l) => acc + Number(l.qty || 0), 0), 0);
+  return {
+    tickets: tickets.length,
+    total,
+    lineas,
+    media: tickets.length ? total / tickets.length : 0
+  };
+}
+
+function agruparVentasPorDia(tickets) {
+  const mapa = {};
+  tickets.forEach(t => {
+    const key = fechaKeyLocal(t.ts);
+    if (!mapa[key]) mapa[key] = { fecha: key, tickets: 0, lineas: 0, total: 0 };
+    mapa[key].tickets += 1;
+    mapa[key].lineas += (t.lineas || []).reduce((acc, l) => acc + Number(l.qty || 0), 0);
+    mapa[key].total += Number(t.total || 0);
+  });
+  return Object.values(mapa).sort((a, b) => b.fecha.localeCompare(a.fecha));
+}
+
+async function cargarHistorialVentas(force = false) {
+  if (!force && historialVentasCargado) return historialVentasCache;
+  const snap = await get(ref(db, 'historial'));
+  historialVentasCache = normalizarHistorialVentasData(snap.val() || {});
+  historialVentasCargado = true;
+  return historialVentasCache;
+}
+
+function resumirMesaParaHistorial(mesaNombre, pedidosMesa = {}) {
+  const todasLineas = Object.values(pedidosMesa || {})
+    .filter(envio => envio && typeof envio === 'object' && !String(envio.envioId || '').startsWith('_'))
+    .flatMap(envio => Object.values(envio.lineas || {}));
+  const agrupado = {};
+  const camareros = new Set();
+
+  todasLineas.forEach(l => {
+    if (!l || l.estado === 'cancelado') return;
+    const qtyCuenta = l.qtyTicket !== undefined && l.qtyTicket !== null
+      ? Number(l.qtyTicket || 0)
+      : (l.estado === 'servido'
+        ? Number(l.qty || 0)
+        : (l.qtyServida !== undefined && l.qtyServida !== null ? Number(l.qtyServida || 0) : Number(l.qty || 0)));
+    if (qtyCuenta <= 0) return;
+    if (l.camarero && l.destino !== 'descuento') camareros.add(l.camarero);
+    const key = `${l.nombre || 'Articulo'}||${Number(l.precio || 0).toFixed(2)}||${l.nota || ''}`;
+    if (!agrupado[key]) {
+      agrupado[key] = {
+        nombre: l.nombre || 'Articulo',
+        precio: Number(l.precio || 0),
+        qty: 0,
+        nota: l.nota || ''
+      };
+    }
+    agrupado[key].qty += qtyCuenta;
+  });
+
+  const lineas = Object.values(agrupado);
+  const total = lineas.reduce((s, l) => s + Number(l.precio || 0) * Number(l.qty || 0), 0);
+  return {
+    mesa: mesaNombre,
+    camarero: [...camareros].join(', '),
+    lineas,
+    total: Math.round(total * 100) / 100
+  };
+}
+
+async function cerrarMesasAbiertasParaTurno() {
+  const [snapMesas, snapPedidos] = await Promise.all([
+    get(ref(db, 'mesas')),
+    get(ref(db, 'pedidos'))
+  ]);
+  const mesas = snapMesas.val() || {};
+  const pedidos = snapPedidos.val() || {};
+  const ahora = new Date();
+  let mesasCerradas = 0;
+
+  for (const [mesaId, pedidosMesa] of Object.entries(pedidos)) {
+    if (!pedidosMesa || typeof pedidosMesa !== 'object') continue;
+    const mesaNombre = mesas[mesaId]?.nombre || mesaId;
+    const resumenMesa = resumirMesaParaHistorial(mesaNombre, pedidosMesa);
+    if (resumenMesa.lineas.length > 0) {
+      await push(ref(db, 'historial'), {
+        mesa: resumenMesa.mesa,
+        camarero: resumenMesa.camarero,
+        ts: ahora.getTime(),
+        fecha: ahora.toLocaleDateString('es-ES'),
+        hora: ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+        total: resumenMesa.total,
+        lineas: resumenMesa.lineas
+      });
+    }
+    await remove(ref(db, `pedidos/${mesaId}`));
+    await set(ref(db, `mesas/${mesaId}/estado`), 'libre');
+    mesasCerradas += 1;
+  }
+
+  historialVentasCargado = false;
+  return { mesasCerradas };
+}
+
+function initFiltrosVentasHoy() {
+  const hoy = new Date();
+  const hoyKey = fechaKeyFromDate(hoy);
+  document.getElementById('filtro-fecha-ini').value = hoyKey;
+  document.getElementById('filtro-fecha-fin').value = hoyKey;
+  document.getElementById('filtro-hora-ini').value = '00:00';
+  document.getElementById('filtro-hora-fin').value = '23:59';
+}
+
+async function prepararFiltrosVentasIniciales() {
+  initFiltrosVentasHoy();
+  const ultimo = (await cargarHistorialVentas())[0];
+  if (!ultimo) return;
+  const d = new Date(ultimo.ts);
+  const key = fechaKeyFromDate(d);
+  document.getElementById('filtro-fecha-ini').value = key;
+  document.getElementById('filtro-fecha-fin').value = key;
+}
+
+function renderMetricasVentas(tickets) {
+  const resumen = resumirTickets(tickets);
+  document.getElementById('stat-mesas').textContent = resumen.tickets;
+  document.getElementById('stat-total').textContent = fmtEu(resumen.total);
+  document.getElementById('stat-media').textContent = resumen.tickets ? fmtEu(resumen.media) : '-';
+  document.getElementById('stat-lineas').textContent = resumen.lineas;
+  const topbar = document.getElementById('topbar-ventas-pill');
+  if (topbar) topbar.textContent = tickets.length ? `${tickets.length} tickets filtrados` : 'Sin ventas filtradas';
+}
+
+function renderPager(totalItems, pageSize, page, prefix, onEmptyHide = true) {
+  const pager = document.getElementById(`${prefix}-pager`);
+  const info = document.getElementById(`${prefix}-pager-info`);
+  const prev = document.getElementById(`${prefix}-prev`);
+  const next = document.getElementById(`${prefix}-next`);
+  if (!pager || !info || !prev || !next) return;
+
+  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+  if (onEmptyHide && totalItems <= pageSize) {
+    pager.style.display = 'none';
+    return;
+  }
+
+  pager.style.display = 'flex';
+  const start = totalItems ? ((page - 1) * pageSize) + 1 : 0;
+  const end = Math.min(totalItems, page * pageSize);
+  info.textContent = totalItems
+    ? `Mostrando ${start}-${end} de ${totalItems}`
+    : 'Sin resultados';
+  prev.disabled = page <= 1;
+  next.disabled = page >= totalPages;
+}
+
+function renderVentasTablaArticulos(tickets) {
+  const host = document.getElementById('ventas-articulos');
+  if (!host) return;
+  if (!tickets.length) {
+    host.innerHTML = '<div class="empty">Sin datos en el periodo seleccionado.</div>';
+    return;
+  }
+
+  const mapa = {};
+  tickets.forEach(t => {
+    (t.lineas || []).forEach(l => {
+      const nombre = String(l.nombre || 'Sin nombre');
+      if (!mapa[nombre]) mapa[nombre] = { nombre, qty: 0, total: 0 };
+      mapa[nombre].qty += Number(l.qty || 0);
+      mapa[nombre].total += Number(l.precio || 0) * Number(l.qty || 0);
+    });
+  });
+
+  const rows = Object.values(mapa).sort((a, b) => b.qty - a.qty);
+  host.innerHTML = `
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Articulo</th><th>Unidades</th><th>Total</th></tr>
+        </thead>
+        <tbody>
+          ${rows.map(r => `
+            <tr>
+              <td>${escHtml(r.nombre)}</td>
+              <td class="num">${r.qty}</td>
+              <td class="num">${fmtEu(r.total)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function renderVentasTablaDias(tickets) {
+  const host = document.getElementById('ventas-dias');
+  if (!host) return;
+  if (!tickets.length) {
+    host.innerHTML = '<div class="empty">Sin datos en el periodo seleccionado.</div>';
+    return;
+  }
+
+  const rows = agruparVentasPorDia(tickets);
+  host.innerHTML = `
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Fecha</th><th>Tickets</th><th>Articulos</th><th>Total</th></tr>
+        </thead>
+        <tbody>
+          ${rows.map(r => `
+            <tr>
+              <td>${fechaLabelDesdeKey(r.fecha)}</td>
+              <td class="num">${r.tickets}</td>
+              <td class="num">${r.lineas}</td>
+              <td class="num">${fmtEu(r.total)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function renderVentasTickets(tickets) {
+  const lista = document.getElementById('ventas-lista');
+  if (!lista) return;
+  if (!tickets.length) {
+    lista.innerHTML = '<div class="empty">Sin ventas en ese periodo.</div>';
+    renderPager(0, SALES_PAGE_SIZE, 1, 'ventas');
+    return;
+  }
+
+  const totalPages = Math.max(1, Math.ceil(tickets.length / SALES_PAGE_SIZE));
+  ventasPagina = Math.min(Math.max(1, ventasPagina), totalPages);
+  const start = (ventasPagina - 1) * SALES_PAGE_SIZE;
+  const pageItems = tickets.slice(start, start + SALES_PAGE_SIZE);
+
+  lista.innerHTML = pageItems.map(t => {
+    const fecha = new Date(t.ts).toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
+    const lineas = (t.lineas || []).map(l => `
+      <div class="ticket-line">
+        <span>${Number(l.qty || 0)} x ${escHtml(l.nombre || 'Articulo')}</span>
+        <span>${fmtEu(Number(l.precio || 0) * Number(l.qty || 0))}</span>
+      </div>
+    `).join('');
+
+    return `
+      <article class="ticket-card">
+        <div class="ticket-head">
+          <div>
+            <div class="ticket-title">Mesa ${escHtml(t.mesa || '-')}</div>
+            <div class="ticket-meta">${fecha}${t.camarero ? ` · ${escHtml(t.camarero)}` : ''}</div>
+          </div>
+          <div class="ticket-total">${fmtEu(t.total || 0)}</div>
+        </div>
+        <div class="ticket-body">
+          <div class="ticket-lines">${lineas || '<div class="ticket-line"><span>Sin lineas guardadas</span><span>-</span></div>'}</div>
+          <div class="ticket-actions">
+            <button class="small" onclick="reimprimirTicketHistorial('${t.id}')">Reimprimir ticket</button>
+          </div>
+        </div>
+      </article>
+    `;
+  }).join('');
+
+  renderPager(tickets.length, SALES_PAGE_SIZE, ventasPagina, 'ventas');
+}
+
+function renderVentasSegunTab() {
+  renderMetricasVentas(ventasFiltradas);
+  renderVentasTickets(ventasFiltradas);
+  renderVentasTablaArticulos(ventasFiltradas);
+  renderVentasTablaDias(ventasFiltradas);
+}
+
+window.mostrarTabVentasGerente = (tab, btn) => {
+  ventasTabActiva = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn?.classList.add('active');
+
+  document.getElementById('ventas-por-ticket').style.display = tab === 'tickets' ? '' : 'none';
+  document.getElementById('ventas-por-articulo').style.display = tab === 'articulos' ? '' : 'none';
+  document.getElementById('ventas-por-dia').style.display = tab === 'dias' ? '' : 'none';
+};
+
+window.cambiarPaginaVentas = delta => {
+  const totalPages = Math.max(1, Math.ceil(ventasFiltradas.length / SALES_PAGE_SIZE));
+  ventasPagina = Math.min(totalPages, Math.max(1, ventasPagina + delta));
+  renderVentasTickets(ventasFiltradas);
+};
+
+window.aplicarFiltrosGerente = async () => {
+  try {
+    const fechaIni = document.getElementById('filtro-fecha-ini').value;
+    const fechaFin = document.getElementById('filtro-fecha-fin').value;
+    const horaIni = document.getElementById('filtro-hora-ini').value || '00:00';
+    const horaFin = document.getElementById('filtro-hora-fin').value || '23:59';
+
+    if (!fechaIni || !fechaFin) {
+      toast('Selecciona las fechas');
+      return;
+    }
+
+    const tsIni = new Date(`${fechaIni}T${horaIni}:00`).getTime();
+    const tsFin = new Date(`${fechaFin}T${horaFin}:59`).getTime();
+
+    ventasFiltradas = (await cargarHistorialVentas())
+      .filter(t => t.ts >= tsIni && t.ts <= tsFin)
+      .sort((a, b) => b.ts - a.ts);
+
+    ventasPagina = 1;
+    renderVentasSegunTab();
+  } catch (err) {
+    console.error('Error filtrando ventas', err);
+    ventasFiltradas = [];
+    renderVentasSegunTab();
+    toast('No se pudieron cargar las ventas');
+  }
+};
+
+window.resetFiltrosGerente = () => {
+  initFiltrosVentasHoy();
+  ventasPagina = 1;
+  window.aplicarFiltrosComunesGerente();
+};
+
+window.exportarVentasGerenteCSV = () => {
+  if (!ventasFiltradas.length) {
+    toast('Sin datos para exportar');
+    return;
+  }
+
+  let csv = '';
+  let sufijo = ventasTabActiva;
+
+  if (ventasTabActiva === 'articulos') {
+    const mapa = {};
+    ventasFiltradas.forEach(t => {
+      (t.lineas || []).forEach(l => {
+        const nombre = String(l.nombre || 'Sin nombre');
+        if (!mapa[nombre]) mapa[nombre] = { nombre, qty: 0, total: 0 };
+        mapa[nombre].qty += Number(l.qty || 0);
+        mapa[nombre].total += Number(l.precio || 0) * Number(l.qty || 0);
+      });
+    });
+    csv = 'Articulo,Unidades,Total\n';
+    Object.values(mapa).sort((a, b) => b.qty - a.qty).forEach(r => {
+      csv += `${escCsv(r.nombre)},${escCsv(r.qty)},${escCsv(r.total.toFixed(2))}\n`;
+    });
+  } else if (ventasTabActiva === 'dias') {
+    csv = 'Fecha,Tickets,Articulos,Total\n';
+    agruparVentasPorDia(ventasFiltradas).forEach(d => {
+      csv += `${escCsv(fechaLabelDesdeKey(d.fecha))},${escCsv(d.tickets)},${escCsv(d.lineas)},${escCsv(d.total.toFixed(2))}\n`;
+    });
+  } else {
+    sufijo = 'tickets';
+    csv = 'Fecha,Hora,Mesa,Camarero,Total,Articulo,Cantidad,Precio unitario\n';
+    ventasFiltradas.forEach(t => {
+      const fecha = new Date(t.ts).toLocaleDateString('es-ES');
+      const hora = new Date(t.ts).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+      (t.lineas || []).forEach(l => {
+        csv += `${escCsv(fecha)},${escCsv(hora)},${escCsv(t.mesa || '')},${escCsv(t.camarero || '')},${escCsv(Number(t.total || 0).toFixed(2))},${escCsv(l.nombre || '')},${escCsv(l.qty || 0)},${escCsv(Number(l.precio || 0).toFixed(2))}\n`;
+      });
+    });
+  }
+
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const fechaIni = document.getElementById('filtro-fecha-ini').value;
+  const fechaFin = document.getElementById('filtro-fecha-fin').value;
+  a.href = url;
+  a.download = `ventas_gerencia_${sufijo}_${fechaIni}_${fechaFin}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
+function buildTicketHtml(ticket) {
+  const paper = configLocal.ticketPaper || '80mm';
+  const logoHtml = configLocal.ticketLogoUrl
+    ? `<div style="text-align:center;margin-bottom:4px"><img src="${escHtml(configLocal.ticketLogoUrl)}" style="max-width:60mm;max-height:18mm;object-fit:contain"></div>`
+    : '';
+  const localLines = [
+    configLocal.nombre ? `<div style="text-align:center;font-weight:bold;font-size:11px">${escHtml(configLocal.nombre)}</div>` : '',
+    configLocal.direccion ? `<div style="text-align:center;font-size:8px;color:#444">${escHtml(configLocal.direccion)}</div>` : '',
+    configLocal.telefono ? `<div style="text-align:center;font-size:8px;color:#444">${escHtml(configLocal.telefono)}</div>` : '',
+    configLocal.cif ? `<div style="text-align:center;font-size:8px;color:#444">${escHtml(configLocal.cif)}</div>` : ''
+  ].join('');
+
+  const lineasHtml = (ticket.lineas || []).map(l => `
+    <div style="display:flex;justify-content:space-between;gap:10px;margin:3px 0">
+      <span>${Number(l.qty || 0)} x ${escHtml(l.nombre || 'Articulo')}</span>
+      <span>${fmtEu(Number(l.precio || 0) * Number(l.qty || 0))}</span>
+    </div>
+    ${l.nota ? `<div style="font-size:8px;color:#666;margin-top:-1px;margin-bottom:3px">${escHtml(l.nota)}</div>` : ''}
+  `).join('');
+
+  const fecha = new Date(ticket.ts || Date.now()).toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
+  const footerHtml = configLocal.footer
+    ? `<div style="text-align:center;font-size:7px;color:#777;margin-top:8px;border-top:1px dashed #999;padding-top:4px">${escHtml(configLocal.footer)}</div>`
+    : '';
+
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+@page{size:${paper} auto;margin:3mm}
+body{font-family:'Courier New',monospace;font-size:9px;width:${paper};max-width:${paper};color:#111}
+.bar{display:flex;gap:6px;margin-bottom:10px;justify-content:center;flex-wrap:wrap}
+.bar button{border:1px solid #aaa;background:#f5f5f5;color:#111;border-radius:999px;padding:5px 14px;font:inherit;cursor:pointer;font-size:10px}
+.rule{border:none;border-top:1px dashed #666;margin:5px 0}
+.total{display:flex;justify-content:space-between;font-weight:bold;font-size:10px;margin-top:6px;padding-top:4px;border-top:1px solid #333}
+@media print{.bar{display:none}}
+</style></head><body>
+<div class="bar">
+  <button onclick="window.print()">Imprimir / PDF</button>
+  <button id="btn-servicio">Enviar a impresora</button>
+  <button onclick="window.close()">Cerrar</button>
+</div>
+${logoHtml}
+${localLines}
+<div style="text-align:center;font-size:8px;margin-top:5px">Mesa ${escHtml(ticket.mesa || '-')}</div>
+<div style="text-align:center;font-size:8px;color:#555">${fecha}${ticket.camarero ? ` · ${escHtml(ticket.camarero)}` : ''}</div>
+<div style="text-align:center;font-size:7px;color:#666;margin-top:3px">Reimpresion desde gerencia</div>
+<hr class="rule">
+${lineasHtml || '<div style="text-align:center;font-size:8px;color:#666">Sin lineas guardadas</div>'}
+<div class="total"><span>Total</span><span>${fmtEu(ticket.total || 0)}</span></div>
+${footerHtml}
+<script>
+document.getElementById('btn-servicio')?.addEventListener('click', () => {
+  window.__sendToService?.();
+});
+<\/script>
+</body></html>`;
+}
+
+window.reimprimirTicketHistorial = async ticketId => {
+  const ticket = historialVentasCache.find(t => t.id === ticketId);
+  if (!ticket) {
+    toast('No se encontro el ticket');
+    return;
+  }
+
+  const html = buildTicketHtml(ticket);
+  const win = window.open('', '_blank');
+  if (!win) {
+    toast('Permite las ventanas emergentes para reimprimir');
+    return;
+  }
+
+  win.document.open();
+  win.document.write(html);
+  win.document.close();
+
+  win.__sendToService = async () => {
+    const serviceId = String(configLocal.ticketPrintServiceId || PRINT_SERVICE_ID).trim() || PRINT_SERVICE_ID;
+    const payload = {
+      kind: 'ticket_final',
+      status: 'pending',
+      createdAt: Date.now(),
+      serviceId,
+      requestedBy: 'gerencia-reprint',
+      mesaId: ticket.mesa || '',
+      mesaNombre: ticket.mesa || '',
+      local: {
+        nombre: configLocal.nombre || '',
+        direccion: configLocal.direccion || '',
+        telefono: configLocal.telefono || '',
+        cif: configLocal.cif || '',
+        footer: configLocal.footer || '',
+        logoUrl: configLocal.ticketLogoUrl || '',
+        ticketShowNotes: configLocal.ticketShowNotes !== false
+      },
+      format: {
+        paper: configLocal.ticketPaper || '80mm',
+        fontSize: Number(configLocal.ticketFontSize || 9),
+        uppercase: configLocal.ticketUppercase === true,
+        headerOffset: Number(configLocal.ticketHeaderOffset || 0)
+      },
+      total: Math.round(Number(ticket.total || 0) * 100) / 100,
+      lines: (ticket.lineas || []).map(l => ({
+        nombre: l.nombre || '',
+        qty: Number(l.qty || 0),
+        precio: Math.round(Number(l.precio || 0) * 100) / 100,
+        nota: configLocal.ticketShowNotes === false ? '' : String(l.nota || '')
+      })),
+      cobro: null,
+      verifactu: null
+    };
+
+    try {
+      await push(ref(db, 'print_jobs'), payload);
+      const btn = win.document.getElementById('btn-servicio');
+      if (btn) {
+        btn.textContent = 'Enviado';
+        btn.disabled = true;
+      }
+    } catch (err) {
+      alert(`Error al enviar: ${err.message}`);
+    }
+  };
+};
+
+window.abrirTurnoGerente = async () => {
+  const nombre = document.getElementById('turno-nombre')?.value.trim() || 'Turno';
+  await set(ref(db, 'config/turno'), { abierto: true, inicio: Date.now(), nombre });
+  toast(`Turno abierto: ${nombre}`);
+};
+
+window.cerrarTurnoGerente = async () => {
+  const snap = await get(ref(db, 'config/turno'));
+  const turno = snap.val();
+  if (!turno?.abierto) {
+    toast('No hay turno abierto');
+    return;
+  }
+
+  const snapPedidos = await get(ref(db, 'pedidos'));
+  const pedidosActivos = Object.keys(snapPedidos.val() || {}).filter(k => !String(k).startsWith('_'));
+  if (pedidosActivos.length) {
+    const ok = await confirmDialog({
+      title: 'Cerrar turno con mesas abiertas',
+      body: `Hay ${pedidosActivos.length} ${pedidosActivos.length === 1 ? 'mesa con cuenta abierta' : 'mesas con cuentas abiertas'}. Si continúas, se generará el ticket pendiente de cada mesa, se guardará en ventas y después se limpiarán todas las mesas.`,
+      confirmLabel: 'Cerrar turno y limpiar',
+      cancelLabel: 'Volver',
+      danger: true
+    });
+    if (!ok) return;
+    const cierreMesas = await cerrarMesasAbiertasParaTurno();
+    if (cierreMesas.mesasCerradas) toast(`Se cerraron ${cierreMesas.mesasCerradas} mesas antes de cerrar el turno`);
+  }
+
+  const tickets = (await cargarHistorialVentas(true)).filter(t => t.ts >= Number(turno.inicio || 0));
+  const resumen = resumirTickets(tickets);
+
+  await push(ref(db, 'historial_turnos'), {
+    nombre: turno.nombre,
+    inicio: turno.inicio,
+    fin: Date.now(),
+    mesas: resumen.tickets,
+    total: Math.round(resumen.total * 100) / 100,
+    lineas_count: resumen.lineas,
+    ticket_medio: Math.round(resumen.media * 100) / 100
+  });
+
+  await set(ref(db, 'config/turno'), { ...turno, abierto: false, ultimoCierre: Date.now() });
+  toast(`Turno cerrado: ${resumen.tickets} tickets · ${fmtEu(resumen.total)}`);
+};
+
+function renderResumenTurnoActualConTickets(turno, tickets) {
+  const cont = document.getElementById('turno-resumen-actual');
+  const status = document.getElementById('turno-status');
+  const pill = document.getElementById('topbar-turno-pill');
+  const btnAbrir = document.getElementById('btn-abrir-turno');
+  const btnCerrar = document.getElementById('btn-cerrar-turno');
+  const compact = document.getElementById('turno-compact-summary');
+  if (!cont || !status) return;
+
+  if (!turno?.abierto) {
+    status.textContent = 'Sin turno activo';
+    status.style.color = 'var(--muted)';
+    if (pill) pill.textContent = 'Sin turno activo';
+    if (btnAbrir) btnAbrir.disabled = false;
+    if (btnCerrar) btnCerrar.disabled = true;
+    if (compact) compact.textContent = 'Sin turno activo';
+    cont.innerHTML = '<div class="empty">No hay turno activo.</div>';
+    return;
+  }
+
+  const resumen = resumirTickets(tickets);
+  const inicio = new Date(turno.inicio);
+  const inicioTxt = `${inicio.toLocaleDateString('es-ES')} · ${inicio.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`;
+
+  status.textContent = `"${turno.nombre || 'Turno'}" abierto desde las ${inicio.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`;
+  status.style.color = 'var(--success)';
+  if (pill) pill.textContent = `${turno.nombre || 'Turno'} activo`;
+  if (btnAbrir) btnAbrir.disabled = true;
+  if (btnCerrar) btnCerrar.disabled = false;
+  if (compact) {
+    compact.innerHTML = `${escHtml(turno.nombre || 'Turno')} activo<br>${resumen.tickets} tickets · ${fmtEu(resumen.total)}`;
+  }
+
+  cont.innerHTML = `
+    <article class="turno-card">
+      <div class="turno-head">
+        <div>
+          <div class="turno-title">${escHtml(turno.nombre || 'Turno en curso')}</div>
+          <div class="turno-meta">Abierto el ${inicioTxt}</div>
+        </div>
+        <div class="badge active">Activo</div>
+      </div>
+      <div class="turno-body">
+        <div class="turno-stats">
+          <div class="turno-stat"><strong>${resumen.tickets}</strong><span>Tickets</span></div>
+          <div class="turno-stat"><strong>${resumen.lineas}</strong><span>Articulos</span></div>
+          <div class="turno-stat"><strong>${fmtEu(resumen.total)}</strong><span>Total</span></div>
+          <div class="turno-stat"><strong>${resumen.tickets ? fmtEu(resumen.media) : '-'}</strong><span>Ticket medio</span></div>
+        </div>
+      </div>
+    </article>`;
+}
+
+async function renderResumenTurnoActual(turno = turnoActualCache) {
+  if (!turno?.abierto) {
+    renderResumenTurnoActualConTickets(turno, []);
+    return;
+  }
+  const tickets = (await cargarHistorialVentas(true)).filter(t => t.ts >= Number(turno.inicio || 0));
+  renderResumenTurnoActualConTickets(turno, tickets);
+}
+
+function renderHistorialTurnos(turnosData) {
+  const lista = document.getElementById('turnos-lista');
+  if (!lista) return;
+
+  const turnos = Object.entries(turnosData || {})
+    .map(([id, t]) => ({ id, ...t }))
+    .filter(t => t.inicio && t.fin)
+    .sort((a, b) => Number(b.fin || 0) - Number(a.fin || 0));
+
+  if (!turnos.length) {
+    lista.innerHTML = '<div class="empty">Todavia no hay turnos cerrados.</div>';
+    return;
+  }
+
+  lista.innerHTML = turnos.map(t => {
+    const inicio = new Date(t.inicio);
+    const fin = new Date(t.fin);
+    const mins = Math.max(0, Math.round((Number(t.fin) - Number(t.inicio)) / 60000));
+    const horas = Math.floor(mins / 60);
+    const resto = mins % 60;
+    const duracion = horas ? `${horas}h ${String(resto).padStart(2, '0')}m` : `${resto}m`;
+    const media = Number(t.ticket_medio ?? ((Number(t.total || 0)) / Math.max(1, Number(t.mesas || 0))));
+    return `
+      <article class="turno-card">
+        <div class="turno-head">
+          <div>
+            <div class="turno-title">${escHtml(t.nombre || 'Turno')}</div>
+            <div class="turno-meta">${inicio.toLocaleDateString('es-ES')} · ${inicio.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })} - ${fin.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div>
+          </div>
+          <div class="turno-badge">${fmtEu(t.total || 0)}</div>
+        </div>
+        <div class="turno-body">
+          <div class="turno-stats">
+            <div class="turno-stat"><strong>${Number(t.mesas || 0)}</strong><span>Tickets</span></div>
+            <div class="turno-stat"><strong>${Number(t.lineas_count || 0)}</strong><span>Articulos</span></div>
+            <div class="turno-stat"><strong>${fmtEu(media)}</strong><span>Ticket medio</span></div>
+            <div class="turno-stat"><strong>${duracion}</strong><span>Duracion</span></div>
+          </div>
+        </div>
+      </article>
+    `;
+  }).join('');
+}
+
+function initFiltrosAuditoria() {
+  const hoyKey = fechaKeyFromDate(new Date());
+  const ini = document.getElementById('filtro-fecha-ini');
+  const fin = document.getElementById('filtro-fecha-fin');
+  const hIni = document.getElementById('filtro-hora-ini');
+  const hFin = document.getElementById('filtro-hora-fin');
+  if (ini && !ini.value) ini.value = hoyKey;
+  if (fin && !fin.value) fin.value = hoyKey;
+  if (hIni && !hIni.value) hIni.value = '00:00';
+  if (hFin && !hFin.value) hFin.value = '23:59';
+}
+
+window.resetFiltrosAuditoriaGerente = () => {
+  const hoyKey = fechaKeyFromDate(new Date());
+  document.getElementById('filtro-fecha-ini').value = hoyKey;
+  document.getElementById('filtro-fecha-fin').value = hoyKey;
+  document.getElementById('filtro-hora-ini').value = '00:00';
+  document.getElementById('filtro-hora-fin').value = '23:59';
+  document.getElementById('audit-camarero').value = '';
+  document.getElementById('audit-accion').value = '';
+  document.getElementById('audit-mesa').value = '';
+  auditPagina = 1;
+  window.aplicarFiltrosComunesGerente();
+};
+
+function poblarCamarerosAuditoria(usuarios) {
+  auditUsuarios = usuarios || {};
+  const sel = document.getElementById('audit-camarero');
+  if (!sel) return;
+  const actual = sel.value;
+  const nombres = Object.values(auditUsuarios)
+    .map(u => u?.nombre ? String(u.nombre) : null)
+    .filter(Boolean)
+    .sort((a, b) => a.localeCompare(b, 'es'));
+  sel.innerHTML = '<option value="">- Todos -</option>' +
+    nombres.map(n => `<option value="${escHtml(n)}">${escHtml(n)}</option>`).join('');
+  if (actual && nombres.includes(actual)) sel.value = actual;
+}
+
+function desbloquearAuditoriaGerente() {
+  auditUnlocked = true;
+  const locked = document.getElementById('audit-locked');
+  const unlocked = document.getElementById('audit-unlocked');
+  if (locked) locked.style.display = 'none';
+  if (unlocked) unlocked.style.display = '';
+  initFiltrosAuditoria();
+  poblarCamarerosAuditoria(auditUsuarios);
+  window.aplicarFiltrosAuditoriaGerente();
+}
+
+async function leerEventosAuditoriaRango(fechaIni, fechaFin) {
+  const ini = new Date(`${fechaIni}T00:00:00`);
+  const fin = new Date(`${fechaFin}T00:00:00`);
+  if (isNaN(ini.getTime()) || isNaN(fin.getTime()) || ini > fin) return [];
+
+  const eventos = [];
+  const cursor = new Date(ini);
+  let safety = 95;
+  while (cursor <= fin && safety-- > 0) {
+    const key = fechaKeyFromDate(cursor);
+    try {
+      const snap = await get(ref(db, `auditoria/${key}`));
+      const data = snap.val() || {};
+      Object.entries(data).forEach(([id, ev]) => {
+        if (!ev || typeof ev !== 'object') return;
+        eventos.push({ id, fechaKey: key, ...ev });
+      });
+    } catch (_) {}
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return eventos;
+}
+
+function renderEventosAuditoria(eventos) {
+  const lista = document.getElementById('audit-lista');
+  if (!lista) return;
+
+  document.getElementById('audit-stat-eventos').textContent = eventos.length;
+  document.getElementById('audit-stat-eliminados').textContent = eventos.filter(e => e.accion === 'articulo_eliminado').length;
+  document.getElementById('audit-stat-descuentos').textContent = eventos.filter(e =>
+    e.accion === 'descuento_aplicado' ||
+    (e.accion === 'cantidad_editada' && Number(e.qtyDespues || 0) < Number(e.qtyAntes || 0))
+  ).length;
+
+  const totalPages = Math.max(1, Math.ceil(eventos.length / AUDIT_PAGE_SIZE));
+  auditPagina = Math.min(Math.max(1, auditPagina), totalPages);
+  document.getElementById('audit-stat-paginas').textContent = totalPages;
+
+  if (!eventos.length) {
+    lista.innerHTML = '<div class="empty">Sin eventos en el periodo o filtro seleccionado.</div>';
+    renderPager(0, AUDIT_PAGE_SIZE, 1, 'audit');
+    return;
+  }
+
+  const start = (auditPagina - 1) * AUDIT_PAGE_SIZE;
+  const pageItems = eventos.slice(start, start + AUDIT_PAGE_SIZE);
+  lista.innerHTML = pageItems.map(ev => {
+    const info = AUDIT_LABELS[ev.accion] || { label: ev.accion || '-', color: 'var(--muted)', sensible: false };
+    const fecha = new Date(Number(ev.ts) || 0);
+    const fechaTxt = fecha.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: '2-digit' });
+    const horaTxt = ev.hora || fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const detalle = escHtml(ev.detalle || '');
+    const totalStr = ev.total !== undefined && ev.total !== null && !isNaN(Number(ev.total))
+      ? ` <span style="color:var(--accent);font-family:var(--mono)">${fmtEu(ev.total)}</span>`
+      : '';
+    return `
+      <article class="audit-row ${info.sensible ? 'sensitive' : ''}">
+        <div class="audit-col mono">${fechaTxt}<br>${horaTxt}</div>
+        <div class="audit-col mono">${escHtml(ev.camarero || '-')}</div>
+        <div class="audit-col mono">${ev.mesa ? `Mesa ${escHtml(ev.mesa)}` : '-'}</div>
+        <div class="audit-col" style="color:${info.color};font-weight:700">${escHtml(info.label)}</div>
+        <div class="audit-col">${detalle}${totalStr}</div>
+      </article>
+    `;
+  }).join('');
+
+  renderPager(eventos.length, AUDIT_PAGE_SIZE, auditPagina, 'audit');
+}
+
+window.cambiarPaginaAuditoria = delta => {
+  const totalPages = Math.max(1, Math.ceil(auditEventos.length / AUDIT_PAGE_SIZE));
+  auditPagina = Math.min(totalPages, Math.max(1, auditPagina + delta));
+  renderEventosAuditoria(auditEventos);
+};
+
+window.aplicarFiltrosComunesGerente = async () => {
+  await window.aplicarFiltrosGerente();
+  await window.aplicarFiltrosAuditoriaGerente();
+};
+
+window.aplicarFiltrosAuditoriaGerente = async () => {
+  if (!auditUnlocked) return;
+
+  const fechaIni = document.getElementById('filtro-fecha-ini').value;
+  const fechaFin = document.getElementById('filtro-fecha-fin').value;
+  const horaIni = document.getElementById('filtro-hora-ini').value || '00:00';
+  const horaFin = document.getElementById('filtro-hora-fin').value || '23:59';
+  const camFiltro = document.getElementById('audit-camarero').value || '';
+  const accFiltro = document.getElementById('audit-accion').value || '';
+  const mesaFiltro = (document.getElementById('audit-mesa').value || '').trim().toLowerCase();
+
+  if (!fechaIni || !fechaFin) {
+    toast('Selecciona el rango de fechas');
+    return;
+  }
+
+  const lista = document.getElementById('audit-lista');
+  if (lista) lista.innerHTML = '<div class="empty">Cargando...</div>';
+
+  let eventos = await leerEventosAuditoriaRango(fechaIni, fechaFin);
+  const tsMin = new Date(`${fechaIni}T${horaIni}:00`).getTime();
+  const tsMax = new Date(`${fechaFin}T${horaFin}:59`).getTime();
+
+  eventos = eventos.filter(ev => {
+    const ts = Number(ev.ts || 0);
+    if (!ts || ts < tsMin || ts > tsMax) return false;
+    if (camFiltro && String(ev.camarero || '') !== camFiltro) return false;
+    if (accFiltro && String(ev.accion || '') !== accFiltro) return false;
+    if (mesaFiltro && !String(ev.mesa || '').toLowerCase().includes(mesaFiltro)) return false;
+    return true;
+  }).sort((a, b) => Number(b.ts || 0) - Number(a.ts || 0));
+
+  auditEventos = eventos;
+  auditPagina = 1;
+  renderEventosAuditoria(eventos);
+  if (window.innerWidth <= 760) {
+    const state = { turno: false, 'audit-filter': false, ...leerEstadoCompactoGerente(), 'audit-filter': false };
+    guardarEstadoCompactoGerente(state);
+    aplicarCompactState('audit-filter', false);
+  }
+};
+
+window.exportarAuditoriaGerenteCSV = () => {
+  if (!auditEventos.length) {
+    toast('Sin eventos para exportar');
+    return;
+  }
+
+  let csv = 'Fecha,Hora,Camarero,Mesa,Accion,Detalle,Total\n';
+  auditEventos.forEach(ev => {
+    const d = new Date(Number(ev.ts) || 0);
+    const fecha = d.toLocaleDateString('es-ES');
+    const hora = ev.hora || d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    const accionLabel = AUDIT_LABELS[ev.accion]?.label || ev.accion || '';
+    csv += `${escCsv(fecha)},${escCsv(hora)},${escCsv(ev.camarero || '')},${escCsv(ev.mesa || '')},${escCsv(accionLabel)},${escCsv(ev.detalle || '')},${escCsv(ev.total ?? '')}\n`;
+  });
+
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const fIni = document.getElementById('filtro-fecha-ini').value;
+  const fFin = document.getElementById('filtro-fecha-fin').value;
+  a.href = url;
+  a.download = `auditoria_gerencia_${fIni}_${fFin}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
+
+window.checkLogin = async () => {
+  const pwd = document.getElementById('pwd-input').value;
+  const snap = await get(ref(db, GERENTE_PWD_PATH));
+  const stored = snap.val() || GERENTE_PWD_DEFAULT;
+  if (pwd === stored) {
+    document.getElementById('login-error').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    await init();
+  } else {
+    document.getElementById('login-error').style.display = 'block';
+  }
+};
+
+document.getElementById('pwd-input')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter') window.checkLogin();
+});
+
+async function init() {
+  await prepararFiltrosVentasIniciales();
+  initGerenteSections();
+  initGerenteCompactBlocks();
+
+  onValue(ref(db, 'config/local'), snap => {
+    configLocal = snap.val() || {};
+  });
+
+  onValue(ref(db, 'config/usuarios'), snap => {
+    poblarCamarerosAuditoria(snap.val() || {});
+  });
+
+  onValue(ref(db, 'config/turno'), snap => {
+    const t = snap.val() || {};
+    turnoActualCache = t;
+
+    // Manage real-time subscription for the active turn's sales
+    if (unsubscribeTurnSales) {
+      unsubscribeTurnSales();
+      unsubscribeTurnSales = null;
+    }
+
+    if (t.abierto && t.inicio) {
+      const q = query(ref(db, 'historial'), orderByChild('ts'), startAt(Number(t.inicio)));
+      unsubscribeTurnSales = onValue(q, snapSales => {
+        const salesObj = snapSales.val() || {};
+        const currentTurnTickets = normalizarHistorialVentasData(salesObj);
+        renderResumenTurnoActualConTickets(t, currentTurnTickets);
+      });
+    } else {
+      renderResumenTurnoActualConTickets(t, []);
+    }
+  });
+
+  onValue(query(ref(db, 'historial_turnos'), limitToLast(25)), snap => {
+    renderHistorialTurnos(snap.val() || {});
+  });
+
+  desbloquearAuditoriaGerente();
+
+  poblarCamarerosAuditoria(auditUsuarios);
+  await window.aplicarFiltrosComunesGerente();
+}
+
+window.cierreCajaRapido = async () => {
+  const dateInput = document.getElementById("cierre-fecha");
+  const chosenDateStr = dateInput ? dateInput.value : "";
+
+  let startTs, endTs;
+  if (chosenDateStr) {
+    const dStart = new Date(`${chosenDateStr}T05:00:00`);
+    const dEnd = new Date(dStart.getTime() + 24 * 60 * 60 * 1000);
+    startTs = dStart.getTime();
+    endTs = dEnd.getTime();
+  } else {
+    const ahora = new Date();
+    const inicioDiaComercial = new Date(ahora);
+    if (ahora.getHours() < 5) {
+      inicioDiaComercial.setDate(ahora.getDate() - 1);
+    }
+    inicioDiaComercial.setHours(5, 0, 0, 0);
+    startTs = inicioDiaComercial.getTime();
+    endTs = ahora.getTime();
+  }
+
+  toast('Generando cierre de caja...');
+  const tickets = (await cargarHistorialVentas(true)).filter(t => t.ts >= startTs && t.ts <= endTs);
+
+  if (tickets.length === 0) {
+    toast(chosenDateStr ? 'No hay ventas en la fecha seleccionada' : 'No hay ventas hoy (desde las 5:00 AM)');
+    return;
+  }
+
+  const ticketsCount = tickets.length;
+  const total = tickets.reduce((sum, t) => sum + Number(t.total || 0), 0);
+  const efectivo = tickets.filter(t => (t.pagoMetodo || '').toLowerCase() === 'efectivo' || (t.cobro && !t.pagoMetodo)).reduce((sum, t) => sum + Number(t.total || 0), 0);
+  const tarjeta = tickets.filter(t => (t.pagoMetodo || '').toLowerCase() === 'tarjeta').reduce((sum, t) => sum + Number(t.total || 0), 0);
+  const ticketMedio = ticketsCount ? total / ticketsCount : 0;
+
+  const articulosMap = {};
+  tickets.forEach(t => {
+    (t.lineas || []).forEach(l => {
+      const nombre = l.nombre || 'Artículo';
+      const qty = Number(l.qty || 0);
+      const precio = Number(l.precio || 0);
+      if (!articulosMap[nombre]) {
+        articulosMap[nombre] = { nombre, qty: 0, total: 0 };
+      }
+      articulosMap[nombre].qty += qty;
+      articulosMap[nombre].total += (qty * precio);
+    });
+  });
+  const articulos = Object.values(articulosMap).sort((a, b) => b.qty - a.qty);
+
+  const resumenDia = {
+    startTs,
+    endTs,
+    ticketsCount,
+    total,
+    efectivo,
+    tarjeta,
+    ticketMedio,
+    articulos
+  };
+
+  const loc = configLocal || {};
+  const serviceId = String(loc.ticketPrintServiceId || PRINT_SERVICE_ID).trim() || PRINT_SERVICE_ID;
+  const payload = {
+    kind: 'ticket_final',
+    status: 'pending',
+    createdAt: Date.now(),
+    serviceId,
+    requestedBy: 'gerencia-cierre',
+    mesaId: 'cierre',
+    mesaNombre: 'CIERRE DIARIO',
+    local: {
+      nombre: loc.nombre || '',
+      direccion: loc.direccion || '',
+      telefono: loc.telefono || '',
+      cif: loc.cif || '',
+      footer: 'Fin de Cierre de Caja',
+      logoUrl: loc.ticketLogoUrl || '',
+      ticketShowNotes: false,
+      headerNameFontSize: Number(loc.ticketHeaderNameFontSize || 12),
+      headerSubFontSize: Number(loc.ticketHeaderSubFontSize || 8)
+    },
+    format: {
+      paper: loc.ticketPaper || '80mm',
+      fontSize: Number(loc.ticketFontSize || 9),
+      uppercase: loc.ticketUppercase === true,
+      headerOffset: Number(loc.ticketHeaderOffset || 0)
+    },
+    total: Math.round(total * 100) / 100,
+    lines: [
+      { nombre: 'Tickets Cobrados', qty: ticketsCount, precio: 0 },
+      { nombre: '* EFECTIVO *', qty: 1, precio: Math.round(efectivo * 100) / 100 },
+      { nombre: '* TARJETA *', qty: 1, precio: Math.round(tarjeta * 100) / 100 },
+      { nombre: '--- DESGLOSE ARTÍCULOS ---', qty: 1, precio: 0 },
+      ...articulos.map(a => ({
+        nombre: a.nombre,
+        qty: a.qty,
+        precio: Math.round((a.total / a.qty) * 100) / 100
+      }))
+    ],
+    cobro: null
+  };
+
+  try {
+    await push(ref(db, 'print_jobs'), payload);
+    toast('✓ Cierre enviado a la impresora');
+  } catch (e) {
+    alert('Error al enviar: ' + e.message);
+  }
+};
+
+function buildCierreCajaHtml(resumenDia) {
+  const loc = configLocal || {};
+  const paper = loc.ticketPaper || '80mm';
+  const logoHtml = loc.ticketLogoUrl
+    ? `<div style="text-align:center;margin-bottom:4px"><img src="${escHtml(loc.ticketLogoUrl)}" style="max-width:60mm;max-height:18mm;object-fit:contain"></div>`
+    : '';
+  const localLines = [
+    loc.nombre ? `<div style="text-align:center;font-weight:bold;font-size:11px">${escHtml(loc.nombre)}</div>` : '',
+    loc.direccion ? `<div style="text-align:center;font-size:8px;color:#444">${escHtml(loc.direccion)}</div>` : '',
+    loc.telefono ? `<div style="text-align:center;font-size:8px;color:#444">${escHtml(loc.telefono)}</div>` : '',
+    loc.cif ? `<div style="text-align:center;font-size:8px;color:#444">${escHtml(loc.cif)}</div>` : ''
+  ].join('');
+
+  const fechaImpresion = new Date().toLocaleString('es-ES');
+  const fechaDesde = new Date(resumenDia.startTs).toLocaleString('es-ES');
+  const fechaHasta = new Date(resumenDia.endTs).toLocaleString('es-ES');
+
+  const linesHtml = resumenDia.articulos.map(a => `
+    <div style="display:flex;justify-content:space-between;gap:10px;margin:3px 0">
+      <span>${a.qty} x ${escHtml(a.nombre)}</span>
+      <span>${fmtEu(a.total)}</span>
+    </div>
+  `).join('');
+
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+@page{size:${paper} auto;margin:3mm}
+body{font-family:'Courier New',monospace;font-size:9px;width:${paper};max-width:${paper};color:#111}
+.bar{display:flex;gap:6px;margin-bottom:10px;justify-content:center;flex-wrap:wrap}
+.bar button{border:1px solid #aaa;background:#f5f5f5;color:#111;border-radius:999px;padding:5px 14px;font:inherit;cursor:pointer;font-size:10px}
+.rule{border:none;border-top:1px dashed #666;margin:5px 0}
+.total{display:flex;justify-content:space-between;font-weight:bold;font-size:10px;margin-top:6px;padding-top:4px;border-top:1px solid #333}
+@media print{.bar{display:none}}
+</style></head><body>
+<div class="bar">
+  <button onclick="window.print()">Imprimir / PDF</button>
+  <button id="btn-servicio">Enviar a impresora</button>
+  <button onclick="window.close()">Cerrar</button>
+</div>
+${logoHtml}
+${localLines}
+<div style="text-align:center;font-weight:bold;font-size:11px;margin-top:8px">CIERRE DE CAJA DIARIO</div>
+<div style="text-align:center;font-size:8px;color:#555;margin-top:4px">Reporte Z</div>
+<hr class="rule">
+<div style="font-size:8px;color:#333;margin-bottom:6px;line-height:1.4">
+  <div><strong>Desde:</strong> ${fechaDesde}</div>
+  <div><strong>Hasta:</strong> ${fechaHasta}</div>
+  <div><strong>Impreso:</strong> ${fechaImpresion}</div>
+</div>
+<hr class="rule">
+<div style="font-size:9px;font-weight:bold;margin-bottom:4px">RESUMEN DE CAJA:</div>
+<div style="display:flex;justify-content:space-between;margin:3px 0">
+  <span>Tickets Cobrados:</span>
+  <span>${resumenDia.ticketsCount}</span>
+</div>
+<div style="display:flex;justify-content:space-between;margin:3px 0">
+  <span>Ventas en Efectivo:</span>
+  <span>${fmtEu(resumenDia.efectivo)}</span>
+</div>
+<div style="display:flex;justify-content:space-between;margin:3px 0">
+  <span>Ventas en Tarjeta:</span>
+  <span>${fmtEu(resumenDia.tarjeta)}</span>
+</div>
+<div style="display:flex;justify-content:space-between;margin:3px 0">
+  <span>Ticket Medio:</span>
+  <span>${fmtEu(resumenDia.ticketMedio)}</span>
+</div>
+<div class="total">
+  <span>TOTAL GENERAL</span>
+  <span>${fmtEu(resumenDia.total)}</span>
+</div>
+<hr class="rule">
+<div style="font-size:9px;font-weight:bold;margin-top:8px;margin-bottom:4px">ARTÍCULOS VENDIDOS:</div>
+${linesHtml || '<div style="text-align:center;font-size:8px;color:#666">Sin artículos vendidos</div>'}
+<hr class="rule">
+<div style="text-align:center;font-size:8px;color:#666;margin-top:10px">Fin de Cierre de Caja</div>
+<script>
+document.getElementById('btn-servicio')?.addEventListener('click', () => {
+  window.__sendToService?.();
+});
+<\/script>
+</body></html>`;
+}
