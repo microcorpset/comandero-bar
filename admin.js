@@ -12,7 +12,7 @@ if (!_dominiosPermitidos.some(d => location.hostname === d || location.hostname.
 
 import { authReady, db } from './firebase.js';
 import {
-  ref, set, push, remove, onValue, get, update
+  ref, set, push, remove, onValue, get, update, query, limitToLast, orderByChild, startAt
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import {
   listarFacturas, consultarEstado, actualizarEstadoFactura,
@@ -79,6 +79,7 @@ let ventasTabActiva = 'tickets';
 let historialVentasCache = [];
 let historialVentasCargado = false;
 let turnoActualCache = {};
+let unsubscribeTurnSales = null;
 
 function confirmDialog({ title, body, confirmLabel = 'Aceptar', cancelLabel = 'Cancelar', danger = false }) {
   return new Promise(resolve => {
@@ -440,7 +441,8 @@ window.setDest = d => {
 window.addCategoria = async () => {
   const nombre = document.getElementById('cat-nombre').value.trim();
   if (!nombre) return;
-  await push(ref(db, 'categorias'), { nombre });
+  const maxOrden = Object.values(categoriasData).reduce((max, c) => Math.max(max, c.orden || 0), 0);
+  await push(ref(db, 'categorias'), { nombre, orden: maxOrden + 1 });
   document.getElementById('cat-nombre').value = '';
   toast('Categoría añadida');
 };
@@ -481,16 +483,23 @@ function renderCarta() {
   }
   lista.innerHTML = '';
   Object.entries(categoriasData)
-    .sort(([,a],[,b]) => a.nombre.localeCompare(b.nombre, 'es'))
-    .forEach(([catId, cat]) => {
+    .sort(([,a],[,b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre, 'es'))
+    .forEach(([catId, cat], idx, arr) => {
       const arts = Object.entries(cartaData)
         .filter(([,a]) => a.catId === catId)
         .sort(([,a],[,b]) => (a.orden||0) - (b.orden||0) || a.nombre.localeCompare(b.nombre,'es'));
 
       const catEl = document.createElement('div');
-      catEl.innerHTML = `<div class="categoria-header">${cat.nombre}
-        <button class="btn btn-sm btn-danger" style="float:right;margin-top:-2px"
-          onclick="delCat('${catId}')">× eliminar</button></div>`;
+      catEl.innerHTML = `<div class="categoria-header" style="display:flex;justify-content:space-between;align-items:center">
+        <span>${cat.nombre}</span>
+        <div style="display:flex;gap:4px;align-items:center">
+          <button class="btn btn-sm" title="Mover categoría arriba"
+            onclick="moverCat('${catId}',${idx},-1)" ${idx===0?'disabled':''}>↑</button>
+          <button class="btn btn-sm" title="Mover categoría abajo"
+            onclick="moverCat('${catId}',${idx},1)" ${idx===arr.length-1?'disabled':''}>↓</button>
+          <button class="btn btn-sm btn-danger" onclick="delCat('${catId}')">× eliminar</button>
+        </div>
+      </div>`;
 
       arts.forEach(([id, a], idx) => {
         const disponible = a.disponible !== false;
@@ -579,6 +588,7 @@ function renderCarta() {
     const sel = document.getElementById('edit-cat-' + id);
     if (!sel) return;
     sel.innerHTML = Object.entries(categoriasData)
+      .sort(([,a],[,b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre, 'es'))
       .map(([cid, c]) => `<option value="${cid}" ${cartaData[id]?.catId===cid?'selected':''}>${c.nombre}</option>`)
       .join('');
   });
@@ -650,6 +660,20 @@ window.moverArt = async (id, catId, idx, dir) => {
   await update(ref(db), updates);
 };
 
+window.moverCat = async (id, idx, dir) => {
+  const cats = Object.entries(categoriasData)
+    .sort(([,a],[,b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre, 'es'));
+
+  const idxDest = idx + dir;
+  if (idxDest < 0 || idxDest >= cats.length) return;
+
+  const updates = {};
+  cats.forEach(([cid], i) => { updates['categorias/' + cid + '/orden'] = i; });
+  updates['categorias/' + cats[idx][0] + '/orden'] = idxDest;
+  updates['categorias/' + cats[idxDest][0] + '/orden'] = idx;
+  await update(ref(db), updates);
+};
+
 window.delCat = async id => {
   if (!confirm('¿Eliminar categoría y sus artículos?')) return;
   const snaps = await get(ref(db, 'carta'));
@@ -663,9 +687,11 @@ window.delCat = async id => {
 function updateCatSelect() {
   const sel = document.getElementById('art-cat');
   sel.innerHTML = '<option value="">— Categoría —</option>';
-  Object.entries(categoriasData).forEach(([id, c]) => {
-    sel.innerHTML += `<option value="${id}">${c.nombre}</option>`;
-  });
+  Object.entries(categoriasData)
+    .sort(([,a],[,b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre, 'es'))
+    .forEach(([id, c]) => {
+      sel.innerHTML += `<option value="${id}">${c.nombre}</option>`;
+    });
 }
 
 window.guardarPin = (rol) => {
@@ -1170,7 +1196,7 @@ window.cerrarTurno = async () => {
   toast(`Turno cerrado — ${resumen.tickets} mesas · ${fmtEu(resumen.total)}`);
 };
 
-async function renderResumenTurnoActual(turno = turnoActualCache) {
+function renderResumenTurnoActualConTickets(turno, tickets) {
   const cont = document.getElementById('turno-resumen-actual');
   if (!cont) return;
 
@@ -1179,7 +1205,6 @@ async function renderResumenTurnoActual(turno = turnoActualCache) {
     return;
   }
 
-  const tickets = (await cargarHistorialVentas(true)).filter(t => t.ts >= Number(turno.inicio || 0));
   const resumen = resumirTickets(tickets);
   const inicio = new Date(turno.inicio);
 
@@ -1187,7 +1212,7 @@ async function renderResumenTurnoActual(turno = turnoActualCache) {
     <div class="turno-card">
       <div class="turno-card-head">
         <div>
-          <div class="turno-card-title">${turno.nombre || 'Turno en curso'}</div>
+          <div class="turno-card-title">${escHtml(turno.nombre || 'Turno en curso')}</div>
           <div class="turno-card-meta">Abierto el ${inicio.toLocaleDateString('es-ES')} a las ${inicio.toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit' })}</div>
         </div>
         <span class="turno-badge activo">Activo</span>
@@ -1199,6 +1224,15 @@ async function renderResumenTurnoActual(turno = turnoActualCache) {
         <div class="turno-stat"><strong>${fmtEu(resumen.media)}</strong><span>Ticket medio</span></div>
       </div>
     </div>`;
+}
+
+async function renderResumenTurnoActual(turno = turnoActualCache) {
+  if (!turno?.abierto) {
+    renderResumenTurnoActualConTickets(turno, []);
+    return;
+  }
+  const tickets = (await cargarHistorialVentas(true)).filter(t => t.ts >= Number(turno.inicio || 0));
+  renderResumenTurnoActualConTickets(turno, tickets);
 }
 
 function renderHistorialTurnos(turnosData) {
@@ -1534,6 +1568,8 @@ async function init() {
     document.getElementById('local-telefono').value  = d.telefono  || '';
     document.getElementById('local-cif').value       = d.cif       || '';
     document.getElementById('local-footer').value    = d.footer    || '';
+    document.getElementById('local-network-url').value = d.localNetworkUrl || '';
+    document.getElementById('local-network-mode').value = d.localNetworkMode || 'disabled';
     document.getElementById('local-ticket-logo').value = d.ticketLogoUrl || '';
     document.getElementById('local-ticket-paper').value = d.ticketPaper || d.papelTicket || '58mm';
     syncTicketPaper('local');
@@ -1551,18 +1587,14 @@ async function init() {
     document.getElementById('local-cocina-font-size').value = d.cocinaFontSize || 9;
     document.getElementById('local-barra-uppercase').value = String(d.barraUppercase === true);
     document.getElementById('local-cocina-uppercase').value = String(d.cocinaUppercase === true);
+    document.getElementById('local-browser-print-enabled').value = String(d.localBrowserPrintEnabled === true);
     document.getElementById('local-ticket-print-mode').value = d.ticketPrintMode || 'browser';
     document.getElementById('local-comanda-auto-servir').value = String(d.comandaAutoServir === true);
     document.getElementById('local-ticket-print-service-id').value = d.ticketPrintServiceId || PRINT_SERVICE_ID;
     document.getElementById('local-barra-print-service-id').value = d.barraPrintServiceId || '';
     document.getElementById('local-cocina-print-service-id').value = d.cocinaPrintServiceId || '';
   });
-  onValue(ref(db, 'historial'), snap => {
-    historialVentasCache = normalizarHistorialVentasData(snap.val() || {});
-    historialVentasCargado = true;
-    if (turnoActualCache?.abierto) renderResumenTurnoActual(turnoActualCache);
-  });
-  onValue(ref(db, 'historial_turnos'), snap => renderHistorialTurnos(snap.val()));
+  onValue(query(ref(db, 'historial_turnos'), limitToLast(25)), snap => renderHistorialTurnos(snap.val()));
   onValue(ref(db, 'config/usuarios'), snap => {
     const usuarios = snap.val();
     renderUsuarios(usuarios);
@@ -1619,6 +1651,13 @@ async function init() {
     const statusEl  = document.getElementById('turno-status');
     const btnAbrir  = document.getElementById('btn-abrir-turno');
     const btnCerrar = document.getElementById('btn-cerrar-turno');
+    
+    // Manage real-time subscription for the active turn's sales
+    if (unsubscribeTurnSales) {
+      unsubscribeTurnSales();
+      unsubscribeTurnSales = null;
+    }
+
     if (!statusEl) return;
     if (t.abierto) {
       const inicio = new Date(t.inicio).toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit' });
@@ -1626,13 +1665,24 @@ async function init() {
       statusEl.style.color = 'var(--success)';
       if (btnAbrir)  btnAbrir.disabled  = true;
       if (btnCerrar) btnCerrar.disabled = false;
+
+      if (t.inicio) {
+        const q = query(ref(db, 'historial'), orderByChild('ts'), startAt(Number(t.inicio)));
+        unsubscribeTurnSales = onValue(q, snapSales => {
+          const salesObj = snapSales.val() || {};
+          const currentTurnTickets = normalizarHistorialVentasData(salesObj);
+          renderResumenTurnoActualConTickets(t, currentTurnTickets);
+        });
+      } else {
+        renderResumenTurnoActualConTickets(t, []);
+      }
     } else {
       statusEl.textContent = 'Sin turno activo';
       statusEl.style.color = 'var(--muted)';
       if (btnAbrir)  btnAbrir.disabled  = false;
       if (btnCerrar) btnCerrar.disabled = true;
+      renderResumenTurnoActualConTickets(t, []);
     }
-    renderResumenTurnoActual(t);
   });
 }
 
@@ -1699,6 +1749,8 @@ window.guardarLocal = async () => {
     telefono:  document.getElementById('local-telefono').value.trim(),
     cif:       document.getElementById('local-cif').value.trim(),
     footer:    document.getElementById('local-footer').value.trim(),
+    localNetworkUrl: document.getElementById('local-network-url').value.trim(),
+    localNetworkMode: document.getElementById('local-network-mode').value || 'disabled',
     ticketLogoUrl: document.getElementById('local-ticket-logo').value.trim(),
     ticketPaper: document.getElementById('local-ticket-paper').value || '58mm',
     ticketFontSize: parseFloat(document.getElementById('local-ticket-font-size').value) || 9,
@@ -1713,6 +1765,7 @@ window.guardarLocal = async () => {
     cocinaFontSize: parseFloat(document.getElementById('local-cocina-font-size').value) || 9,
     barraUppercase: document.getElementById('local-barra-uppercase').value === 'true',
     cocinaUppercase: document.getElementById('local-cocina-uppercase').value === 'true',
+    localBrowserPrintEnabled: document.getElementById('local-browser-print-enabled').value === 'true',
     ticketPrintMode: document.getElementById('local-ticket-print-mode').value || 'browser',
     ticketPrintServiceId: document.getElementById('local-ticket-print-service-id').value.trim() || PRINT_SERVICE_ID,
     barraPrintServiceId: document.getElementById('local-barra-print-service-id').value.trim(),
@@ -1766,7 +1819,7 @@ window.togglePausaImpresion = async () => {
 window.guardarConfigImpresoras = async () => {
   const snap = await get(ref(db, 'config/printService'));
   const actual = snap.val() || {};
-  await set(ref(db, 'config/printService'), {
+  const nextConfig = {
     ...actual,
     barra: {
       enabled: document.getElementById('ps-barra-enabled').value === 'true',
@@ -1783,7 +1836,32 @@ window.guardarConfigImpresoras = async () => {
       printerName: document.getElementById('ps-ticket-printer').value.trim(),
       paper: document.getElementById('ps-ticket-paper').value,
     },
-  });
+  };
+  await set(ref(db, 'config/printService'), nextConfig);
+
+  const localUrl = (document.getElementById('local-network-url')?.value || '').trim().replace(/\/+$/, '');
+  if (localUrl) {
+    try {
+      await fetch(localUrl + '/api/config', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          printing: {
+            barra: nextConfig.barra,
+            cocina: nextConfig.cocina,
+            ticketFinal: nextConfig.ticketFinal
+          }
+        })
+      });
+      toast('Configuración de impresoras guardada y enviada al servidor local');
+      return;
+    } catch (err) {
+      console.warn('No se pudo sincronizar con el servidor local', err);
+      toast('Configuración guardada, pero no se pudo enviar al servidor local');
+      return;
+    }
+  }
+
   toast('Configuración de impresoras guardada');
 };
 
@@ -2306,3 +2384,201 @@ document.getElementById('vf-modal-overlay')?.addEventListener('click', e => {
   if (e.target === document.getElementById('vf-modal-overlay'))
     document.getElementById('vf-modal-overlay').style.display = 'none';
 });
+
+window.cierreCajaRapido = async () => {
+  const dateInput = document.getElementById("cierre-fecha");
+  const chosenDateStr = dateInput ? dateInput.value : "";
+
+  let startTs, endTs;
+  if (chosenDateStr) {
+    const dStart = new Date(`${chosenDateStr}T05:00:00`);
+    const dEnd = new Date(dStart.getTime() + 24 * 60 * 60 * 1000);
+    startTs = dStart.getTime();
+    endTs = dEnd.getTime();
+  } else {
+    const ahora = new Date();
+    const inicioDiaComercial = new Date(ahora);
+    if (ahora.getHours() < 5) {
+      inicioDiaComercial.setDate(ahora.getDate() - 1);
+    }
+    inicioDiaComercial.setHours(5, 0, 0, 0);
+    startTs = inicioDiaComercial.getTime();
+    endTs = ahora.getTime();
+  }
+
+  toast('Generando cierre de caja...');
+  const tickets = (await cargarHistorialVentas(true)).filter(t => t.ts >= startTs && t.ts <= endTs);
+
+  if (tickets.length === 0) {
+    toast(chosenDateStr ? 'No hay ventas en la fecha seleccionada' : 'No hay ventas hoy (desde las 5:00 AM)');
+    return;
+  }
+
+  const ticketsCount = tickets.length;
+  const total = tickets.reduce((sum, t) => sum + Number(t.total || 0), 0);
+  const efectivo = tickets.filter(t => (t.pagoMetodo || '').toLowerCase() === 'efectivo' || (t.cobro && !t.pagoMetodo)).reduce((sum, t) => sum + Number(t.total || 0), 0);
+  const tarjeta = tickets.filter(t => (t.pagoMetodo || '').toLowerCase() === 'tarjeta').reduce((sum, t) => sum + Number(t.total || 0), 0);
+  const ticketMedio = ticketsCount ? total / ticketsCount : 0;
+
+  const articulosMap = {};
+  tickets.forEach(t => {
+    (t.lineas || []).forEach(l => {
+      const nombre = l.nombre || 'Artículo';
+      const qty = Number(l.qty || 0);
+      const precio = Number(l.precio || 0);
+      if (!articulosMap[nombre]) {
+        articulosMap[nombre] = { nombre, qty: 0, total: 0 };
+      }
+      articulosMap[nombre].qty += qty;
+      articulosMap[nombre].total += (qty * precio);
+    });
+  });
+  const articulos = Object.values(articulosMap).sort((a, b) => b.qty - a.qty);
+
+  const resumenDia = {
+    startTs,
+    endTs,
+    ticketsCount,
+    total,
+    efectivo,
+    tarjeta,
+    ticketMedio,
+    articulos
+  };
+
+  const loc = configLocalAdmin || {};
+  const serviceId = String(loc.ticketPrintServiceId || PRINT_SERVICE_ID).trim() || PRINT_SERVICE_ID;
+  const payload = {
+    kind: 'ticket_final',
+    status: 'pending',
+    createdAt: Date.now(),
+    serviceId,
+    requestedBy: 'admin-cierre',
+    mesaId: 'cierre',
+    mesaNombre: 'CIERRE DIARIO',
+    local: {
+      nombre: loc.nombre || '',
+      direccion: loc.direccion || '',
+      telefono: loc.telefono || '',
+      cif: loc.cif || '',
+      footer: 'Fin de Cierre de Caja',
+      logoUrl: loc.ticketLogoUrl || '',
+      ticketShowNotes: false,
+      headerNameFontSize: Number(loc.ticketHeaderNameFontSize || 12),
+      headerSubFontSize: Number(loc.ticketHeaderSubFontSize || 8)
+    },
+    format: {
+      paper: loc.ticketPaper || '80mm',
+      fontSize: Number(loc.ticketFontSize || 9),
+      uppercase: loc.ticketUppercase === true,
+      headerOffset: Number(loc.ticketHeaderOffset || 0)
+    },
+    total: Math.round(total * 100) / 100,
+    lines: [
+      { nombre: 'Tickets Cobrados', qty: ticketsCount, precio: 0 },
+      { nombre: '* EFECTIVO *', qty: 1, precio: Math.round(efectivo * 100) / 100 },
+      { nombre: '* TARJETA *', qty: 1, precio: Math.round(tarjeta * 100) / 100 },
+      { nombre: '--- DESGLOSE ARTÍCULOS ---', qty: 1, precio: 0 },
+      ...articulos.map(a => ({
+        nombre: a.nombre,
+        qty: a.qty,
+        precio: Math.round((a.total / a.qty) * 100) / 100
+      }))
+    ],
+    cobro: null
+  };
+
+  try {
+    await push(ref(db, 'print_jobs'), payload);
+    toast('✓ Cierre enviado a la impresora');
+  } catch (e) {
+    alert('Error al enviar: ' + e.message);
+  }
+};
+
+const escHtml = v => String(v || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+function buildCierreCajaHtml(resumenDia) {
+  const loc = configLocalAdmin || {};
+  const paper = loc.ticketPaper || '80mm';
+  const logoHtml = loc.ticketLogoUrl
+    ? `<div style="text-align:center;margin-bottom:4px"><img src="${escHtml(loc.ticketLogoUrl)}" style="max-width:60mm;max-height:18mm;object-fit:contain"></div>`
+    : '';
+  const localLines = [
+    loc.nombre ? `<div style="text-align:center;font-weight:bold;font-size:11px">${escHtml(loc.nombre)}</div>` : '',
+    loc.direccion ? `<div style="text-align:center;font-size:8px;color:#444">${escHtml(loc.direccion)}</div>` : '',
+    loc.telefono ? `<div style="text-align:center;font-size:8px;color:#444">${escHtml(loc.telefono)}</div>` : '',
+    loc.cif ? `<div style="text-align:center;font-size:8px;color:#444">${escHtml(loc.cif)}</div>` : ''
+  ].join('');
+
+  const fechaImpresion = new Date().toLocaleString('es-ES');
+  const fechaDesde = new Date(resumenDia.startTs).toLocaleString('es-ES');
+  const fechaHasta = new Date(resumenDia.endTs).toLocaleString('es-ES');
+
+  const linesHtml = resumenDia.articulos.map(a => `
+    <div style="display:flex;justify-content:space-between;gap:10px;margin:3px 0">
+      <span>${a.qty} x ${escHtml(a.nombre)}</span>
+      <span>${fmtEu(a.total)}</span>
+    </div>
+  `).join('');
+
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+@page{size:${paper} auto;margin:3mm}
+body{font-family:'Courier New',monospace;font-size:9px;width:${paper};max-width:${paper};color:#111}
+.bar{display:flex;gap:6px;margin-bottom:10px;justify-content:center;flex-wrap:wrap}
+.bar button{border:1px solid #aaa;background:#f5f5f5;color:#111;border-radius:999px;padding:5px 14px;font:inherit;cursor:pointer;font-size:10px}
+.rule{border:none;border-top:1px dashed #666;margin:5px 0}
+.total{display:flex;justify-content:space-between;font-weight:bold;font-size:10px;margin-top:6px;padding-top:4px;border-top:1px solid #333}
+@media print{.bar{display:none}}
+</style></head><body>
+<div class="bar">
+  <button onclick="window.print()">Imprimir / PDF</button>
+  <button id="btn-servicio">Enviar a impresora</button>
+  <button onclick="window.close()">Cerrar</button>
+</div>
+${logoHtml}
+${localLines}
+<div style="text-align:center;font-weight:bold;font-size:11px;margin-top:8px">CIERRE DE CAJA DIARIO</div>
+<div style="text-align:center;font-size:8px;color:#555;margin-top:4px">Reporte Z</div>
+<hr class="rule">
+<div style="font-size:8px;color:#333;margin-bottom:6px;line-height:1.4">
+  <div><strong>Desde:</strong> ${fechaDesde}</div>
+  <div><strong>Hasta:</strong> ${fechaHasta}</div>
+  <div><strong>Impreso:</strong> ${fechaImpresion}</div>
+</div>
+<hr class="rule">
+<div style="font-size:9px;font-weight:bold;margin-bottom:4px">RESUMEN DE CAJA:</div>
+<div style="display:flex;justify-content:space-between;margin:3px 0">
+  <span>Tickets Cobrados:</span>
+  <span>${resumenDia.ticketsCount}</span>
+</div>
+<div style="display:flex;justify-content:space-between;margin:3px 0">
+  <span>Ventas en Efectivo:</span>
+  <span>${fmtEu(resumenDia.efectivo)}</span>
+</div>
+<div style="display:flex;justify-content:space-between;margin:3px 0">
+  <span>Ventas en Tarjeta:</span>
+  <span>${fmtEu(resumenDia.tarjeta)}</span>
+</div>
+<div style="display:flex;justify-content:space-between;margin:3px 0">
+  <span>Ticket Medio:</span>
+  <span>${fmtEu(resumenDia.ticketMedio)}</span>
+</div>
+<div class="total">
+  <span>TOTAL GENERAL</span>
+  <span>${fmtEu(resumenDia.total)}</span>
+</div>
+<hr class="rule">
+<div style="font-size:9px;font-weight:bold;margin-top:8px;margin-bottom:4px">ARTÍCULOS VENDIDOS:</div>
+${linesHtml || '<div style="text-align:center;font-size:8px;color:#666">Sin artículos vendidos</div>'}
+<hr class="rule">
+<div style="text-align:center;font-size:8px;color:#666;margin-top:10px">Fin de Cierre de Caja</div>
+<script>
+document.getElementById('btn-servicio')?.addEventListener('click', () => {
+  window.__sendToService?.();
+});
+<\/script>
+</body></html>`;
+}

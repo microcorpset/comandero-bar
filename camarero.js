@@ -19,10 +19,7 @@ import {
   emitirSustitutiva, emitirRectificativa, anularFactura, consultarEstado,
   labelTipoFactura
 } from './verifacti.js';
-import {
-  enqueueBrowserCommandJobs,
-  enqueueBrowserTicketJob
-} from './browser-print-bridge.js';
+
 
 await authReady;
 
@@ -753,7 +750,7 @@ window.volverMesas = () => {
 // ── CARTA ─────────────────────────────────────────────────────────────────────
 function renderCarta() {
   const body = document.getElementById('carta-body');
-  const cats = Object.entries(categoriasData).sort(([,a],[,b]) => a.nombre.localeCompare(b.nombre, 'es'));
+  const cats = Object.entries(categoriasData).sort(([,a],[,b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre, 'es'));
   if (!cats.length) { body.innerHTML = '<div class="loading">Sin categorías.</div>'; return; }
   body.innerHTML = '';
 
@@ -1881,27 +1878,11 @@ async function enviarTicketAServidorLocal(lineasTicket, total, cobro = null) {
 }
 
 function enviarComandaAMiniApp(lineasObj) {
-  if (!usarMiniAppImpresion()) return;
-  enqueueBrowserCommandJobs({
-    mesaId,
-    mesaNombre,
-    camarero: camareroActual || '',
-    lineasObj,
-    configLocal
-  });
+  // Eliminado: no se usa browser-print-bridge.js
 }
 
 function enviarTicketAMiniApp(lineasTicket, total, cobro = null, verifactu = null) {
-  enqueueBrowserTicketJob({
-    mesaId,
-    mesaNombre,
-    camarero: camareroActual || '',
-    total,
-    cobro,
-    lineas: lineasTicket,
-    configLocal,
-    verifactu
-  });
+  // Eliminado: no se usa browser-print-bridge.js
 }
 
 async function limpiarPrintJobsCerradosDeMesa(mesaIdObjetivo) {
