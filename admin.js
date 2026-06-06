@@ -441,7 +441,8 @@ window.setDest = d => {
 window.addCategoria = async () => {
   const nombre = document.getElementById('cat-nombre').value.trim();
   if (!nombre) return;
-  await push(ref(db, 'categorias'), { nombre });
+  const maxOrden = Object.values(categoriasData).reduce((max, c) => Math.max(max, c.orden || 0), 0);
+  await push(ref(db, 'categorias'), { nombre, orden: maxOrden + 1 });
   document.getElementById('cat-nombre').value = '';
   toast('Categoría añadida');
 };
@@ -482,16 +483,23 @@ function renderCarta() {
   }
   lista.innerHTML = '';
   Object.entries(categoriasData)
-    .sort(([,a],[,b]) => a.nombre.localeCompare(b.nombre, 'es'))
-    .forEach(([catId, cat]) => {
+    .sort(([,a],[,b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre, 'es'))
+    .forEach(([catId, cat], idx, arr) => {
       const arts = Object.entries(cartaData)
         .filter(([,a]) => a.catId === catId)
         .sort(([,a],[,b]) => (a.orden||0) - (b.orden||0) || a.nombre.localeCompare(b.nombre,'es'));
 
       const catEl = document.createElement('div');
-      catEl.innerHTML = `<div class="categoria-header">${cat.nombre}
-        <button class="btn btn-sm btn-danger" style="float:right;margin-top:-2px"
-          onclick="delCat('${catId}')">× eliminar</button></div>`;
+      catEl.innerHTML = `<div class="categoria-header" style="display:flex;justify-content:space-between;align-items:center">
+        <span>${cat.nombre}</span>
+        <div style="display:flex;gap:4px;align-items:center">
+          <button class="btn btn-sm" title="Mover categoría arriba"
+            onclick="moverCat('${catId}',${idx},-1)" ${idx===0?'disabled':''}>↑</button>
+          <button class="btn btn-sm" title="Mover categoría abajo"
+            onclick="moverCat('${catId}',${idx},1)" ${idx===arr.length-1?'disabled':''}>↓</button>
+          <button class="btn btn-sm btn-danger" onclick="delCat('${catId}')">× eliminar</button>
+        </div>
+      </div>`;
 
       arts.forEach(([id, a], idx) => {
         const disponible = a.disponible !== false;
@@ -580,6 +588,7 @@ function renderCarta() {
     const sel = document.getElementById('edit-cat-' + id);
     if (!sel) return;
     sel.innerHTML = Object.entries(categoriasData)
+      .sort(([,a],[,b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre, 'es'))
       .map(([cid, c]) => `<option value="${cid}" ${cartaData[id]?.catId===cid?'selected':''}>${c.nombre}</option>`)
       .join('');
   });
@@ -651,6 +660,20 @@ window.moverArt = async (id, catId, idx, dir) => {
   await update(ref(db), updates);
 };
 
+window.moverCat = async (id, idx, dir) => {
+  const cats = Object.entries(categoriasData)
+    .sort(([,a],[,b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre, 'es'));
+
+  const idxDest = idx + dir;
+  if (idxDest < 0 || idxDest >= cats.length) return;
+
+  const updates = {};
+  cats.forEach(([cid], i) => { updates['categorias/' + cid + '/orden'] = i; });
+  updates['categorias/' + cats[idx][0] + '/orden'] = idxDest;
+  updates['categorias/' + cats[idxDest][0] + '/orden'] = idx;
+  await update(ref(db), updates);
+};
+
 window.delCat = async id => {
   if (!confirm('¿Eliminar categoría y sus artículos?')) return;
   const snaps = await get(ref(db, 'carta'));
@@ -664,9 +687,11 @@ window.delCat = async id => {
 function updateCatSelect() {
   const sel = document.getElementById('art-cat');
   sel.innerHTML = '<option value="">— Categoría —</option>';
-  Object.entries(categoriasData).forEach(([id, c]) => {
-    sel.innerHTML += `<option value="${id}">${c.nombre}</option>`;
-  });
+  Object.entries(categoriasData)
+    .sort(([,a],[,b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre, 'es'))
+    .forEach(([id, c]) => {
+      sel.innerHTML += `<option value="${id}">${c.nombre}</option>`;
+    });
 }
 
 window.guardarPin = (rol) => {

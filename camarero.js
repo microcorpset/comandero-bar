@@ -750,7 +750,7 @@ window.volverMesas = () => {
 // ── CARTA ─────────────────────────────────────────────────────────────────────
 function renderCarta() {
   const body = document.getElementById('carta-body');
-  const cats = Object.entries(categoriasData).sort(([,a],[,b]) => a.nombre.localeCompare(b.nombre, 'es'));
+  const cats = Object.entries(categoriasData).sort(([,a],[,b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre, 'es'));
   if (!cats.length) { body.innerHTML = '<div class="loading">Sin categorías.</div>'; return; }
   body.innerHTML = '';
 
