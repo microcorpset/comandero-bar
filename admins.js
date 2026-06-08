@@ -76,6 +76,14 @@ let cartaData     = {};
 let categoriasData = {};
 let openCatVarsPanels = new Set();
 let openEditPanels = new Set();
+let collapsedCategories = new Set();
+let editingArticuloId = null;
+let editingCatId = null;
+let pedidosData = {};
+let alertasConfig = { verde: 10, amarillo: 20 };
+let planoZonaActiva = null;
+let configLocalAdmin = {};
+
 let ventasData    = [];        // para CSV y dashboard por artículo
 let ventasTabActiva = 'tickets';
 let historialVentasCache = [];
@@ -169,269 +177,197 @@ function agruparVentasPorDia(tickets) {
 }
 
 // ─── MESAS ───────────────────────────────────────────────────────────────────
-function renderMesas(mesas) {
-  mesasData = mesas || {};
-  const contenedor = document.getElementById('mesas-lista');
+// ─── PLANO VISUAL DE MESAS ───────────────────────────────────────────────────
+function normalizarEtiquetaZona(zona) {
+  const txt = String(zona ?? '').trim();
+  if (!txt) return 'Sin zona';
+  const mapa = {
+    'SALÃ“N': 'SALÓN',
+    'SalÃ³n': 'Salón',
+    'salÃ³n': 'salón'
+  };
+  return mapa[txt] || txt;
+}
+
+function qtyResumenMesa(linea) {
+  if (linea.estado === 'cancelado') return 0;
+  if (linea.qtyTicket !== undefined && linea.qtyTicket !== null) return Number(linea.qtyTicket || 0);
+  if (linea.estado === 'servido') return Number(linea.qty || 0);
+  if (linea.qtyServida !== undefined && linea.qtyServida !== null && Number(linea.qtyServida) > 0) {
+    return Number(linea.qtyServida || 0);
+  }
+  return Number(linea.qty || 0);
+}
+
+function resumenMesaActual(id) {
+  const pedidosMesa = pedidosData[id];
+  if (!pedidosMesa) return 'Sin consumo';
+  const lineas = aplanarPedidos(pedidosMesa).filter(l => l.estado !== 'cancelado' && l.destino !== 'descuento');
+  const uds   = lineas.reduce((s, l) => s + qtyResumenMesa(l), 0);
+  const total = lineas.reduce((s, l) => s + Number(l.precio || 0) * qtyResumenMesa(l), 0);
+  if (!uds) return 'Sin consumo';
+  return `<strong>${uds} uds</strong> | <strong>${fmtEu(total)}</strong>`;
+}
+
+function aplanarPedidos(pedidos) {
+  const lineas = [];
+  Object.entries(pedidos).forEach(([envioId, envio]) => {
+    if (envioId.startsWith('_')) return;
+    const ls = envio.lineas || { [envioId]: envio };
+    const envioTs = envio.ts || null;
+    const envioCamarero = envio.camarero || null;
+    Object.entries(ls).forEach(([keyInDb, l]) => {
+      const artId = l.artId || keyInDb;
+      const baseId = artId.split('__')[0];
+      const nombre = l.nombre || (cartaData[baseId]?.nombre) || 'Artículo';
+      const precio = l.precio !== undefined ? l.precio : (cartaData[baseId]?.precio || 0);
+      const destino = l.destino || (cartaData[baseId]?.destino || 'barra');
+      lineas.push({ ...l, envioId, dbKey: keyInDb, artId, nombre, precio, destino, envioTs, envioCamarero });
+    });
+  });
+  return lineas;
+}
+
+function calcularInfoMesa(id, m) {
+  const ocupada = m.estado === 'ocupada';
+  const empty = { clase: 'libre', alertaHTML: '', iconHTML: '', tiempoHTML: '', tiempoPendHTML: '', resumen: '', totalHTML: '' };
+  if (!ocupada) return empty;
+
+  const data = pedidosData[id];
+  if (!data) return { ...empty, clase: 'ocupada' };
+
+  const lineasResumen = aplanarPedidos(data).filter(l => l.estado !== 'cancelado' && l.destino !== 'descuento');
+  const totalVal = lineasResumen.reduce((s, l) => s + Number(l.precio || 0) * qtyResumenMesa(l), 0);
+  const totalHTML = lineasResumen.length
+    ? `<span class="plano-mesa-resumen">${fmtEu(totalVal)}</span>` : '';
+
+  const resumen = resumenMesaActual(id);
+
+  let minTs = Infinity;
+  let lineasPend = [];
+  Object.values(data).forEach(envio => {
+    const envioTs = Number(envio.ts) || 0;
+    if (envioTs > 0 && envioTs < minTs) minTs = envioTs;
+    const ls = envio.lineas || { _: envio };
+    Object.values(ls).forEach(l => {
+      if (l.estado === 'pendiente')
+        lineasPend.push({ destino: l.destino, _tsMesa: Number(l.ts) || envioTs });
+    });
+  });
+
+  const minsOcupada = minTs < Infinity ? Math.max(0, Math.floor((Date.now() - minTs) / 60000)) : 0;
+  const horas    = Math.floor(minsOcupada / 60);
+  const minResto = minsOcupada % 60;
+  const tiempoHTML = minsOcupada > 0
+    ? `<span class="plano-mesa-tiempo">${horas > 0 ? horas + 'h ' : ''}${minResto}m</span>` : '';
+
+  if (!lineasPend.length)
+    return { clase: 'ocupada', alertaHTML: '', iconHTML: '', tiempoHTML, tiempoPendHTML: '', resumen, totalHTML };
+
+  const masAntigua  = lineasPend.reduce((min, l) => l._tsMesa < min._tsMesa ? l : min, lineasPend[0]);
+  const minsPend    = Math.max(0, Math.floor((Date.now() - (masAntigua._tsMesa || Date.now())) / 60000));
+  const minsPendTxt = minsPend === 0 ? '<1m' : `${minsPend}m`;
+
+  const destinos = [...new Set(lineasPend.map(l => l.destino))];
+  const iconoDestino = destinos.includes('ambos')
+    ? '&#127866;&#127869;'
+    : destinos.map(d => d === 'cocina' ? '&#127869;' : '&#127866;').join('');
+
+  const pendTxt    = lineasPend.length === 1 ? '1 pend' : `${lineasPend.length} pend`;
+  const alertaHTML = `<span class="plano-mesa-alerta">${iconoDestino} ${pendTxt} · ${minsPendTxt}</span>`;
+  const iconHTML   = `<span class="plano-mesa-alerta" style="font-size:13px;line-height:1">${iconoDestino}</span>`;
+  const tiempoPendHTML = `<span class="plano-mesa-tiempo">${minsPendTxt}</span>`;
+
+  let clase = 'alerta-ok';
+  if      (minsPend >= alertasConfig.amarillo) clase = 'alerta-danger';
+  else if (minsPend >= alertasConfig.verde)    clase = 'alerta-warn';
+
+  return { clase, alertaHTML, iconHTML, tiempoHTML, tiempoPendHTML, resumen, totalHTML };
+}
+
+function renderPlano() {
+  const contenedor = document.getElementById('plano-contenedor');
   if (!contenedor) return;
+
   const entries = Object.entries(mesasData)
     .filter(([id]) => !id.startsWith('temp_'))
     .sort(([,a],[,b]) => (a.orden??999)-(b.orden??999) || a.nombre.localeCompare(b.nombre,'es',{numeric:true}));
 
   if (!entries.length) {
-    contenedor.innerHTML = '<p style="color:var(--muted);font-size:13px;padding:4px 0">Sin mesas aún</p>';
+    contenedor.innerHTML = '<div class="loading">Sin mesas.</div>';
     return;
   }
-  contenedor.innerHTML = '';
-  entries.forEach(([id, m], idx) => {
-    const zona = m.zona ? `<span class="row-sub" style="font-size:11px;opacity:.7">${m.zona}</span>` : '';
-    const row = document.createElement('div');
-    row.className = 'row-item';
-    row.innerHTML = `
-      <span class="row-label" style="font-family:var(--mono);font-size:15px" id="mlbl-${id}">${m.nombre}</span>
-      ${zona}
-      <span class="row-sub">${m.estado||'libre'}</span>
-      <button class="btn btn-sm" onclick="editarMesaInline('${id}','${m.nombre.replace(/'/g,"\\'")}','${(m.zona||'').replace(/'/g,"\\'")}')">✏</button>
-      <button class="btn btn-sm btn-danger" onclick="delMesa('${id}')">×</button>`;
-    contenedor.appendChild(row);
-  });
-}
 
-window.editarMesaInline = (id, nombreActual, zonaActual) => {
-  const lbl = document.getElementById('mlbl-' + id);
-  if (!lbl) return;
-  lbl.innerHTML = `
-    <input type="text" id="inp-mesa-${id}" value="${nombreActual}"
-      style="font-family:var(--mono);font-size:13px;background:var(--bg);border:1px solid var(--accent);
-      border-radius:4px;padding:3px 8px;width:110px;color:var(--text)" />
-    <input type="text" id="inp-zona-${id}" value="${zonaActual||''}" placeholder="Zona (opc.)"
-      style="font-size:12px;background:var(--bg);border:1px solid var(--border);
-      border-radius:4px;padding:3px 8px;width:90px;color:var(--text);margin-left:4px" />`;
-  const inp = document.getElementById('inp-mesa-' + id);
-  const inpZona = document.getElementById('inp-zona-' + id);
-  inp.focus(); inp.select();
-  const guardar = async () => {
-    const nuevo = inp.value.trim();
-    const nuevaZona = inpZona.value.trim();
-    const updates = {};
-    if (nuevo && nuevo !== nombreActual) updates['mesas/' + id + '/nombre'] = nuevo;
-    if (nuevaZona !== (zonaActual || '')) updates['mesas/' + id + '/zona'] = nuevaZona;
-    if (Object.keys(updates).length) {
-      await update(ref(db), updates);
-      toast('Mesa actualizada');
-    }
-  };
-  inp.addEventListener('blur', guardar);
-  inp.addEventListener('keydown', e => { if (e.key === 'Enter') inp.blur(); });
-};
-
-window.moverMesa = async (id, idx, dir) => {
-  const lista = Object.entries(mesasData)
-    .sort(([,a],[,b]) => (a.orden??999)-(b.orden??999) || a.nombre.localeCompare(b.nombre,'es',{numeric:true}));
-  const idxDest = idx + dir;
-  if (idxDest < 0 || idxDest >= lista.length) return;
-  const updates = {};
-  lista.forEach(([mid], i) => { updates['mesas/' + mid + '/orden'] = i; });
-  updates['mesas/' + lista[idx][0] + '/orden'] = idxDest;
-  updates['mesas/' + lista[idxDest][0] + '/orden'] = idx;
-  await update(ref(db), updates);
-};
-
-window.addMesa = async () => {
-  const nombre = document.getElementById('nueva-mesa').value.trim();
-  const zona   = (document.getElementById('nueva-mesa-zona')?.value || '').trim();
-  if (!nombre) return;
-  await push(ref(db, 'mesas'), { nombre, estado: 'libre', zona });
-  document.getElementById('nueva-mesa').value = '';
-  if (document.getElementById('nueva-mesa-zona')) document.getElementById('nueva-mesa-zona').value = '';
-  toast('Mesa añadida');
-};
-
-window.delMesa = async (id, e) => {
-  if (e) e.stopPropagation();
-  if (!confirm('¿Eliminar esta mesa?')) return;
-  await remove(ref(db, 'mesas/' + id));
-  toast('Mesa eliminada');
-};
-
-// ─── PLANO ───────────────────────────────────────────────────────────────────
-let adminPlanoMesaSel = null;
-let adminPlanoZona    = null;
-
-function renderPlanoEditor() {
-  const gridEl    = document.getElementById('admin-plano-grid');
-  const sidebarEl = document.getElementById('plano-sidebar');
-  if (!gridEl || !sidebarEl) return;
-
-  const cols = planoCfgAdmin.cols;
-  const rows = planoCfgAdmin.rows;
-  const allEntries = Object.entries(mesasData)
-    .filter(([id]) => !id.startsWith('temp_'))
-    .sort(([,a],[,b]) => (a.orden??999)-(b.orden??999) || a.nombre.localeCompare(b.nombre,'es',{numeric:true}));
-
-  // ── Tabs de zona ─────────────────────────────────────────────────────────
-  const hayZonas = allEntries.some(([,m]) => m.zona && m.zona.trim());
-  const zonas    = hayZonas
-    ? [...new Set(allEntries.map(([,m]) => m.zona?.trim() || 'Sin zona'))]
+  const hayZonas = entries.some(([,m]) => m.zona && m.zona.trim());
+  const zonas = hayZonas
+    ? [...new Set(entries.map(([,m]) => normalizarEtiquetaZona(m.zona)))]
     : null;
-  if (hayZonas && (!adminPlanoZona || !zonas.includes(adminPlanoZona)))
-    adminPlanoZona = zonas[0];
+
+  if (hayZonas && (!planoZonaActiva || !zonas.includes(planoZonaActiva))) {
+    planoZonaActiva = zonas[0];
+  }
+
+  const mesasFiltradas = hayZonas
+    ? entries.filter(([,m]) => normalizarEtiquetaZona(m.zona) === planoZonaActiva)
+    : entries;
+
+  const cols = planoCfgAdmin.cols || 16;
+  const rows = planoCfgAdmin.rows || 12;
+  const ubicadas  = mesasFiltradas.filter(([,m]) => m.plano);
+  const sinUbicar = mesasFiltradas.filter(([,m]) => !m.plano && !m.nombre.startsWith('#'));
+
+  const tabsHTML = hayZonas
+    ? zonas.map(z => `<button class="plano-tab${z === planoZonaActiva ? ' active' : ''}" onclick="seleccionarZonaPlano('${z.replace(/'/g,"\\'")}')">${z}</button>`).join('')
+    : '';
 
   const tabsEl = document.getElementById('plano-zona-tabs');
   if (tabsEl) {
     tabsEl.style.display = hayZonas ? 'flex' : 'none';
-    if (hayZonas) {
-      tabsEl.innerHTML = zonas.map(z =>
-        `<button class="plano-sidebar-btn${z === adminPlanoZona ? ' selected' : ''}"
-          style="padding:5px 14px" onclick="selectAdminZona('${z.replace(/'/g,"\\'")}')">
-          ${z}
-        </button>`
-      ).join('');
-    }
+    tabsEl.innerHTML = tabsHTML;
   }
 
-  const entries = hayZonas
-    ? allEntries.filter(([,m]) => (m.zona?.trim() || 'Sin zona') === adminPlanoZona)
-    : allEntries;
+  const mesasHTML = ubicadas.map(([id, m]) => {
+    const p = m.plano;
+    const circle    = p.shape === 'circle' ? ' circle' : '';
+    const isDeco    = m.nombre.startsWith('#');
+    const shortCard = p.h === 1 ? ' short' : '';
 
-  // ── Sidebar ───────────────────────────────────────────────────────────────
-  sidebarEl.innerHTML = '';
-  entries.forEach(([id, m]) => {
-    const btn = document.createElement('button');
-    const isPlaced = !!m.plano;
-    btn.className = 'plano-sidebar-btn' + (isPlaced ? ' placed' : '') + (adminPlanoMesaSel === id ? ' selected' : '');
-    btn.title = isPlaced ? `Col ${m.plano.x} Fil ${m.plano.y} — ${m.plano.w}×${m.plano.h}` : 'Sin ubicar';
-    btn.innerHTML = `${m.nombre}${isPlaced ? ' <span style="opacity:.5;font-size:10px">✓</span>' : ''}`;
-    btn.onclick = () => {
-      adminPlanoMesaSel = adminPlanoMesaSel === id ? null : id;
-      renderPlanoEditor();
-    };
-    sidebarEl.appendChild(btn);
-  });
-
-  // ── Grid ──────────────────────────────────────────────────────────────────
-  gridEl.style.setProperty('--plano-cols', cols);
-  gridEl.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-  gridEl.style.gridTemplateRows    = `repeat(${rows}, 1fr)`;
-  gridEl.innerHTML = '';
-
-  // Celdas de fondo con posición EXPLÍCITA (evita imprecisión por auto-placement)
-  for (let r = 1; r <= rows; r++) {
-    for (let c = 1; c <= cols; c++) {
-      const cell = document.createElement('div');
-      cell.className       = 'plano-admin-cell';
-      cell.dataset.type    = 'cell';
-      cell.dataset.col     = c;
-      cell.dataset.row     = r;
-      cell.style.gridColumn = c;
-      cell.style.gridRow    = r;
-      gridEl.appendChild(cell);
+    if (isDeco) {
+      const displayNombre = m.nombre.slice(1);
+      return `<div class="plano-mesa decorador${circle}${shortCard}"
+        style="grid-column:${p.x}/span ${p.w};grid-row:${p.y}/span ${p.h}">
+        <span class="plano-mesa-nombre">${displayNombre}</span>
+      </div>`;
     }
-  }
 
-  // Mesas colocadas (explicit placement, encima de las celdas)
-  entries.filter(([,m]) => m.plano).forEach(([id, m]) => {
-    const p   = m.plano;
-    const div = document.createElement('div');
-    const isDeco = m.nombre.startsWith('#');
-    div.className = 'plano-admin-mesa' +
-      (p.shape === 'circle' ? ' circle' : '') +
-      (isDeco ? ' decorador' : '') +
-      (adminPlanoMesaSel === id ? ' selected' : '');
-    div.dataset.type = 'mesa';
-    div.dataset.id   = id;
-    div.style.gridColumn = `${p.x} / span ${p.w}`;
-    div.style.gridRow    = `${p.y} / span ${p.h}`;
-    div.textContent = isDeco ? m.nombre.slice(1) : m.nombre;
-    gridEl.appendChild(div);
-  });
+    const { clase, alertaHTML, iconHTML, tiempoHTML, tiempoPendHTML, resumen, totalHTML } = calcularInfoMesa(id, m);
 
-  // Delegación de clicks en el grid
-  gridEl.onclick = e => {
-    const mesa = e.target.closest('[data-type="mesa"]');
-    const cell = e.target.closest('[data-type="cell"]');
-    if (mesa) {
-      // Seleccionar o deseleccionar la mesa pulsada
-      adminPlanoMesaSel = adminPlanoMesaSel === mesa.dataset.id ? null : mesa.dataset.id;
-      renderPlanoEditor();
-    } else if (cell && adminPlanoMesaSel) {
-      const m = mesasData[adminPlanoMesaSel];
-      if (!m) return;
-      const col   = parseInt(cell.dataset.col);
-      const row   = parseInt(cell.dataset.row);
-      const prevP = m.plano;
-      const w     = prevP?.w || 2;
-      const h     = prevP?.h || 2;
-      const shape = prevP?.shape || 'rect';
-      // Actualización optimista local
-      mesasData[adminPlanoMesaSel].plano = { x: col, y: row, w, h, shape };
-      renderPlanoEditor();
-      // Guardar en Firebase
-      set(ref(db, `mesas/${adminPlanoMesaSel}/plano`), { x: col, y: row, w, h, shape })
-        .then(() => toast('Mesa ubicada'));
-    }
-  };
+    const topHTML  = tiempoHTML;
+    const mainHTML = totalHTML;
+    const resumenHTML = resumen && resumen !== 'Sin consumo'
+      ? `<span class="plano-mesa-resumen">${resumen}</span>` : '';
+    const extraHTML = resumenHTML + alertaHTML;
 
-  // ── Controles de la mesa seleccionada ────────────────────────────────────
-  const ctrl = document.getElementById('plano-mesa-controls');
-  if (!ctrl) return;
-  if (!adminPlanoMesaSel || !mesasData[adminPlanoMesaSel]) {
-    ctrl.style.display = 'none';
-    return;
-  }
-  const selId = adminPlanoMesaSel;
-  const selM  = mesasData[selId];
-  const p     = selM.plano;
-  ctrl.style.display = 'flex';
-  ctrl.innerHTML = `
-    <strong style="font-family:var(--mono);font-size:13px;margin-right:4px">${selM.nombre}</strong>
-    <label class="plano-ctrl-label">Ancho
-      <input class="plano-ctrl-input" type="number" id="pctrl-w" min="1" max="${cols}" value="${p?.w||2}">
-    </label>
-    <label class="plano-ctrl-label">Alto
-      <input class="plano-ctrl-input" type="number" id="pctrl-h" min="1" max="${rows}" value="${p?.h||2}">
-    </label>
-    <label class="plano-ctrl-label">Forma
-      <select class="plano-ctrl-sel" id="pctrl-s">
-        <option value="rect"${p?.shape!=='circle'?' selected':''}>Rect</option>
-        <option value="circle"${p?.shape==='circle'?' selected':''}>Círculo</option>
-      </select>
-    </label>
-    <button class="btn btn-sm btn-success" onclick="guardarPlanoDesdeControles()">Aplicar</button>
-    <button class="btn btn-sm btn-danger" onclick="quitarPlanoMesa('${selId}')">Quitar del plano</button>`;
+    return `<div class="plano-mesa ${clase}${circle}${shortCard}"
+      style="grid-column:${p.x}/span ${p.w};grid-row:${p.y}/span ${p.h}">
+      <span class="plano-mesa-tiempo">${topHTML}</span>
+      <span class="plano-mesa-nombre">${m.nombre}</span>
+      <span class="plano-mesa-extra">${extraHTML}</span>
+    </div>`;
+  }).join('');
+
+  const sinUbicarHTML = sinUbicar.length
+    ? `<div class="plano-sinubicar" style="margin-top:12px; font-size:12px; color:var(--muted)">Sin ubicar: ${sinUbicar.map(([,m]) => m.nombre).join(', ')}</div>`
+    : '';
+
+  contenedor.innerHTML = `<div class="plano-wrap"><div class="plano-grid" style="--plano-cols:${cols};--plano-rows:${rows}">${mesasHTML}</div></div>` + sinUbicarHTML;
 }
 
-window.guardarPlanoDesdeControles = async () => {
-  if (!adminPlanoMesaSel) return;
-  const m = mesasData[adminPlanoMesaSel];
-  if (!m?.plano) { toast('Primero ubica la mesa pulsando en el plano'); return; }
-  const w     = Math.max(1, parseInt(document.getElementById('pctrl-w')?.value) || 2);
-  const h     = Math.max(1, parseInt(document.getElementById('pctrl-h')?.value) || 2);
-  const shape = document.getElementById('pctrl-s')?.value || 'rect';
-  const { x, y } = m.plano;
-  mesasData[adminPlanoMesaSel].plano = { x, y, w, h, shape };
-  renderPlanoEditor();
-  await set(ref(db, `mesas/${adminPlanoMesaSel}/plano`), { x, y, w, h, shape });
-  toast('Posición guardada');
+window.seleccionarZonaPlano = (zona) => {
+  planoZonaActiva = zona;
+  renderPlano();
 };
 
-window.quitarPlanoMesa = async id => {
-  await remove(ref(db, 'mesas/' + id + '/plano'));
-  if (adminPlanoMesaSel === id) adminPlanoMesaSel = null;
-  toast('Mesa quitada del plano');
-};
-
-window.guardarPlanoGrid = async () => {
-  const cols = Math.max(4, parseInt(document.getElementById('plano-cols')?.value) || 16);
-  const rows = Math.max(4, parseInt(document.getElementById('plano-rows')?.value) || 12);
-  await set(ref(db, 'config/plano'), { cols, rows });
-  toast('Tamaño del plano guardado');
-};
-
-window.selectAdminZona = zona => {
-  adminPlanoZona    = zona;
-  adminPlanoMesaSel = null;
-  renderPlanoEditor();
-};
 
 // ─── CARTA ───────────────────────────────────────────────────────────────────
 let destino = 'barra';
@@ -483,11 +419,13 @@ window.toggleDisponible = async (id, disponibleActual) => {
 
 function renderCarta() {
   const lista = document.getElementById('carta-lista');
+  if (!lista) return;
   if (!Object.keys(categoriasData).length) {
     lista.innerHTML = '<p style="color:var(--muted);font-size:13px">Sin categorías aún</p>';
     return;
   }
   lista.innerHTML = '';
+  
   Object.entries(categoriasData)
     .sort(([,a],[,b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre, 'es'))
     .forEach(([catId, cat], idx, arr) => {
@@ -495,48 +433,44 @@ function renderCarta() {
         .filter(([,a]) => a.catId === catId)
         .sort(([,a],[,b]) => (a.orden||0) - (b.orden||0) || a.nombre.localeCompare(b.nombre,'es'));
 
+      const isCollapsed = collapsedCategories.has(catId);
       const catEl = document.createElement('div');
-      catEl.innerHTML = `<div class="categoria-header" style="display:flex;justify-content:space-between;align-items:center">
-        <span>${cat.nombre}</span>
-        <div style="display:flex;gap:4px;align-items:center">
-          <button class="btn btn-sm" title="Mover categoría arriba"
-            onclick="moverCat('${catId}',${idx},-1)" ${idx===0?'disabled':''}>↑</button>
-          <button class="btn btn-sm" title="Mover categoría abajo"
-            onclick="moverCat('${catId}',${idx},1)" ${idx===arr.length-1?'disabled':''}>↓</button>
-          <button class="btn btn-sm" title="Editar variantes compartidas"
-            onclick="toggleCatVariantes('${catId}')">✏ var</button>
-          <button class="btn btn-sm btn-danger" onclick="delCat('${catId}')">× eliminar</button>
-        </div>
-      </div>`;
+      catEl.className = 'categoria-wrapper';
+      catEl.style.marginBottom = '16px';
+      catEl.style.border = '1px solid var(--border)';
+      catEl.style.borderRadius = '12px';
+      catEl.style.background = 'var(--surface)';
+      catEl.style.overflow = 'hidden';
 
-      const catVars = cat.variantes || [];
-      const isOpen = openCatVarsPanels.has(catId);
-      const catVarsPanel = document.createElement('div');
-      catVarsPanel.id = 'cat-vars-panel-' + catId;
-      catVarsPanel.style.cssText = `display:${isOpen ? 'flex' : 'none'};padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:12px;margin:8px 0;flex-direction:column;gap:10px`;
-      catVarsPanel.innerHTML = `
-        <div style="font-size:11px;color:var(--muted);margin-bottom:6px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em">Variantes compartidas de la categoría</div>
-        <div id="cat-variantes-lista-${catId}">
-          ${catVars.map((v, i) => `
-            <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
-              <span style="flex:1;font-size:13px">${v.nombre}</span>
-              <span style="font-family:var(--mono);font-size:12px;color:var(--muted)">${Number(v.precio).toFixed(2)} €</span>
-              <button class="btn btn-sm btn-danger" onclick="eliminarCatVariante('${catId}',${i})">×</button>
-            </div>`).join('')}
-        </div>
-        <div style="display:flex;gap:8px;margin-top:6px">
-          <input type="text" id="cat-var-nombre-${catId}" placeholder="Nombre variante" style="flex:2;min-width:100px" />
-          <input type="number" id="cat-var-precio-${catId}" placeholder="Precio €" step="0.1" min="0" style="width:90px;flex:none" />
-          <button class="btn btn-sm btn-success" onclick="agregarCatVariante('${catId}')">+ Añadir</button>
+      catEl.innerHTML = `
+        <div class="categoria-header" onclick="toggleCollapseCategoria('${catId}')" style="display:flex;justify-content:space-between;align-items:center;background:var(--surface2);padding:10px 14px;border-bottom:${isCollapsed?'none':'1px solid var(--border)'};cursor:pointer;user-select:none">
+          <div style="display:flex;align-items:center;gap:6px">
+            <span class="cat-toggle-arrow ${isCollapsed ? 'collapsed' : ''}" style="color:var(--accent);font-size:10px;transition:transform 0.2s;display:inline-block;transform:${isCollapsed?'rotate(-90deg)':'none'}">▼</span>
+            <span style="font-weight:600;font-size:14px">${cat.nombre}</span>
+            <span style="font-size:11px;color:var(--muted);margin-left:4px">(${arts.length} art.)</span>
+          </div>
+          <div style="display:flex;gap:4px;align-items:center" onclick="event.stopPropagation()">
+            <button class="btn btn-sm" title="Mover categoría arriba"
+              onclick="moverCat('${catId}',${idx},-1)" ${idx===0?'disabled':''}>↑</button>
+            <button class="btn btn-sm" title="Mover categoría abajo"
+              onclick="moverCat('${catId}',${idx},1)" ${idx===arr.length-1?'disabled':''}>↓</button>
+            <button class="btn btn-sm ${editingCatId === catId ? 'btn-success' : ''}" title="Editar variantes compartidas"
+              onclick="toggleCatVariantes('${catId}')">✏ var</button>
+            <button class="btn btn-sm btn-danger" onclick="delCat('${catId}')">×</button>
+          </div>
         </div>
       `;
-      catEl.appendChild(catVarsPanel);
+
+      const articlesContainer = document.createElement('div');
+      articlesContainer.className = `categoria-articles ${isCollapsed ? 'collapsed' : ''}`;
+      articlesContainer.style.display = isCollapsed ? 'none' : 'block';
 
       arts.forEach(([id, a], idx) => {
         const disponible = a.disponible !== false;
         const row = document.createElement('div');
         row.className = 'row-item';
         row.id = 'art-row-' + id;
+        row.style.borderBottom = idx === arts.length - 1 ? 'none' : '1px solid var(--border)';
         row.innerHTML = `
           <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0">
             <span class="row-label" id="art-label-${id}" style="${disponible?'':'opacity:.45;text-decoration:line-through'}">${a.nombre}</span>
@@ -551,120 +485,70 @@ function renderCarta() {
               onclick="moverArt('${id}','${catId}',${idx},-1)" ${idx===0?'disabled':''}>↑</button>
             <button class="btn btn-sm" title="Mover abajo"
               onclick="moverArt('${id}','${catId}',${idx},1)" ${idx===arts.length-1?'disabled':''}>↓</button>
-            <button class="btn btn-sm" onclick="editarArticulo('${id}')">✏</button>
+            <button class="btn btn-sm ${editingArticuloId === id ? 'btn-success' : ''}" onclick="editarArticulo('${id}')">✏</button>
             <button class="btn btn-sm btn-danger" onclick="delArticulo('${id}')">×</button>
           </div>`;
-        catEl.appendChild(row);
-
-        // Panel de edición inline
-        const isEditOpen = openEditPanels.has(id);
-        const editPanel = document.createElement('div');
-        editPanel.id = 'edit-panel-' + id;
-        editPanel.style.cssText = `display:${isEditOpen ? 'flex' : 'none'};padding:12px;background:var(--surface2);border-bottom:1px solid var(--border);flex-direction:column;gap:10px`;
-
-        // Campos básicos
-        const camposHTML = `
-          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-            <input type="text" id="edit-nombre-${id}" value="${a.nombre.replace(/"/g,'&quot;')}"
-              placeholder="Nombre" style="flex:2;min-width:120px" />
-            <input type="number" id="edit-precio-${id}" value="${Number(a.precio).toFixed(2)}"
-              placeholder="Precio" step="0.1" min="0" style="width:90px;flex:none" />
-            <select id="edit-cat-${id}" style="flex:1;min-width:110px"></select>
-            <button class="btn btn-success btn-sm" onclick="guardarArticulo('${id}')">Guardar</button>
-            <button class="btn btn-sm" onclick="cancelarEdicion('${id}')">Cancelar</button>
-          </div>`;
-
-        // Alérgenos
-        const alergenosActuales = a.alergenos || [];
-        const alergenosHTML = `
-          <div>
-            <div style="font-size:11px;color:var(--muted);margin-bottom:6px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em">Alérgenos</div>
-            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:4px" id="alerg-checks-${id}">
-              ${ALERGENOS_EU.map(al => `
-                <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:3px 0">
-                  <input type="checkbox" data-alerg="${al}" ${alergenosActuales.includes(al)?'checked':''} style="width:14px;height:14px" />
-                  <span>${al}</span>
-                </label>`).join('')}
-            </div>
-          </div>`;
-
-        // Variantes
-        const variantesActuales = a.variantes || [];
-        const variantesHTML = `
-          <div>
-            <div style="font-size:11px;color:var(--muted);margin-bottom:6px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em">Variantes de precio</div>
-            <div id="variantes-lista-${id}">
-              ${variantesActuales.map((v, i) => `
-                <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
-                  <span style="flex:1;font-size:13px">${v.nombre}</span>
-                  <span style="font-family:var(--mono);font-size:12px;color:var(--muted)">${Number(v.precio).toFixed(2)} €</span>
-                  <button class="btn btn-sm btn-danger" onclick="eliminarVariante('${id}',${i})">×</button>
-                </div>`).join('')}
-            </div>
-            <div style="display:flex;gap:8px;margin-top:6px">
-              <input type="text" id="var-nombre-${id}" placeholder="Nombre variante" style="flex:2;min-width:100px" />
-              <input type="number" id="var-precio-${id}" placeholder="Precio €" step="0.1" min="0" style="width:90px;flex:none" />
-              <button class="btn btn-sm btn-success" onclick="agregarVariante('${id}')">+ Añadir</button>
-            </div>
-          </div>`;
-
-        editPanel.innerHTML = camposHTML + alergenosHTML + variantesHTML;
-        catEl.appendChild(editPanel);
+        articlesContainer.appendChild(row);
       });
 
+      if (arts.length === 0) {
+        const row = document.createElement('div');
+        row.style.padding = '12px';
+        row.style.fontSize = '13px';
+        row.style.color = 'var(--muted)';
+        row.textContent = 'Sin artículos en esta categoría';
+        articlesContainer.appendChild(row);
+      }
+
+      catEl.appendChild(articlesContainer);
       lista.appendChild(catEl);
     });
 
-  // Rellenar selects de categoría en paneles de edición
-  Object.keys(cartaData).forEach(id => {
-    const sel = document.getElementById('edit-cat-' + id);
-    if (!sel) return;
-    sel.innerHTML = Object.entries(categoriasData)
-      .sort(([,a],[,b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre, 'es'))
-      .map(([cid, c]) => `<option value="${cid}" ${cartaData[id]?.catId===cid?'selected':''}>${c.nombre}</option>`)
-      .join('');
-  });
+  if (editingCatId) {
+    updateCatVariantsList(editingCatId);
+  }
+  if (editingArticuloId) {
+    updateEditVariantsList(editingArticuloId);
+  }
 }
 
-window.editarArticulo = id => {
-  document.querySelectorAll('[id^="edit-panel-"]').forEach(p => {
-    p.style.display = 'none';
-    const match = p.id.match(/^edit-panel-(.+)$/);
-    if (match) openEditPanels.delete(match[1]);
-  });
-  const panel = document.getElementById('edit-panel-' + id);
-  if (panel) {
-    panel.style.cssText = panel.style.cssText.replace('none','flex');
-    openEditPanels.add(id);
+window.toggleCollapseCategoria = (catId) => {
+  if (collapsedCategories.has(catId)) {
+    collapsedCategories.delete(catId);
+  } else {
+    collapsedCategories.add(catId);
   }
+  renderCarta();
+};
+
+window.editarArticulo = id => {
+  editingArticuloId = id;
+  editingCatId = null;
+  const catVarContainer = document.getElementById('cat-variantes-sidebar-container');
+  if (catVarContainer) catVarContainer.innerHTML = '';
+  
+  renderSidebarEditForm(id);
+  renderCarta();
 };
 
 window.cancelarEdicion = id => {
-  const panel = document.getElementById('edit-panel-' + id);
-  if (panel) {
-    panel.style.display = 'none';
-    openEditPanels.delete(id);
-  }
+  editingArticuloId = null;
+  renderSidebarNuevoForm();
+  renderCarta();
 };
 
 window.toggleCatVariantes = id => {
-  const panel = document.getElementById('cat-vars-panel-' + id);
-  if (panel) {
-    const isHidden = panel.style.display === 'none';
-    if (isHidden) {
-      panel.style.display = 'flex';
-      openCatVariRoot(panel);
-      openCatVarsPanels.add(id);
-    } else {
-      panel.style.display = 'none';
-      openCatVarsPanels.delete(id);
-    }
+  if (editingCatId === id) {
+    editingCatId = null;
+    const container = document.getElementById('cat-variantes-sidebar-container');
+    if (container) container.innerHTML = '';
+    renderCarta();
+  } else {
+    editingCatId = id;
+    renderSidebarCatVariantesForm(id);
+    renderCarta();
   }
 };
-
-function openCatVariRoot(panel) {
-  panel.style.cssText = panel.style.cssText.replace('none','flex');
-}
 
 window.agregarCatVariante = async (catId) => {
   const nombre = document.getElementById('cat-var-nombre-' + catId)?.value.trim();
@@ -673,6 +557,12 @@ window.agregarCatVariante = async (catId) => {
   const variantesActuales = categoriasData[catId]?.variantes || [];
   const nuevas = [...variantesActuales, { nombre, precio }];
   await set(ref(db, 'categorias/' + catId + '/variantes'), nuevas);
+  
+  const inpNom = document.getElementById('cat-var-nombre-' + catId);
+  const inpPre = document.getElementById('cat-var-precio-' + catId);
+  if (inpNom) inpNom.value = '';
+  if (inpPre) inpPre.value = '';
+  
   toast('Variante compartida añadida');
 };
 
@@ -701,6 +591,9 @@ window.guardarArticulo = async id => {
     variantes: variantesActuales,
     disponible: cartaData[id]?.disponible !== false
   });
+  
+  editingArticuloId = null;
+  renderSidebarNuevoForm();
   toast('Artículo actualizado');
 };
 
@@ -711,8 +604,12 @@ window.agregarVariante = async (artId) => {
   const variantesActuales = cartaData[artId]?.variantes || [];
   const nuevas = [...variantesActuales, { nombre, precio }];
   await set(ref(db, 'carta/' + artId + '/variantes'), nuevas);
-  document.getElementById('var-nombre-' + artId).value = '';
-  document.getElementById('var-precio-' + artId).value = '';
+  
+  const inpNom = document.getElementById('var-nombre-' + artId);
+  const inpPre = document.getElementById('var-precio-' + artId);
+  if (inpNom) inpNom.value = '';
+  if (inpPre) inpPre.value = '';
+  
   toast('Variante añadida');
 };
 
@@ -727,10 +624,8 @@ window.moverArt = async (id, catId, idx, dir) => {
   const arts = Object.entries(cartaData)
     .filter(([,a]) => a.catId === catId)
     .sort(([,a],[,b]) => (a.orden||0) - (b.orden||0) || a.nombre.localeCompare(b.nombre,'es'));
-
   const idxDest = idx + dir;
   if (idxDest < 0 || idxDest >= arts.length) return;
-
   const updates = {};
   arts.forEach(([aid], i) => { updates['carta/' + aid + '/orden'] = i; });
   updates['carta/' + arts[idx][0] + '/orden'] = idxDest;
@@ -741,10 +636,8 @@ window.moverArt = async (id, catId, idx, dir) => {
 window.moverCat = async (id, idx, dir) => {
   const cats = Object.entries(categoriasData)
     .sort(([,a],[,b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre, 'es'));
-
   const idxDest = idx + dir;
   if (idxDest < 0 || idxDest >= cats.length) return;
-
   const updates = {};
   cats.forEach(([cid], i) => { updates['categorias/' + cid + '/orden'] = i; });
   updates['categorias/' + cats[idx][0] + '/orden'] = idxDest;
@@ -764,12 +657,184 @@ window.delCat = async id => {
 
 function updateCatSelect() {
   const sel = document.getElementById('art-cat');
+  if (!sel) return;
   sel.innerHTML = '<option value="">— Categoría —</option>';
   Object.entries(categoriasData)
     .sort(([,a],[,b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre, 'es'))
     .forEach(([id, c]) => {
       sel.innerHTML += `<option value="${id}">${c.nombre}</option>`;
     });
+}
+
+function renderSidebarEditForm(id) {
+  const container = document.getElementById('articulo-form-container');
+  if (!container) return;
+  const a = cartaData[id];
+  if (!a) {
+    editingArticuloId = null;
+    renderSidebarNuevoForm();
+    return;
+  }
+  const alergenosActuales = a.alergenos || [];
+  container.innerHTML = `
+    <div class="card" id="edit-articulo-card">
+      <div class="card-header">
+        <div>
+          <div class="card-kicker">Modificar</div>
+          <div class="card-title">Editar artículo</div>
+          <p class="card-desc">Modificando "${a.nombre}"</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="field-stack" style="margin-bottom:10px">
+          <label>Nombre del artículo</label>
+          <input type="text" id="edit-nombre-${id}" value="${a.nombre.replace(/"/g,'&quot;')}" placeholder="Nombre" style="width:100%" />
+        </div>
+        <div class="field-stack" style="margin-bottom:10px">
+          <label>Precio €</label>
+          <input type="number" id="edit-precio-${id}" value="${Number(a.precio).toFixed(2)}" placeholder="Precio €" step="0.1" min="0" style="width:100%" />
+        </div>
+        <div class="field-stack" style="margin-bottom:12px">
+          <label for="edit-cat-${id}">Categoría</label>
+          <select id="edit-cat-${id}" style="width:100%"></select>
+        </div>
+        
+        <div style="margin-top:12px">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em">Alérgenos</div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:4px" id="alerg-checks-${id}">
+            ${ALERGENOS_EU.map(al => `
+              <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer;padding:3px 0">
+                <input type="checkbox" data-alerg="${al}" ${alergenosActuales.includes(al)?'checked':''} style="width:14px;height:14px" />
+                <span>${al}</span>
+              </label>`).join('')}
+          </div>
+        </div>
+        
+        <div style="margin-top:12px; border-top: 1px solid var(--border); padding-top: 12px">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em">Variantes de precio</div>
+          <div id="edit-variantes-lista-${id}"></div>
+          <div style="display:flex;gap:8px;margin-top:6px">
+            <input type="text" id="var-nombre-${id}" placeholder="Nueva variante" style="flex:2;min-width:100px" />
+            <input type="number" id="var-precio-${id}" placeholder="Precio" step="0.1" min="0" style="width:75px;flex:none" />
+            <button class="btn btn-sm btn-success" onclick="agregarVariante('${id}')">+ Añadir</button>
+          </div>
+        </div>
+        
+        <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end">
+          <button class="btn btn-sm" onclick="cancelarEdicion('${id}')">Cancelar</button>
+          <button class="btn btn-sm btn-success" onclick="guardarArticulo('${id}')">Guardar</button>
+        </div>
+      </div>
+    </div>
+  `;
+  const sel = document.getElementById('edit-cat-' + id);
+  if (sel) {
+    sel.innerHTML = Object.entries(categoriasData)
+      .sort(([,a],[,b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre, 'es'))
+      .map(([cid, c]) => `<option value="${cid}" ${a.catId===cid?'selected':''}>${c.nombre}</option>`)
+      .join('');
+  }
+  updateEditVariantsList(id);
+}
+
+function renderSidebarNuevoForm() {
+  const container = document.getElementById('articulo-form-container');
+  if (!container) return;
+  container.innerHTML = `
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-kicker">Alta</div>
+          <div class="card-title">Nuevo artículo</div>
+          <p class="card-desc">Añade producto, precio, categoría y destino operativo desde un solo bloque.</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="form-row">
+          <input type="text" id="art-nombre" placeholder="Nombre del artículo" style="flex:2" />
+          <input type="number" id="art-precio" placeholder="Precio €" step="0.1" min="0" style="max-width:140px" />
+        </div>
+        <div class="form-grid">
+          <div class="field-stack">
+            <label for="art-cat">Categoría</label>
+            <select id="art-cat"><option value="">— Categoría —</option></select>
+          </div>
+          <div class="field-stack">
+            <label>Destino</label>
+            <div class="destino-btns">
+              <button class="dest-btn active-barra" id="db-barra" onclick="setDest('barra')">Barra</button>
+              <button class="dest-btn" id="db-cocina" onclick="setDest('cocina')">Cocina</button>
+              <button class="dest-btn" id="db-ambos" onclick="setDest('ambos')">Ambos</button>
+            </div>
+          </div>
+        </div>
+        <div class="add-row">
+          <button class="btn btn-success" onclick="addArticulo()">+ Añadir artículo</button>
+        </div>
+      </div>
+    </div>
+  `;
+  updateCatSelect();
+}
+
+function renderSidebarCatVariantesForm(catId) {
+  const container = document.getElementById('cat-variantes-sidebar-container');
+  if (!container) return;
+  const cat = categoriasData[catId];
+  if (!cat) {
+    editingCatId = null;
+    container.innerHTML = '';
+    return;
+  }
+  container.innerHTML = `
+    <div class="card" id="edit-cat-vars-card">
+      <div class="card-header">
+        <div>
+          <div class="card-kicker">Modificar</div>
+          <div class="card-title">Variantes de categoría</div>
+          <p class="card-desc">Variantes para "${cat.nombre}"</p>
+        </div>
+      </div>
+      <div class="card-body">
+        <div id="cat-variantes-lista-${catId}"></div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <input type="text" id="cat-var-nombre-${catId}" placeholder="Nueva variante" style="flex:2;min-width:100px" />
+          <input type="number" id="cat-var-precio-${catId}" placeholder="Precio" step="0.1" min="0" style="width:75px;flex:none" />
+          <button class="btn btn-sm btn-success" onclick="agregarCatVariante('${catId}')">+ Añadir</button>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:12px">
+          <button class="btn btn-sm" onclick="toggleCatVariantes('${catId}')">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  `;
+  updateCatVariantsList(catId);
+}
+
+function updateEditVariantsList(id) {
+  const el = document.getElementById(`edit-variantes-lista-${id}`);
+  if (!el) return;
+  const a = cartaData[id];
+  const variantesActuales = a?.variantes || [];
+  el.innerHTML = variantesActuales.map((v, i) => `
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
+      <span style="flex:1;font-size:13px">${v.nombre}</span>
+      <span style="font-family:var(--mono);font-size:12px;color:var(--muted)">${Number(v.precio).toFixed(2)} €</span>
+      <button class="btn btn-sm btn-danger" onclick="eliminarVariante('${id}',${i})">×</button>
+    </div>`).join('');
+}
+
+function updateCatVariantsList(catId) {
+  const el = document.getElementById(`cat-variantes-lista-${catId}`);
+  if (!el) return;
+  const cat = categoriasData[catId];
+  const catVars = cat?.variantes || [];
+  el.innerHTML = catVars.map((v, i) => `
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px">
+      <span style="flex:1;font-size:13px">${v.nombre}</span>
+      <span style="font-family:var(--mono);font-size:12px;color:var(--muted)">${Number(v.precio).toFixed(2)} €</span>
+      <button class="btn btn-sm btn-danger" onclick="eliminarCatVariante('${catId}',${i})">×</button>
+    </div>`).join('');
 }
 
 window.guardarPin = (rol) => {
@@ -1612,71 +1677,53 @@ window.exportarAuditoriaCSV = () => {
 async function init() {
   try {
     await prepararFiltrosVentasIniciales();
-    aplicarFiltros();
+    // Do NOT auto-run aplicarFiltros() on load
   } catch (err) {
     console.error('Error preparando ventas', err);
     renderVentas([]);
   }
 
-  onValue(ref(db, 'mesas'), snap => { renderMesas(snap.val()); renderPlanoEditor(); });
+  onValue(ref(db, 'mesas'), snap => {
+    mesasData = snap.val() || {};
+    renderPlano();
+  });
+
+  onValue(ref(db, 'pedidos'), snap => {
+    pedidosData = snap.val() || {};
+    renderPlano();
+  });
+
   onValue(ref(db, 'config/plano'), snap => {
     const d = snap.val();
     if (d) planoCfgAdmin = { cols: Number(d.cols) || 16, rows: Number(d.rows) || 12 };
-    const inpCols = document.getElementById('plano-cols');
-    const inpRows = document.getElementById('plano-rows');
-    if (inpCols) inpCols.value = planoCfgAdmin.cols;
-    if (inpRows) inpRows.value = planoCfgAdmin.rows;
-    renderPlanoEditor();
+    renderPlano();
   });
 
   onValue(ref(db, 'categorias'), snap => {
     categoriasData = snap.val() || {};
     updateCatSelect();
+    if (!editingArticuloId) renderSidebarNuevoForm();
     renderCarta();
   });
+
   onValue(ref(db, 'carta'), snap => {
     cartaData = snap.val() || {};
     renderCarta();
   });
+
   onValue(ref(db, 'config/local'), snap => {
-    const d = snap.val() || {};
-    configLocalAdmin = d;
-    document.getElementById('local-nombre').value    = d.nombre    || '';
-    document.getElementById('local-direccion').value = d.direccion || '';
-    document.getElementById('local-telefono').value  = d.telefono  || '';
-    document.getElementById('local-cif').value       = d.cif       || '';
-    document.getElementById('local-footer').value    = d.footer    || '';
-    document.getElementById('local-network-url').value = d.localNetworkUrl || '';
-    document.getElementById('local-network-mode').value = d.localNetworkMode || 'disabled';
-    document.getElementById('local-ticket-logo').value = d.ticketLogoUrl || '';
-    document.getElementById('local-ticket-paper').value = d.ticketPaper || d.papelTicket || '58mm';
-    syncTicketPaper('local');
-    document.getElementById('local-ticket-font-size').value = d.ticketFontSize || 9;
-    document.getElementById('local-ticket-header-name-size').value = d.ticketHeaderNameFontSize || 12;
-    document.getElementById('local-ticket-header-sub-size').value  = d.ticketHeaderSubFontSize  || 8;
-    document.getElementById('local-ticket-uppercase').value = String(d.ticketUppercase === true);
-    document.getElementById('local-ticket-show-notes').value = String(d.ticketShowNotes !== false);
-    const off = Number(d.ticketHeaderOffset ?? 0);
-    document.getElementById('local-ticket-header-offset').value = off;
-    document.getElementById('local-ticket-header-offset-val').textContent = off;
-    document.getElementById('local-ticket-margin-x').value = d.ticketMarginX ?? 3;
-    document.getElementById('local-ticket-margin-y').value = d.ticketMarginY ?? 3;
-    document.getElementById('local-barra-font-size').value = d.barraFontSize || 9;
-    document.getElementById('local-cocina-font-size').value = d.cocinaFontSize || 9;
-    document.getElementById('local-barra-uppercase').value = String(d.barraUppercase === true);
-    document.getElementById('local-cocina-uppercase').value = String(d.cocinaUppercase === true);
-    document.getElementById('local-browser-print-enabled').value = String(d.localBrowserPrintEnabled === true);
-    document.getElementById('local-ticket-print-mode').value = d.ticketPrintMode || 'browser';
-    document.getElementById('local-comanda-auto-servir').value = String(d.comandaAutoServir === true);
-    document.getElementById('local-ticket-print-service-id').value = d.ticketPrintServiceId || PRINT_SERVICE_ID;
-    document.getElementById('local-barra-print-service-id').value = d.barraPrintServiceId || '';
-    document.getElementById('local-cocina-print-service-id').value = d.cocinaPrintServiceId || '';
+    configLocalAdmin = snap.val() || {};
   });
-  onValue(query(ref(db, 'historial_turnos'), limitToLast(25)), snap => renderHistorialTurnos(snap.val()));
+
   onValue(ref(db, 'config/usuarios'), snap => {
     const usuarios = snap.val();
-    renderUsuarios(usuarios);
     poblarCamarerosAuditoria(usuarios);
+  });
+
+  onValue(ref(db, 'config/alertas'), snap => {
+    const d = snap.val() || {};
+    alertasConfig = { verde: d.verde ?? 10, amarillo: d.amarillo ?? 20 };
+    renderPlano();
   });
 
   // Sesión de auditoría: si se desbloqueó en esta pestaña, restaurar
@@ -1691,77 +1738,6 @@ async function init() {
   } else {
     initFiltrosAuditoria();
   }
-
-  // Cuota en tiempo real
-  onValue(ref(db, 'config/quota/lineas'), snap => {
-    const val = snap.val();
-    const el = document.getElementById('quota-display');
-    if (!el) return;
-    if (val === null)    { el.textContent = 'Sin configurar'; el.style.color = 'var(--muted)'; }
-    else if (val === -1) { el.textContent = '∞ Sin límite';   el.style.color = 'var(--success)'; }
-    else if (val <= 0)   { el.textContent = '0 — BLOQUEADO';  el.style.color = 'var(--danger)'; }
-    else if (val <= 200) { el.textContent = val;              el.style.color = '#e57a35'; }
-    else                 { el.textContent = val;              el.style.color = 'var(--accent)'; }
-  });
-
-  // Estadísticas de consumo mensual
-  onValue(ref(db, 'config/stats'), snap => {
-    renderStats(snap.val() || {});
-  });
-
-  // Alertas de tiempo configurables
-  onValue(ref(db, 'config/alertas'), snap => {
-    const d = snap.val() || {};
-    const elV = document.getElementById('alerta-verde');
-    const elA = document.getElementById('alerta-amarillo');
-    if (elV) elV.value = d.verde    ?? 10;
-    if (elA) elA.value = d.amarillo ?? 20;
-  });
-
-  onValue(ref(db, 'config/printService'), snap => {
-    renderPrintServiceStatus(snap.val());
-  });
-
-  // Turno
-  onValue(ref(db, 'config/turno'), snap => {
-    const t = snap.val() || {};
-    turnoActualCache = t;
-    const statusEl  = document.getElementById('turno-status');
-    const btnAbrir  = document.getElementById('btn-abrir-turno');
-    const btnCerrar = document.getElementById('btn-cerrar-turno');
-    
-    // Manage real-time subscription for the active turn's sales
-    if (unsubscribeTurnSales) {
-      unsubscribeTurnSales();
-      unsubscribeTurnSales = null;
-    }
-
-    if (!statusEl) return;
-    if (t.abierto) {
-      const inicio = new Date(t.inicio).toLocaleTimeString('es-ES', { hour:'2-digit', minute:'2-digit' });
-      statusEl.textContent = `"${t.nombre || 'Sin nombre'}" abierto desde ${inicio}`;
-      statusEl.style.color = 'var(--success)';
-      if (btnAbrir)  btnAbrir.disabled  = true;
-      if (btnCerrar) btnCerrar.disabled = false;
-
-      if (t.inicio) {
-        const q = query(ref(db, 'historial'), orderByChild('ts'), startAt(Number(t.inicio)));
-        unsubscribeTurnSales = onValue(q, snapSales => {
-          const salesObj = snapSales.val() || {};
-          const currentTurnTickets = normalizarHistorialVentasData(salesObj);
-          renderResumenTurnoActualConTickets(t, currentTurnTickets);
-        });
-      } else {
-        renderResumenTurnoActualConTickets(t, []);
-      }
-    } else {
-      statusEl.textContent = 'Sin turno activo';
-      statusEl.style.color = 'var(--muted)';
-      if (btnAbrir)  btnAbrir.disabled  = false;
-      if (btnCerrar) btnCerrar.disabled = true;
-      renderResumenTurnoActualConTickets(t, []);
-    }
-  });
 }
 
 function renderStats(data) {
@@ -1999,7 +1975,6 @@ window.marcarPendientesComoImpresas = async () => {
 // ── VERIFACTU ADMIN ───────────────────────────────────────────────────────────
 
 let configVfAdmin = {};
-let configLocalAdmin = {};
 
 // Carga y rellena el formulario de configuración Verifactu
 onValue(ref(db, 'config/verifacti'), async snap => {

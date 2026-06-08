@@ -340,7 +340,11 @@ async function cerrarMesasAbiertasParaTurno() {
       });
     }
     await remove(ref(db, `pedidos/${mesaId}`));
-    await set(ref(db, `mesas/${mesaId}/estado`), 'libre');
+    if (mesaId.startsWith('temp_')) {
+      await remove(ref(db, `mesas/${mesaId}`));
+    } else {
+      await set(ref(db, `mesas/${mesaId}/estado`), 'libre');
+    }
     mesasCerradas += 1;
   }
 

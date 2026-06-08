@@ -261,6 +261,163 @@ window.abrirNotaModal = (artId, nombreArt) => {
   }
 };
 
+// ── Modal de Nuevo Pedido (Llevar / Domicilio / Local) ──────────────────────────
+let npTipoPedido = 'Llevar';
+
+window.setTipoPedido = (tipo) => {
+  npTipoPedido = tipo;
+  const btnLlevar = document.getElementById('btn-tipo-llevar');
+  const btnDom = document.getElementById('btn-tipo-domicilio');
+  const btnLocal = document.getElementById('btn-tipo-local');
+  
+  if (btnLlevar) btnLlevar.className = 'modal-btn' + (tipo === 'Llevar' ? ' primary' : '');
+  if (btnDom) btnDom.className = 'modal-btn' + (tipo === 'Domicilio' ? ' primary' : '');
+  if (btnLocal) btnLocal.className = 'modal-btn' + (tipo === 'Local' ? ' primary' : '');
+  
+  const divTel = document.getElementById('np-div-telefono');
+  const divHora = document.getElementById('np-div-hora');
+  
+  if (tipo === 'Local') {
+    if (divTel) divTel.style.display = 'none';
+    if (divHora) divHora.style.display = 'none';
+  } else {
+    if (divTel) divTel.style.display = 'block';
+    if (divHora) divHora.style.display = 'block';
+  }
+};
+
+window.npSumarMinutos = (mins) => {
+  const input = document.getElementById('np-hora');
+  if (!input) return;
+  let baseDate = new Date();
+  if (input.value) {
+    const [h, m] = input.value.split(':').map(Number);
+    baseDate.setHours(h, m, 0, 0);
+  }
+  const futureDate = new Date(baseDate.getTime() + mins * 60000);
+  const HH = String(futureDate.getHours()).padStart(2, '0');
+  const MM = String(futureDate.getMinutes()).padStart(2, '0');
+  input.value = `${HH}:${MM}`;
+};
+
+window.abrirNuevoPedidoModal = () => {
+  npTipoPedido = 'Llevar';
+  showModal({ title: '🛍️ Nuevo Pedido', body: '', buttons: [] });
+  
+  const modalBody = document.getElementById('modal-body');
+  modalBody.innerHTML = `
+    <div style="display:flex; flex-direction:column; gap:12px; font-family:var(--sans)">
+      <!-- Selector de Tipo -->
+      <div style="display:flex; gap:6px;">
+        <button id="btn-tipo-llevar" type="button" class="modal-btn primary" style="flex:1; padding:8px; border-radius:10px; font-size:12px; cursor:pointer;" onclick="window.setTipoPedido('Llevar')">🛍️ Llevar</button>
+        <button id="btn-tipo-domicilio" type="button" class="modal-btn" style="flex:1; padding:8px; border-radius:10px; font-size:12px; cursor:pointer;" onclick="window.setTipoPedido('Domicilio')">🛵 Domicilio</button>
+        <button id="btn-tipo-local" type="button" class="modal-btn" style="flex:1; padding:8px; border-radius:10px; font-size:12px; cursor:pointer;" onclick="window.setTipoPedido('Local')">🍺 Local</button>
+      </div>
+      
+      <!-- Nombre de Cliente -->
+      <div>
+        <label style="display:block; font-size:11px; color:var(--muted); margin-bottom:4px; font-family:var(--mono);">CLIENTE</label>
+        <input id="np-cliente" type="text" placeholder="Nombre (ej: Juan, María...)" required style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--border); font-size:14px; background:var(--surface2); color:var(--text); outline:none;">
+      </div>
+
+      <!-- Teléfono -->
+      <div id="np-div-telefono">
+        <label style="display:block; font-size:11px; color:var(--muted); margin-bottom:4px; font-family:var(--mono);">TELÉFONO</label>
+        <input id="np-telefono" type="tel" placeholder="Teléfono (opcional)" style="width:100%; padding:10px; border-radius:10px; border:1px solid var(--border); font-size:14px; background:var(--surface2); color:var(--text); outline:none;">
+      </div>
+
+      <!-- Hora de Recogida -->
+      <div id="np-div-hora">
+        <label style="display:block; font-size:11px; color:var(--muted); margin-bottom:4px; font-family:var(--mono);">HORA DE RECOGIDA</label>
+        <div style="display:flex; gap:6px; margin-bottom:6px;">
+          <input id="np-hora" type="time" style="flex:1; padding:8px; border-radius:10px; border:1px solid var(--border); font-size:14px; background:var(--surface2); color:var(--text); outline:none;">
+          <button type="button" class="modal-btn" style="padding:0 12px; font-size:12px;" onclick="window.npSumarMinutos(5)">+5m</button>
+          <button type="button" class="modal-btn" style="padding:0 12px; font-size:12px;" onclick="window.npSumarMinutos(15)">+15m</button>
+          <button type="button" class="modal-btn" style="padding:0 12px; font-size:12px;" onclick="window.npSumarMinutos(30)">+30m</button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  // Establecer hora actual + 30 min por defecto
+  const now = new Date();
+  const future = new Date(now.getTime() + 30 * 60000);
+  const HH = String(future.getHours()).padStart(2, '0');
+  const MM = String(future.getMinutes()).padStart(2, '0');
+  const horaInput = document.getElementById('np-hora');
+  if (horaInput) horaInput.value = `${HH}:${MM}`;
+  
+  // Foco en nombre del cliente
+  setTimeout(() => {
+    const inp = document.getElementById('np-cliente');
+    if (inp) inp.focus();
+  }, 100);
+  
+  // Configurar botones de acción
+  const acts = document.getElementById('modal-actions');
+  acts.innerHTML = '';
+  
+  const btnCancel = document.createElement('button');
+  btnCancel.className = 'modal-btn';
+  btnCancel.textContent = 'Cancelar';
+  btnCancel.onclick = () => {
+    document.getElementById('modal-overlay').classList.remove('open');
+  };
+  
+  const btnCrear = document.createElement('button');
+  btnCrear.className = 'modal-btn primary';
+  btnCrear.textContent = 'Crear pedido';
+  btnCrear.onclick = async () => {
+    const cliente = document.getElementById('np-cliente').value.trim();
+    const telefono = document.getElementById('np-telefono').value.trim();
+    const hora = document.getElementById('np-hora').value;
+    if (!cliente) {
+      alert('Por favor, introduce el nombre del cliente');
+      return;
+    }
+    document.getElementById('modal-overlay').classList.remove('open');
+    await crearNuevoPedido(cliente, telefono, hora);
+  };
+  
+  acts.appendChild(btnCancel);
+  acts.appendChild(btnCrear);
+};
+
+async function crearNuevoPedido(cliente, telefono, hora) {
+  const newMesaId = 'temp_' + Date.now();
+  const emoji = npTipoPedido === 'Domicilio' ? '🛵' : npTipoPedido === 'Local' ? '🍺' : '🛍️';
+  const displayHora = npTipoPedido !== 'Local' && hora ? ` (${hora})` : '';
+  const nombreMesa = `${emoji} ${cliente}${displayHora}`;
+  
+  const newMesa = {
+    nombre: nombreMesa,
+    estado: 'ocupada',
+    zona: 'Pedidos',
+    temporal: true,
+    cliente: cliente,
+    telefono: npTipoPedido !== 'Local' ? telefono : '',
+    horaRecogida: npTipoPedido !== 'Local' ? hora : '',
+    tipoPedido: npTipoPedido,
+    creadoTs: Date.now()
+  };
+  
+  // Guardar en Firebase
+  await set(ref(db, 'mesas/' + newMesaId), newMesa);
+  
+  // Log auditoría
+  await logAuditoria('articulo_agregado', `Pedido temporal creado: ${nombreMesa}`, {
+    cliente,
+    telefono: newMesa.telefono,
+    hora: newMesa.horaRecogida,
+    tipo: npTipoPedido,
+    mesaId: newMesaId,
+    mesa: nombreMesa
+  });
+  
+  // Abrir la comanda de la mesa temporal directamente
+  abrirMesa(newMesaId, nombreMesa, true);
+}
+
 // ── COLA OFFLINE (IndexedDB) ──────────────────────────────────────────────────
 const IDB_NAME  = 'cmd-queue';
 const IDB_VER   = 1;
@@ -660,6 +817,7 @@ function renderPlano() {
   if (!contenedor) return;
 
   const entries = Object.entries(mesasData)
+    .filter(([id]) => !id.startsWith('temp_'))
     .sort(([,a],[,b]) => (a.orden??999)-(b.orden??999) || a.nombre.localeCompare(b.nombre,'es',{numeric:true}));
 
   if (!entries.length) {
@@ -2676,7 +2834,7 @@ function abrirPartirCuentaModal(totalActual) {
 
 // ── TRANSFERIR MESA ───────────────────────────────────────────────────────────
 function abrirTransferirMesaModal() {
-  const mesasLibres = Object.entries(mesasData).filter(([id, m]) => m.estado === 'libre' && id !== mesaId);
+  const mesasLibres = Object.entries(mesasData).filter(([id, m]) => m.estado === 'libre' && id !== mesaId && !m.nombre.startsWith('#'));
   if (!mesasLibres.length) {
     showModal({ title: 'Sin mesas libres', body: 'No hay mesas disponibles para transferir.', buttons: [{ label: 'Cerrar' }] });
     return;
@@ -2712,7 +2870,11 @@ async function transferirMesa(mesaDestId) {
     batchUpdates[`pedidos/${mesaDestId}/${envioId}`] = envio;
     batchUpdates[`pedidos/${mesaId}/${envioId}`] = null;
   });
-  batchUpdates[`mesas/${mesaId}/estado`]    = 'libre';
+  if (mesaId.startsWith('temp_')) {
+    batchUpdates[`mesas/${mesaId}`] = null;
+  } else {
+    batchUpdates[`mesas/${mesaId}/estado`]    = 'libre';
+  }
   batchUpdates[`mesas/${mesaDestId}/estado`] = 'ocupada';
 
   await update(ref(db), batchUpdates);
@@ -2772,7 +2934,11 @@ window.cerrarMesa = async () => {
         }
 
         await remove(ref(db, 'pedidos/' + mesaId));
-        await set(ref(db, 'mesas/' + mesaId + '/estado'), 'libre');
+        if (mesaId.startsWith('temp_')) {
+          await remove(ref(db, 'mesas/' + mesaId));
+        } else {
+          await set(ref(db, 'mesas/' + mesaId + '/estado'), 'libre');
+        }
         try {
           const borrados = await limpiarPrintJobsCerradosDeMesa(mesaId);
           if (borrados > 0) {
