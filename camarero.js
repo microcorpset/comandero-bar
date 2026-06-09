@@ -11,7 +11,7 @@ if (!_dominiosPermitidos.some(d => location.hostname === d || location.hostname.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { authReady, db } from './firebase.js';
-import { ref, onValue, push, set, remove, get, update }
+import { ref, onValue, push, set, remove, get, update, query, orderByChild, limitToLast }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import {
   fmtFechaVf, buildLineasVf, siguienteNumero, verNumeroActual,
@@ -22,6 +22,7 @@ import {
 
 
 await authReady;
+cargarClientesAutocomplete();
 
 // ─── ESTADO GLOBAL ────────────────────────────────────────────────────────────
 // carrito: key → { art, qty, nota }
@@ -37,33 +38,33 @@ let ticketSimplificado = true;
 let ticketPreciosMode = false;
 let ticketPreciosCustom = {};
 let drawerNotasAbiertas = new Set();
-let mesasViewMode  = localStorage.getItem('mesas_view_mode')   || 'grid';
-let planoInfoMode  = localStorage.getItem('plano_info_mode')  || 'resumen';
+let mesasViewMode = localStorage.getItem('mesas_view_mode') || 'grid';
+let planoInfoMode = localStorage.getItem('plano_info_mode') || 'resumen';
 let planoCfg = { cols: 16, rows: 12 };
 let planoZonaActiva = null;
 let pedidosData = {};
 let alertasConfig = { verde: 10, amarillo: 20 };
 
-let isFirebaseConnected  = false;
-let isSyncInProgress     = false;
-const queuedMesas        = new Set();   // mesaIds con pedidos en cola IDB
-const localOcupada       = new Set();   // mesas marcadas ocupadas offline
+let isFirebaseConnected = false;
+let isSyncInProgress = false;
+const queuedMesas = new Set();   // mesaIds con pedidos en cola IDB
+const localOcupada = new Set();   // mesas marcadas ocupadas offline
 const queuedPedidosLocal = {};          // pedidos locales pendientes de sync
 
 // ── USUARIOS / PIN multi-camarero ─────────────────────────────────────────────
-const PIN_SESSION  = 'cam_auth';
+const PIN_SESSION = 'cam_auth';
 const USER_SESSION = 'cam_user';
-let usuariosData   = {};
+let usuariosData = {};
 let camareroActual = sessionStorage.getItem(USER_SESSION) || '';
-let pinBuffer      = '';
-let seguridadData  = {};
+let pinBuffer = '';
+let seguridadData = {};
 
 get(ref(db, 'config/usuarios')).then(s => {
   usuariosData = s.val() || {};
   if (!Object.keys(usuariosData).length) {
     get(ref(db, 'config/pins/camarero')).then(p => {
       if (p.val()) usuariosData['_default'] = { nombre: 'Camarero', pin: p.val() };
-      else         usuariosData['_default'] = { nombre: 'Camarero', pin: '1234' };
+      else usuariosData['_default'] = { nombre: 'Camarero', pin: '1234' };
     });
   }
 }).catch(() => { usuariosData['_default'] = { nombre: 'Camarero', pin: '1234' }; });
@@ -79,13 +80,13 @@ window.pinKey = d => {
   if (pinBuffer.length === 4) verificarPin();
 };
 window.pinDel = () => {
-  pinBuffer = pinBuffer.slice(0,-1); updatePinDots(false);
+  pinBuffer = pinBuffer.slice(0, -1); updatePinDots(false);
   document.getElementById('pin-error').style.display = 'none';
 };
 function updatePinDots(error) {
-  for (let i=0;i<4;i++) {
-    const dot = document.getElementById('pd'+i);
-    dot.className = 'pin-dot'+(i<pinBuffer.length?(error?' error':' filled'):'');
+  for (let i = 0; i < 4; i++) {
+    const dot = document.getElementById('pd' + i);
+    dot.className = 'pin-dot' + (i < pinBuffer.length ? (error ? ' error' : ' filled') : '');
   }
 }
 async function verificarPin() {
@@ -93,7 +94,7 @@ async function verificarPin() {
   if (!match) {
     updatePinDots(true);
     document.getElementById('pin-error').style.display = 'block';
-    setTimeout(() => { pinBuffer=''; updatePinDots(false); document.getElementById('pin-error').style.display='none'; }, 900);
+    setTimeout(() => { pinBuffer = ''; updatePinDots(false); document.getElementById('pin-error').style.display = 'none'; }, 900);
     return;
   }
 
@@ -103,26 +104,26 @@ async function verificarPin() {
     const originalText = errEl.textContent;
     errEl.textContent = 'Comprobando red del local...';
     errEl.style.display = 'block';
-    
+
     try {
       // Intentar obtener la IP con timeout de 5 segundos
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000);
       const resp = await fetch('https://api.ipify.org?format=json', { signal: controller.signal });
       clearTimeout(timeoutId);
-      
+
       const data = await resp.json();
       const ipActual = data.ip;
-      
+
       if (ipActual !== seguridadData.wifiIP) {
         errEl.textContent = 'Acceso denegado: debes estar en la Wi-Fi del local.';
         errEl.style.display = 'block';
         updatePinDots(true);
-        setTimeout(() => { 
-          pinBuffer = ''; 
-          updatePinDots(false); 
-          errEl.style.display = 'none'; 
-          errEl.textContent = originalText; 
+        setTimeout(() => {
+          pinBuffer = '';
+          updatePinDots(false);
+          errEl.style.display = 'none';
+          errEl.textContent = originalText;
         }, 3000);
         return;
       }
@@ -130,11 +131,11 @@ async function verificarPin() {
       errEl.textContent = 'Error de conexion al validar la Wi-Fi.';
       errEl.style.display = 'block';
       updatePinDots(true);
-      setTimeout(() => { 
-        pinBuffer = ''; 
-        updatePinDots(false); 
-        errEl.style.display = 'none'; 
-        errEl.textContent = originalText; 
+      setTimeout(() => {
+        pinBuffer = '';
+        updatePinDots(false);
+        errEl.style.display = 'none';
+        errEl.textContent = originalText;
       }, 3000);
       return;
     }
@@ -210,7 +211,7 @@ let autoWake = localStorage.getItem(WAKE_KEY) === 'true';
 const wakeTrack = document.getElementById('wake-track');
 wakeTrack.classList.toggle('on', autoWake);
 async function activarWakeLock() {
-  try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch(e) {}
+  try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); } catch (e) { }
 }
 if (autoWake) activarWakeLock();
 wakeTrack.parentElement.addEventListener('click', () => {
@@ -269,14 +270,14 @@ window.setTipoPedido = (tipo) => {
   const btnLlevar = document.getElementById('btn-tipo-llevar');
   const btnDom = document.getElementById('btn-tipo-domicilio');
   const btnLocal = document.getElementById('btn-tipo-local');
-  
+
   if (btnLlevar) btnLlevar.className = 'modal-btn' + (tipo === 'Llevar' ? ' primary' : '');
   if (btnDom) btnDom.className = 'modal-btn' + (tipo === 'Domicilio' ? ' primary' : '');
   if (btnLocal) btnLocal.className = 'modal-btn' + (tipo === 'Local' ? ' primary' : '');
-  
+
   const divTel = document.getElementById('np-div-telefono');
   const divHora = document.getElementById('np-div-hora');
-  
+
   if (tipo === 'Local') {
     if (divTel) divTel.style.display = 'none';
     if (divHora) divHora.style.display = 'none';
@@ -303,7 +304,7 @@ window.npSumarMinutos = (mins) => {
 window.abrirNuevoPedidoModal = () => {
   npTipoPedido = 'Llevar';
   showModal({ title: '🛍️ Nuevo Pedido', body: '', buttons: [] });
-  
+
   const modalBody = document.getElementById('modal-body');
   modalBody.innerHTML = `
     <div style="display:flex; flex-direction:column; gap:12px; font-family:var(--sans)">
@@ -327,24 +328,24 @@ window.abrirNuevoPedidoModal = () => {
       </div>
     </div>
   `;
-  
+
   // Foco en nombre del cliente
   setTimeout(() => {
     const inp = document.getElementById('np-cliente');
     if (inp) inp.focus();
   }, 100);
-  
+
   // Configurar botones de acción
   const acts = document.getElementById('modal-actions');
   acts.innerHTML = '';
-  
+
   const btnCancel = document.createElement('button');
   btnCancel.className = 'modal-btn';
   btnCancel.textContent = 'Cancelar';
   btnCancel.onclick = () => {
     document.getElementById('modal-overlay').classList.remove('open');
   };
-  
+
   const btnCrear = document.createElement('button');
   btnCrear.className = 'modal-btn primary';
   btnCrear.textContent = 'Crear pedido';
@@ -358,7 +359,7 @@ window.abrirNuevoPedidoModal = () => {
     document.getElementById('modal-overlay').classList.remove('open');
     await crearNuevoPedido(cliente, telefono, '');
   };
-  
+
   acts.appendChild(btnCancel);
   acts.appendChild(btnCrear);
 };
@@ -368,7 +369,7 @@ async function crearNuevoPedido(cliente, telefono, hora) {
   const emoji = npTipoPedido === 'Domicilio' ? '🛵' : npTipoPedido === 'Local' ? '🍺' : '🛍️';
   const displayHora = npTipoPedido !== 'Local' && hora ? ` (${hora})` : '';
   const nombreMesa = `${emoji} ${cliente}${displayHora}`;
-  
+
   const newMesa = {
     nombre: nombreMesa,
     estado: 'ocupada',
@@ -380,10 +381,10 @@ async function crearNuevoPedido(cliente, telefono, hora) {
     tipoPedido: npTipoPedido,
     creadoTs: Date.now()
   };
-  
+
   // Guardar en Firebase
   await set(ref(db, 'mesas/' + newMesaId), newMesa);
-  
+
   // Log auditoría
   await logAuditoria('articulo_agregado', `Pedido temporal creado: ${nombreMesa}`, {
     cliente,
@@ -393,7 +394,7 @@ async function crearNuevoPedido(cliente, telefono, hora) {
     mesaId: newMesaId,
     mesa: nombreMesa
   });
-  
+
   // Abrir la comanda de la mesa temporal directamente
   abrirMesa(newMesaId, nombreMesa, true);
 }
@@ -402,9 +403,9 @@ async function crearNuevoPedido(cliente, telefono, hora) {
 window.abrirEditarPedidoModal = () => {
   const m = mesasData[mesaId] || {};
   npTipoPedido = m.tipoPedido || 'Llevar';
-  
+
   showModal({ title: '✏️ Editar Datos del Pedido', body: '', buttons: [] });
-  
+
   const modalBody = document.getElementById('modal-body');
   modalBody.innerHTML = `
     <div style="display:flex; flex-direction:column; gap:12px; font-family:var(--sans)">
@@ -439,7 +440,7 @@ window.abrirEditarPedidoModal = () => {
       </div>
     </div>
   `;
-  
+
   if (!m.horaRecogida && npTipoPedido !== 'Local') {
     const now = new Date();
     const future = new Date(now.getTime() + 15 * 60000);
@@ -448,17 +449,17 @@ window.abrirEditarPedidoModal = () => {
     const horaInput = document.getElementById('np-hora');
     if (horaInput) horaInput.value = `${HH}:${MM}`;
   }
-  
+
   const acts = document.getElementById('modal-actions');
   acts.innerHTML = '';
-  
+
   const btnCancel = document.createElement('button');
   btnCancel.className = 'modal-btn';
   btnCancel.textContent = 'Cancelar';
   btnCancel.onclick = () => {
     document.getElementById('modal-overlay').classList.remove('open');
   };
-  
+
   const btnGuardar = document.createElement('button');
   btnGuardar.className = 'modal-btn primary';
   btnGuardar.textContent = 'Guardar';
@@ -473,7 +474,7 @@ window.abrirEditarPedidoModal = () => {
     document.getElementById('modal-overlay').classList.remove('open');
     await guardarEdicionPedido(cliente, telefono, hora, npTipoPedido);
   };
-  
+
   acts.appendChild(btnCancel);
   acts.appendChild(btnGuardar);
 };
@@ -482,7 +483,7 @@ async function guardarEdicionPedido(cliente, telefono, hora, tipo) {
   const emoji = tipo === 'Domicilio' ? '🛵' : tipo === 'Local' ? '🍺' : '🛍️';
   const displayHora = tipo !== 'Local' && hora ? ` (${hora})` : '';
   const nuevoNombre = `${emoji} ${cliente}${displayHora}`;
-  
+
   const updates = {
     nombre: nuevoNombre,
     cliente: cliente,
@@ -490,12 +491,12 @@ async function guardarEdicionPedido(cliente, telefono, hora, tipo) {
     horaRecogida: tipo !== 'Local' ? hora : '',
     tipoPedido: tipo
   };
-  
+
   await update(ref(db, 'mesas/' + mesaId), updates);
-  
+
   mesaNombre = nuevoNombre;
   document.getElementById('topbar-mesa').textContent = 'Mesa ' + nuevoNombre;
-  
+
   await logAuditoria('cantidad_editada', `Pedido editado: ${nuevoNombre}`, {
     cliente,
     telefono: tipo !== 'Local' ? telefono : '',
@@ -503,13 +504,13 @@ async function guardarEdicionPedido(cliente, telefono, hora, tipo) {
     tipo,
     mesaId
   });
-  
+
   cargarTicketActual();
 }
 
 // ── COLA OFFLINE (IndexedDB) ──────────────────────────────────────────────────
-const IDB_NAME  = 'cmd-queue';
-const IDB_VER   = 1;
+const IDB_NAME = 'cmd-queue';
+const IDB_VER = 1;
 const IDB_STORE = 'orders';
 let idb = null;
 
@@ -521,28 +522,28 @@ function abrirIDB() {
         e.target.result.createObjectStore(IDB_STORE, { keyPath: 'queueId', autoIncrement: true });
     };
     req.onsuccess = e => resolve(e.target.result);
-    req.onerror   = e => reject(e.target.error);
+    req.onerror = e => reject(e.target.error);
   });
 }
 function idbTodos() {
   return new Promise((resolve, reject) => {
     const req = idb.transaction(IDB_STORE, 'readonly').objectStore(IDB_STORE).getAll();
     req.onsuccess = e => resolve(e.target.result || []);
-    req.onerror   = e => reject(e.target.error);
+    req.onerror = e => reject(e.target.error);
   });
 }
 function idbAgregar(registro) {
   return new Promise((resolve, reject) => {
     const req = idb.transaction(IDB_STORE, 'readwrite').objectStore(IDB_STORE).add(registro);
     req.onsuccess = e => resolve(e.target.result);
-    req.onerror   = e => reject(e.target.error);
+    req.onerror = e => reject(e.target.error);
   });
 }
 function idbEliminar(queueId) {
   return new Promise((resolve, reject) => {
     const req = idb.transaction(IDB_STORE, 'readwrite').objectStore(IDB_STORE).delete(queueId);
     req.onsuccess = () => resolve();
-    req.onerror   = e => reject(e.target.error);
+    req.onerror = e => reject(e.target.error);
   });
 }
 
@@ -565,8 +566,8 @@ async function actualizarBannerOffline() {
     banner.style.background = 'rgba(226,77,77,.92)';
     banner.innerHTML = pendientes.length > 0
       ? '📡 Sin conexión — ' + pendientes.length + ' pedido' +
-        (pendientes.length > 1 ? 's' : '') + ' guardado' +
-        (pendientes.length > 1 ? 's' : '') + ' en cola local'
+      (pendientes.length > 1 ? 's' : '') + ' guardado' +
+      (pendientes.length > 1 ? 's' : '') + ' en cola local'
       : '📡 Sin conexión — los pedidos se enviarán al reconectar';
   }
 }
@@ -627,14 +628,14 @@ initCola();
 
 // Inicializar estado de los botones de vista según localStorage
 if (mesasViewMode === 'plano') {
-  const btnGrid  = document.getElementById('btn-vista-grid');
+  const btnGrid = document.getElementById('btn-vista-grid');
   const btnPlano = document.getElementById('btn-vista-plano');
-  const gridEl   = document.getElementById('mesas-grid');
-  const planoEl  = document.getElementById('plano-contenedor');
-  if (btnGrid)  btnGrid.classList.remove('active');
+  const gridEl = document.getElementById('mesas-grid');
+  const planoEl = document.getElementById('plano-contenedor');
+  if (btnGrid) btnGrid.classList.remove('active');
   if (btnPlano) btnPlano.classList.add('active');
-  if (gridEl)   gridEl.style.display = 'none';
-  if (planoEl)  planoEl.style.display = '';
+  if (gridEl) gridEl.style.display = 'none';
+  if (planoEl) planoEl.style.display = '';
   const btnInfo = document.getElementById('btn-plano-info');
   if (btnInfo) {
     btnInfo.style.display = '';
@@ -675,8 +676,8 @@ onValue(ref(db, 'config/plano'), snap => {
 
 // Banner offline + trigger sync on reconnect
 onValue(ref(db, '.info/connected'), snap => {
-  const eraConectado   = isFirebaseConnected;
-  isFirebaseConnected  = !!snap.val();
+  const eraConectado = isFirebaseConnected;
+  isFirebaseConnected = !!snap.val();
   actualizarBannerOffline();
   if (!eraConectado && isFirebaseConnected) vaciarCola();
 });
@@ -700,7 +701,7 @@ function resumenMesaActual(id) {
   const pedidosMesa = pedidosData[id];
   if (!pedidosMesa) return 'Sin consumo';
   const lineas = aplanarPedidos(pedidosMesa).filter(l => l.estado !== 'cancelado' && l.destino !== 'descuento');
-  const uds   = lineas.reduce((s, l) => s + qtyResumenMesa(l), 0);
+  const uds = lineas.reduce((s, l) => s + qtyResumenMesa(l), 0);
   const total = lineas.reduce((s, l) => s + Number(l.precio || 0) * qtyResumenMesa(l), 0);
   if (!uds) return 'Sin consumo';
   return `<strong>${uds} uds</strong> | <strong>${fmtEu(total)}</strong>`;
@@ -723,8 +724,8 @@ function normalizarEtiquetaZona(zona) {
 function renderMesas() {
   const grid = document.getElementById('mesas-grid');
   const entries = Object.entries(mesasData)
-    .filter(([,m]) => !m.nombre.startsWith('#'))
-    .sort(([,a],[,b]) => {
+    .filter(([, m]) => !m.nombre.startsWith('#'))
+    .sort(([, a], [, b]) => {
       // Si ambos son temporales, aplicar ordenación de cola inteligente
       if (a.temporal && b.temporal) {
         const horaA = a.horaRecogida || '';
@@ -741,7 +742,7 @@ function renderMesas() {
       if (a.temporal && !b.temporal) return 1;
       if (!a.temporal && b.temporal) return -1;
       // Ambos fijos
-      return (a.orden??999)-(b.orden??999) || a.nombre.localeCompare(b.nombre,'es',{numeric:true});
+      return (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre, 'es', { numeric: true });
     });
 
   if (!entries.length) {
@@ -750,7 +751,7 @@ function renderMesas() {
     return;
   }
 
-  const hayZonas = entries.some(([,m]) => m.zona && m.zona.trim());
+  const hayZonas = entries.some(([, m]) => m.zona && m.zona.trim());
 
   grid.innerHTML = '';
   grid.classList.toggle('zonas-layout', hayZonas);
@@ -783,7 +784,7 @@ function renderMesas() {
 function crearMesaBtn(id, m) {
   const ocupada = m.estado === 'ocupada' || localOcupada.has(id);
   let claseAlerta = ocupada ? 'ocupada' : 'libre';
-  let alertaInfo  = '';
+  let alertaInfo = '';
 
   if (ocupada && pedidosData[id]) {
     let lineasPend = [];
@@ -800,9 +801,9 @@ function crearMesaBtn(id, m) {
       const minsTxt = mins === 0 ? '<1m' : `${mins}m`;
       const dest = masAntigua.destino === 'cocina' ? '&#127869;' : masAntigua.destino === 'barra' ? '&#127866;' : '&#127866;&#127869;';
       const pendienteTxt = lineasPend.length === 1 ? '1 pendiente' : `${lineasPend.length} pendientes`;
-      if      (mins >= alertasConfig.amarillo) claseAlerta = 'alerta-danger';
-      else if (mins >= alertasConfig.verde)    claseAlerta = 'alerta-warn';
-      else                                     claseAlerta = 'alerta-ok';
+      if (mins >= alertasConfig.amarillo) claseAlerta = 'alerta-danger';
+      else if (mins >= alertasConfig.verde) claseAlerta = 'alerta-warn';
+      else claseAlerta = 'alerta-ok';
       alertaInfo = `<span class="mesa-alerta-info">${dest} ${pendienteTxt} | ${minsTxt}</span>`;
     }
   }
@@ -889,7 +890,7 @@ function calcularInfoMesa(id, m) {
   });
 
   const minsOcupada = minTs < Infinity ? Math.max(0, Math.floor((Date.now() - minTs) / 60000)) : 0;
-  const horas    = Math.floor(minsOcupada / 60);
+  const horas = Math.floor(minsOcupada / 60);
   const minResto = minsOcupada % 60;
   const tiempoHTML = minsOcupada > 0
     ? `<span class="plano-mesa-tiempo">${horas > 0 ? horas + 'h ' : ''}${minResto}m</span>` : '';
@@ -897,8 +898,8 @@ function calcularInfoMesa(id, m) {
   if (!lineasPend.length)
     return { clase: 'ocupada', alertaHTML: '', iconHTML: '', tiempoHTML, tiempoPendHTML: '', resumen, totalHTML };
 
-  const masAntigua  = lineasPend.reduce((min, l) => l._tsMesa < min._tsMesa ? l : min, lineasPend[0]);
-  const minsPend    = Math.max(0, Math.floor((Date.now() - (masAntigua._tsMesa || Date.now())) / 60000));
+  const masAntigua = lineasPend.reduce((min, l) => l._tsMesa < min._tsMesa ? l : min, lineasPend[0]);
+  const minsPend = Math.max(0, Math.floor((Date.now() - (masAntigua._tsMesa || Date.now())) / 60000));
   const minsPendTxt = minsPend === 0 ? '<1m' : `${minsPend}m`;
 
   // Icono(s) de destino únicos entre todos los pendientes
@@ -907,14 +908,14 @@ function calcularInfoMesa(id, m) {
     ? '&#127866;&#127869;'
     : destinos.map(d => d === 'cocina' ? '&#127869;' : '&#127866;').join('');
 
-  const pendTxt    = lineasPend.length === 1 ? '1 pend' : `${lineasPend.length} pend`;
+  const pendTxt = lineasPend.length === 1 ? '1 pend' : `${lineasPend.length} pend`;
   const alertaHTML = `<span class="plano-mesa-alerta">${iconoDestino} ${pendTxt} · ${minsPendTxt}</span>`;
-  const iconHTML   = `<span class="plano-mesa-alerta" style="font-size:13px;line-height:1">${iconoDestino}</span>`;
+  const iconHTML = `<span class="plano-mesa-alerta" style="font-size:13px;line-height:1">${iconoDestino}</span>`;
   const tiempoPendHTML = `<span class="plano-mesa-tiempo">${minsPendTxt}</span>`;
 
   let clase = 'alerta-ok';
-  if      (minsPend >= alertasConfig.amarillo) clase = 'alerta-danger';
-  else if (minsPend >= alertasConfig.verde)    clase = 'alerta-warn';
+  if (minsPend >= alertasConfig.amarillo) clase = 'alerta-danger';
+  else if (minsPend >= alertasConfig.verde) clase = 'alerta-warn';
 
   return { clase, alertaHTML, iconHTML, tiempoHTML, tiempoPendHTML, resumen, totalHTML };
 }
@@ -925,16 +926,16 @@ function renderPlano() {
 
   const entries = Object.entries(mesasData)
     .filter(([id]) => !id.startsWith('temp_'))
-    .sort(([,a],[,b]) => (a.orden??999)-(b.orden??999) || a.nombre.localeCompare(b.nombre,'es',{numeric:true}));
+    .sort(([, a], [, b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre, 'es', { numeric: true }));
 
   if (!entries.length) {
     contenedor.innerHTML = '<div class="loading">Sin mesas.</div>';
     return;
   }
 
-  const hayZonas = entries.some(([,m]) => m.zona && m.zona.trim());
+  const hayZonas = entries.some(([, m]) => m.zona && m.zona.trim());
   const zonas = hayZonas
-    ? [...new Set(entries.map(([,m]) => normalizarEtiquetaZona(m.zona)))]
+    ? [...new Set(entries.map(([, m]) => normalizarEtiquetaZona(m.zona)))]
     : null;
 
   if (hayZonas && (!planoZonaActiva || !zonas.includes(planoZonaActiva))) {
@@ -942,22 +943,22 @@ function renderPlano() {
   }
 
   const mesasFiltradas = hayZonas
-    ? entries.filter(([,m]) => normalizarEtiquetaZona(m.zona) === planoZonaActiva)
+    ? entries.filter(([, m]) => normalizarEtiquetaZona(m.zona) === planoZonaActiva)
     : entries;
 
   const cols = planoCfg.cols;
   const rows = planoCfg.rows;
-  const ubicadas  = mesasFiltradas.filter(([,m]) => m.plano);
-  const sinUbicar = mesasFiltradas.filter(([,m]) => !m.plano && !m.nombre.startsWith('#'));
+  const ubicadas = mesasFiltradas.filter(([, m]) => m.plano);
+  const sinUbicar = mesasFiltradas.filter(([, m]) => !m.plano && !m.nombre.startsWith('#'));
 
   const tabsHTML = hayZonas ? `<div class="plano-tabs">` +
-    zonas.map(z => `<button class="plano-tab${z === planoZonaActiva ? ' active' : ''}" onclick="seleccionarZonaPlano('${z.replace(/'/g,"\\'")}')">${z}</button>`).join('') +
+    zonas.map(z => `<button class="plano-tab${z === planoZonaActiva ? ' active' : ''}" onclick="seleccionarZonaPlano('${z.replace(/'/g, "\\'")}')">${z}</button>`).join('') +
     `</div>` : '';
 
   const mesasHTML = ubicadas.map(([id, m]) => {
     const p = m.plano;
-    const circle    = p.shape === 'circle' ? ' circle' : '';
-    const isDeco    = m.nombre.startsWith('#');
+    const circle = p.shape === 'circle' ? ' circle' : '';
+    const isDeco = m.nombre.startsWith('#');
     const shortCard = p.h === 1 ? ' short' : '';
 
     if (isDeco) {
@@ -973,15 +974,15 @@ function renderPlano() {
     const syncBadge = queuedMesas.has(id) ? '<span class="plano-mesa-sync">⏳</span>' : '';
 
     // Narrow: 3 líneas según modo (ocultas en pantallas anchas)
-    const topHTML  = planoInfoMode === 'resumen' ? tiempoHTML    : (tiempoPendHTML || tiempoHTML);
-    const mainHTML = planoInfoMode === 'resumen' ? totalHTML      : iconHTML;
+    const topHTML = planoInfoMode === 'resumen' ? tiempoHTML : (tiempoPendHTML || tiempoHTML);
+    const mainHTML = planoInfoMode === 'resumen' ? totalHTML : iconHTML;
     // Wide: igual que grid → resumen (uds+total) + alerta (pendientes)
     const resumenHTML = resumen && resumen !== 'Sin consumo'
       ? `<span class="plano-mesa-resumen">${resumen}</span>` : '';
     const extraHTML = resumenHTML + alertaHTML;
 
     return `<div class="plano-mesa ${clase}${circle}${shortCard}"
-      data-id="${id}" data-nombre="${m.nombre.replace(/"/g,'&quot;')}" data-ocupada="${ocupada}"
+      data-id="${id}" data-nombre="${m.nombre.replace(/"/g, '&quot;')}" data-ocupada="${ocupada}"
       style="grid-column:${p.x}/span ${p.w};grid-row:${p.y}/span ${p.h}">
       <span class="plano-narrow-only">${topHTML}</span>
       <span class="plano-mesa-nombre">${m.nombre}${syncBadge}</span>
@@ -991,7 +992,7 @@ function renderPlano() {
   }).join('');
 
   const sinUbicarHTML = sinUbicar.length
-    ? `<div class="plano-sinubicar">Sin ubicar: ${sinUbicar.map(([,m]) => m.nombre).join(', ')}</div>`
+    ? `<div class="plano-sinubicar">Sin ubicar: ${sinUbicar.map(([, m]) => m.nombre).join(', ')}</div>`
     : '';
 
   contenedor.innerHTML = tabsHTML +
@@ -1028,14 +1029,14 @@ window.volverMesas = () => {
 // ── CARTA ─────────────────────────────────────────────────────────────────────
 function renderCarta() {
   const body = document.getElementById('carta-body');
-  const cats = Object.entries(categoriasData).sort(([,a],[,b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre, 'es'));
+  const cats = Object.entries(categoriasData).sort(([, a], [, b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre, 'es'));
   if (!cats.length) { body.innerHTML = '<div class="loading">Sin categorías.</div>'; return; }
   body.innerHTML = '';
 
   cats.forEach(([catId, cat]) => {
     const arts = Object.entries(cartaData)
-      .filter(([,a]) => a.catId === catId)
-      .sort(([,a],[,b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre, 'es'));
+      .filter(([, a]) => a.catId === catId)
+      .sort(([, a], [, b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre, 'es'));
     if (!arts.length) return;
 
     const section = document.createElement('div');
@@ -1085,12 +1086,12 @@ function renderCarta() {
         <span class="art-precio">${Number(art.precio).toFixed(2)} €</span>
         ${alergenosBtn}
         <div class="qty-ctrl">
-          <button class="qty-btn" data-id="${artId}" data-d="-1" ${agotado?'disabled':''}>−</button>
+          <button class="qty-btn" data-id="${artId}" data-d="-1" ${agotado ? 'disabled' : ''}>−</button>
           <span class="qty-num" id="qty-${artId}">0</span>
-          <button class="qty-btn" data-id="${artId}" data-d="1" ${agotado?'disabled':''}>+</button>
+          <button class="qty-btn" data-id="${artId}" data-d="1" ${agotado ? 'disabled' : ''}>+</button>
         </div>
         <button class="btn-nota" id="btnnota-${artId}" title="Añadir nota"
-          onclick="abrirNotaModal('${artId}','${art.nombre.replace(/'/g,"\\'")}')" ${agotado?'disabled':''}>📝</button>`;
+          onclick="abrirNotaModal('${artId}','${art.nombre.replace(/'/g, "\\'")}')" ${agotado ? 'disabled' : ''}>📝</button>`;
       wrap.appendChild(mainRow);
 
       // Panel de alérgenos (oculto por defecto)
@@ -1123,7 +1124,7 @@ function renderCarta() {
   if (catSel) {
     catSel.innerHTML = '<option value="">Todas las categorías</option>';
     cats.forEach(([catId, cat]) => {
-      const arts = Object.entries(cartaData).filter(([,a]) => a.catId === catId);
+      const arts = Object.entries(cartaData).filter(([, a]) => a.catId === catId);
       if (!arts.length) return;
       catSel.innerHTML += `<option value="${catId}">${cat.nombre}</option>`;
     });
@@ -1134,7 +1135,7 @@ function renderCarta() {
   if (panel) {
     panel.innerHTML = '';
     cats.forEach(([catId, cat]) => {
-      const arts = Object.entries(cartaData).filter(([,a]) => a.catId === catId);
+      const arts = Object.entries(cartaData).filter(([, a]) => a.catId === catId);
       if (!arts.length) return;
       const item = document.createElement('div');
       item.style.cssText = 'padding:11px 16px;font-size:14px;cursor:pointer;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;transition:background .1s';
@@ -1159,14 +1160,14 @@ function renderCarta() {
     tabletCats.innerHTML = '';
     let primeraActiva = true;
     cats.forEach(([catId, cat]) => {
-      const arts = Object.entries(cartaData).filter(([,a]) => a.catId === catId);
+      const arts = Object.entries(cartaData).filter(([, a]) => a.catId === catId);
       if (!arts.length) return;
       const item = document.createElement('div');
       item.className = 'tablet-cat-item' + (primeraActiva ? ' activa' : '');
       item.dataset.catId = catId;
       const count = Object.entries(carrito)
         .filter(([k]) => k === catId || cartaData[k.split('__')[0]]?.catId === catId)
-        .reduce((s,[,v]) => s + v.qty, 0);
+        .reduce((s, [, v]) => s + v.qty, 0);
       item.innerHTML = `<span>${cat.nombre}</span>${count > 0 ? `<span class="tablet-cat-count">${count}</span>` : ''}`;
       item.addEventListener('click', () => {
         document.querySelectorAll('.tablet-cat-item').forEach(i => i.classList.remove('activa'));
@@ -1280,8 +1281,8 @@ function abrirVarianteModal(artId, art) {
   let qty = 1;
 
   const modalTitle = document.getElementById('modal-title');
-  const modalBody  = document.getElementById('modal-body');
-  const acts       = document.getElementById('modal-actions');
+  const modalBody = document.getElementById('modal-body');
+  const acts = document.getElementById('modal-actions');
   modalTitle.textContent = art.nombre;
 
   const catVariantes = categoriasData[art.catId]?.variantes || [];
@@ -1302,11 +1303,11 @@ function abrirVarianteModal(artId, art) {
           `</button>` +
           (sel
             ? `<div style="display:flex;align-items:center;gap:10px;border-top:1px solid rgba(61,122,255,.2);padding:8px 16px">` +
-              `<span style="font-size:12px;color:var(--muted);flex:1">Cantidad:</span>` +
-              `<button id="vqty-minus" style="width:32px;height:32px;border-radius:8px 0 0 8px;border:1px solid var(--border);background:var(--surface3);font-size:18px;cursor:pointer">−</button>` +
-              `<span id="vqty-num" style="width:36px;height:32px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:14px;font-weight:700;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:#fff">${qty}</span>` +
-              `<button id="vqty-plus" style="width:32px;height:32px;border-radius:0 8px 8px 0;border:1px solid var(--border);background:var(--surface3);font-size:18px;cursor:pointer">＋</button>` +
-              `</div>`
+            `<span style="font-size:12px;color:var(--muted);flex:1">Cantidad:</span>` +
+            `<button id="vqty-minus" style="width:32px;height:32px;border-radius:8px 0 0 8px;border:1px solid var(--border);background:var(--surface3);font-size:18px;cursor:pointer">−</button>` +
+            `<span id="vqty-num" style="width:36px;height:32px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:14px;font-weight:700;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:#fff">${qty}</span>` +
+            `<button id="vqty-plus" style="width:32px;height:32px;border-radius:0 8px 8px 0;border:1px solid var(--border);background:var(--surface3);font-size:18px;cursor:pointer">＋</button>` +
+            `</div>`
             : '') +
           `</div>`
         );
@@ -1315,7 +1316,7 @@ function abrirVarianteModal(artId, art) {
     acts.innerHTML =
       '<button class="modal-btn" id="vbtn-cancel">Cancelar</button>' +
       `<button class="modal-btn primary" id="vbtn-add"${selIdx === null ? ' disabled' : ''}>` +
-        (selIdx !== null ? `Añadir ${qty}` : 'Añadir') +
+      (selIdx !== null ? `Añadir ${qty}` : 'Añadir') +
       `</button>`;
 
     document.getElementById('vbtn-cancel').onclick = () =>
@@ -1338,9 +1339,9 @@ function abrirVarianteModal(artId, art) {
     });
 
     const minus = document.getElementById('vqty-minus');
-    const plus  = document.getElementById('vqty-plus');
+    const plus = document.getElementById('vqty-plus');
     if (minus) minus.addEventListener('click', e => { e.stopPropagation(); if (qty > 1) { qty--; render(); } });
-    if (plus)  plus.addEventListener('click',  e => { e.stopPropagation(); qty++; render(); });
+    if (plus) plus.addEventListener('click', e => { e.stopPropagation(); qty++; render(); });
   }
 
   render();
@@ -1393,7 +1394,7 @@ function updateQtyDisplay() {
   Object.entries(categoriasData).forEach(([catId]) => {
     const el = document.getElementById('catcount-' + catId);
     if (!el) return;
-    const arts = Object.entries(cartaData).filter(([,a]) => a.catId === catId);
+    const arts = Object.entries(cartaData).filter(([, a]) => a.catId === catId);
     const total = arts.reduce((s, [id]) => {
       return s + Object.entries(carrito)
         .filter(([k]) => k === id || k.startsWith(id + '__v'))
@@ -1406,8 +1407,8 @@ function updateQtyDisplay() {
 
 function updateUI() {
   const n = Object.keys(carrito).length;
-  const totalUds = Object.values(carrito).reduce((s, {qty}) => s + qty, 0);
-  const total = Object.values(carrito).reduce((s, {art, qty}) => s + Number(art.precio) * qty, 0);
+  const totalUds = Object.values(carrito).reduce((s, { qty }) => s + qty, 0);
+  const total = Object.values(carrito).reduce((s, { art, qty }) => s + Number(art.precio) * qty, 0);
 
   document.getElementById('res-lineas').textContent = n ? `${totalUds} ud${totalUds > 1 ? 's' : ''}` : 'Sin artículos';
   document.getElementById('res-total').textContent = total.toFixed(2).replace('.', ',') + ' €';
@@ -1446,7 +1447,7 @@ function renderDrawer() {
   if (!items.length) { body.innerHTML = '<div class="drawer-empty">Sin artículos aún</div>'; return; }
 
   body.innerHTML = '';
-  items.forEach(([carritoKey, {art, qty, nota}]) => {
+  items.forEach(([carritoKey, { art, qty, nota }]) => {
     const notaAbierta = drawerNotasAbiertas.has(carritoKey);
     const notaVisible = !!nota || notaAbierta;
     const wrap = document.createElement('div');
@@ -1454,7 +1455,7 @@ function renderDrawer() {
 
     const main = document.createElement('div');
     main.className = 'ri-main';
-      main.innerHTML = `
+    main.innerHTML = `
       <span class="ri-nombre${notaVisible ? ' abierta' : ''}${nota ? ' con-nota' : ''}" onclick="drawerToggleNota('${carritoKey}')">
         <span class="ri-nombre-text">${art.nombre}</span>
         <span class="ri-nombre-toggle">${notaVisible ? '▾' : '▸'}</span>
@@ -1467,9 +1468,9 @@ function renderDrawer() {
       <span class="ri-precio" id="dprecio-${carritoKey}">${(Number(art.precio) * qty).toFixed(2)} €</span>`;
     wrap.appendChild(main);
 
-      const notaRow = document.createElement('div');
+    const notaRow = document.createElement('div');
     notaRow.className = 'ri-nota-row' + (notaVisible ? '' : ' oculta');
-      notaRow.innerHTML = `
+    notaRow.innerHTML = `
         <span class="ri-nota-label">Nota:</span>
         <input class="ri-nota-input" type="text"
           placeholder="ej: poco hecho, sin cebolla…"
@@ -1491,16 +1492,16 @@ window.drawerCambiarQty = (carritoKey, delta) => {
     else carrito[carritoKey].qty = next;
     updateQtyDisplay();
     updateUI();
-    const qtyEl    = document.getElementById('dqty-' + carritoKey);
+    const qtyEl = document.getElementById('dqty-' + carritoKey);
     const precioEl = document.getElementById('dprecio-' + carritoKey);
     if (carrito[carritoKey]) {
-      if (qtyEl)    qtyEl.textContent = carrito[carritoKey].qty;
+      if (qtyEl) qtyEl.textContent = carrito[carritoKey].qty;
       if (precioEl) precioEl.textContent = (Number(carrito[carritoKey].art.precio) * carrito[carritoKey].qty).toFixed(2) + ' €';
     } else {
       renderDrawer();
     }
   }
-  };
+};
 
 window.drawerToggleNota = carritoKey => {
   if (!carrito[carritoKey]) return;
@@ -1567,7 +1568,7 @@ function renderTicketRowsHTML(lineas, maxChars, conPrecio, showNotes = true) {
     const totalTxt = conPrecio ? `${precioTotal.toFixed(2)}€` : '';
     const extras = [];
     nombreLineas.forEach(n => extras.push(`<div class="ticket-subline">${n}</div>`));
-      if (showNotes && l.nota) extras.push(`<div class="ticket-note">-> ${l.nota}</div>`);
+    if (showNotes && l.nota) extras.push(`<div class="ticket-note">-> ${l.nota}</div>`);
 
     return `
       <div class="print-line">
@@ -1598,13 +1599,13 @@ function construirHTMLTicket({ titulo, subtitulo, lineas, configLocal, mostrarPr
   const cabecera = (configLocal?.nombre || configLocal?.direccion || configLocal?.telefono || configLocal?.cif)
     ? `<div class="local">${logoHtml}${configLocal?.nombre ? `<div class="local-name">${configLocal.nombre}</div>` : ''}${configLocal?.direccion ? `<div class="local-line">${configLocal.direccion}</div>` : ''}${configLocal?.telefono ? `<div class="local-line">${configLocal.telefono}</div>` : ''}${configLocal?.cif ? `<div class="local-line">${configLocal.cif}</div>` : ''}</div>`
     : logoHtml;
-    const rows = renderTicketRowsHTML(lineas, paperCfg.chars, mostrarPrecio, configLocal?.ticketShowNotes !== false);
+  const rows = renderTicketRowsHTML(lineas, paperCfg.chars, mostrarPrecio, configLocal?.ticketShowNotes !== false);
   const totalHtml = mostrarTotal
     ? `<div class="print-total"><span>Total</span><span>${fmtEu(total)}</span></div>`
     : '';
   const cobradoHtml = cobro
     ? `<div class="print-total" style="font-weight:normal;border-top:none;margin-top:4px;padding-top:4px"><span>Recibido</span><span>${fmtEu(cobro.recibido)}</span></div>` +
-      `<div class="print-total" style="border-top:1px dashed #666;margin-top:4px;padding-top:4px"><span>Cambio</span><span>${fmtEu(cobro.cambio)}</span></div>`
+    `<div class="print-total" style="border-top:1px dashed #666;margin-top:4px;padding-top:4px"><span>Cambio</span><span>${fmtEu(cobro.cambio)}</span></div>`
     : '';
   const footerHtml = pie
     ? `<div class="print-footer">${pie}</div>`
@@ -1613,19 +1614,19 @@ function construirHTMLTicket({ titulo, subtitulo, lineas, configLocal, mostrarPr
   // ── Bloque Verifactu: desglose IVA + QR ──
   let verifactuHtml = '';
   if (verifactu) {
-    const tipoLabel = {F1:'FACTURA COMPLETA',F2:'TICKET SIMPLIFICADO',F3:'FACTURA SUSTITUTIVA',R1:'RECTIFICATIVA',R2:'RECTIFICATIVA',R3:'RECTIFICATIVA',R4:'RECTIFICATIVA',R5:'RECTIFICATIVA',Rx:'RECTIFICATIVA'}[verifactu.tipo] || 'FACTURA VERIFACTU';
+    const tipoLabel = { F1: 'FACTURA COMPLETA', F2: 'TICKET SIMPLIFICADO', F3: 'FACTURA SUSTITUTIVA', R1: 'RECTIFICATIVA', R2: 'RECTIFICATIVA', R3: 'RECTIFICATIVA', R4: 'RECTIFICATIVA', R5: 'RECTIFICATIVA', Rx: 'RECTIFICATIVA' }[verifactu.tipo] || 'FACTURA VERIFACTU';
     const destinatarioHtml = verifactu.destinatario
       ? `<div style="font-size:10px;color:#333;border-top:1px dashed #ccc;padding-top:4px;margin-top:4px">`
-        + `<div>Destinatario:</div><div>${verifactu.destinatario.nombre || ''}</div>`
-        + `<div>NIF: ${verifactu.destinatario.nif || ''}</div>`
-        + (verifactu.destinatario.direccion ? `<div>${verifactu.destinatario.direccion}</div>` : '')
-        + `</div>`
+      + `<div>Destinatario:</div><div>${verifactu.destinatario.nombre || ''}</div>`
+      + `<div>NIF: ${verifactu.destinatario.nif || ''}</div>`
+      + (verifactu.destinatario.direccion ? `<div>${verifactu.destinatario.direccion}</div>` : '')
+      + `</div>`
       : '';
     const ivaHtml = (verifactu.lineasIva || []).map(l =>
       `<div style="display:flex;justify-content:space-between;font-size:9px;color:#555">`
-      + `<span>Base imp. (${l.tipo_impositivo}%)</span><span>${parseFloat(l.base_imponible).toFixed(2).replace('.',',')} €</span></div>`
+      + `<span>Base imp. (${l.tipo_impositivo}%)</span><span>${parseFloat(l.base_imponible).toFixed(2).replace('.', ',')} €</span></div>`
       + `<div style="display:flex;justify-content:space-between;font-size:9px;color:#555">`
-      + `<span>IVA ${l.tipo_impositivo}%</span><span>${parseFloat(l.cuota_repercutida).toFixed(2).replace('.',',')} €</span></div>`
+      + `<span>IVA ${l.tipo_impositivo}%</span><span>${parseFloat(l.cuota_repercutida).toFixed(2).replace('.', ',')} €</span></div>`
     ).join('');
     const qrHtml = verifactu.qr
       ? `<div style="text-align:center;margin:6px 0"><img src="data:image/png;base64,${verifactu.qr}" style="width:80px;height:80px;display:block;margin:0 auto" alt="QR Verifactu"/><div style="font-size:8px;color:#666;margin-top:2px">Verificación AEAT</div></div>`
@@ -1634,7 +1635,7 @@ function construirHTMLTicket({ titulo, subtitulo, lineas, configLocal, mostrarPr
       ? `<div style="font-size:7px;color:#aaa;text-align:center;word-break:break-all;margin-top:2px">${verifactu.uuid}</div>`
       : '';
     const factRefHtml = verifactu.facturas_ref && verifactu.facturas_ref.length
-      ? `<div style="font-size:8px;color:#555;margin-top:3px">Ref: ${verifactu.facturas_ref.map(f=>`${f.serie}-${f.numero}`).join(', ')}</div>`
+      ? `<div style="font-size:8px;color:#555;margin-top:3px">Ref: ${verifactu.facturas_ref.map(f => `${f.serie}-${f.numero}`).join(', ')}</div>`
       : '';
     verifactuHtml = `
       <div style="border-top:1px dashed #999;margin-top:8px;padding-top:6px">
@@ -1764,12 +1765,12 @@ function abrirCopiaTicketFinal({ titulo, subtitulo, lineas, configLocal, total =
 
 function generarTXTComanda(nombreMesa, lineas, configLocal) {
   const ahora = new Date();
-  const hora  = ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  const hora = ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
   const fecha = ahora.toLocaleDateString('es-ES');
-  const ts    = `${String(ahora.getHours()).padStart(2,'0')}${String(ahora.getMinutes()).padStart(2,'0')}${String(ahora.getSeconds()).padStart(2,'0')}`;
-  const sep   = '--------------------------------';
+  const ts = `${String(ahora.getHours()).padStart(2, '0')}${String(ahora.getMinutes()).padStart(2, '0')}${String(ahora.getSeconds()).padStart(2, '0')}`;
+  const sep = '--------------------------------';
   let txt = '';
-  if (configLocal?.nombre)    txt += configLocal.nombre + '\n';
+  if (configLocal?.nombre) txt += configLocal.nombre + '\n';
   if (configLocal?.direccion) txt += configLocal.direccion + '\n';
   txt += sep + '\n';
   txt += `Mesa ${nombreMesa}\n${fecha}  ${hora}\n${sep}\n`;
@@ -1779,8 +1780,8 @@ function generarTXTComanda(nombreMesa, lineas, configLocal) {
   });
   txt += sep + '\n';
   const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
   a.href = url; a.download = `comanda-mesa${nombreMesa}-${ts}.txt`;
   document.body.appendChild(a); a.click();
   document.body.removeChild(a); URL.revokeObjectURL(url);
@@ -1815,7 +1816,7 @@ async function logAccion(mesaId, envioId, accion, detalle) {
     await push(ref(db, `pedidos/${mesaId}/${envioId}/log`), {
       ts: Date.now(), accion, usuario: camareroActual, detalle: String(detalle || '')
     });
-  } catch(e) {}
+  } catch (e) { }
 }
 
 // ── AUDITORÍA GLOBAL ──────────────────────────────────────────────────────────
@@ -1843,7 +1844,7 @@ async function logAuditoria(accion, detalle = '', extras = {}) {
       });
     }
     await push(ref(db, `auditoria/${fechaKey}`), entrada);
-  } catch (e) {}
+  } catch (e) { }
 }
 
 // ── ENVIAR PEDIDO ─────────────────────────────────────────────────────────────
@@ -1901,7 +1902,7 @@ window.enviarPedido = async () => {
       </div>
     </div>
   `;
-  
+
   if (!m.horaRecogida && npTipoPedido !== 'Local') {
     const now = new Date();
     const future = new Date(now.getTime() + 15 * 60000);
@@ -1993,14 +1994,14 @@ async function realizarEnvioPedido(tableUpdates) {
   btn2.disabled = true; btn2.textContent = '…';
 
   const lineasImprimir = [];
-  const envioTs  = Date.now();
-  const envioId  = envioTs + '_' + mesaId;
+  const envioTs = Date.now();
+  const envioId = envioTs + '_' + mesaId;
   const lineasObj = {};
 
   // La comanda debe nacer pendiente para que barra/cocina o el servicio Python
   // puedan verla e imprimirla. El auto-servicio se aplica despues, no al crearla.
   const estadoInicial = 'pendiente';
-  Object.entries(carrito).forEach(([carritoKey, {art, qty, nota}]) => {
+  Object.entries(carrito).forEach(([carritoKey, { art, qty, nota }]) => {
     const artId = carritoKey.split('__')[0];
     lineasObj[carritoKey] = {
       artId, nombre: art.nombre, precio: Number(art.precio),
@@ -2047,9 +2048,9 @@ async function realizarEnvioPedido(tableUpdates) {
     }
     enviarComandaAMiniApp(lineasObj);
     if (autoTXT) generarTXTComanda(mesaNombre, lineasImprimir, configLocal);
-      carrito = {};
-      drawerNotasAbiertas.clear();
-      cerrarDrawer();
+    carrito = {};
+    drawerNotasAbiertas.clear();
+    cerrarDrawer();
     updateQtyDisplay();
     updateUI();
     btn1.textContent = '📥 En cola'; btn1.disabled = false;
@@ -2116,16 +2117,16 @@ async function realizarEnvioPedido(tableUpdates) {
   }
 
   const ahora2 = new Date();
-  const mesKey = `${ahora2.getFullYear()}-${String(ahora2.getMonth()+1).padStart(2,'0')}`;
+  const mesKey = `${ahora2.getFullYear()}-${String(ahora2.getMonth() + 1).padStart(2, '0')}`;
   const statsRef = ref(db, 'config/stats/' + mesKey + '/lineas');
   const statsSnap = await get(statsRef);
   await set(statsRef, (statsSnap.val() || 0) + nLineas);
 
   if (autoTXT) generarTXTComanda(mesaNombre, lineasImprimir, configLocal);
 
-    carrito = {};
-    drawerNotasAbiertas.clear();
-    cerrarDrawer();
+  carrito = {};
+  drawerNotasAbiertas.clear();
+  cerrarDrawer();
   updateQtyDisplay();
   updateUI();
   btn1.textContent = '✓ Enviado'; btn1.disabled = false;
@@ -2177,7 +2178,7 @@ async function upsertHistorial(datos) {
       const newRef = await push(ref(db, 'historial'), datos);
       await set(ref(db, `pedidos/${mesaId}/_meta/ventaKey`), newRef.key);
     }
-  } catch (_) {}
+  } catch (_) { }
 }
 
 async function enviarTicketFinalAServicio(lineasServidas, total, cobro = null, verifactu = null) {
@@ -2191,17 +2192,17 @@ async function enviarTicketFinalAServicio(lineasServidas, total, cobro = null, v
     requestedBy: camareroActual || '',
     mesaId: mesaId || '',
     mesaNombre: mesaNombre || '',
-      local: {
-        nombre: configLocal?.nombre || '',
-        direccion: configLocal?.direccion || '',
-        telefono: configLocal?.telefono || '',
-        cif: configLocal?.cif || '',
-        footer: configLocal?.footer || '',
-        logoUrl: configLocal?.ticketLogoUrl || '',
-        ticketShowNotes: configLocal?.ticketShowNotes !== false,
-        headerNameFontSize: Number(configLocal?.ticketHeaderNameFontSize || 12),
-        headerSubFontSize: Number(configLocal?.ticketHeaderSubFontSize || 8)
-      },
+    local: {
+      nombre: configLocal?.nombre || '',
+      direccion: configLocal?.direccion || '',
+      telefono: configLocal?.telefono || '',
+      cif: configLocal?.cif || '',
+      footer: configLocal?.footer || '',
+      logoUrl: configLocal?.ticketLogoUrl || '',
+      ticketShowNotes: configLocal?.ticketShowNotes !== false,
+      headerNameFontSize: Number(configLocal?.ticketHeaderNameFontSize || 12),
+      headerSubFontSize: Number(configLocal?.ticketHeaderSubFontSize || 8)
+    },
     format: {
       paper: paperCfg.paper,
       fontSize: paperCfg.fontSize,
@@ -2210,11 +2211,11 @@ async function enviarTicketFinalAServicio(lineasServidas, total, cobro = null, v
     },
     total: Math.round(Number(total || 0) * 100) / 100,
     lines: lineasServidas.map(l => ({
-        nombre: l.nombre,
-        qty: Number(l.qtyCuenta || 0),
-        precio: Math.round(Number(l.precio || 0) * 100) / 100,
-        nota: configLocal?.ticketShowNotes === false ? '' : limpiarNotaTicket(l.nota)
-      })),
+      nombre: l.nombre,
+      qty: Number(l.qtyCuenta || 0),
+      precio: Math.round(Number(l.precio || 0) * 100) / 100,
+      nota: configLocal?.ticketShowNotes === false ? '' : limpiarNotaTicket(l.nota)
+    })),
     cobro: cobro ? { recibido: Math.round(cobro.recibido * 100) / 100, cambio: Math.round(cobro.cambio * 100) / 100 } : null,
     verifactu: verifactu || null
   };
@@ -2324,7 +2325,7 @@ async function limpiarPrintJobsCerradosDeMesa(mesaIdObjetivo) {
 
 async function imprimirTicketFinal(lineasServidas, total, cobro = null, verifactu = null) {
   const mode = String(configLocal?.ticketPrintMode || 'browser');
-  const fecha = new Date().toLocaleString('es-ES', { dateStyle:'short', timeStyle:'short' });
+  const fecha = new Date().toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
   const copiaWindow = autoPDF ? window.open('', '_blank') : null;
 
   // Auditoría: registrar la impresión del ticket
@@ -2340,22 +2341,22 @@ async function imprimirTicketFinal(lineasServidas, total, cobro = null, verifact
     };
     if (cobro) {
       extras.recibido = Number(cobro.recibido || 0);
-      extras.cambio   = Number(cobro.cambio   || 0);
+      extras.cambio = Number(cobro.cambio || 0);
     }
     if (verifactu) {
-      extras.verifactuTipo   = verifactu.tipo   || null;
-      extras.verifactuSerie  = verifactu.serie  || null;
+      extras.verifactuTipo = verifactu.tipo || null;
+      extras.verifactuSerie = verifactu.serie || null;
       extras.verifactuNumero = verifactu.numero || null;
     }
     await logAuditoria(cobro ? 'ticket_cobrado' : 'ticket_impreso', detalle, extras);
-  } catch (_) {}
+  } catch (_) { }
 
   const lineasTicket = lineasServidas.map(l => ({
-      nombre: l.nombre,
-      qty: l.qtyCuenta,
-      precio: Number(l.precio),
-      nota: configLocal?.ticketShowNotes === false ? '' : limpiarNotaTicket(l.nota)
-    }));
+    nombre: l.nombre,
+    qty: l.qtyCuenta,
+    precio: Number(l.precio),
+    nota: configLocal?.ticketShowNotes === false ? '' : limpiarNotaTicket(l.nota)
+  }));
 
   if (mode === 'local' || mode === 'local+browser') {
     enviarTicketAMiniApp(lineasTicket, total, cobro, verifactu);
@@ -2563,7 +2564,7 @@ function limpiarNotaTicket(nota) {
 function renderTicket(pedidos) {
   const vfRef = pedidos['_vf'] || null;
   const todasLineas = aplanarPedidos(pedidos);
-  
+
   const esTemporal = mesaId && mesaId.startsWith('temp_');
   const btnEditarMesa = esTemporal
     ? ' <button class="btn btn-sm no-print" onclick="window.abrirEditarPedidoModal()" style="padding:2px 8px; font-size:11px; margin-left:8px; background:none; border:1px solid var(--border); border-radius:6px; cursor:pointer; color:var(--muted)">✏️ Editar</button>'
@@ -2581,7 +2582,7 @@ function renderTicket(pedidos) {
   const lineasServidas = todasLineas
     .map(l => {
       const qtyCuenta = qtyEnCuenta(l);
-      const qtyMax    = qtyMaxEnCuenta(l);
+      const qtyMax = qtyMaxEnCuenta(l);
       return { ...l, qtyOriginal: l.qty, qtyCuenta, qtyMax };
     })
     .filter(l => l.qtyCuenta > 0)
@@ -2604,7 +2605,7 @@ function renderTicket(pedidos) {
       '<div class="ticket-edit-hint">No hay artículos servidos aún</div>' +
       '<div class="ticket-total"><span>Total</span><span>' + fmtEu(0) + '</span></div>' +
       '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:1rem">' +
-        '<button class="btn-transferir no-print" style="flex:1;background:none;color:var(--muted);border:1px solid var(--border);border-radius:12px;padding:10px;font-family:var(--mono);font-size:13px;cursor:pointer">Transferir</button>' +
+      '<button class="btn-transferir no-print" style="flex:1;background:none;color:var(--muted);border:1px solid var(--border);border-radius:12px;padding:10px;font-family:var(--mono);font-size:13px;cursor:pointer">Transferir</button>' +
       '</div>' +
       '<button class="btn-cerrar">Cerrar mesa y limpiar</button>';
     document.getElementById('ticket-card').onclick = e => {
@@ -2620,7 +2621,7 @@ function renderTicket(pedidos) {
     return s + pUd * l.qtyCuenta;
   }, 0);
   const totalUds = lineasServidas.filter(l => l.destino !== 'descuento').reduce((s, l) => s + l.qtyCuenta, 0);
-  const fecha = new Date().toLocaleString('es-ES', { dateStyle:'short', timeStyle:'short' });
+  const fecha = new Date().toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
   const loc = configLocal;
 
   const cab =
@@ -2649,26 +2650,26 @@ function renderTicket(pedidos) {
       const precioCustom = ticketPreciosCustom[clave] !== undefined;
       const preciosCol = esDescuento
         ? '<div style="display:flex;gap:4px">' +
-            '<span style="min-width:52px"></span>' +
-            '<span class="ticket-linea-precio" style="color:var(--success);min-width:52px;text-align:right">' + fmtEu(pTotal) + '</span>' +
-          '</div>'
+        '<span style="min-width:52px"></span>' +
+        '<span class="ticket-linea-precio" style="color:var(--success);min-width:52px;text-align:right">' + fmtEu(pTotal) + '</span>' +
+        '</div>'
         : ticketPreciosMode
           ? '<div class="no-print" style="display:flex;gap:4px;align-items:center">' +
-              '<input type="number" min="0" step="0.01" class="input-precio-custom" data-clave="' + clave + '" value="' + pUd.toFixed(2) + '"' +
-              ' style="width:60px;min-width:60px;padding:3px 5px;border:1px solid var(--accent2);border-radius:6px;font-size:13px;font-family:var(--mono);background:var(--surface);color:var(--text);text-align:right">' +
-              '<span class="ticket-linea-precio" style="min-width:52px;text-align:right">' + fmtEu(pTotal) + '</span>' +
-            '</div>'
+          '<input type="number" min="0" step="0.01" class="input-precio-custom" data-clave="' + clave + '" value="' + pUd.toFixed(2) + '"' +
+          ' style="width:60px;min-width:60px;padding:3px 5px;border:1px solid var(--accent2);border-radius:6px;font-size:13px;font-family:var(--mono);background:var(--surface);color:var(--text);text-align:right">' +
+          '<span class="ticket-linea-precio" style="min-width:52px;text-align:right">' + fmtEu(pTotal) + '</span>' +
+          '</div>'
           : '<div style="display:flex;gap:4px">' +
-              '<span style="min-width:52px;text-align:right;font-size:12px;color:' + (precioCustom ? 'var(--accent2)' : 'var(--muted)') + '">' + fmtEu(pUd) + '</span>' +
-              '<span class="ticket-linea-precio" style="min-width:52px;text-align:right">' + fmtEu(pTotal) + '</span>' +
-            '</div>';
+          '<span style="min-width:52px;text-align:right;font-size:12px;color:' + (precioCustom ? 'var(--accent2)' : 'var(--muted)') + '">' + fmtEu(pUd) + '</span>' +
+          '<span class="ticket-linea-precio" style="min-width:52px;text-align:right">' + fmtEu(pTotal) + '</span>' +
+          '</div>';
       return '<div class="ticket-linea ticket-linea-edit' + (esDescuento ? ' ticket-descuento' : '') + '">' +
         (esDescuento ? '<span style="min-width:24px"></span>' : '<span style="min-width:24px;font-weight:bold">' + l.qtyCuenta + '</span>') +
         '<div style="flex:1">' +
-          '<div>' + l.nombre + '</div>' +
+        '<div>' + l.nombre + '</div>' +
         '</div>' +
         preciosCol +
-      '</div>';
+        '</div>';
     }).join('');
   } else {
     lineasHTML = lineasServidas.map((l, i) => {
@@ -2679,9 +2680,9 @@ function renderTicket(pedidos) {
       const pTotal = pUd * l.qtyCuenta;
       const controlesEdicion = (!esDescuento && ticketEditMode)
         ? '<div class="ticket-qty-edit no-print">' +
-          '<button class="ticket-qty-btn" data-accion="restar" data-idx="' + i + '"' + (l.qtyCuenta <= 1 ? ' disabled' : '') + '>-</button>' +
-          '<span class="ticket-qty-num">' + l.qtyCuenta + '</span>' +
-          '<button class="ticket-qty-btn" data-accion="sumar" data-idx="' + i + '">+</button>' +
+        '<button class="ticket-qty-btn" data-accion="restar" data-idx="' + i + '"' + (l.qtyCuenta <= 1 ? ' disabled' : '') + '>-</button>' +
+        '<span class="ticket-qty-num">' + l.qtyCuenta + '</span>' +
+        '<button class="ticket-qty-btn" data-accion="sumar" data-idx="' + i + '">+</button>' +
         '</div>'
         : '';
       const horaLinea = l.envioTs
@@ -2690,25 +2691,25 @@ function renderTicket(pedidos) {
       const metaLinea = [horaLinea, l.envioCamarero].filter(Boolean).join(' · ');
       const preciosCol = esDescuento
         ? '<div style="display:flex;gap:4px">' +
-            '<span style="min-width:52px"></span>' +
-            '<span class="ticket-linea-precio" style="color:var(--success);min-width:52px;text-align:right">' + fmtEu(pTotal) + '</span>' +
-          '</div>'
+        '<span style="min-width:52px"></span>' +
+        '<span class="ticket-linea-precio" style="color:var(--success);min-width:52px;text-align:right">' + fmtEu(pTotal) + '</span>' +
+        '</div>'
         : '<div style="display:flex;gap:4px">' +
-            (l.qtyCuenta > 1 ? '<span style="min-width:52px;text-align:right;font-size:12px;color:var(--muted)">' + fmtEu(pUd) + '</span>' : '<span style="min-width:52px"></span>') +
-            '<span class="ticket-linea-precio" style="min-width:52px;text-align:right">' + fmtEu(pTotal) + '</span>' +
-          '</div>';
+        (l.qtyCuenta > 1 ? '<span style="min-width:52px;text-align:right;font-size:12px;color:var(--muted)">' + fmtEu(pUd) + '</span>' : '<span style="min-width:52px"></span>') +
+        '<span class="ticket-linea-precio" style="min-width:52px;text-align:right">' + fmtEu(pTotal) + '</span>' +
+        '</div>';
       return '<div class="ticket-linea ticket-linea-edit' + (esDescuento ? ' ticket-descuento' : '') + '">' +
         (esDescuento ? '<span style="min-width:24px"></span>' : '<span style="min-width:24px;font-weight:bold">' + l.qtyCuenta + '</span>') +
         '<div style="flex:1">' +
-          '<div>' + l.nombre + '</div>' +
-          (metaLinea ? '<div class="ticket-linea-meta no-print">' + metaLinea + '</div>' : '') +
-          (notaVisible ? '<div class="no-print" style="font-size:11px;color:var(--muted);font-style:italic">-> ' + notaVisible + '</div>' : '') +
-          (l.verificado ? '<span class="nota-verificado no-print">Verificado</span>' : '') +
+        '<div>' + l.nombre + '</div>' +
+        (metaLinea ? '<div class="ticket-linea-meta no-print">' + metaLinea + '</div>' : '') +
+        (notaVisible ? '<div class="no-print" style="font-size:11px;color:var(--muted);font-style:italic">-> ' + notaVisible + '</div>' : '') +
+        (l.verificado ? '<span class="nota-verificado no-print">Verificado</span>' : '') +
         '</div>' +
         controlesEdicion +
         preciosCol +
         (!esDescuento && !ticketEditMode ? '<button class="btn-quitar-linea" data-idx="' + i + '" title="Devolver a barra/cocina">x</button>' : '') +
-      '</div>';
+        '</div>';
     }).join('');
   }
 
@@ -2720,41 +2721,41 @@ function renderTicket(pedidos) {
 
   document.getElementById('ticket-card').innerHTML =
     '<div class="ticket-header">' +
-      cab +
-      '<div style="margin-top:' + (loc.nombre ? '.75rem' : '0') + '">' +
-        '<div class="ticket-mesa" style="display:flex; align-items:center; justify-content:center;">Mesa ' + mesaNombre + btnEditarMesa + '</div>' +
-        '<div class="ticket-fecha">' + fecha + '</div>' +
-      '</div>' +
+    cab +
+    '<div style="margin-top:' + (loc.nombre ? '.75rem' : '0') + '">' +
+    '<div class="ticket-mesa" style="display:flex; align-items:center; justify-content:center;">Mesa ' + mesaNombre + btnEditarMesa + '</div>' +
+    '<div class="ticket-fecha">' + fecha + '</div>' +
+    '</div>' +
     '</div>' +
     '<div class="ticket-edit-hint">' + textoHint + '</div>' +
     '<div class="ticket-linea" style="font-size:11px;color:var(--muted);border-bottom:1px solid var(--border);padding-bottom:4px;margin-bottom:2px">' +
-      '<span style="min-width:24px;font-weight:600">Ud.</span>' +
-      '<span style="flex:1;font-weight:600">Artículo</span>' +
-      '<span style="font-size:10px;margin-right:4px;min-width:52px;text-align:right">Precio</span>' +
-      '<span style="font-weight:600;min-width:52px;text-align:right">Importe</span>' +
+    '<span style="min-width:24px;font-weight:600">Ud.</span>' +
+    '<span style="flex:1;font-weight:600">Artículo</span>' +
+    '<span style="font-size:10px;margin-right:4px;min-width:52px;text-align:right">Precio</span>' +
+    '<span style="font-weight:600;min-width:52px;text-align:right">Importe</span>' +
     '</div>' +
     lineasHTML +
     '<div class="ticket-total"><span>Total</span><span>' + fmtEu(total) + '</span></div>' +
     pie +
     '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:1rem">' +
-      '<button class="btn-descuento no-print" style="flex:1;background:rgba(53,199,119,.1);color:var(--success);border:1px solid rgba(53,199,119,.3);border-radius:12px;padding:10px;font-family:var(--mono);font-size:13px;cursor:pointer">＋ Descuento</button>' +
-      '<button class="btn-partir no-print" style="flex:1;background:none;color:var(--accent2);border:1px solid rgba(61,122,255,.3);border-radius:12px;padding:10px;font-family:var(--mono);font-size:13px;cursor:pointer">Partir cuenta</button>' +
-      '<button class="btn-transferir no-print" style="flex:1;background:none;color:var(--muted);border:1px solid var(--border);border-radius:12px;padding:10px;font-family:var(--mono);font-size:13px;cursor:pointer">Transferir</button>' +
+    '<button class="btn-descuento no-print" style="flex:1;background:rgba(53,199,119,.1);color:var(--success);border:1px solid rgba(53,199,119,.3);border-radius:12px;padding:10px;font-family:var(--mono);font-size:13px;cursor:pointer">＋ Descuento</button>' +
+    '<button class="btn-partir no-print" style="flex:1;background:none;color:var(--accent2);border:1px solid rgba(61,122,255,.3);border-radius:12px;padding:10px;font-family:var(--mono);font-size:13px;cursor:pointer">Partir cuenta</button>' +
+    '<button class="btn-transferir no-print" style="flex:1;background:none;color:var(--muted);border:1px solid var(--border);border-radius:12px;padding:10px;font-family:var(--mono);font-size:13px;cursor:pointer">Transferir</button>' +
     '</div>' +
     '<button class="btn-simplificar no-print" style="width:100%;margin-top:8px;background:none;color:var(--muted);border:1px solid var(--border);border-radius:12px;padding:10px;font-family:var(--mono);font-size:13px;cursor:pointer">' + btnSimplificarLabel + ' ticket</button>' +
     (ticketSimplificado ? '<button class="btn-precios no-print" style="width:100%;margin-top:6px;background:none;color:' + (ticketPreciosMode ? 'var(--accent2)' : 'var(--muted)') + ';border:1px solid ' + (ticketPreciosMode ? 'var(--accent2)' : 'var(--border)') + ';border-radius:12px;padding:10px;font-family:var(--mono);font-size:13px;cursor:pointer">' + (ticketPreciosMode ? 'Guardar precios' : 'Precios') + '</button>' : '') +
     '<div style="display:flex;gap:8px;margin-top:8px">' +
-      '<button class="btn-print no-print-btn" style="flex:1">Imprimir ticket</button>' +
-      '<button class="btn-cobrar no-print" style="flex:1;background:rgba(53,199,119,.15);color:var(--success);border:1px solid rgba(53,199,119,.5);border-radius:12px;padding:10px 14px;font-family:var(--mono);font-size:13px;font-weight:bold;cursor:pointer">Cobrar</button>' +
+    '<button class="btn-print no-print-btn" style="flex:1">Imprimir ticket</button>' +
+    '<button class="btn-cobrar no-print" style="flex:1;background:rgba(53,199,119,.15);color:var(--success);border:1px solid rgba(53,199,119,.5);border-radius:12px;padding:10px 14px;font-family:var(--mono);font-size:13px;font-weight:bold;cursor:pointer">Cobrar</button>' +
     '</div>' +
-    (configVf?.habilitado ? renderVfButtons(vfRef) : '') +
+    (configVf?.habilitado ? renderVfButtons(vfRef) : renderStandardBillingButtons(pedidos['_standard_factura'] || null)) +
     '<button class="btn-refresh no-print">Actualizar ticket</button>' +
     '<button class="btn-cerrar">Cerrar mesa y limpiar</button>';
 
   const card = document.getElementById('ticket-card');
   card.onclick = async e => {
     if (e.target.classList.contains('ticket-qty-btn')) {
-      const i     = parseInt(e.target.dataset.idx);
+      const i = parseInt(e.target.dataset.idx);
       const delta = e.target.dataset.accion === 'sumar' ? 1 : -1;
       await editarCantidadTicket(i, delta);
     } else if (e.target.classList.contains('btn-quitar-linea')) {
@@ -2763,11 +2764,11 @@ function renderTicket(pedidos) {
       const lineasImprimir = aplicarPreciosCustom(
         ticketSimplificado
           ? Object.values(lineasServidas.reduce((acc, l) => {
-              const k = l.artId + '||' + l.nombre;
-              if (!acc[k]) acc[k] = { ...l, qtyCuenta: 0 };
-              acc[k].qtyCuenta += l.qtyCuenta;
-              return acc;
-            }, {}))
+            const k = l.artId + '||' + l.nombre;
+            if (!acc[k]) acc[k] = { ...l, qtyCuenta: 0 };
+            acc[k].qtyCuenta += l.qtyCuenta;
+            return acc;
+          }, {}))
           : lineasServidas
       );
       await imprimirTicketFinal(lineasImprimir, total);
@@ -2775,11 +2776,11 @@ function renderTicket(pedidos) {
       const lineasImprimir = aplicarPreciosCustom(
         ticketSimplificado
           ? Object.values(lineasServidas.reduce((acc, l) => {
-              const k = l.artId + '||' + l.nombre;
-              if (!acc[k]) acc[k] = { ...l, qtyCuenta: 0 };
-              acc[k].qtyCuenta += l.qtyCuenta;
-              return acc;
-            }, {}))
+            const k = l.artId + '||' + l.nombre;
+            if (!acc[k]) acc[k] = { ...l, qtyCuenta: 0 };
+            acc[k].qtyCuenta += l.qtyCuenta;
+            return acc;
+          }, {}))
           : lineasServidas
       );
       showCobrarModal(total, lineasImprimir);
@@ -2839,6 +2840,12 @@ function renderTicket(pedidos) {
       window.showVfRectificativaModal({ serie: ref_.serie, numero: ref_.numero, fecha: ref_.fecha, tipo: ref_.tipo });
     } else if (e.target.classList.contains('btn-vf-reimp')) {
       if (vfRef?.fbKey) reimprimirFacturaVfMesa(vfRef.fbKey);
+    } else if (e.target.classList.contains('btn-standard-factura')) {
+      const lp = aplicarPreciosCustom(agruparLineasSimplificado(lineasServidas));
+      showStandardCompletaModal(lp, total);
+    } else if (e.target.classList.contains('btn-standard-reimp')) {
+      const standardFacturaRef = pedidos['_standard_factura'] || null;
+      if (standardFacturaRef?.fbKey) reimprimirFacturaVfMesa(standardFacturaRef.fbKey);
     }
   };
 }
@@ -2846,10 +2853,10 @@ function renderTicket(pedidos) {
 function renderVfButtons(vfRef) {
   const btn = (cls, label, style = '') =>
     `<button class="${cls}" style="flex:1;min-width:120px;border-radius:10px;padding:8px 10px;font-family:var(--mono);font-size:12px;cursor:pointer;${style}">${label}</button>`;
-  const accentBtn  = (cls, label) => btn(cls, label, 'background:rgba(61,122,255,.12);color:var(--accent2);border:1px solid rgba(61,122,255,.3)');
-  const greenBtn   = (cls, label) => btn(cls, label, 'background:rgba(53,199,119,.12);color:var(--success);border:1px solid rgba(53,199,119,.3);font-weight:bold');
-  const mutedBtn   = (cls, label) => btn(cls, label, 'background:rgba(216,255,97,.08);color:var(--muted);border:1px solid var(--border)');
-  const dangerBtn  = (cls, label) => btn(cls, label, 'background:rgba(229,85,85,.1);color:#e55;border:1px solid rgba(229,85,85,.3)');
+  const accentBtn = (cls, label) => btn(cls, label, 'background:rgba(61,122,255,.12);color:var(--accent2);border:1px solid rgba(61,122,255,.3)');
+  const greenBtn = (cls, label) => btn(cls, label, 'background:rgba(53,199,119,.12);color:var(--success);border:1px solid rgba(53,199,119,.3);font-weight:bold');
+  const mutedBtn = (cls, label) => btn(cls, label, 'background:rgba(216,255,97,.08);color:var(--muted);border:1px solid var(--border)');
+  const dangerBtn = (cls, label) => btn(cls, label, 'background:rgba(229,85,85,.1);color:#e55;border:1px solid rgba(229,85,85,.3)');
 
   const header = '<div style="font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:7px">Facturación Verifactu</div>';
   const wrap = inner => `<div class="no-print" style="margin-top:10px;padding:10px;border:1px solid var(--border);border-radius:12px;background:var(--surface3)">${header}${inner}</div>`;
@@ -3009,8 +3016,8 @@ function abrirDescuentoModal(totalActual = 0) {
       if (!nombre) nombre = 'Descuento';
     }
     document.getElementById('modal-overlay').classList.remove('open');
-    const ts       = Date.now();
-    const envioId  = 'desc_' + ts;
+    const ts = Date.now();
+    const envioId = 'desc_' + ts;
     await set(ref(db, `pedidos/${mesaId}/${envioId}`), {
       ts, camarero: camareroActual, envioId,
       lineas: {
@@ -3108,7 +3115,7 @@ async function transferirMesa(mesaDestId) {
   if (mesaId.startsWith('temp_')) {
     batchUpdates[`mesas/${mesaId}`] = null;
   } else {
-    batchUpdates[`mesas/${mesaId}/estado`]    = 'libre';
+    batchUpdates[`mesas/${mesaId}/estado`] = 'libre';
   }
   batchUpdates[`mesas/${mesaDestId}/estado`] = 'ocupada';
 
@@ -3117,7 +3124,7 @@ async function transferirMesa(mesaDestId) {
   const mesaDestNombre = mesasData[mesaDestId]?.nombre || mesaDestId;
   const mesaOrigenNombre = mesaNombre;
   const mesaOrigenId = mesaId;
-  mesaId     = mesaDestId;
+  mesaId = mesaDestId;
   mesaNombre = mesaDestNombre;
   document.getElementById('topbar-mesa').textContent = 'Mesa ' + mesaDestNombre;
   await logAuditoria('mesa_transferida',
@@ -3134,60 +3141,64 @@ window.cerrarMesa = async () => {
     body: 'Se borrarán todos los pedidos de esta mesa. ¿Continuar?',
     buttons: [
       { label: 'Cancelar' },
-      { label: 'Cerrar mesa', style: 'danger', action: async () => {
-        const snap = await get(ref(db, 'pedidos/' + mesaId));
-        const pedidos = snap.val() || {};
+      {
+        label: 'Cerrar mesa', style: 'danger', action: async () => {
+          const snap = await get(ref(db, 'pedidos/' + mesaId));
+          const pedidos = snap.val() || {};
 
-        const todasLineas = aplanarPedidos(pedidos);
-        const agrupado = {};
-        const camareros = new Set();
-        todasLineas.forEach(l => {
-          const qtyCuenta = qtyEnCuenta(l);
-          if (qtyCuenta <= 0) return;
-          if (l.camarero && l.destino !== 'descuento') camareros.add(l.camarero);
-          const k = l.nombre + '||' + Number(l.precio).toFixed(2);
-          if (!agrupado[k]) agrupado[k] = { nombre: l.nombre, precio: Number(l.precio), qty: 0, nota: l.nota || '' };
-          agrupado[k].qty += qtyCuenta;
-        });
-        const lineas = Object.values(agrupado);
-        const total  = lineas.reduce((s, l) => s + l.precio * l.qty, 0);
-
-        if (lineas.length > 0) {
-          const ahora = new Date();
-          await upsertHistorial({
-            mesa: mesaNombre, camarero: [...camareros].join(', '),
-            ts: ahora.getTime(), fecha: ahora.toLocaleDateString('es-ES'),
-            hora: ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
-            total: Math.round(total * 100) / 100, lineas
+          const todasLineas = aplanarPedidos(pedidos);
+          const agrupado = {};
+          const camareros = new Set();
+          todasLineas.forEach(l => {
+            const qtyCuenta = qtyEnCuenta(l);
+            if (qtyCuenta <= 0) return;
+            if (l.camarero && l.destino !== 'descuento') camareros.add(l.camarero);
+            const k = l.nombre + '||' + Number(l.precio).toFixed(2);
+            if (!agrupado[k]) agrupado[k] = { nombre: l.nombre, precio: Number(l.precio), qty: 0, nota: l.nota || '' };
+            agrupado[k].qty += qtyCuenta;
           });
-          await logAuditoria('mesa_cerrada',
-            `Total ${fmtEu(total)} · ${lineas.length} artículos`,
-            { total: Math.round(total * 100) / 100, articulos: lineas.length }
-          );
-        } else {
-          await logAuditoria('mesa_cerrada', 'Mesa cerrada sin consumo', { total: 0 });
-        }
+          const lineas = Object.values(agrupado);
+          const total = lineas.reduce((s, l) => s + l.precio * l.qty, 0);
 
-        await remove(ref(db, 'pedidos/' + mesaId));
-        if (mesaId.startsWith('temp_')) {
-          await remove(ref(db, 'mesas/' + mesaId));
-        } else {
-          await set(ref(db, 'mesas/' + mesaId + '/estado'), 'libre');
-        }
-        try {
-          const borrados = await limpiarPrintJobsCerradosDeMesa(mesaId);
-          if (borrados > 0) {
-            await logAuditoria(
-              'print_jobs_limpiados',
-              `Limpieza tecnica al cerrar mesa (${borrados})`,
-              { mesaId, mesa: mesaNombre, printJobs: borrados }
+          if (lineas.length > 0 && !pedidos['_vf'] && !pedidos['_standard_factura']) {
+            const ahora = new Date();
+            await upsertHistorial({
+              mesa: mesaNombre, camarero: [...camareros].join(', '),
+              ts: ahora.getTime(), fecha: ahora.toLocaleDateString('es-ES'),
+              hora: ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+              total: Math.round(total * 100) / 100, lineas
+            });
+            await logAuditoria('mesa_cerrada',
+              `Total ${fmtEu(total)} · ${lineas.length} artículos`,
+              { total: Math.round(total * 100) / 100, articulos: lineas.length }
             );
+          } else if (lineas.length > 0) {
+            await logAuditoria('mesa_cerrada', `Mesa cerrada (facturada previamente) total ${fmtEu(total)}`, { total: Math.round(total * 100) / 100 });
+          } else {
+            await logAuditoria('mesa_cerrada', 'Mesa cerrada sin consumo', { total: 0 });
           }
-        } catch (_) {}
-        mesaId = null; mesaNombre = null; carrito = {};
-        document.getElementById('topbar-mesa').style.display = 'none';
-        show('mesas');
-      }}
+
+          await remove(ref(db, 'pedidos/' + mesaId));
+          if (mesaId.startsWith('temp_')) {
+            await remove(ref(db, 'mesas/' + mesaId));
+          } else {
+            await set(ref(db, 'mesas/' + mesaId + '/estado'), 'libre');
+          }
+          try {
+            const borrados = await limpiarPrintJobsCerradosDeMesa(mesaId);
+            if (borrados > 0) {
+              await logAuditoria(
+                'print_jobs_limpiados',
+                `Limpieza tecnica al cerrar mesa (${borrados})`,
+                { mesaId, mesa: mesaNombre, printJobs: borrados }
+              );
+            }
+          } catch (_) { }
+          mesaId = null; mesaNombre = null; carrito = {};
+          document.getElementById('topbar-mesa').style.display = 'none';
+          show('mesas');
+        }
+      }
     ]
   });
 };
@@ -3206,14 +3217,14 @@ async function vfEmitirYPrint({ tipo, lineas, total, cobro = null, destinatario 
 
   const serie =
     tipo === 'F2' ? (configVf.serieSimp || 'SIMP') :
-    tipo === 'F3' ? (configVf.serieSust || 'SUST') :
-    (tipo.startsWith('R') || tipo === 'Rx') ? (configVf.serieRect || 'RECT') :
-    (configVf.serieFact || 'FACT');
+      tipo === 'F3' ? (configVf.serieSust || 'SUST') :
+        (tipo.startsWith('R') || tipo === 'Rx') ? (configVf.serieRect || 'RECT') :
+          (configVf.serieFact || 'FACT');
 
-  const iva    = Number(configVf.ivaDefault ?? 10);
+  const iva = Number(configVf.ivaDefault ?? 10);
   const numero = await siguienteNumero(serie);
-  const fecha  = fmtFechaVf(Date.now());
-  const desc   = configVf.descripcionDefault || `Mesa ${mesaNombre}`;
+  const fecha = fmtFechaVf(Date.now());
+  const desc = configVf.descripcionDefault || `Mesa ${mesaNombre}`;
   const lineasVf = buildLineasVf(lineas, iva);
   const totalNum = Math.round(Number(total) * 100) / 100;
 
@@ -3246,20 +3257,22 @@ async function vfEmitirYPrint({ tipo, lineas, total, cobro = null, destinatario 
   };
 
   let fbKey = null;
-  try { fbKey = await guardarFacturaEmitida(vfData); } catch (_) {}
+  try { fbKey = await guardarFacturaEmitida(vfData); } catch (_) { }
   if (fbKey) vfData.fbKey = fbKey;
 
   await logAuditoria('factura_emitida',
     `${labelTipoFactura ? labelTipoFactura(tipo) : tipo} ${serie}-${numero} · ${fmtEu(totalNum)}`,
-    { tipo, serie, numero, total: totalNum, uuid: uuid || null, fbKey: fbKey || null,
-      destinatario: destinatario ? (destinatario.nombre || destinatario.nif || null) : null }
+    {
+      tipo, serie, numero, total: totalNum, uuid: uuid || null, fbKey: fbKey || null,
+      destinatario: destinatario ? (destinatario.nombre || destinatario.nif || null) : null
+    }
   );
 
   // Guardar referencia en pedidos/{mesaId}/_vf para control de estado de botones
   if (mesaId) {
     try {
       await set(ref(db, `pedidos/${mesaId}/_vf`), { tipo, serie, numero, fecha, fbKey: fbKey || null });
-    } catch (_) {}
+    } catch (_) { }
   }
 
   // Guardar venta en historial ANTES de imprimir, por si falla la impresión
@@ -3286,10 +3299,10 @@ async function vfEmitirYPrint({ tipo, lineas, total, cobro = null, destinatario 
           ts: ahora.getTime(), fecha: ahora.toLocaleDateString('es-ES'),
           hora: ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
           total: Math.round(totalNum * 100) / 100, lineas: lineasHist,
-          verifactu: { tipo, serie, numero, uuid: uuid || null }
+          verifactu: { tipo, serie, numero, uuid: uuid || null, fbKey: fbKey || null }
         });
       }
-    } catch (_) {}
+    } catch (_) { }
   }
 
   await imprimirTicketFinal(lineas, total, cobro, vfData);
@@ -3351,10 +3364,10 @@ function showVfCompletaModal(lineas, total) {
         <div style="font-size:11px;color:var(--muted)">Base imp. (${iva}%): ${fmtEu(base)} | IVA: ${fmtEu(cuota)}</div>
       </div>
       <label style="font-size:12px;color:var(--muted)">NIF / CIF destinatario *</label>
-      <input id="vf-nif" type="text" placeholder="B12345678 / 12345678A" maxlength="20"
+      <input id="vf-nif" type="text" placeholder="B12345678 / 12345678A" list="clientes-nif-list" maxlength="20"
         style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:14px;background:var(--surface2);color:var(--text);text-transform:uppercase" />
       <label style="font-size:12px;color:var(--muted)">Nombre / Razón social *</label>
-      <input id="vf-nombre" type="text" placeholder="Nombre completo o empresa"
+      <input id="vf-nombre" type="text" placeholder="Nombre completo o empresa" list="clientes-nombre-list"
         style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:14px;background:var(--surface2);color:var(--text)" />
       <label style="font-size:12px;color:var(--muted)">Dirección (opcional)</label>
       <input id="vf-dir" type="text" placeholder="Calle, nº, CP Ciudad"
@@ -3363,6 +3376,7 @@ function showVfCompletaModal(lineas, total) {
       <input id="vf-desc" type="text" value="Consumición en local"
         style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:13px;background:var(--surface2);color:var(--text)" />
       <div id="vf-err" style="color:#e55;font-size:12px;display:none">Introduce NIF y nombre del destinatario.</div>
+      ${getAutocompleteDatalists()}
     </div>`;
   const acts = document.getElementById('modal-actions');
   acts.innerHTML = '';
@@ -3383,13 +3397,23 @@ function showVfCompletaModal(lineas, total) {
   };
   acts.appendChild(btnC); acts.appendChild(btnOk);
   document.getElementById('modal-overlay').classList.add('open');
+  setupAutocompleteListeners();
   setTimeout(() => document.getElementById('vf-nif')?.focus(), 80);
+
+  // background refresh datalist
+  cargarClientesAutocomplete().then(() => {
+    const datalistNif = document.getElementById('clientes-nif-list');
+    const datalistNombre = document.getElementById('clientes-nombre-list');
+    if (datalistNif) datalistNif.innerHTML = clientesCache.map(c => `<option value="${escapeHtml(c.nif)}">${escapeHtml(c.nombre)}</option>`).join('');
+    if (datalistNombre) datalistNombre.innerHTML = clientesCache.map(c => `<option value="${escapeHtml(c.nombre)}">${escapeHtml(c.nif)}</option>`).join('');
+  });
 }
+
 
 // Modal: Factura Sustitutiva F3 (reemplaza una simplificada con una completa)
 function showVfSustitutivaModal(lineas, total, original = {}) {
   const prefSerie = original.serie || configVf.serieSimp || 'SIMP';
-  const prefNum   = original.numero || '';
+  const prefNum = original.numero || '';
   const prefFecha = original.fecha || fmtFechaVf(Date.now());
   document.getElementById('modal-title').textContent = 'Factura Sustitutiva F3';
   document.getElementById('modal-body').innerHTML = `
@@ -3407,15 +3431,16 @@ function showVfSustitutivaModal(lineas, total, original = {}) {
       <input id="vf-orig-fecha" type="text" value="${prefFecha}"
         style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:13px;background:var(--surface2);color:var(--text)" />
       <label style="font-size:12px;color:var(--muted)">NIF destinatario *</label>
-      <input id="vf-nif" type="text" placeholder="B12345678"
+      <input id="vf-nif" type="text" placeholder="B12345678" list="clientes-nif-list"
         style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:14px;background:var(--surface2);color:var(--text);text-transform:uppercase" />
       <label style="font-size:12px;color:var(--muted)">Nombre / Razón social *</label>
-      <input id="vf-nombre" type="text" placeholder="Nombre completo o empresa"
+      <input id="vf-nombre" type="text" placeholder="Nombre completo o empresa" list="clientes-nombre-list"
         style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:14px;background:var(--surface2);color:var(--text)" />
       <label style="font-size:12px;color:var(--muted)">Dirección (opcional)</label>
       <input id="vf-dir" type="text" placeholder="Calle, nº, CP Ciudad"
         style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:13px;background:var(--surface2);color:var(--text)" />
       <div id="vf-err" style="color:#e55;font-size:12px;display:none">Completa todos los campos obligatorios.</div>
+      ${getAutocompleteDatalists()}
     </div>`;
   const acts = document.getElementById('modal-actions');
   acts.innerHTML = '';
@@ -3443,16 +3468,25 @@ function showVfSustitutivaModal(lineas, total, original = {}) {
   };
   acts.appendChild(btnC); acts.appendChild(btnOk);
   document.getElementById('modal-overlay').classList.add('open');
+  setupAutocompleteListeners();
   setTimeout(() => document.getElementById('vf-nif')?.focus(), 80);
+
+  // background refresh datalist
+  cargarClientesAutocomplete().then(() => {
+    const datalistNif = document.getElementById('clientes-nif-list');
+    const datalistNombre = document.getElementById('clientes-nombre-list');
+    if (datalistNif) datalistNif.innerHTML = clientesCache.map(c => `<option value="${escapeHtml(c.nif)}">${escapeHtml(c.nombre)}</option>`).join('');
+    if (datalistNombre) datalistNombre.innerHTML = clientesCache.map(c => `<option value="${escapeHtml(c.nombre)}">${escapeHtml(c.nif)}</option>`).join('');
+  });
 }
+
 
 // Modal: Rectificativa Rx (desde camarero, para la mesa actual)
 // Se usa desde admin.js para el historial de facturas
-window.showVfRectificativaModal = function({ serie, numero, fecha, nif, nombre, total, tipo = 'R1' } = {}) {
+window.showVfRectificativaModal = function ({ serie, numero, fecha, nif, nombre, total, tipo = 'R1' } = {}) {
   document.getElementById('modal-title').textContent = 'Factura Rectificativa';
-  const tiposRect = ['R1','R2','R3','R4','R5'].map(t =>
-    `<option value="${t}"${t===tipo?' selected':''}>${t} – ${
-      t==='R1'?'Art.80.1,2,6 LIVA':t==='R2'?'Art.80.3 (concurso)':t==='R3'?'Art.80.4 (impago)':t==='R4'?'Otras causas':'Simpl. rectificativa'
+  const tiposRect = ['R1', 'R2', 'R3', 'R4', 'R5'].map(t =>
+    `<option value="${t}"${t === tipo ? ' selected' : ''}>${t} – ${t === 'R1' ? 'Art.80.1,2,6 LIVA' : t === 'R2' ? 'Art.80.3 (concurso)' : t === 'R3' ? 'Art.80.4 (impago)' : t === 'R4' ? 'Otras causas' : 'Simpl. rectificativa'
     }</option>`
   ).join('');
   document.getElementById('modal-body').innerHTML = `
@@ -3525,10 +3559,10 @@ window.showVfRectificativaModal = function({ serie, numero, fecha, nif, nombre, 
         facturas_ref: [{ serie, numero, fecha_expedicion: fecha }],
         destinatario: nif ? { nif, nombre } : null
       };
-      try { await guardarFacturaEmitida(vfData); } catch (_) {}
+      try { await guardarFacturaEmitida(vfData); } catch (_) { }
 
       // Reimprimir la rectificativa como ticket
-      const fecha2 = new Date().toLocaleString('es-ES', { dateStyle:'short', timeStyle:'short' });
+      const fecha2 = new Date().toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
       const lineasImpresion = [{ nombre: desc, qty: 1, precio: importeNum, nota: '' }];
       abrirImpresionTicket({
         titulo: `Rectificativa ${serieRect}-${numRect}`,
@@ -3634,9 +3668,9 @@ async function reimprimirFacturaVfMesa(fbKey) {
 }
 
 // Reimprimir una factura emitida (desde historial admin)
-window.reimprimirFacturaVf = function(vfData) {
+window.reimprimirFacturaVf = function (vfData) {
   if (!vfData) return;
-  const fecha = new Date().toLocaleString('es-ES', { dateStyle:'short', timeStyle:'short' });
+  const fecha = new Date().toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' });
   const lineas = (vfData.lineasIva || []).map(l => ({
     nombre: `Base imp. ${l.tipo_impositivo}%`,
     qty: 1,
@@ -3671,8 +3705,8 @@ window.reimprimirFacturaVf = function(vfData) {
 
 // ── SHOW / NAVEGACIÓN ─────────────────────────────────────────────────────────
 window.show = v => {
-  document.getElementById('view-mesas').style.display  = v === 'mesas'  ? 'block' : 'none';
-  document.getElementById('view-carta').style.display  = v === 'carta'  ? 'block' : 'none';
+  document.getElementById('view-mesas').style.display = v === 'mesas' ? 'block' : 'none';
+  document.getElementById('view-carta').style.display = v === 'carta' ? 'block' : 'none';
   document.getElementById('view-ticket').style.display = v === 'ticket' ? 'block' : 'none';
   const viewCarta = document.getElementById('view-carta');
   if (v === 'carta' && window.innerWidth >= 768) viewCarta.classList.add('tablet-active');
@@ -3684,3 +3718,307 @@ window.show = v => {
   cerrarCatsPanel();
   document.body.classList.toggle('plano-active', v === 'mesas' && mesasViewMode === 'plano');
 };
+
+// ── CLIENTES AUTOCOMPLETE ──────────────────────────────────────────────────────
+let clientesCache = [];
+
+async function cargarClientesAutocomplete() {
+  try {
+    const snap = await get(ref(db, 'verifactu/facturas'));
+    const facturas = snap.val() || {};
+    const clientesMap = {};
+    Object.values(facturas).forEach(f => {
+      if (f.destinatario && f.destinatario.nif) {
+        const nif = f.destinatario.nif.toUpperCase().trim();
+        const nombre = (f.destinatario.nombre || '').trim();
+        const direccion = (f.destinatario.direccion || '').trim();
+        if (nif && nombre) {
+          clientesMap[nif] = { nif, nombre, direccion };
+        }
+      }
+    });
+    clientesCache = Object.values(clientesMap);
+  } catch (e) {
+    console.error("Error cargando autocompletado de clientes:", e);
+  }
+}
+
+function getAutocompleteDatalists() {
+  const nifOptions = clientesCache.map(c => `<option value="${escapeHtml(c.nif)}">${escapeHtml(c.nombre)}</option>`).join('');
+  const nombreOptions = clientesCache.map(c => `<option value="${escapeHtml(c.nombre)}">${escapeHtml(c.nif)}</option>`).join('');
+  return `
+    <datalist id="clientes-nif-list">${nifOptions}</datalist>
+    <datalist id="clientes-nombre-list">${nombreOptions}</datalist>
+  `;
+}
+
+function setupAutocompleteListeners() {
+  const nifInput = document.getElementById('vf-nif');
+  const nombreInput = document.getElementById('vf-nombre');
+  const dirInput = document.getElementById('vf-dir');
+
+  if (!nifInput || !nombreInput) return;
+
+  nifInput.addEventListener('input', () => {
+    const val = nifInput.value.trim().toUpperCase();
+    const client = clientesCache.find(c => c.nif === val);
+    if (client) {
+      nombreInput.value = client.nombre;
+      if (dirInput && client.direccion) {
+        dirInput.value = client.direccion;
+      }
+    }
+  });
+
+  nombreInput.addEventListener('input', () => {
+    const val = nombreInput.value.trim();
+    const client = clientesCache.find(c => c.nombre === val);
+    if (client) {
+      nifInput.value = client.nif;
+      if (dirInput && client.direccion) {
+        dirInput.value = client.direccion;
+      }
+    }
+  });
+}
+
+// ── ÚLTIMOS TICKETS CERRADOS ───────────────────────────────────────────────────
+window.abrirUltimosTicketsModal = async function () {
+  document.getElementById('modal-title').textContent = 'Últimos tickets cerrados';
+  document.getElementById('modal-body').innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">Cargando últimos tickets...</div>';
+  const acts = document.getElementById('modal-actions');
+  acts.innerHTML = '';
+  const btnC = document.createElement('button');
+  btnC.className = 'modal-btn'; btnC.textContent = 'Cerrar';
+  btnC.onclick = () => document.getElementById('modal-overlay').classList.remove('open');
+  acts.appendChild(btnC);
+  document.getElementById('modal-overlay').classList.add('open');
+
+  try {
+    const snap = await get(query(ref(db, 'historial'), orderByChild('ts'), limitToLast(5)));
+    const historyObj = snap.val() || {};
+    const historyList = Object.entries(historyObj)
+      .map(([key, value]) => ({ key, ...value }))
+      .sort((a, b) => (b.ts || 0) - (a.ts || 0));
+
+    if (historyList.length === 0) {
+      document.getElementById('modal-body').innerHTML = '<div style="text-align:center;padding:20px;color:var(--muted)">No hay tickets cerrados en el historial.</div>';
+      return;
+    }
+
+    let html = '<div style="display:flex;flex-direction:column;gap:12px;max-height:400px;overflow-y:auto;padding-right:4px">';
+    historyList.forEach(h => {
+      const tipoText = h.verifactu
+        ? (h.verifactu.status === 'Local' ? 'Factura Completa (Local)' : `Factura (${h.verifactu.tipo})`)
+        : 'Ticket Simplificado';
+      const detArticulos = (h.lineas || []).map(l => `${l.qty}x ${l.nombre}`).join(', ');
+      html += `
+        <div style="padding:12px;background:var(--surface3);border:1px solid var(--border);border-radius:10px;display:flex;flex-direction:column;gap:4px">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-weight:bold;font-size:13px">${escapeHtml(h.mesa || 'Sin Mesa')}</span>
+            <span style="font-size:11px;color:var(--muted)">${escapeHtml(h.fecha || '')} ${escapeHtml(h.hora || '')}</span>
+          </div>
+          <div style="font-size:11px;color:var(--accent2);font-weight:500">${tipoText}</div>
+          <div style="font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${escapeHtml(detArticulos)}">
+            ${escapeHtml(detArticulos)}
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;border-top:1px dashed var(--border);padding-top:6px">
+            <span style="font-weight:bold;font-size:14px;color:var(--text)">${fmtEu(h.total || 0)}</span>
+            <button class="modal-btn primary" onclick="window.reimprimirTicketHistorial('${h.key}')" style="padding:4px 10px;font-size:11px;border-radius:6px;min-width:auto;margin:0">Reimprimir</button>
+          </div>
+        </div>
+      `;
+    });
+    html += '</div>';
+    document.getElementById('modal-body').innerHTML = html;
+    window._ultimosTickets = historyList;
+  } catch (e) {
+    document.getElementById('modal-body').innerHTML = `<div style="color:var(--danger);padding:10px">Error al cargar el historial: ${e.message}</div>`;
+  }
+};
+
+window.reimprimirTicketHistorial = async function (key) {
+  const item = (window._ultimosTickets || []).find(h => h.key === key);
+  if (!item) {
+    showModal({ title: 'Reimpresión', body: 'No se encontraron los datos del ticket.', buttons: [{ label: 'Cerrar' }] });
+    return;
+  }
+
+  document.getElementById('modal-overlay').classList.remove('open');
+
+  const lineasParaImprimir = (item.lineas || []).map(l => ({
+    nombre: l.nombre,
+    precio: Number(l.precio || 0),
+    qtyCuenta: Number(l.qty || 0),
+    nota: l.nota || ''
+  }));
+
+  if (item.verifactu && item.verifactu.fbKey) {
+    try {
+      const snap = await get(ref(db, `verifactu/facturas/${item.verifactu.fbKey}`));
+      const vfData = snap.val();
+      if (vfData) {
+        await imprimirTicketFinal(lineasParaImprimir, item.total, null, vfData);
+        return;
+      }
+    } catch (e) {
+      console.warn("No se pudo cargar vfData desde fbKey, se imprime sin QR:", e);
+    }
+  }
+
+  const vfData = item.verifactu ? {
+    tipo: item.verifactu.tipo,
+    serie: item.verifactu.serie,
+    numero: item.verifactu.numero,
+    fecha: item.fecha,
+    total: item.total,
+    status: item.verifactu.status || 'Pending',
+    destinatario: item.destinatario || null,
+    lineasIva: buildLineasVf(lineasParaImprimir, Number(configVf?.ivaDefault ?? 10))
+  } : null;
+
+  await imprimirTicketFinal(lineasParaImprimir, item.total, null, vfData);
+};
+
+// ── FACTURACIÓN ESTÁNDAR (SIN VERIFACTU ACTIVO) ──────────────────────────────
+function renderStandardBillingButtons(standardRef) {
+  const btn = (cls, label, style = '') =>
+    `<button class="${cls}" style="flex:1;min-width:120px;border-radius:10px;padding:8px 10px;font-family:var(--mono);font-size:12px;cursor:pointer;${style}">${label}</button>`;
+  const accentBtn = (cls, label) => btn(cls, label, 'background:rgba(61,122,255,.12);color:var(--accent2);border:1px solid rgba(61,122,255,.3)');
+
+  const header = '<div style="font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:7px">Facturación Estándar</div>';
+  const wrap = inner => `<div class="no-print" style="margin-top:10px;padding:10px;border:1px solid var(--border);border-radius:12px;background:var(--surface3)">${header}${inner}</div>`;
+  const row = (...btns) => `<div style="display:flex;gap:6px;flex-wrap:wrap">${btns.join('')}</div>`;
+
+  if (!standardRef) {
+    return wrap(
+      row(accentBtn('btn-standard-factura', 'Crear Factura Completa'))
+    );
+  }
+
+  const badge = `<div style="font-size:11px;margin-bottom:6px;padding:4px 8px;border-radius:6px;background:rgba(53,199,119,.12);color:var(--success);display:inline-block">✓ Factura emitida — ${standardRef.serie}-${standardRef.numero}</div>`;
+  return wrap(
+    badge +
+    row(accentBtn('btn-standard-reimp', 'Reimprimir Factura'))
+  );
+}
+
+function showStandardCompletaModal(lineas, total) {
+  const iva = Number(configVf?.ivaDefault ?? 10);
+  const factor = 1 + iva / 100;
+  const base = Math.round(total / factor * 100) / 100;
+  const cuota = Math.round((total - base) * 100) / 100;
+
+  document.getElementById('modal-title').textContent = 'Crear Factura Completa';
+  document.getElementById('modal-body').innerHTML = `
+    <div style="font-family:var(--mono);font-size:13px;display:flex;flex-direction:column;gap:8px">
+      <div style="padding:10px;background:var(--surface3);border-radius:10px">
+        <div>Serie: <strong>${configVf.serieFact || 'FACT'}</strong> | Total: <strong>${fmtEu(total)}</strong></div>
+        <div style="font-size:11px;color:var(--muted)">Base imp. (${iva}%): ${fmtEu(base)} | IVA: ${fmtEu(cuota)}</div>
+      </div>
+      <label style="font-size:12px;color:var(--muted)">NIF / CIF destinatario *</label>
+      <input id="vf-nif" type="text" placeholder="B12345678 / 12345678A" list="clientes-nif-list" maxlength="20"
+        style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:14px;background:var(--surface2);color:var(--text);text-transform:uppercase" />
+      <label style="font-size:12px;color:var(--muted)">Nombre / Razón social *</label>
+      <input id="vf-nombre" type="text" placeholder="Nombre completo o empresa" list="clientes-nombre-list"
+        style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:14px;background:var(--surface2);color:var(--text)" />
+      <label style="font-size:12px;color:var(--muted)">Dirección *</label>
+      <input id="vf-dir" type="text" placeholder="Calle, nº, CP Ciudad"
+        style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:13px;background:var(--surface2);color:var(--text)" />
+      <div id="vf-err" style="color:#e55;font-size:12px;display:none">Introduce NIF, nombre y dirección del destinatario.</div>
+      ${getAutocompleteDatalists()}
+    </div>`;
+  const acts = document.getElementById('modal-actions');
+  acts.innerHTML = '';
+  const btnC = document.createElement('button');
+  btnC.className = 'modal-btn'; btnC.textContent = 'Cancelar';
+  btnC.onclick = () => document.getElementById('modal-overlay').classList.remove('open');
+  const btnOk = document.createElement('button');
+  btnOk.className = 'modal-btn primary'; btnOk.textContent = 'Emitir y imprimir';
+  btnOk.onclick = async () => {
+    const nif = (document.getElementById('vf-nif')?.value || '').trim().toUpperCase();
+    const nombre = (document.getElementById('vf-nombre')?.value || '').trim();
+    const direccion = (document.getElementById('vf-dir')?.value || '').trim();
+    if (!nif || !nombre || !direccion) { document.getElementById('vf-err').style.display = 'block'; return; }
+    document.getElementById('modal-overlay').classList.remove('open');
+    btnOk.disabled = true;
+    await emitirFacturaEstandarCompleta(lineas, total, { nif, nombre, direccion });
+  };
+  acts.appendChild(btnC); acts.appendChild(btnOk);
+  document.getElementById('modal-overlay').classList.add('open');
+  setupAutocompleteListeners();
+  setTimeout(() => document.getElementById('vf-nif')?.focus(), 80);
+}
+
+async function emitirFacturaEstandarCompleta(lineas, total, destinatario) {
+  const serie = configVf.serieFact || 'FACT';
+  const numero = await siguienteNumero(serie);
+  const fecha = fmtFechaVf(Date.now());
+  const totalNum = Math.round(Number(total) * 100) / 100;
+  const lineasVf = buildLineasVf(lineas, Number(configVf?.ivaDefault ?? 10));
+
+  const factData = {
+    tipo: 'F1',
+    serie,
+    numero,
+    fecha,
+    total: totalNum,
+    lineasIva: lineasVf,
+    status: 'Local',
+    mesa: mesaNombre,
+    camarero: camareroActual,
+    destinatario: destinatario
+  };
+
+  let fbKey = null;
+  try { fbKey = await guardarFacturaEmitida(factData); } catch (_) { }
+  if (fbKey) factData.fbKey = fbKey;
+
+  await logAuditoria('factura_estandar_emitida',
+    `Factura Estándar ${serie}-${numero} · ${fmtEu(totalNum)}`,
+    {
+      tipo: 'F1', serie, numero, total: totalNum, fbKey: fbKey || null,
+      destinatario: destinatario ? (destinatario.nombre || destinatario.nif || null) : null
+    }
+  );
+
+  if (mesaId) {
+    try {
+      await set(ref(db, `pedidos/${mesaId}/_standard_factura`), { tipo: 'F1', serie, numero, fecha, fbKey: fbKey || null });
+    } catch (_) { }
+  }
+
+  // Guardar en historial
+  if (mesaId) {
+    try {
+      const snap = await get(ref(db, 'pedidos/' + mesaId));
+      const pedidosSnap = snap.val() || {};
+      const todasLineas = aplanarPedidos(pedidosSnap);
+      const agrupado = {};
+      const camareros = new Set();
+      todasLineas.forEach(l => {
+        const qtyCuenta = qtyEnCuenta(l);
+        if (qtyCuenta <= 0) return;
+        if (l.camarero && l.destino !== 'descuento') camareros.add(l.camarero);
+        const k = l.nombre + '||' + Number(l.precio).toFixed(2);
+        if (!agrupado[k]) agrupado[k] = { nombre: l.nombre, precio: Number(l.precio), qty: 0, nota: l.nota || '' };
+        agrupado[k].qty += qtyCuenta;
+      });
+      const lineasHist = Object.values(agrupado);
+      if (lineasHist.length > 0) {
+        const ahora = new Date();
+        await upsertHistorial({
+          mesa: mesaNombre, camarero: [...camareros].join(', '),
+          ts: ahora.getTime(), fecha: ahora.toLocaleDateString('es-ES'),
+          hora: ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+          total: Math.round(totalNum * 100) / 100, lineas: lineasHist,
+          verifactu: { tipo: 'F1', serie, numero, status: 'Local', fbKey: fbKey || null }
+        });
+      }
+    } catch (_) { }
+  }
+
+  await cargarClientesAutocomplete();
+  await imprimirTicketFinal(lineas, total, null, factData);
+  await cargarTicketActual();
+}

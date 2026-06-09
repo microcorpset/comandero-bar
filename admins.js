@@ -1988,6 +1988,8 @@ onValue(ref(db, 'config/verifacti'), async snap => {
   set_('vf-serie-fact', configVfAdmin.serieFact || 'FACT');
   set_('vf-serie-rect', configVfAdmin.serieRect || 'RECT');
   set_('vf-serie-sust', configVfAdmin.serieSust || 'SUST');
+  set_('vf-prefix',     configVfAdmin.numPrefijo || '');
+  set_('vf-digits',     configVfAdmin.numDigitos || '');
 
   const track = document.getElementById('vf-enabled-track');
   const label = document.getElementById('vf-enabled-label');
@@ -2008,6 +2010,8 @@ window.guardarConfigVf = async () => {
   const serieFact = (v('vf-serie-fact') || 'FACT').toUpperCase();
   const serieRect = (v('vf-serie-rect') || 'RECT').toUpperCase();
   const serieSust = (v('vf-serie-sust') || 'SUST').toUpperCase();
+  const numPrefijo = v('vf-prefix') || '';
+  const numDigitos = v('vf-digits') !== '' ? Number(v('vf-digits')) : 0;
   await set(ref(db, 'config/verifacti'), {
     ...configVfAdmin,
     apiKey:              v('vf-apikey') || '',
@@ -2015,6 +2019,7 @@ window.guardarConfigVf = async () => {
     ivaDefault:          Number(v('vf-iva')) || 10,
     descripcionDefault:  v('vf-desc') || 'Consumición en local',
     serieSimp, serieFact, serieRect, serieSust,
+    numPrefijo, numDigitos,
     habilitado:          configVfAdmin.habilitado || false
   });
   toast('Configuración Verifactu guardada');
@@ -2115,7 +2120,7 @@ function renderHistorialVf() {
     return;
   }
 
-  const colorEstado = s => s === 'Accepted' ? 'var(--success)' : s === 'Rejected' ? 'var(--danger)' : s === 'Cancelled' ? 'var(--muted)' : 'var(--info)';
+  const colorEstado = s => s === 'Accepted' ? 'var(--success)' : s === 'Rejected' ? 'var(--danger)' : s === 'Cancelled' ? 'var(--muted)' : s === 'Local' ? 'var(--muted)' : 'var(--info)';
 
   lista.innerHTML = `
     <div style="overflow-x:auto">
@@ -2145,7 +2150,7 @@ function renderHistorialVf() {
             <td style="padding:6px 8px;text-align:center;white-space:nowrap">
               <button class="btn btn-sm" style="font-size:11px;padding:4px 8px" onclick="vfAccion('reprint','${f.fbKey}')">Reimpr.</button>
               ${f.uuid ? `<button class="btn btn-sm" style="font-size:11px;padding:4px 8px;margin-left:4px" onclick="vfAccion('status','${f.fbKey}')">Estado</button>` : ''}
-              ${(f.tipo === 'F1' || f.tipo === 'F2') ? `<button class="btn btn-sm" style="font-size:11px;padding:4px 8px;margin-left:4px;background:var(--danger-dim);color:var(--danger)" onclick="vfAccion('rect','${f.fbKey}')">Rectif.</button>` : ''}
+              ${(f.tipo === 'F1' || f.tipo === 'F2') && f.status !== 'Local' ? `<button class="btn btn-sm" style="font-size:11px;padding:4px 8px;margin-left:4px;background:var(--danger-dim);color:var(--danger)" onclick="vfAccion('rect','${f.fbKey}')">Rectif.</button>` : ''}
             </td>
           </tr>
         `).join('')}
@@ -2200,6 +2205,12 @@ function buildVfTicketHtml(f) {
   const footerHtml = loc.footer
     ? `<div style="text-align:center;font-size:7px;color:#888;margin-top:6px;border-top:1px dashed #999;padding-top:4px">${loc.footer}</div>` : '';
 
+  const isLocal = f.status === 'Local';
+  const headerText = isLocal ? tipoLabel.toUpperCase() : `${tipoLabel.toUpperCase()} VERIFACTU`;
+  const qrOutput = isLocal ? '' : qrHtml;
+  const uuidOutput = isLocal ? '' : (f.uuid ? `<div style="font-size:6px;color:#bbb;text-align:center;word-break:break-all;margin-top:2px">${f.uuid}</div>` : '');
+  const verifactuLegalFooter = isLocal ? '' : `<div style="text-align:center;font-size:7px;color:#666;margin-top:4px;border-top:1px dashed #999;padding-top:3px">Conforme RD 1007/2023 — Verifactu</div>`;
+
   return `<!DOCTYPE html><html><head><meta charset="UTF-8">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -2219,15 +2230,15 @@ body{font-family:'Courier New',monospace;font-size:9px;width:${paperW};max-width
 ${logoHtml}${localHtml}${localInfoHtml}
 <div style="text-align:center;font-size:7px;color:#666;margin:2px 0">Reimpresión ${fecha}</div>
 <hr class="rule">
-<div style="text-align:center;font-weight:bold;font-size:10px;letter-spacing:.05em;margin-bottom:2px">${tipoLabel.toUpperCase()} VERIFACTU</div>
+<div style="text-align:center;font-weight:bold;font-size:10px;letter-spacing:.05em;margin-bottom:2px">${headerText}</div>
 <div style="text-align:center;font-size:8px;margin-bottom:4px">Nº ${f.serie}-${f.numero} | ${f.fecha}</div>
 ${destHtml}
 <hr class="rule">
 ${ivaHtml}
 <div class="total"><span>Total</span><span>${Number(f.total||0).toFixed(2).replace('.',',')} €</span></div>
-${qrHtml}
-${f.uuid ? `<div style="font-size:6px;color:#bbb;text-align:center;word-break:break-all;margin-top:2px">${f.uuid}</div>` : ''}
-<div style="text-align:center;font-size:7px;color:#666;margin-top:4px;border-top:1px dashed #999;padding-top:3px">Conforme RD 1007/2023 — Verifactu</div>
+${qrOutput}
+${uuidOutput}
+${verifactuLegalFooter}
 ${footerHtml}
 <script>
 document.getElementById('btn-servicio')?.addEventListener('click', () => {
