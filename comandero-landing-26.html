@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Comandero · Sistema de comandas digital para hostelería · JON GLEZ</title>
+<meta name="description" content="Sistema de comandas digitales para hostelería. Control de plano de sala, pagos parciales y auditoría de seguridad. Multiplataforma para Apple, Android y PC.">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600&family=DM+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#C9A84C;--gold2:#E8D5A3;--rust:#C45C26;--sage:#5A7A50;
+  --charcoal:#1C1C1A;--ink:#0D0D0B;--cream:#F5F0E8;--paper:#FAF8F4;--paper2:#F0EDE4;
+  --border:#E0D8C8;--warm:#7A6E60;
+  --accent-blue:#3d7aff;--accent-green:#35c777;
+  --ff-display:'Cormorant Garamond',Georgia,serif;
+  --ff-body:'Outfit',sans-serif;
+  --ff-mono:'DM Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--ff-body);background:var(--paper);color:var(--ink);overflow-x:hidden}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1rem 2rem;display:flex;align-items:center;justify-content:space-between;transition:background .3s,box-shadow .3s}
+nav.scrolled{background:rgba(250,248,244,.95);backdrop-filter:blur(12px);box-shadow:0 1px 0 var(--border)}
+.nav-brand{font-family:var(--ff-display);font-size:1.3rem;font-weight:700;color:#FAF8F4;text-decoration:none;display:flex;align-items:center;gap:.5rem;transition:color .3s}
+nav.scrolled .nav-brand{color:var(--ink)}
+.nav-brand span{color:var(--gold)}
+.nav-badge{font-size:.65rem;font-family:var(--ff-mono);background:rgba(201,168,76,.15);color:var(--gold);border:1px solid rgba(201,168,76,.25);border-radius:20px;padding:.15rem .5rem;letter-spacing:.05em;vertical-align:middle}
+.nav-cta{background:var(--gold);color:var(--charcoal);border:none;border-radius:50px;padding:.6rem 1.4rem;font-family:var(--ff-body);font-size:.85rem;font-weight:600;cursor:pointer;transition:background .2s;text-decoration:none;display:inline-flex;align-items:center;gap:.4rem}
+.nav-cta:hover{background:var(--gold2)}
+.nav-price-old{font-size:.7rem;text-decoration:line-through;opacity:.55}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;background:var(--charcoal);position:relative;overflow:hidden;padding:6rem 2rem 4rem}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 30% 50%,rgba(201,168,76,.1),transparent 65%),radial-gradient(ellipse 50% 70% at 85% 80%,rgba(90,122,80,.07),transparent 60%)}
+.hero-wrap{max-width:1120px;margin:0 auto;width:100%;display:grid;grid-template-columns:1.05fr .95fr;gap:4rem;align-items:center;position:relative;z-index:1}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:.5rem;background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.25);border-radius:20px;padding:.35rem .9rem;font-size:.75rem;color:var(--gold);letter-spacing:.1em;text-transform:uppercase;font-weight:500;margin-bottom:1.5rem}
+.hero-title{font-family:var(--ff-display);font-size:clamp(2.6rem,5vw,4.2rem);font-weight:700;color:#FAF8F4;line-height:1.08;letter-spacing:-.01em;margin-bottom:1.2rem}
+.hero-title em{color:var(--gold);font-style:italic}
+.hero-sub{font-size:1.05rem;color:rgba(250,248,244,.55);line-height:1.7;margin-bottom:2rem;max-width:480px}
+.hero-actions{display:flex;gap:.9rem;flex-wrap:wrap;margin-bottom:1.8rem}
+.btn-primary{background:var(--gold);color:var(--charcoal);border:none;border-radius:50px;padding:.85rem 2rem;font-family:var(--ff-body);font-size:.95rem;font-weight:600;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block}
+.btn-primary:hover{background:var(--gold2);transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:rgba(250,248,244,.7);border:1px solid rgba(250,248,244,.2);border-radius:50px;padding:.85rem 1.8rem;font-family:var(--ff-body);font-size:.95rem;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-block}
+.btn-ghost:hover{border-color:rgba(250,248,244,.5);color:#FAF8F4}
+
+/* Device badge list in Hero */
+.hero-devices{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1.5rem}
+.device-badge{font-size:.72rem;font-weight:500;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:.3rem .75rem;color:rgba(250,248,244,.8);display:flex;align-items:center;gap:.35rem}
+
+/* Hero precio oferta */
+.hero-price-box{display:inline-flex;flex-direction:column;gap:.3rem;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);border-radius:14px;padding:.9rem 1.4rem}
+.hero-price-old{font-family:var(--ff-display);font-size:1.3rem;color:rgba(250,248,244,.25);text-decoration:line-through;line-height:1}
+.hero-price-current{display:flex;align-items:baseline;gap:.4rem}
+.hero-price-num{font-family:var(--ff-display);font-size:2.8rem;font-weight:700;color:var(--gold);line-height:1}
+.hero-price-unit{font-size:.8rem;color:rgba(250,248,244,.4);letter-spacing:.04em}
+.hero-price-tag{display:inline-flex;align-items:center;gap:.4rem;background:rgba(90,255,154,.1);border:1px solid rgba(90,255,154,.25);border-radius:20px;padding:.2rem .7rem;font-size:.68rem;color:#5aff9a;font-weight:500;font-family:var(--ff-mono);margin-top:.3rem;align-self:flex-start}
+
+/* HERO SCREENS */
+.hero-screens{display:flex;gap:1rem;align-items:flex-end;justify-content:center;flex-wrap:wrap}
+.scr-phone{background:#111827;border:1px solid #374151;border-radius:18px;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,.5),0 0 0 1px rgba(201,168,76,.08)}
+.scr-notch{height:14px;display:flex;align-items:center;justify-content:center;background:#111827}
+.scr-notch-bar{width:50px;height:4px;background:#1f2937;border-radius:2px}
+
+/* camarero */
+.c-offline{background:rgba(226,77,77,.95);padding:3px 8px;font-size:6px;color:#fff;font-family:var(--ff-mono);text-align:center;display:flex;align-items:center;justify-content:center;gap:3px;font-weight:bold}
+.c-topbar{background:#f3f4f6;padding:6px 8px;display:flex;align-items:center;gap:6px;border-bottom:1px solid #e5e7eb}
+.c-topbar-title{font-family:var(--ff-mono);font-size:8px;font-weight:500;color:#111827;flex:1}
+.c-mesa-badge{background:#111827;color:#fff;font-size:6px;padding:2px 6px;border-radius:10px;font-family:var(--ff-mono)}
+.mesas-grid-mini{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:6px 8px}
+.mesa-mini{border-radius:10px;border:1px solid #e5e7eb;background:#fff;padding:6px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.mesa-mini.ocupada{border-color:rgba(61,122,255,.35);background:rgba(61,122,255,.04)}
+.mesa-mini.alerta{border-color:#d97706;background:rgba(217,119,6,.04)}
+.mesa-mini-nombre{font-family:var(--ff-mono);font-size:10px;font-weight:500;color:#111827}
+.mesa-mini-estado{font-size:6px;color:#6b7280}
+.mesa-mini.ocupada .mesa-mini-estado{color:#3d7aff}
+.mesa-mini-sync{font-size:5px;color:#d97706;background:rgba(217,119,6,.1);border:1px solid rgba(217,119,6,.25);border-radius:10px;padding:1px 4px;font-family:var(--ff-mono)}
+.c-bottom{padding:6px 8px;background:#fff;border-top:1px solid #e5e7eb;display:flex;align-items:center;gap:5px}
+.c-bottom-info{flex:1}
+.c-bottom-sub{font-size:5.5px;color:#9ca3af;font-family:var(--ff-mono)}
+.c-bottom-total{font-size:9px;font-weight:500;font-family:var(--ff-mono)}
+.c-btn-env{border-radius:5px;padding:4px 8px;font-size:6.5px;font-family:var(--ff-mono);font-weight:500;color:#fff}
+.c-btn-env.normal{background:#111827}
+.c-btn-env.cola{background:#3d7aff}
+.c-cat{padding:5px 8px 3px;font-size:6px;color:#6b7280;text-transform:uppercase;letter-spacing:.08em;font-weight:500;background:#f3f4f6;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;gap:4px}
+.c-cat-count{background:rgba(61,122,255,.1);color:#3d7aff;font-size:5px;padding:1px 4px;border-radius:8px}
+.c-art{display:flex;align-items:center;gap:5px;padding:6px 8px;background:#fff;border-bottom:1px solid #f3f4f6}
+.c-art-name{flex:1;font-size:7.5px;color:#111827}
+.c-art-price{font-size:6.5px;color:#6b7280;font-family:var(--ff-mono)}
+
+/* barra/cocina */
+.b-topbar{background:#111827;padding:6px 8px;display:flex;align-items:center;gap:5px;border-bottom:1px solid #374151}
+.b-title{font-family:var(--ff-mono);font-size:9px;color:#e8ff5a;flex:1}
+.b-badge{background:rgba(232,255,90,.13);color:#e8ff5a;font-size:5.5px;padding:2px 6px;border-radius:10px;border:1px solid #e8ff5a}
+.b-card{background:#111827;border:1px solid #374151;border-radius:8px;margin:6px 0;overflow:hidden}
+.b-card.nueva{border-color:#e8ff5a;animation:flash-mini 1.4s ease-in-out infinite}
+@keyframes flash-mini{0%,100%{background:#1f2937}50%{background:rgba(232,255,90,.08)}}
+.b-card-hdr{background:#1f2937;padding:5px 8px;display:flex;align-items:center;gap:5px;border-bottom:1px solid #374151}
+.b-dot{width:5px;height:5px;border-radius:50%;background:#e8ff5a;animation:pulse-mini 1s ease-in-out infinite;flex-shrink:0}
+@keyframes pulse-mini{0%,100%{opacity:1}50%{opacity:.2}}
+.b-mesa{font-family:var(--ff-mono);font-size:8px;font-weight:500;color:#e8ff5a;flex:1}
+.b-time{font-size:6px;color:#9ca3af;font-family:var(--ff-mono)}
+.b-linea{display:flex;align-items:center;gap:5px;padding:5px 8px;border-bottom:1px solid #374151}
+.b-qty{font-size:9px;font-weight:500;color:#e8ff5a;min-width:14px;font-family:var(--ff-mono)}
+.b-nombre{flex:1;font-size:7.5px;color:#f3f4f6}
+.b-nota{margin:0 8px 5px 21px;font-size:6px;color:#e8ff5a;background:rgba(232,255,90,.08);border-left:2px solid #e8ff5a;padding:2px 5px;border-radius:0 3px 3px 0;font-family:var(--ff-mono)}
+.b-btn-serv{font-size:5.5px;padding:3px 6px;border-radius:5px;border:1px solid #374151;background:#1f2937;color:#9ca3af;font-family:var(--ff-mono);white-space:nowrap}
+.b-btn-serv.ok{border-color:rgba(90,255,154,.25);color:#5aff9a;background:rgba(90,255,154,.08)}
+.b-bulk{font-size:5px;padding:2px 6px;border-radius:4px;background:rgba(232,255,90,.1);color:#e8ff5a;border:1px solid rgba(232,255,90,.3);font-family:var(--ff-mono);margin:4px 8px 6px auto;display:block;width:fit-content}
+.b-title.cocina{color:#5af0ff}
+.b-badge.cocina{background:rgba(90,240,255,.12);color:#5af0ff;border-color:#5af0ff}
+.b-card.nueva.cocina{border-color:#5af0ff}
+.b-dot.cocina{background:#5af0ff}
+.b-qty.cocina{color:#5af0ff}
+.b-mesa.cocina{color:#5af0ff}
+.b-nota.cocina{color:#5af0ff;background:rgba(90,240,255,.08);border-color:#5af0ff}
+
+/* WRAP */
+.wrap{max-width:1060px;margin:0 auto;padding:0 1.5rem;position:relative;z-index:1}
+.section-label{display:inline-block;font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);font-weight:500;margin-bottom:1rem}
+.section-title{font-family:var(--ff-display);font-size:clamp(2rem,4vw,3rem);font-weight:700;color:var(--ink);line-height:1.1;margin-bottom:1.2rem}
+.section-title em{color:var(--gold);font-style:italic}
+.section-sub{font-size:1rem;color:var(--warm);line-height:1.7;max-width:520px;margin-bottom:3rem}
+
+/* WHAT'S NEW */
+.whats-new{padding:3.5rem 0;background:var(--charcoal)}
+.new-chips{display:flex;flex-wrap:wrap;gap:.6rem;justify-content:center;margin-top:1.5rem}
+.new-chip{display:inline-flex;align-items:center;gap:.4rem;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.2);border-radius:20px;padding:.4rem 1rem;font-size:.78rem;color:var(--gold2);font-family:var(--ff-mono)}
+.new-chip.green{background:rgba(90,122,80,.1);border-color:rgba(90,122,80,.28);color:#b9d3be}
+.new-chip.blue{background:rgba(61,122,255,.08);border-color:rgba(61,122,255,.22);color:#8aaeff}
+.new-chip.purple{background:rgba(160,90,255,.08);border-color:rgba(160,90,255,.22);color:#c9aaff}
+
+/* PROBLEM */
+.problem{padding:5rem 0;background:var(--paper2)}
+.problem-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.2rem}
+.problem-card{background:var(--paper);border:1px solid var(--border);border-radius:12px;padding:1.5rem}
+.problem-icon{font-size:1.8rem;margin-bottom:.8rem}
+.problem-title{font-family:var(--ff-display);font-size:1.1rem;font-weight:600;margin-bottom:.4rem}
+.problem-desc{font-size:.85rem;color:var(--warm);line-height:1.6}
+
+/* HOW */
+.how{padding:5rem 0}
+.flows{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}
+.flow-side{display:flex;flex-direction:column;gap:0}
+.flow-title{font-family:var(--ff-display);font-size:1.4rem;font-weight:600;margin-bottom:1.5rem;display:flex;align-items:center;gap:.6rem}
+.flow-step{display:flex;gap:1rem;padding:1rem 0;position:relative}
+.flow-step:not(:last-child)::after{content:'';position:absolute;left:18px;top:44px;bottom:-4px;width:1px;background:var(--border)}
+.step-dot{width:36px;height:36px;border-radius:50%;background:var(--charcoal);color:var(--gold);display:flex;align-items:center;justify-content:center;font-family:var(--ff-display);font-size:1rem;font-weight:700;flex-shrink:0}
+.flow-step.active .step-dot{background:var(--gold);color:var(--charcoal)}
+.step-content{padding-top:.35rem}
+.step-title{font-weight:500;font-size:.92rem;color:var(--ink);margin-bottom:.2rem}
+.step-desc{font-size:.82rem;color:var(--warm);line-height:1.55}
+@media(max-width:750px){.flows{grid-template-columns:1fr}}
+
+/* SCREENS SECTION (High fidelity mockups) */
+.screens{padding:4.5rem 0 5rem;background:var(--paper2)}
+.scr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;margin-bottom:1.5rem}
+.scr-card{background:var(--paper);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 10px 30px rgba(0,0,0,.03)}
+.scr-card-lbl{padding:.8rem 1rem;border-bottom:1px solid var(--border);font-size:.78rem;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:.5rem;background:#fff}
+.scr-card-body{padding:1.5rem;display:flex;justify-content:center;align-items:center;background:var(--paper2);flex:1}
+
+/* High Fidelity App Shell Elements for Mockups */
+.app-mock{width:100%;max-width:240px;background:#eef2f8;border:1px solid rgba(65,84,122,.12);border-radius:20px;overflow:hidden;box-shadow:0 15px 35px rgba(18,27,49,.12);font-family:var(--ff-body)}
+.app-mock-top{background:rgba(255,255,255,.8);padding:8px 10px;display:flex;align-items:center;gap:6px;border-bottom:1px solid rgba(65,84,122,.1)}
+.app-mock-logo{font-size:12px;font-weight:bold}
+.app-mock-title{font-family:var(--ff-mono);font-size:9px;color:var(--ink);font-weight:500;flex:1}
+.app-mock-badge{background:var(--charcoal);color:#fff;font-family:var(--ff-mono);font-size:7px;padding:2px 6px;border-radius:10px}
+.app-mock-body{padding:8px}
+
+/* Plano de sala mockup styling */
+.mock-plano-tabs{display:flex;gap:4px;margin-bottom:6px}
+.mock-plano-tab{padding:3px 6px;border-radius:6px;font-size:6px;font-family:var(--ff-mono);border:1px solid rgba(65,84,122,.15);background:none;color:var(--warm)}
+.mock-plano-tab.active{background:rgba(255,255,255,.9);color:var(--ink);font-weight:bold}
+.mock-plano-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;background:#ebf1fa;border-radius:10px;padding:6px;border:1px solid rgba(65,84,122,.08)}
+.mock-plano-mesa{aspect-ratio:1.2;background:#fff;border-radius:6px;border:1px solid rgba(65,84,122,.2);display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--ff-mono);font-size:9px;font-weight:bold;gap:1px;position:relative}
+.mock-plano-mesa.ocupada{background:#e8f0ff;border-color:#3d7aff;color:#3d7aff}
+.mock-plano-mesa.alerta-warn{background:#fffbeb;border-color:#d97706;color:#d97706}
+.mock-plano-mesa.alerta-danger{background:#fef2f2;border-color:#e24d4d;color:#e24d4d}
+.mock-plano-mesa.circle{border-radius:50%;aspect-ratio:1}
+.mock-plano-time{font-size:5px;font-weight:500;color:var(--warm)}
+.mock-plano-mesa.alerta-warn .mock-plano-time{color:#d97706}
+.mock-plano-mesa.alerta-danger .mock-plano-time{color:#e24d4d}
+.mock-plano-sync{position:absolute;top:1px;right:2px;font-size:4.5px;color:#d97706}
+
+/* Pago parcial mockup styling */
+.mock-parcial-tabs{display:flex;background:#e5e7eb;border-radius:8px;padding:2px;margin-bottom:8px}
+.mock-parcial-tab{flex:1;padding:4px;border:none;border-radius:6px;font-size:7.5px;font-weight:bold;text-align:center;background:none;color:#6b7280;cursor:default}
+.mock-parcial-tab.active{background:#3d7aff;color:#fff}
+.mock-parcial-item{display:flex;justify-content:space-between;align-items:center;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:6px 8px;margin-bottom:4px}
+.mock-parcial-info{font-size:8px;font-weight:600}
+.mock-parcial-sub{font-size:6px;color:#9ca3af;font-family:var(--ff-mono)}
+.mock-parcial-ctrl{display:flex;align-items:center;gap:4px}
+.mock-parcial-btn{width:14px;height:14px;border-radius:4px;border:1px solid #ccc;background:#f3f4f6;font-size:8px;display:flex;align-items:center;justify-content:center;font-weight:bold}
+.mock-parcial-qty{font-size:7.5px;font-family:var(--ff-mono);font-weight:bold;width:24px;text-align:center}
+.mock-parcial-banner{background:rgba(53,199,119,.12);border:1px solid #35c777;color:#22c55e;border-radius:8px;padding:5px;font-size:7px;font-weight:bold;text-align:center;margin-bottom:6px}
+
+/* Verifactu mockup styling */
+.mock-vf-badge{display:flex;align-items:center;gap:3px;background:rgba(53,199,119,.12);border:1px solid #35c777;border-radius:6px;padding:4px 6px;color:#22c55e;font-size:7px;font-weight:bold;margin-bottom:6px;font-family:var(--ff-mono)}
+.mock-vf-btn{width:100%;border-radius:8px;padding:6px;font-family:var(--ff-mono);font-size:7.5px;font-weight:bold;border:1px solid rgba(61,122,255,.3);background:rgba(61,122,255,.1);color:#3d7aff;margin-bottom:4px;text-align:center}
+.mock-vf-btn.success{border-color:#35c777;background:rgba(53,199,119,.1);color:#22c55e}
+.mock-vf-btn.danger{border-color:#e24d4d;background:rgba(226,77,77,.08);color:#e24d4d}
+.mock-vf-btn.muted{border-color:#ccc;background:#f3f4f6;color:var(--warm)}
+
+/* Audit log mockup styling */
+.mock-audit-top{background:#111827;padding:5px 8px;border-bottom:1px solid #374151;display:flex;align-items:center;justify-content:space-between}
+.mock-audit-title{font-family:var(--ff-mono);font-size:7.5px;color:#e8ff5a;font-weight:bold}
+.mock-audit-badge{font-size:5px;background:rgba(232,255,90,.1);border:1px solid #e8ff5a;color:#e8ff5a;padding:1px 4px;border-radius:4px;font-family:var(--ff-mono)}
+.mock-audit-log{background:#1f2937;border:1px solid #374151;border-radius:8px;padding:6px;margin-bottom:6px}
+.mock-audit-row{font-family:var(--ff-mono);font-size:6.5px;color:#e5e7eb;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05);line-height:1.3}
+.mock-audit-row:last-child{border-bottom:none}
+.mock-audit-time{color:#9ca3af;margin-right:2px}
+.mock-audit-action{color:#e8ff5a}
+.mock-audit-detail{color:#ff7a7a}
+.mock-audit-pass{background:#111827;border:1px solid #374151;border-radius:8px;padding:5px;text-align:center;font-size:6.5px;color:#9ca3af;font-family:var(--ff-mono)}
+
+/* FEATURES */
+.features{padding:5rem 0}
+.feats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem}
+.feat-card{background:var(--paper2);border:1px solid var(--border);border-radius:12px;padding:1.5rem;position:relative}
+.feat-card.new-feat{border-color:rgba(201,168,76,.3);background:linear-gradient(135deg,var(--paper2),rgba(201,168,76,.04))}
+.feat-new-badge{position:absolute;top:.8rem;right:.8rem;font-size:.6rem;font-family:var(--ff-mono);background:var(--gold);color:var(--charcoal);border-radius:20px;padding:.15rem .5rem;letter-spacing:.05em;text-transform:uppercase;font-weight:600}
+.feat-icon{font-size:1.5rem;margin-bottom:.8rem}
+.feat-title{font-family:var(--ff-display);font-size:1.05rem;font-weight:600;margin-bottom:.4rem}
+.feat-desc{font-size:.84rem;color:var(--warm);line-height:1.6}
+
+/* DEVICE COMPATIBILITY SECTION (New) */
+.compatibility-section{padding:4rem 0;background:var(--paper);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.compat-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
+.compat-icon-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem}
+.compat-icon-card{background:var(--paper2);border:1px solid var(--border);border-radius:16px;padding:1.5rem;text-align:center;transition:transform .2s}
+.compat-icon-card:hover{transform:translateY(-2px)}
+.compat-icon-large{font-size:2.5rem;margin-bottom:.5rem}
+.compat-icon-name{font-weight:600;font-size:.9rem;color:var(--ink);margin-bottom:.2rem}
+.compat-icon-desc{font-size:.78rem;color:var(--warm)}
+@media(max-width:800px){
+  .compat-grid{grid-template-columns:1fr;gap:2rem}
+}
+
+/* PRINT */
+.print-section{padding:5rem 0;background:var(--charcoal);position:relative;overflow:hidden}
+.print-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 70% 50%,rgba(90,122,80,.1),transparent 65%);pointer-events:none}
+.print-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;position:relative;z-index:1}
+.print-eyebrow{display:inline-flex;align-items:center;gap:.5rem;background:rgba(90,255,154,.08);border:1px solid rgba(90,255,154,.2);border-radius:20px;padding:.35rem .9rem;font-size:.75rem;color:#5aff9a;letter-spacing:.1em;text-transform:uppercase;font-weight:500;margin-bottom:1.2rem}
+.print-title{font-family:var(--ff-display);font-size:clamp(2rem,4vw,3.2rem);font-weight:700;color:#FAF8F4;line-height:1.1;margin-bottom:1rem}
+.print-title em{color:var(--gold);font-style:italic}
+.print-sub{font-size:1rem;color:rgba(250,248,244,.5);line-height:1.7;margin-bottom:2rem}
+.print-steps{display:flex;flex-direction:column;gap:.9rem}
+.print-step{display:flex;align-items:flex-start;gap:.9rem}
+.print-step-num{width:28px;height:28px;border-radius:50%;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);color:var(--gold);display:flex;align-items:center;justify-content:center;font-family:var(--ff-mono);font-size:.75rem;font-weight:600;flex-shrink:0;margin-top:.1rem}
+.print-step-text{font-size:.88rem;color:rgba(250,248,244,.65);line-height:1.6}
+.print-step-text strong{color:#FAF8F4}
+.print-vis{background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:1.5rem}
+.print-terminal{font-family:var(--ff-mono);font-size:.78rem;color:#5aff9a;line-height:1.8}
+.print-terminal .muted{color:rgba(255,255,255,.25)}
+.print-terminal .gold{color:var(--gold)}
+.print-terminal .white{color:rgba(255,255,255,.8)}
+@media(max-width:800px){.print-grid{grid-template-columns:1fr}}
+
+/* OFFLINE */
+.offline-section{padding:4.5rem 0;background:var(--paper2)}
+.offline-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
+.offline-vis{background:var(--paper);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:0 20px 48px rgba(0,0,0,.08)}
+.offline-banner-demo{padding:8px 14px;font-size:.75rem;color:#fff;font-family:var(--ff-mono);display:flex;align-items:center;gap:.5rem}
+.offline-banner-demo.red{background:rgba(226,77,77,.85)}
+.offline-banner-demo.blue{background:rgba(61,122,255,.88)}
+.offline-body{padding:1rem}
+.offline-mesa-row{display:flex;align-items:center;justify-content:space-between;padding:.5rem .6rem;border-radius:10px;border:1px solid var(--border);margin-bottom:.5rem;background:#fff}
+.offline-mesa-row.warn{border-color:rgba(217,119,6,.3);background:rgba(217,119,6,.03)}
+.offline-mesa-name{font-family:var(--ff-mono);font-size:.85rem;font-weight:500}
+.offline-mesa-badge{font-size:.6rem;font-family:var(--ff-mono);color:#d97706;background:rgba(217,119,6,.1);border:1px solid rgba(217,119,6,.25);border-radius:20px;padding:.15rem .5rem}
+.offline-mesa-synced{font-size:.6rem;font-family:var(--ff-mono);color:#35c777;background:rgba(53,199,119,.1);border:1px solid rgba(53,199,119,.25);border-radius:20px;padding:.15rem .5rem}
+@media(max-width:800px){.offline-grid{grid-template-columns:1fr}}
+
+/* VENTAS SECTION */
+.ventas-section{padding:5rem 0;background:var(--charcoal);position:relative;overflow:hidden}
+.ventas-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 30% 50%,rgba(201,168,76,.07),transparent 65%);pointer-events:none}
+.ventas-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;position:relative;z-index:1}
+@media(max-width:800px){.ventas-grid{grid-template-columns:1fr}}
+.ventas-mockup{background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.08);border-radius:16px;overflow:hidden}
+
+/* PRICING */
+.pricing{padding:5rem 0;background:var(--paper2)}
+.pricing-single-wrap{max-width:620px;margin:0 auto}
+.pricing-card{background:var(--charcoal);border-radius:20px;padding:3rem;position:relative;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,.3)}
+.pricing-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(201,168,76,.16),transparent 70%);pointer-events:none}
+.pricing-launch{display:inline-flex;align-items:center;gap:6px;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.35);border-radius:20px;padding:.4rem 1.2rem;font-size:.8rem;color:var(--gold);margin-bottom:1.5rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.pricing-price-block{margin-bottom:1rem}
+.pricing-old-row{display:flex;align-items:baseline;gap:.3rem;margin-bottom:.2rem;opacity:.45}
+.pricing-old-currency{font-size:1.1rem;font-weight:500;color:#FAF8F4}
+.pricing-old-num{font-family:var(--ff-display);font-size:2.4rem;font-weight:700;color:#FAF8F4;text-decoration:line-through;line-height:1;letter-spacing:-.02em}
+.pricing-old-label{font-size:.78rem;color:rgba(250,248,244,.6)}
+.pricing-price{display:flex;align-items:baseline;gap:.2rem}
+.pricing-currency{font-size:1.8rem;font-weight:500;color:var(--gold)}
+.pricing-num{font-family:var(--ff-display);font-size:5.5rem;font-weight:700;color:#FAF8F4;line-height:1;letter-spacing:-.03em}
+.pricing-discount-badge{display:inline-flex;align-items:center;background:rgba(90,255,154,.12);border:1px solid rgba(90,255,154,.3);border-radius:20px;padding:.25rem .8rem;font-size:.75rem;color:#5aff9a;font-family:var(--ff-mono);font-weight:600;margin-left:.5rem}
+.pricing-note{font-size:.88rem;color:rgba(250,248,244,.55);line-height:1.5;margin-bottom:2rem}
+.pricing-feats{display:flex;flex-direction:column;gap:.7rem;margin-bottom:2rem}
+.pricing-feat{display:flex;align-items:flex-start;gap:.6rem;font-size:.9rem;color:rgba(250,248,244,.85);line-height:1.55}
+.pricing-feat::before{content:'✓';color:var(--gold);font-weight:600;flex-shrink:0;margin-top:.05rem}
+.pricing-divider{border:none;border-top:1px solid rgba(250,248,244,.1);margin-bottom:2rem}
+.btn-pricing{width:100%;background:var(--gold);color:var(--charcoal);border:none;border-radius:50px;padding:1.1rem;font-family:var(--ff-body);font-size:1.05rem;font-weight:700;cursor:pointer;transition:all .2s;margin-bottom:1rem}
+.btn-pricing:hover{background:var(--gold2);transform:translateY(-1px)}
+.pricing-compat{text-align:center;font-size:.78rem;color:rgba(250,248,244,.35)}
+
+.pack-banner{max-width:620px;margin:2rem auto 0;background:rgba(90,122,80,.12);border:1px solid rgba(90,122,80,.3);border-radius:16px;padding:1.5rem;display:flex;flex-direction:column;gap:1rem}
+.pack-text{font-size:.92rem;color:var(--warm);line-height:1.6}
+.pack-text strong{color:var(--ink)}
+.pack-option{background:rgba(250,248,244,.65);border:1px solid rgba(90,122,80,.22);border-radius:12px;padding:1.2rem;display:flex;justify-content:space-between;align-items:center;gap:1.5rem}
+.pack-option-info{flex:1}
+.pack-option-title{font-size:.95rem;font-weight:700;color:var(--ink);margin-bottom:.35rem}
+.pack-price{font-family:var(--ff-display);font-size:2rem;font-weight:700;color:var(--sage);white-space:nowrap}
+.pack-sub{font-size:.75rem;color:var(--warm);margin-top:2px}
+
+/* FAQ */
+.faq{padding:4rem 0 5rem}
+.faq-list{margin-top:2.5rem;display:flex;flex-direction:column;gap:0}
+.faq-item{border-top:1px solid var(--border);padding:1.2rem 0}
+.faq-item:last-child{border-bottom:1px solid var(--border)}
+.faq-q{font-family:var(--ff-display);font-size:1.05rem;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:1rem;user-select:none}
+.faq-q::after{content:'+';font-size:1.3rem;color:var(--gold);flex-shrink:0;transition:transform .2s;font-family:var(--ff-body);font-weight:300}
+.faq-item.open .faq-q::after{transform:rotate(45deg)}
+.faq-a{display:none;font-size:.86rem;color:var(--warm);line-height:1.7;padding-top:.7rem;max-width:680px}
+.faq-item.open .faq-a{display:block}
+
+/* CTA BOTTOM */
+.cta-bottom{padding:5rem 0;background:var(--charcoal);text-align:center;position:relative;overflow:hidden}
+.cta-bottom::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 70% at 50% 50%,rgba(201,168,76,.1),transparent 65%);pointer-events:none}
+.cta-bottom .section-label{color:var(--gold)}
+
+/* FOOTER */
+footer{background:var(--ink);color:rgba(250,248,244,.4);padding:2rem 1.5rem;text-align:center;font-size:.8rem}
+footer a{color:var(--gold2);text-decoration:none}
+footer a:hover{text-decoration:underline}
+.footer-name{font-family:var(--ff-display);font-size:1.4rem;color:#FAF8F4;margin-bottom:.5rem}
+
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media(max-width:900px){
+  .hero-wrap{grid-template-columns:1fr;gap:3rem}
+  .hero-screens{order:-1}
+}
+@media(max-width:600px){
+  .hero{padding:5rem 1rem 3rem}
+  .wrap{padding:0 1rem}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <a href="#" class="nav-brand">JON <span>GLEZ</span> <span class="nav-badge">Comandero</span></a>
+  <a href="#pricing" class="nav-cta">
+    <span class="nav-price-old">400€</span> 200€/año
+  </a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-wrap">
+    <div class="hero-content">
+      <div class="hero-eyebrow">🧾 Comandero · Hostelería digital</div>
+      <h1 class="hero-title">Las comandas,<br>de la mesa <em>a la cocina</em><br>en un segundo</h1>
+      <p class="hero-sub">El camarero toma nota desde el móvil. El pedido llega al instante a barra y cocina. Impresión térmica integrada, control de sala por plano visual, pagos parciales y facturación directa. Funciona aunque se caiga el wifi.</p>
+      
+      <div class="hero-actions">
+        <a href="#how" class="btn-primary">Ver cómo funciona</a>
+        <a href="#pricing" class="btn-ghost">Ver precio →</a>
+      </div>
+
+      <div class="hero-price-box">
+        <div class="hero-price-old">400 €/año</div>
+        <div class="hero-price-current">
+          <span class="hero-price-num">200€</span>
+          <span class="hero-price-unit">· /año · todo configurado e instantáneo</span>
+        </div>
+        <div class="hero-price-tag">🔥 50% descuento de lanzamiento permanente</div>
+      </div>
+
+      <div class="hero-devices">
+        <span class="device-badge">🍏 Apple (iOS, iPadOS, Mac)</span>
+        <span class="device-badge">🤖 Android (Móviles, Tablets)</span>
+        <span class="device-badge">💻 Windows PC / Laptop</span>
+      </div>
+    </div>
+
+    <!-- HERO MOCKUPS -->
+    <div class="hero-screens">
+      <!-- Camarero: mesas con offline -->
+      <div style="position:relative">
+        <div class="scr-phone" style="width:155px">
+          <div class="scr-notch"><div class="scr-notch-bar"></div></div>
+          <div class="c-offline">📡 Sin conexión — 2 pedidos en cola</div>
+          <div class="c-topbar">
+            <span class="c-topbar-title">Comandero</span>
+            <span class="c-mesa-badge">Luis</span>
+          </div>
+          <div class="mesas-grid-mini">
+            <div class="mesa-mini alerta">
+              <div class="mesa-mini-nombre">T1</div>
+              <div class="mesa-mini-estado">21m · 3 pend</div>
+              <div class="mesa-mini-sync">⏳ Sin sincronizar</div>
+            </div>
+            <div class="mesa-mini ocupada">
+              <div class="mesa-mini-nombre">3</div>
+              <div class="mesa-mini-estado">8m · 2 uds</div>
+            </div>
+            <div class="mesa-mini">
+              <div class="mesa-mini-nombre">5</div>
+              <div class="mesa-mini-estado">libre</div>
+            </div>
+            <div class="mesa-mini">
+              <div class="mesa-mini-nombre">7</div>
+              <div class="mesa-mini-estado">libre</div>
+            </div>
+          </div>
+          <div class="c-bottom">
+            <div class="c-bottom-info">
+              <div class="c-bottom-sub">2 pedidos guardados</div>
+              <div class="c-bottom-total" style="color:#d97706">Offline</div>
+            </div>
+            <div class="c-btn-env cola">📥 Cola</div>
+          </div>
+        </div>
+        <div style="position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);background:rgba(61,122,255,.15);border:1px solid rgba(61,122,255,.4);border-radius:20px;padding:.22rem .7rem;font-size:.62rem;color:#3d7aff;white-space:nowrap;font-weight:500;font-family:'Outfit',sans-serif">📋 Camarero</div>
+      </div>
+
+      <!-- Barra -->
+      <div style="position:relative">
+        <div class="scr-phone" style="width:155px">
+          <div class="scr-notch"><div class="scr-notch-bar"></div></div>
+          <div class="b-topbar">
+            <span class="b-title">Barra</span>
+            <span class="b-badge">2 nuevas</span>
+            <span style="font-size:6px;color:#555;font-family:var(--ff-mono)">21:34</span>
+          </div>
+          <div style="padding:6px">
+            <div class="b-card nueva">
+              <div class="b-card-hdr">
+                <div class="b-dot"></div>
+                <span class="b-mesa">Mesa T1</span>
+                <span class="b-time">2 pend · 8m</span>
+              </div>
+              <div class="b-linea"><span class="b-qty">2×</span><span class="b-nombre">Cerveza caña</span><span class="b-btn-serv">Servido</span></div>
+              <div class="b-linea"><span class="b-qty">1×</span><span class="b-nombre">Agua sin gas</span><span class="b-btn-serv">Servido</span></div>
+              <div class="b-bulk">✓ Servir todo</div>
+            </div>
+            <div class="b-card nueva" style="margin-top:4px">
+              <div class="b-card-hdr">
+                <div class="b-dot"></div>
+                <span class="b-mesa">Mesa 3</span>
+                <span class="b-time">1 pend · 1m</span>
+              </div>
+              <div class="b-linea"><span class="b-qty">3×</span><span class="b-nombre">Copa vino tinto</span><span class="b-btn-serv">Servido</span></div>
+            </div>
+          </div>
+        </div>
+        <div style="position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);background:rgba(232,255,90,.1);border:1px solid rgba(232,255,90,.4);border-radius:20px;padding:.22rem .7rem;font-size:.62rem;color:#c9a84c;white-space:nowrap;font-weight:500;font-family:'Outfit',sans-serif">🍺 Barra</div>
+      </div>
+
+      <!-- Cocina -->
+      <div style="position:relative">
+        <div class="scr-phone" style="width:148px">
+          <div class="scr-notch"><div class="scr-notch-bar"></div></div>
+          <div class="b-topbar">
+            <span class="b-title cocina">Cocina</span>
+            <span class="b-badge cocina">1 nueva</span>
+          </div>
+          <div style="padding:6px">
+            <div class="b-card nueva cocina">
+              <div class="b-card-hdr">
+                <div class="b-dot cocina"></div>
+                <span class="b-mesa cocina">Mesa T1</span>
+                <span class="b-time">4m</span>
+              </div>
+              <div class="b-linea"><span class="b-qty cocina">1×</span><span class="b-nombre">Entrecot 400g</span><span class="b-btn-serv">Servido</span></div>
+              <div class="b-nota cocina">↳ poco hecho, sin sal</div>
+              <div class="b-linea"><span class="b-qty cocina">2×</span><span class="b-nombre">Croquetas</span><span class="b-btn-serv">Servido</span></div>
+            </div>
+          </div>
+        </div>
+        <div style="position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);background:rgba(90,240,255,.1);border:1px solid rgba(90,240,255,.4);border-radius:20px;padding:.22rem .7rem;font-size:.62rem;color:#5af0ff;white-space:nowrap;font-weight:500;font-family:'Outfit',sans-serif">🍳 Cocina</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FUNCIONALIDADES DESTACADAS -->
+<section class="whats-new">
+  <div class="wrap" style="text-align:center">
+    <span class="section-label" style="color:var(--gold)">Todo lo que incluye el sistema</span>
+    <div class="new-chips">
+      <div class="new-chip purple">⚖️ Preparado para Verifactu / TicketBai</div>
+      <div class="new-chip">💶 División de Cuentas (Pago Parcial por Item)</div>
+      <div class="new-chip green">🔐 Registro de Auditoría Antifraude para Gerentes</div>
+      <div class="new-chip blue">🗺️ Plano de Sala visual interactivo por zonas</div>
+      <div class="new-chip">🖨️ Impresión térmica — Windows y Android</div>
+      <div class="new-chip green">📡 Pedidos seguros aunque falle el wifi</div>
+      <div class="new-chip blue">📊 Turnos de trabajo y cierres de caja</div>
+      <div class="new-chip green">👥 Multi-camarero con PIN propio</div>
+      <div class="new-chip blue">🧬 Variantes de artículo con precio propio</div>
+      <div class="new-chip purple">⚡ Servir pedido completo de un clic</div>
+      <div class="new-chip">🌙 Modo oscuro/claro en barra y cocina</div>
+      <div class="new-chip green">⚠️ Alérgenos visibles en la carta</div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="problem">
+  <div class="wrap">
+    <span class="section-label">El problema</span>
+    <h2 class="section-title">Lo que cuesta<br>sin un sistema</h2>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="problem-icon">📢</div>
+        <div class="problem-title">Gritos y malentendidos</div>
+        <div class="problem-desc">El camarero grita la comanda por encima del ruido. La cocina entiende otra cosa. El cliente recibe un plato distinto al que pidió.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">📝</div>
+        <div class="problem-title">Papel que se pierde</div>
+        <div class="problem-desc">Comandas escritas a mano que se mojan, se pierden o son ilegibles. Cada vez que cambia el camarero hay que explicarlo todo otra vez.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">🔄</div>
+        <div class="problem-title">Platos que se confunden</div>
+        <div class="problem-desc">La barra no sabe qué está servido y qué no. Se llevan bebidas que ya están en la mesa o se olvidan las que faltan.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-icon">💸</div>
+        <div class="problem-title">Descuentos o ítems borrados sin control</div>
+        <div class="problem-desc">Sin un registro de auditoría, las líneas borradas del ticket final o los descuentos manuales injustificados representan fugas invisibles de dinero cada mes.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="wrap">
+    <span class="section-label">Cómo funciona</span>
+    <h2 class="section-title">Flujo completo,<br>de sala a facturación</h2>
+    <p class="section-sub">El camarero toma, envía y gestiona. Barra y cocina reciben, sirven y controlan tiempos. El admin configura, audita la actividad y analiza ventas. Todo en tiempo real, cumpliendo la normativa fiscal y sin apps externas.</p>
+    <div class="flows">
+      <div class="flow-side">
+        <div class="flow-title">Camarero y Sala</div>
+        <div class="flow-step active">
+          <div class="step-dot">1</div>
+          <div class="step-content">
+            <div class="step-title">Abre la app e introduce su PIN</div>
+            <div class="step-desc">Cada camarero tiene su propio PIN y nombre. Al entrar ve las mesas con toda la información: estado, importe, tiempo de espera, alertas de color y avisos de sincronización offline.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-dot">2</div>
+          <div class="step-content">
+            <div class="step-title">Plano de sala interactivo y por zonas</div>
+            <div class="step-desc">El camarero puede alternar entre la cuadrícula o el plano visual de sala por zonas (Terraza, Comedor, Barra). Las mesas se sitúan en el espacio real en forma circular o rectangular reflejando su estado exacto en tiempo real.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-dot">3</div>
+          <div class="step-content">
+            <div class="step-title">Toma nota con variantes y alérgenos</div>
+            <div class="step-desc">Categorías plegables de carta con selector rápido. Artículos con variantes de tamaño/precio, notas de cocina individuales ("sin sal", "muy hecho") y acceso inmediato a los 14 alérgenos de la normativa europea.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-dot">4</div>
+          <div class="step-content">
+            <div class="step-title">Envío seguro offline</div>
+            <div class="step-desc">Si el wifi del restaurante flaquea, los pedidos se guardan localmente en IndexedDB en el navegador. No se pierde trabajo; se autoenvían en orden al reconectar.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-dot">5</div>
+          <div class="step-content">
+            <div class="step-title">Cierre de ticket y división de cuentas</div>
+            <div class="step-desc">Cobros rápidos aplicando descuentos directos en porcentaje o euros. Permite partir la cuenta equitativamente entre comensales o realizar cobros parciales seleccionando ítems uno a uno, manteniendo el resto de la mesa abierta.</div>
+          </div>
+        </div>
+      </div>
+      <div class="flow-side">
+        <div class="flow-title">Control y Administración</div>
+        <div class="flow-step active">
+          <div class="step-dot">1</div>
+          <div class="step-content">
+            <div class="step-title">Barra y cocina: Puestos especializados</div>
+            <div class="step-desc">Cada pantalla recibe únicamente las líneas que le corresponden según la configuración de la carta. Notificaciones sonoras y visuales inmediatas con tarjetas organizadas por minutos de espera para evitar atascos.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-dot">2</div>
+          <div class="step-content">
+            <div class="step-title">Preparado para Verifactu</div>
+            <div class="step-desc">Generación directa del cobro conforme a la ley de prevención del fraude. Emisión de facturas simplificadas (F2) y completas con NIF (F1), gestión de rectificativas y sustitutivas con registro encadenado inalterable enviado a la AEAT.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-dot">3</div>
+          <div class="step-content">
+            <div class="step-title">Registro de Auditoría (Prevención de Fugas)</div>
+            <div class="step-desc">El panel de administrador incluye una sección de auditoría protegida por contraseña que registra cada artículo eliminado de una cuenta, descuentos manuales o transferencias de mesa, especificando el camarero y la hora exacta.</div>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="step-dot">4</div>
+          <div class="step-content">
+            <div class="step-title">Turnos de caja y ranking de artículos</div>
+            <div class="step-desc">Apertura y cierre de turnos de trabajo independientes (Comida, Cena, Fin de semana). Control de caja total, ranking de artículos más vendidos con importes y exportación instantánea a CSV.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPATIBILITY SECTION (Apple/Android/PC/Tablet) -->
+<section class="compatibility-section">
+  <div class="wrap">
+    <div class="compat-grid">
+      <div>
+        <span class="section-label">Compatibilidad universal</span>
+        <h2 class="section-title">Funciona en todos<br><em>tus dispositivos</em></h2>
+        <p class="section-sub">Comandero no te obliga a comprar hardware propietario costoso. El sistema funciona sobre cualquier navegador web moderno (Safari, Chrome, Firefox, Edge) sin necesidad de instalar aplicaciones. Puedes usar los dispositivos de los que ya dispones en tu restaurante.</p>
+        <p style="font-size:.9rem;color:var(--warm);line-height:1.6;margin-bottom:1rem">Cada empleado puede usar su propio teléfono inteligente. El panel de cocina y barra puede mostrarse en tabletas Android o iPads antiguos, y el servicio de impresión se conecta directamente a tu PC de caja.</p>
+      </div>
+      <div class="compat-icon-grid">
+        <div class="compat-icon-card">
+          <div class="compat-icon-large">🍏</div>
+          <div class="compat-icon-name">Apple iOS & Mac</div>
+          <div class="compat-icon-desc">Optimizado para iPhone, iPad y Safari con respuesta táctil instantánea.</div>
+        </div>
+        <div class="compat-icon-card">
+          <div class="compat-icon-large">🤖</div>
+          <div class="compat-icon-name">Android</div>
+          <div class="compat-icon-desc">Compatible con cualquier teléfono y tableta Android, sin importar la marca.</div>
+        </div>
+        <div class="compat-icon-card">
+          <div class="compat-icon-large">💻</div>
+          <div class="compat-icon-name">PC & Mac</div>
+          <div class="compat-icon-desc">Ideal para pantallas de caja grandes o pantallas de cocina con modo de fuentes extra grandes.</div>
+        </div>
+        <div class="compat-icon-card">
+          <div class="compat-icon-large">🖨️</div>
+          <div class="compat-icon-name">Impresoras Térmicas</div>
+          <div class="compat-icon-desc">Soporte directo para modelos EPSON, STAR, iDPRT, Bixolon en Windows y Android.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SCREEN MOCKUPS (High fidelity HTML/CSS) -->
+<section class="screens">
+  <div class="wrap">
+    <span class="section-label">Lo que ve cada perfil</span>
+    <h2 class="section-title">Pantallas reales<br><em>del sistema</em></h2>
+
+    <div class="scr-grid">
+      <!-- 1. Plano de Sala -->
+      <div class="scr-card">
+        <div class="scr-card-lbl"><div style="width:8px;height:8px;border-radius:50%;background:var(--accent-blue)"></div> Camarero — Plano de Sala</div>
+        <div class="scr-card-body">
+          <div class="app-mock">
+            <div class="app-mock-top">
+              <span class="app-mock-logo">🗺️</span>
+              <span class="app-mock-title">Comandero · Plano</span>
+              <span class="app-mock-badge">Ana</span>
+            </div>
+            <div class="app-mock-body">
+              <div class="mock-plano-tabs">
+                <span class="mock-plano-tab active">Terraza</span>
+                <span class="mock-plano-tab">Salón</span>
+                <span class="mock-plano-tab">Barra</span>
+              </div>
+              <div class="mock-plano-grid">
+                <div class="mock-plano-mesa ocupada">
+                  <span>T1</span>
+                  <span class="mock-plano-time">8m</span>
+                  <span class="mock-plano-sync">⏳</span>
+                </div>
+                <div class="mock-plano-mesa alerta-warn">
+                  <span>T2</span>
+                  <span class="mock-plano-time">22m</span>
+                </div>
+                <div class="mock-plano-mesa circle">
+                  <span>T3</span>
+                  <span class="mock-plano-time">libre</span>
+                </div>
+                <div class="mock-plano-mesa ocupada circle">
+                  <span>T4</span>
+                  <span class="mock-plano-time">14m</span>
+                </div>
+                <div class="mock-plano-mesa alerta-danger">
+                  <span>T5</span>
+                  <span class="mock-plano-time">35m</span>
+                </div>
+                <div class="mock-plano-mesa">
+                  <span>T6</span>
+                  <span class="mock-plano-time">libre</span>
+                </div>
+                <div class="mock-plano-mesa ocupada">
+                  <span>T7</span>
+                  <span class="mock-plano-time">2m</span>
+                </div>
+                <div class="mock-plano-mesa">
+                  <span>T8</span>
+                  <span class="mock-plano-time">libre</span>
+                </div>
+              </div>
+              <div style="font-size:5px;color:var(--muted);margin-top:6px;text-align:center;font-family:var(--ff-mono)">Mesas posicionadas en tiempo real</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Pago Parcial (Dividir cuenta) -->
+      <div class="scr-card">
+        <div class="scr-card-lbl"><div style="width:8px;height:8px;border-radius:50%;background:var(--accent-green)"></div> Camarero — Pago Parcial</div>
+        <div class="scr-card-body">
+          <div class="app-mock">
+            <div class="app-mock-top">
+              <span class="app-mock-logo">💶</span>
+              <span class="app-mock-title">Mesa 3 · Cobros</span>
+              <span class="app-mock-badge">Partes</span>
+            </div>
+            <div class="app-mock-body">
+              <div class="mock-parcial-tabs">
+                <span class="mock-parcial-tab active">Por Selección</span>
+                <span class="mock-parcial-tab">Equitativa</span>
+              </div>
+              <div class="mock-parcial-banner">
+                ✅ Pago 1 / 3 registrado
+              </div>
+              <div class="mock-parcial-item">
+                <div class="mock-parcial-info">
+                  <div>Cerveza caña</div>
+                  <div class="mock-parcial-sub">1,80 € / ud</div>
+                </div>
+                <div class="mock-parcial-ctrl">
+                  <span class="mock-parcial-btn">−</span>
+                  <span class="mock-parcial-qty">2 / 3</span>
+                  <span class="mock-parcial-btn">＋</span>
+                </div>
+              </div>
+              <div class="mock-parcial-item">
+                <div class="mock-parcial-info">
+                  <div>Entrecot 400g</div>
+                  <div class="mock-parcial-sub">18,00 € / ud</div>
+                </div>
+                <div class="mock-parcial-ctrl">
+                  <span class="mock-parcial-btn">−</span>
+                  <span class="mock-parcial-qty">0 / 1</span>
+                  <span class="mock-parcial-btn">＋</span>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:7.5px;font-weight:bold;margin-top:8px;border-top:1px solid #ccc;padding-top:4px">
+                <span>Total parcial:</span>
+                <span style="color:#35c777;font-family:var(--ff-mono)">3,60 €</span>
+              </div>
+              <div style="background:#111827;color:#fff;border-radius:4px;padding:3.5px;text-align:center;font-size:6.5px;font-family:var(--ff-mono);margin-top:6px;font-weight:bold">Cobrar e Imprimir</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Facturación / Cobro -->
+      <div class="scr-card">
+        <div class="scr-card-lbl"><div style="width:8px;height:8px;border-radius:50%;background:#C9A84C"></div> Ticket — Facturación y Cobro</div>
+        <div class="scr-card-body">
+          <div class="app-mock">
+            <div class="app-mock-top">
+              <span class="app-mock-logo">⚖️</span>
+              <span class="app-mock-title">Facturación Legal</span>
+              <span class="app-mock-badge">F2 / F1</span>
+            </div>
+            <div class="app-mock-body" style="padding:10px 8px">
+              <div class="mock-vf-badge">
+                <span>●</span> Factura Simplificada F2 emitida
+              </div>
+              <div style="font-size:6px;color:var(--warm);margin-bottom:6px;font-family:var(--ff-mono);text-align:center">Nº Factura: A-2026-049 · Mesa T1</div>
+              <div class="mock-vf-btn success">Cobrar + Generar Factura F2</div>
+              <div class="mock-vf-btn">Emitir con NIF Cliente (F1)</div>
+              <div class="mock-vf-btn danger">Rectificar Factura (Abono)</div>
+              <div class="mock-vf-btn muted">Reimprimir copia fiscal</div>
+              <div style="display:flex;align-items:center;gap:4px;background:#f3f4f6;border:1px solid #e5e7eb;border-radius:6px;padding:4px;margin-top:6px">
+                <div style="width:16px;height:16px;background:#000;display:flex;align-items:center;justify-content:center;font-size:4px;color:#fff;font-weight:bold">QR</div>
+                <div style="font-size:4.5px;line-height:1.2;color:var(--warm)">Documento encadenado de forma segura y verificado por la AEAT.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Registro de Auditoría Antifraude -->
+      <div class="scr-card">
+        <div class="scr-card-lbl"><div style="width:8px;height:8px;border-radius:50%;background:#C45C26"></div> Admin — Auditoría de Seguridad</div>
+        <div class="scr-card-body">
+          <div class="app-mock">
+            <div class="mock-audit-top">
+              <span class="mock-audit-title">// Auditoría</span>
+              <span class="mock-audit-badge">Seguridad</span>
+            </div>
+            <div class="app-mock-body" style="padding:6px">
+              <div class="mock-audit-pass">🔐 Acceso protegido con PIN Gerente</div>
+              <div class="mock-audit-log" style="margin-top:5px">
+                <div class="mock-audit-row">
+                  <span class="mock-audit-time">[21:40]</span>
+                  <span class="mock-audit-action">Mesa 3:</span>
+                  <span class="mock-audit-detail">Descuento 10% aplicado por Luis (C/ Habitual)</span>
+                </div>
+                <div class="mock-audit-row">
+                  <span class="mock-audit-time">[20:15]</span>
+                  <span class="mock-audit-action">Mesa T1:</span>
+                  <span class="mock-audit-detail">1x Croquetas quitado del ticket por Ana</span>
+                </div>
+                <div class="mock-audit-row">
+                  <span class="mock-audit-time">[19:30]</span>
+                  <span class="mock-audit-action">Mesa 5:</span>
+                  <span class="mock-audit-detail">Mesa transferida a Mesa 3 por Luis</span>
+                </div>
+              </div>
+              <div style="background:rgba(232,255,90,.1);border:1px solid #e8ff5a;color:#e8ff5a;font-size:5.5px;padding:3px;text-align:center;border-radius:4px;font-family:var(--ff-mono)">Exportar Auditoría a Excel</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRINT SECTION -->
+<section class="print-section" id="impresion">
+  <div class="wrap">
+    <div class="print-grid">
+      <div>
+        <div class="print-eyebrow">🖨️ Impresión térmica</div>
+        <h2 class="print-title">Impresión directa.<br><em>Sin aplicaciones externas.</em></h2>
+        <p class="print-sub">El sistema incluye su propio servicio de impresión disponible para <strong style="color:#FAF8F4">Windows y Android</strong>. Sin programas de terceros de pago. Con una tableta Android o un PC ya tienes impresión funcionando — comandas, ticket de cliente, o modo 100% digital si no quieres papel.</p>
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1.5rem">
+          <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(90,255,154,.08);border:1px solid rgba(90,255,154,.2);border-radius:20px;padding:.3rem .8rem;font-size:.75rem;color:#5aff9a;font-family:var(--ff-mono)">🪟 Windows</div>
+          <div style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(61,122,255,.08);border:1px solid rgba(61,122,255,.22);border-radius:20px;padding:.3rem .8rem;font-size:.75rem;color:#8aaeff;font-family:var(--ff-mono)">🤖 Android</div>
+        </div>
+        <div class="print-steps">
+          <div class="print-step">
+            <div class="print-step-num">1</div>
+            <div class="print-step-text"><strong>Windows o Android</strong> — instala el servicio en el PC o en la tableta Android que tenga la impresora conectada. Un solo archivo, sin instaladores complicados.</div>
+          </div>
+          <div class="print-step">
+            <div class="print-step-num">2</div>
+            <div class="print-step-text"><strong>Configura desde el panel admin</strong> — asigna impresora por rol (barra, cocina, ticket cliente), elige papel de 58 o 80 mm, cabecera, logo, pie y modo local o remoto. Puedes pausar o reanudar el servicio en cualquier momento.</div>
+          </div>
+          <div class="print-step">
+            <div class="print-step-num">3</div>
+            <div class="print-step-text"><strong>Imprime desde cualquier dispositivo</strong> — el camarero pulsa «Imprimir ticket» y la impresora lo saca sola, sin diálogos ni pasos extra.</div>
+          </div>
+          <div class="print-step">
+            <div class="print-step-num">4</div>
+            <div class="print-step-text"><strong>Con o sin papel</strong> — activa la auto-impresión al enviar cada comanda, o trabaja en modo digital: el ticket queda en el historial y se puede compartir sin imprimir nada.</div>
+          </div>
+        </div>
+      </div>
+      <div class="print-vis">
+        <div class="print-terminal">
+          <div class="muted"># Comandero · Servicio de impresión</div>
+          <div class="muted"># iniciando…</div>
+          <div>&nbsp;</div>
+          <div class="white">Impresora detectada:</div>
+          <div class="gold">  EPSON TM-T20III</div>
+          <div>&nbsp;</div>
+          <div class="white">Papel configurado: <span class="gold">80mm</span></div>
+          <div class="white">Modo: <span class="gold">local + remoto</span></div>
+          <div>&nbsp;</div>
+          <div>Servicio listo ●</div>
+          <div>&nbsp;</div>
+          <div class="muted">─────────────────────────</div>
+          <div>&nbsp;</div>
+          <div class="white">→ Ticket · Mesa T1</div>
+          <div>  Imprimiendo… <span class="gold">OK</span></div>
+          <div>&nbsp;</div>
+          <div class="white">→ Comanda · Mesa 3</div>
+          <div>  Imprimiendo… <span class="gold">OK</span></div>
+          <div>&nbsp;</div>
+          <div class="muted">Compatible con EPSON, STAR,</div>
+          <div class="muted">iDPRT, Bixolon y la mayoría</div>
+          <div class="muted">de impresoras térmicas</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- OFFLINE SECTION -->
+<section class="offline-section">
+  <div class="wrap">
+    <div class="offline-grid">
+      <div>
+        <span class="section-label">Cuando falla el wifi</span>
+        <h2 class="section-title">Sin conexión,<br><em>sin perder nada</em></h2>
+        <p class="section-sub">Si el router se cae o la señal flaquea justo al enviar, el pedido se guarda automáticamente en el dispositivo. Al volver la conexión se envía solo, en orden, sin que el camarero tenga que hacer nada.</p>
+        <div style="display:flex;flex-direction:column;gap:.8rem;max-width:400px">
+          <div style="display:flex;align-items:flex-start;gap:.8rem">
+            <span style="font-size:1.2rem;flex-shrink:0">📥</span>
+            <div><strong style="font-size:.9rem">El camarero sigue trabajando</strong><br><span style="font-size:.82rem;color:var(--warm);line-height:1.5">El botón cambia a «📥 En cola». La mesa queda como ocupada y el pedido se ve reflejado en la pantalla.</span></div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:.8rem">
+            <span style="font-size:1.2rem;flex-shrink:0">⏳</span>
+            <div><strong style="font-size:.9rem">Indicador visual en la mesa</strong><br><span style="font-size:.82rem;color:var(--warm);line-height:1.5">Las mesas con pedidos pendientes de enviar muestran el aviso «Sin sincronizar» para que el equipo conozca el estado real.</span></div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:.8rem">
+            <span style="font-size:1.2rem;flex-shrink:0">🔄</span>
+            <div><strong style="font-size:.9rem">Autoenvío al reconectar</strong><br><span style="font-size:.82rem;color:var(--warm);line-height:1.5">Al volver la conexión el sistema detecta los pedidos guardados y los envía en orden, mostrando el progreso.</span></div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:.8rem">
+            <span style="font-size:1.2rem;flex-shrink:0">💾</span>
+            <div><strong style="font-size:.9rem">Persiste aunque cierres el navegador</strong><br><span style="font-size:.82rem;color:var(--warm);line-height:1.5">Los pedidos se guardan en IndexedDB, no en memoria. Si se reinicia el dispositivo siguen ahí y se sincronizan al reabrir.</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="offline-vis">
+        <div class="offline-banner-demo red">
+          <span>●</span> Sin conexión — 2 pedidos guardados en el dispositivo
+        </div>
+        <div class="offline-body">
+          <div style="font-size:.7rem;color:var(--warm);font-family:var(--ff-mono);margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.08em">Mesas</div>
+          <div class="offline-mesa-row warn">
+            <div>
+              <div class="offline-mesa-name">Mesa T1</div>
+              <div style="font-size:.65rem;color:var(--warm)">4 uds · 26,20€</div>
+            </div>
+            <div class="offline-mesa-badge">⏳ Sin sincronizar</div>
+          </div>
+          <div class="offline-mesa-row warn">
+            <div>
+              <div class="offline-mesa-name">Mesa T2</div>
+              <div style="font-size:.65rem;color:var(--warm)">2 uds · 9,20€</div>
+            </div>
+            <div class="offline-mesa-badge">⏳ Sin sincronizar</div>
+          </div>
+          <div class="offline-mesa-row">
+            <div>
+              <div class="offline-mesa-name">Mesa 3</div>
+              <div style="font-size:.65rem;color:var(--warm)">3 uds · 12,00€</div>
+            </div>
+            <div class="offline-mesa-synced">✔ Sincronizada</div>
+          </div>
+        </div>
+        <div style="border-top:1px solid var(--border);padding:.75rem 1rem;background:rgba(61,122,255,.04)">
+          <div style="font-size:.7rem;color:var(--warm);margin-bottom:.4rem;font-family:var(--ff-mono)">Al reconectar →</div>
+          <div class="offline-banner-demo blue" style="border-radius:8px;font-size:.72rem">
+            <span style="display:inline-block;width:10px;height:10px;border:1.5px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .75s linear infinite"></span>
+            Sincronizando 2 pedidos…
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VENTAS SECTION -->
+<section class="ventas-section">
+  <div class="wrap">
+    <div class="ventas-grid">
+      <div>
+        <div class="print-eyebrow" style="background:rgba(201,168,76,.08);border-color:rgba(201,168,76,.2);color:var(--gold)">📊 Historial de ventas</div>
+        <h2 class="print-title">Sabe qué se vende.<br><em>Cada día.</em></h2>
+        <p class="print-sub">El panel de ventas del administrador guarda cada ticket cerrado con mesa, camarero, hora e importe. Filtra por rango de fechas y horas, consulta qué artículos se venden más y exporta todo a CSV con un clic.</p>
+        <div style="display:flex;flex-direction:column;gap:.8rem;max-width:400px">
+          <div style="display:flex;align-items:flex-start;gap:.8rem">
+            <span style="font-size:1.2rem;flex-shrink:0">🗓️</span>
+            <div><strong style="font-size:.9rem;color:#FAF8F4">Filtros por fecha y hora</strong><br><span style="font-size:.82rem;color:rgba(250,248,244,.5);line-height:1.5">Selecciona el rango exacto que necesitas: por día, por turno o por semana. Los tickets se ordenan del más reciente al más antiguo.</span></div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:.8rem">
+            <span style="font-size:1.2rem;flex-shrink:0">🏆</span>
+            <div><strong style="font-size:.9rem;color:#FAF8F4">Ranking de artículos</strong><br><span style="font-size:.82rem;color:rgba(250,248,244,.5);line-height:1.5">Vista de artículos más vendidos con unidades y total generado. Útil para decidir qué platos potenciar o retirar.</span></div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:.8rem">
+            <span style="font-size:1.2rem;flex-shrink:0">📁</span>
+            <div><strong style="font-size:.9rem;color:#FAF8F4">Exportación CSV</strong><br><span style="font-size:.82rem;color:rgba(250,248,244,.5);line-height:1.5">Exporta tickets detallados, resumen por día o ranking de artículos directamente a Excel con un clic. Listo para contabilidad.</span></div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:.8rem">
+            <span style="font-size:1.2rem;flex-shrink:0">👤</span>
+            <div><strong style="font-size:.9rem;color:#FAF8F4">Camarero registrado en cada venta</strong><br><span style="font-size:.82rem;color:rgba(250,248,244,.5);line-height:1.5">Cada ticket guarda el nombre del camarero que atendió la mesa, para trazabilidad total.</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="ventas-mockup">
+        <div style="background:#1a1a1a;padding:8px 12px;border-bottom:1px solid #2c2c2c;display:flex;align-items:center;gap:8px">
+          <span style="font-family:var(--ff-mono);font-size:10px;color:#e8ff5a;flex:1">Ventas — hoy</span>
+          <span style="font-size:9px;padding:2px 8px;border-radius:4px;background:rgba(90,255,154,.1);color:#5aff9a;border:1px solid rgba(90,255,154,.25);font-family:var(--ff-mono)">↓ CSV</span>
+        </div>
+        <div style="padding:10px 12px;border-bottom:1px solid #2c2c2c;display:flex;gap:8px">
+          <div style="flex:1;background:#232323;border-radius:8px;padding:8px;text-align:center">
+            <div style="font-size:10px;color:#555;font-family:var(--ff-mono);margin-bottom:4px">tickets</div>
+            <div style="font-family:var(--ff-mono);font-size:20px;font-weight:700;color:#FAF8F4">12</div>
+          </div>
+          <div style="flex:1;background:#232323;border-radius:8px;padding:8px;text-align:center">
+            <div style="font-size:10px;color:#555;font-family:var(--ff-mono);margin-bottom:4px">total</div>
+            <div style="font-family:var(--ff-mono);font-size:20px;font-weight:700;color:#e8ff5a">387€</div>
+          </div>
+          <div style="flex:1;background:#232323;border-radius:8px;padding:8px;text-align:center">
+            <div style="font-size:10px;color:#555;font-family:var(--ff-mono);margin-bottom:4px">media</div>
+            <div style="font-family:var(--ff-mono);font-size:20px;font-weight:700;color:#5af0ff">32€</div>
+          </div>
+        </div>
+        <div style="padding:10px 12px">
+          <div style="font-size:9px;color:#555;font-family:var(--ff-mono);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em">Más vendidos hoy</div>
+          <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #2c2c2c">
+            <span style="font-size:11px;color:#e8ff5a;font-family:var(--ff-mono);min-width:24px">24×</span>
+            <span style="flex:1;font-size:11px;color:#f0f0f0">Cerveza caña</span>
+            <span style="font-size:11px;color:#5aff9a;font-family:var(--ff-mono)">43,20€</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #2c2c2c">
+            <span style="font-size:11px;color:#e8ff5a;font-family:var(--ff-mono);min-width:24px">14×</span>
+            <span style="flex:1;font-size:11px;color:#f0f0f0">Entrecot 400g</span>
+            <span style="font-size:11px;color:#5aff9a;font-family:var(--ff-mono)">252€</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #2c2c2c">
+            <span style="font-size:11px;color:#e8ff5a;font-family:var(--ff-mono);min-width:24px">11×</span>
+            <span style="flex:1;font-size:11px;color:#f0f0f0">Croquetas jamón</span>
+            <span style="font-size:11px;color:#5aff9a;font-family:var(--ff-mono)">41,25€</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;padding:6px 0">
+            <span style="font-size:11px;color:#e8ff5a;font-family:var(--ff-mono);min-width:24px">9×</span>
+            <span style="flex:1;font-size:11px;color:#f0f0f0">Copa vino tinto</span>
+            <span style="font-size:11px;color:#5aff9a;font-family:var(--ff-mono)">22,50€</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <div class="wrap">
+    <span class="section-label">Funcionalidades completas</span>
+    <h2 class="section-title">Todo lo que incluye</h2>
+    <div class="feats-grid">
+      <div class="feat-card new-feat"><div class="feat-new-badge">Nuevo</div><div class="feat-icon">⚖️</div><div class="feat-title">Preparado para Verifactu / TicketBai</div><div class="feat-desc">Permite emitir facturas simplificadas (F2) y completas con NIF (F1) directamente desde el terminal de cobro, preparado para adaptarse a los requisitos de facturación vigentes.</div></div>
+      <div class="feat-card new-feat"><div class="feat-new-badge">Nuevo</div><div class="feat-icon">💶</div><div class="feat-title">División de Cuentas Avanzada</div><div class="feat-desc">Divide tickets fácilmente: por comensales (equitativa) con registro de cobros por partes, o seleccionando platos sueltos (por ítem) para cobros individuales, manteniendo el resto de la mesa activa.</div></div>
+      <div class="feat-card new-feat"><div class="feat-new-badge">Nuevo</div><div class="feat-icon">🔐</div><div class="feat-title">Auditoría Antifraude del Local</div><div class="feat-desc">Seguimiento exhaustivo de la actividad. Cada línea borrada del ticket, descuento manual o traspaso de mesa queda guardado con el nombre del camarero en un registro protegido para el gerente.</div></div>
+      <div class="feat-card new-feat"><div class="feat-new-badge">Destacado</div><div class="feat-icon">🗺️</div><div class="feat-title">Plano Visual de Sala</div><div class="feat-desc">Controla tus zonas (terraza, salón, barra) en un plano visual real. Permite ubicar mesas redondas o cuadradas, ver avisos de sincronización y controlar los minutos de espera de comandas.</div></div>
+      <div class="feat-card"><div class="feat-icon">🖨️</div><div class="feat-title">Impresión térmica integrada</div><div class="feat-desc">Servicio propio para Windows y Android. Sin dependencias externas. Gestiona impresoras por rol (barra, cocina, tickets), tamaño de papel 58/80mm, logo y cabecera de ticket personalizables.</div></div>
+      <div class="feat-card"><div class="feat-icon">📡</div><div class="feat-title">Pedidos seguros offline</div><div class="feat-desc">Si se cae el wifi, los pedidos se guardan en el terminal (IndexedDB) y se autoenvían en orden de llegada al recuperar la señal, aunque se haya cerrado la pestaña del navegador.</div></div>
+      <div class="feat-card"><div class="feat-icon">👥</div><div class="feat-title">Multi-camarero con PIN propio</div><div class="feat-desc">Cada empleado utiliza su PIN de acceso exclusivo. Su nombre queda registrado en cada comanda para auditar el rendimiento y solucionar cualquier error de servicio.</div></div>
+      <div class="feat-card"><div class="feat-icon">🧬</div><div class="feat-title">Variantes de artículo</div><div class="feat-desc">Artículos con variantes ilimitadas con su propio nombre y precio (ej. copa, botella, ración, media ración). El camarero selecciona la variante en un toque antes de enviar.</div></div>
+      <div class="feat-card"><div class="feat-icon">⚡</div><div class="feat-title">Servicio en bloque</div><div class="feat-desc">Botones en barra y cocina para marcar pedidos en bloque ("Servir todo") para despachar mesas completas de golpe en horas puntas de trabajo.</div></div>
+      <div class="feat-card"><div class="feat-icon">⏰</div><div class="feat-title">Tiempos y alertas configurables</div><div class="feat-desc">Umbrales de color para indicar la espera del cliente en sala, barra y cocina (verde, naranja, rojo). El administrador define cuántos minutos son aceptables por nivel de alerta.</div></div>
+      <div class="feat-card"><div class="feat-icon">📝</div><div class="feat-title">Notas por artículo</div><div class="feat-desc">El camarero puede añadir indicaciones de preparación a cualquier línea ("sin sal", "muy hecho"). La nota se destaca en color para que cocina la vea al instante.</div></div>
+      <div class="feat-card"><div class="feat-icon">🔆</div><div class="feat-title">Wake Lock (Pantalla siempre activa)</div><div class="feat-desc">Evita que la pantalla de la tablet de cocina o el terminal de barra se apague durante el servicio. Activación con un toque desde la barra superior de la app.</div></div>
+      <div class="feat-card"><div class="feat-icon">🔄</div><div class="feat-title">Turnos de caja y turnos de trabajo</div><div class="feat-desc">Abre y cierra turnos (Comida, Cena, etc.) para mantener agrupadas las ventas de cada jornada de forma separada para control diario.</div></div>
+      <div class="feat-card"><div class="feat-icon">⚙️</div><div class="feat-title">Panel de administración total</div><div class="feat-desc">Gestiona la carta, alérgenos, precios, mesas, usuarios, impresoras térmicas y datos fiscales desde un único panel web, sin modificar archivos de código.</div></div>
+      <div class="feat-card"><div class="feat-icon">📱</div><div class="feat-title">Sin instalación obligatoria</div><div class="feat-desc">Funciona en cualquier móvil, tableta o PC mediante navegador web. El único programa externo es el pequeño servicio de impresión para conectar la ticketera local.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="wrap">
+    <span class="section-label">Precio</span>
+    <h2 class="section-title">Inversión anual<br>pensada para tu negocio</h2>
+    <p class="section-sub">Sin cuota mensual, sin permanencias, sin comisiones por pedido. Un precio cerrado anual que incluye la configuración de tus impresoras, mantenimiento, soporte técnico y actualizaciones continuas.</p>
+    
+    <div class="pricing-single-wrap">
+      <!-- PLAN UNICO: 200€/año -->
+      <div class="pricing-card">
+        <div class="pricing-launch">🔥 Tarifa lanzamiento todo incluido</div>
+        <div class="pricing-price-block">
+          <div class="pricing-old-row">
+            <span class="pricing-old-currency">€</span>
+            <span class="pricing-old-num">400</span>
+            <span class="pricing-old-label">/año tarifa habitual</span>
+          </div>
+          <div class="pricing-price">
+            <span class="pricing-currency">€</span>
+            <span class="pricing-num">200</span>
+            <span class="pricing-discount-badge">−50% permanente</span>
+          </div>
+        </div>
+        
+        <div class="pricing-note">
+          Tarifa de 200€/año. Modificaciones inmediatas de carta/precios incluidas en minutos. Soporte y mantenimiento completos.
+        </div>
+
+        <div style="background:rgba(90,255,154,.07);border:1px solid rgba(90,255,154,.2);border-radius:10px;padding:.75rem 1rem;margin-bottom:1.5rem;font-size:.8rem;color:rgba(250,248,244,.65);line-height:1.6">
+          ✦ <strong style="color:#5aff9a">Garantía de renovación para clientes pioneros.</strong> Los clientes que contraten durante esta fase de lanzamiento mantendrán de forma permanente un <strong style="color:#5aff9a">descuento mínimo del 25% sobre el precio de lista oficial</strong> en todas las futuras renovaciones anuales.
+        </div>
+
+        <div class="pricing-feats">
+          <div class="pricing-feat"><strong>Comanderos ILIMITADOS:</strong> Conecta todos los móviles y tablets que quieras. Sin pagar por licencias extras de dispositivos (ahorra los más de 60€/mes que te cobran otros programas por solo 1 o 2 terminales)</div>
+          <div class="pricing-feat"><strong>Cambios en carta en minutos:</strong> Precios, productos y mesas actualizados en tiempo real cualquier día de la semana</div>
+          <div class="pricing-feat">Módulo de facturación preparado para <strong>Verifactu y TicketBai</strong></div>
+          <div class="pricing-feat">Configuración inicial a medida de tus zonas, mesas, carta y datos del local</div>
+          <div class="pricing-feat">Instalación guiada y soporte en la conexión de tus impresoras térmicas locales</div>
+          <div class="pricing-feat">Prueba práctica con tu equipo antes de entrar en servicio real en el local</div>
+          <div class="pricing-feat">Mantenimiento técnico, parches del sistema y actualizaciones periódicas del software</div>
+          <div class="pricing-feat">Acceso a todas las nuevas características operativas que se lancen al sistema</div>
+        </div>
+        
+        <hr class="pricing-divider">
+        
+        <button class="btn-pricing" onclick="contactar('Comandero · 200€/año · Todo Incluido')">Quiero esta opción →</button>
+        <div class="pricing-compat">Equivale a unos 16€ al mes. Todo incluido, sin cuotas mensuales extra por comanderos.</div>
+      </div>
+    </div>
+
+    <!-- PACKS -->
+    <div class="pack-banner">
+      <div class="pack-text">
+        🎁 <strong>Packs Carta Digital + Comandero Profesional</strong><br>
+        Si deseas ofrecer carta QR interactiva digital a tus comensales y vincularla con tu comandero, aquí tienes los planes integrados con descuento:
+      </div>
+      
+      <div class="pack-option">
+        <div class="pack-option-info">
+          <div class="pack-option-title">Pack Carta Dinámica + Comandero (cambios inmediatos)</div>
+          <div class="pack-sub">Carta digital autogestionable y sistema completo de comandas.</div>
+        </div>
+        <div style="text-align:right">
+          <div class="pack-price">250€<span style="font-size:10px;color:var(--warm)">/año</span></div>
+          <div class="pack-sub" style="text-decoration:line-through">280€/año</div>
+          <button onclick="contactar('Pack carta + Comandero · 250€/año')" style="margin-top:.5rem;background:var(--sage);color:#fff;border:none;border-radius:8px;padding:.5rem 1rem;font-family:var(--ff-body);font-size:.82rem;font-weight:700;cursor:pointer">Pedir Pack →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq">
+  <div class="wrap">
+    <span class="section-label">Preguntas frecuentes</span>
+    <h2 class="section-title">Lo que suelen<br><em>preguntarme</em></h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q">¿Funciona en todos los dispositivos del local?</div>
+        <div class="faq-a">Sí. Funciona en cualquier dispositivo Apple (iPhone, iPad, Mac), Android (teléfonos y tabletas de cualquier marca) y PC o tableta con Windows. No requiere descargas de apps en App Store ni Play Store: se abre desde el navegador de internet y se puede anclar a la pantalla de inicio como una aplicación más.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">¿Cuál es el límite de comanderos conectados y cuánto cuesta añadir más?</div>
+        <div class="faq-a">No hay ningún límite de comanderos ni de dispositivos conectados, y añadir terminales cuesta exactamente 0€. La gran mayoría de programas del mercado te limitan el uso a uno o dos comanderos y te cobran licencias extra por cada dispositivo adicional, haciendo que la cuota se dispare rápidamente por encima de los 60€ al mes. Con nuestro sistema, la tarifa plana anual de 200€ te permite conectar tantos móviles o tablets de camareros como necesite tu restaurante. Sin límites y sin sorpresas en tu factura.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">¿Está preparado para Verifactu / TicketBai?</div>
+        <div class="faq-a">Sí. El sistema permite emitir facturas simplificadas (F2) y completas con NIF (F1) directamente en el cobro, estando preparado para la modalidad Verifactu y TicketBai según la normativa vigente, sin costes adicionales.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">¿Qué es el Registro de Auditoría y cómo ayuda a evitar robos?</div>
+        <div class="faq-a">Es una pantalla especial de administración protegida por contraseña a la que solo accede el gerente. Registra detalladamente cada acción sensible del camarero que pueda ocultar una fuga: cuándo se aplica un descuento manual, cuándo se elimina un plato ya servido de la mesa o cuándo se cambia un precio. Cada registro muestra la hora, la mesa, el nombre del camarero y el importe afectado.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">¿Cómo funciona el pago parcial o la división de cuentas?</div>
+        <div class="faq-a">El sistema ofrece dos métodos en el cobro: 1) **Por Selección**, donde el camarero selecciona con botones +/− qué platos paga el cliente (ej. un cliente de la mesa paga solo su café y su refresco, manteniéndose el resto de platos abiertos para el resto). 2) **Equitativo**, dividiendo la cuenta total entre 2, 3 o más comensales y realizando el seguimiento del cobro de cada parte de forma visual hasta saldar la cuenta.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">¿Necesito instalar algún programa externo para imprimir tickets térmicos?</div>
+        <div class="faq-a">No para los comanderos. El sistema incluye un pequeño servicio de impresión para Windows y Android. Instalas este servicio (un único archivo) en el ordenador de caja o tableta que tenga conectada la impresora, y desde ese momento cualquier camarero puede mandar a imprimir tickets y comandas desde su propio móvil.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">¿Funciona si se corta la conexión a internet?</div>
+        <div class="faq-a">Sí, parcialmente. Si se pierde la conexión mientras el camarero está enviando un pedido, este se guarda automáticamente en el navegador mediante IndexedDB. El botón cambia a «📥 En cola» y las mesas muestran un aviso de «Sin sincronizar». Al volver la conexión, todos los pedidos guardados se autoenvían en orden de llegada sin perder información, incluso si el camarero cerró el móvil en mitad del corte de red. Lo que requiere internet es la sincronización en vivo entre pantallas de sala, barra y cocina.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">¿Hay historial de ventas y cierres de caja?</div>
+        <div class="faq-a">Sí. Cada ticket cerrado se archiva en un historial detallado con fecha, hora, mesa, camarero y desglose de artículos. Puedes filtrar ventas por turnos de trabajo (comidas, cenas) o por horas específicas, consultar el ranking de platos más vendidos y exportar la información a CSV para contabilidad.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">¿Cuánto tiempo se tarda en poner en marcha el sistema?</div>
+        <div class="faq-a">Una vez nos facilitas los datos de tu local, plano de mesas, zonas y la carta con sus alérgenos y precios, normalmente el sistema está listo y configurado en menos de 48 horas. Realizamos una prueba guiada con tu equipo e impresoras antes de ponerlo a funcionar en el local.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BOTTOM -->
+<section class="cta-bottom">
+  <div class="wrap" style="text-align:center;position:relative;z-index:1">
+    <span class="section-label">¿Empezamos?</span>
+    <h2 class="section-title" style="color:#FAF8F4;margin-bottom:1rem">Tu local, sin papel,<br>malentendidos ni descuadres</h2>
+    <p style="font-size:1rem;color:rgba(250,248,244,.5);line-height:1.7;max-width:460px;margin:0 auto 2rem">200€/año con todo configurado a medida y cambios ilimitados. Compatible con Apple, Android y PC con conexión de ticketera térmica incluida.</p>
+    <button class="btn-primary" style="font-size:1.05rem;padding:1rem 2.4rem" onclick="contactar('Comandero · 200€/año · WhatsApp Directo')">Contactar por WhatsApp →</button>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-name">JON GLEZ · Soluciones digitales para hostelería</div>
+  <p style="margin-bottom:1rem">
+    ¿Tienes alguna duda? Escríbeme —
+    <a href="https://wa.me/34644700830?text=Hola,%20me%20interesa%20el%20Comandero%20para%20mi%20local">WhatsApp</a> ·
+    <a href="https://t.me/jon_glez">Telegram</a> ·
+    <a href="mailto:jongt23@gmail.com">Email</a>
+  </p>
+  <p style="font-size:.72rem;opacity:.5">© 2026 JON GLEZ · Comandero · Todos los derechos reservados</p>
+</footer>
+
+<script>
+window.addEventListener('scroll', function() {
+  var nav = document.getElementById('nav');
+  if (window.scrollY > 40) nav.classList.add('scrolled');
+  else nav.classList.remove('scrolled');
+});
+document.querySelectorAll('.faq-q').forEach(function(q) {
+  q.addEventListener('click', function() {
+    var item = this.closest('.faq-item');
+    var wasOpen = item.classList.contains('open');
+    document.querySelectorAll('.faq-item').forEach(function(i){i.classList.remove('open')});
+    if (!wasOpen) item.classList.add('open');
+  });
+});
+document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+  a.addEventListener('click', function(e) {
+    var target = document.querySelector(this.getAttribute('href'));
+    if (target) { e.preventDefault(); target.scrollIntoView({behavior:'smooth'}); }
+  });
+});
+function contactar(plan) {
+  var p = plan || 'Comandero';
+  var msg = 'Hola Jon, me interesa el ' + p + ' para mi local. ¿Podemos hablar?';
+  window.open('https://wa.me/34644700830?text=' + encodeURIComponent(msg), '_blank');
+}
+</script>
+</body>
+</html>
