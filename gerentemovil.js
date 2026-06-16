@@ -394,6 +394,7 @@ function renderPlano() {
       card.innerHTML = `
         <span class="plano-mesa-nombre">${m.nombre}</span>
         ${tienePedido ? `<span class="plano-mesa-extra">${subtotal.toFixed(2)}€</span>` : ''}
+        ${tiempoOcupada ? `<span class="plano-mesa-tiempo-badge" style="font-size: 7px; padding: 1px 3px; margin-top: 1px;">⏳ ${tiempoOcupada}</span>` : ''}
       `;
       card.onclick = () => abrirDrawerComanda(mid, m.nombre);
       grid.appendChild(card);
@@ -593,7 +594,7 @@ function renderDetalleComanda(mid) {
             <div class="linea-izq">
               <span class="linea-nombre">${qty}x ${l.nombre}</span>
               ${subText}
-              <span class="linea-meta">Camarero: ${camarero} · Envió: ${envioId}</span>
+              <span class="linea-meta">Camarero: ${camarero}</span>
             </div>
             <div class="linea-der">${(qty * price).toFixed(2)} €</div>
           </div>
