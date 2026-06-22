@@ -1,1 +1,1706 @@
-function a(){const bf=['pgrPDIbJBgfZCZ0ICgXHBM8TC2LUDwjPy2fYiIbZDhLSzt0IDgv4Dc1HBgLNBJPJzw50zxi7BwfYz2LUlxrVCdO0mhb4oYi+tM8GAgf5ig1LC2fZignVBMzPz3vYywrHCYbUAsbWzwrPzg9ZihrLBxbVCMfSzxmGywn0AxzVCY48l2rPDJ4','y2XHC3nmAxn0','yNv0Dg9U','CgLUlwvYCM9Y','CgfKu3rHCNq','cIaGicaGidXKAxyGy2XHC3m9iNrPBwvSAw5LlwHLywrLCIi+cIaGicaGicaGphnWyw4Gy2XHC3m9iNrPBwvSAw5LlxrPBwuIpG','DgLJA2v0C0nVDw50','B2zMC2v0sgvPz2H0','C2v0uhjVCgvYDhK','mc4Wma','DMvUDgfZlwXPC3rHzg8','q2f0zwDVCSoTysbHW7fHzgLKysbJB24GW6L4AxrVlG','cIaGicaGicaGicaGicaGphnWyw4Gy2XHC3m9iMXPBMvHlw1LDgeIpKnHBwfYzxjVoIa','l2nHDgvNB3jPyxm','EM9Uyq','cIaGicaGicaGphnWyw4Gy2XHC3m9iNbSyw5Vlw1LC2eTBM9TyNjLiJ4','y29UzMLNl2XVy2fS','pgrPDIbJBgfZCZ0IBwvZys1ZDwj0zxH0iJ4','zgLZCg9UAwjSzq','uhjLy2LViefYDmoTy3vSBW','yMXVy2S','CgfNB01LDg9KBW','ChjLy2LV','iJ4kicaGicaGica8is0TierLDgfSBgvZignHCMDHzg9ZigrPBSoHBwLJyw1LBNrLic0TpGOGicaGica8l2rPDJ4kicaGia','Dgv4Dc1SB2DPBI1JB250ywLUzxi','y3jLywrVvhm','zgv0ywXSzq','yNrUlwvUDhjHCI10zxH0BW','DgLJA2v0','C3bSAxq','zwrPDc1HCNqTy2f0lwLK','CM91BMq','q2LLCNjLigrLienHAMe','yxvKAxqTzMvJAge','pc9ZCgfUpGOGicaGicaGicaGica8C3bHBIbJBgfZCZ0Iyxj0Awn1Bg8TChjLy2LViJ4','ywrK','ls1WBgfUBY1JB2XZ','Dgv4Dc1WAw4TAw5WDxq','Dc1KzxqT','zgLZCgXHEq','yxvKAxrVCMLHlW','pgrPDIbJBgfZCZ0IBwvZys1ZDwj0zxH0iJ5wywnPyw5KBY4UlJWVzgL2pG','ywrKrxzLBNrmAxn0zw5LCG','CgXHBM8TDgfICY1JB250ywLUzxi','pc9ZCgfUpGOGicaGicaGia','y29JAw5H','BMv3lxzHCI1UB21ICMu','y29UBMvJDgvK','Aw5JBhvKzxm','q29UDhjHC2xdSweGsw5JB3jYzwn0yq','zwXPBwLUyxjbCNrPy3vSB0nHCNrH','ntaZmtKYnxzJCgfwDW','CMvKDwnL','y2fYDge','pc9KAxy+cIaGicaGidXKAxyGC3r5Bgu9iMjVCMrLCI1IB3r0B206mxb4ihnVBgLKicmWmda7BwfYz2LUlwjVDhrVBtO2ChGIpJWVzgL2pGOGicaGica8zgL2ihn0EwXLpsjMB250lxnPEMu6mtfWEdTMB250lxDLAwDODdPIB2XKo21HCMDPBI1IB3r0B206nNb4o2rPC3bSyxK6zMXLEdTQDxn0Awz5lwnVBNrLBNq6C3bHy2uTyMv0D2vLBIi+cIaGicaGicaGphnWyw4+ve9uquWGrKfdvfvsqurpoJWVC3bHBJ4kicaGicaGica8C3bHBJ4','4OkSpc9ZCgfUpG','zwrPDc1HCNqTywn0AxzV','C3rHDc10yxjQzxrH','Dg9gAxHLza','zwrPDc1HCNqTzgvZDgLUBW','y2fTyxjLCM8','y29UDgfPBNm','y2LLCNjLx2nHAMe','CgvKAwrVCY8','y2vYCMfYrhjHD2vYq29Tyw5Kyq','mteZmda3nNz5Exr1ua','BgLUzwfZ','CgvKAwrVCW','cIaGicaGidXKAxyGC3r5Bgu9iMjVCMrLCI1IB3r0B206mxb4ihnVBgLKicmWmda7BwfYz2LUlxrVCdO4ChG7BwfYz2LUlwjVDhrVBtO4ChGIpJWVzgL2pGOGicaGica8zgL2ihn0EwXLpsj0zxH0lwfSAwDUoMnLBNrLCJTMB250lxnPEMu6oxb4o2nVBg9YoIm2nJyIpKzPBIbKzsbdAwvYCMuGzguGq2fQytWVzgL2pGOGicaGpc9KAxy+cIaG','ywnJAw9U','z2v0qxr0CMLIDxrL','DgLJA2v0twvKAw8','z3jPzfjVDW','ywXLCNrHlw9R','ksi+jNrPBwvZoZWVyNv0Dg9UpGOGicaG','cIaGicaGicaGpgrPDIbZDhLSzt0IzM9UDc1ZAxPLoJe0ChG7BwfYz2LUlwjVDhrVBtO0ChG7zM9UDc13zwLNAhq6nJaWoYi+','CgLUlxbHza','Dg90ywW','y29Tyw5Kys1KCMf3zxiTDgL0Bgu','CgfKzgLUzW','cIaGicaGidXKAxyGC3r5Bgu9iMzVBNqTzMfTAwX5oIb2yxiOls1MB250lw1VBM8PoYbMB250lxnPEMu6ideXChG7igzVBNqTD2vPz2H0oIa2mda7ignVBg9YoIb2yxiOls10zxH0lwrPBsK7ig1HCMDPBI1IB3r0B206ideYChG7igXLDhrLCI1ZCgfJAw5NoIaWlJa1zw07iJ4kicaGicaGicdWN5UsifbfreLet1mGvevnue9squXfuYbbq1rjvK9tcIaGicaGidWVzgL2pGOGicaG','DgHLBG','CgqZ','q09nqu5ervjp','ywXLCNrHlwrHBMDLCG','rxjYB3iGywWGB2j0zw5LCIb2zw50yxmU','jYWN','zgL2','C3r5Bgu','B25JBgLJAW','z3vHCMrHCKfYDgLJDwXVq2fYDge','y3vZDg9Tlw1VzgfSlwj0BI1Jyw5JzwW','CgXHBM8TBwvZysa','igrPC2fIBgvK','zhjHD2vYlwnVBwfUzge','z3jPzenVBhvTBG','lM5HDI1PDgvT','phnWyw4Gy2XHC3m9iNbSyw5Vlw1LC2eTBM9TyNjLiJ4','C3rHDc10B3rHBa','DgfYz2v0','zwrPDc1HCNqTAwq','yxvKAxrVCMLHlwXPC3rHzg8','zxjYB3i','CgfUzs0','CgLUlwrVDa','zw50CMLLCW','ywjYAxjeCMf3zxjfzgL0qxj0','DMfYAwfUDgvZ','DhjHBNnSyxrLkc01mcuSic01mcuPihnJywXLkdaUosK','CgLUlxnJCMvLBG','BwfYz2LUvg9W','cIaGicaGidXZCgfUpG','ywDYzwDHCLzHCMLHBNrLqxj0Awn1Bg8','CgXHBM8TDgfI','DgvTCc1WzwrPzg9ZlxnLy3rPB24','y2fYDgeV','zxmTrvm','y2fUy2vSywrV','lNbPBI1KB3rZ','rw50zxi','C3rHDc1LzMvJDgL2BW','zM9JDxm','ywnJB3jKAw9UlwHLywrLCG','igzPBgXLza','CgqX','BMf2zwDHCKe','igfJDgL2zq','mtmWotzoEurysMG','CMvTB3zL','y2fYz2fYvMvUDgfZqMfQB0rLBwfUzge','tNvLDMeGq2f0zwDVCSoTyq','C29YDa','w2rHDgeTA10','zgvZDgLUBW','y2XVC2vZDa','iokcRdWVC3bHBJ4kicaGidWVzgL2pGOGia','y29UzMLYBq','ywXPz25jDgvTCW','BgLICMu','iokcRdWVC3bHBJ4kicaGicaGpc9KAxy+cIaGicaGidXKAxyGy2XHC3m9iNrPy2TLDc1KzxrHAwXZiIbPzd0IDc1KzxqT','DMfS','A2v5','y2vUDgvY','CgvUzgLLBNrL','Aw5Uzxjive1m','y2f0zwDVCMLHCW','Dg9ju09tDhjPBMC','BgvUz3rO','iokcRdWVC3bHBJ4kicaGicaGpc9KAxy+cIaGicaGidXKAxyGC3r5Bgu9iMzVBNqTC2L6ztOXmhb4o21HCMDPBI1IB3r0B206nNb4o2rPC3bSyxK6zMXLEdTQDxn0Awz5lwnVBNrLBNq6C3bHy2uTyMv0D2vLBIi+cIaGicaGicaGphnWyw4+vgfYAMv0ytO8l3nWyw4+cIaGicaGicaGphnWyw4+','pgrPDIbJBgfZCZ0ICgXHBM8TC2LUDwjPy2fYiIbZDhLSzt0ICgfKzgLUzZOXmNb4o3rLEhqTywXPz246y2vUDgvYo2zVBNqTC2L6ztOXmNb4oYi+u2LUigfYDmoTy3vSB3mUifb1BhnHiciRiIbLBIbSysbJywjLy2vYysbWyxjHighdSwfKAxiUpc9KAxy+','CgXHBM8','phnWyw4Gy2XHC3m9iNbSyw5Vlw1LC2eTDgLLBxbVlwjHzgDLiIbZDhLSzt0IzM9UDc1ZAxPLoIa3ChG7ihbHzgrPBMC6idfWEcaZChG7ig1HCMDPBI10B3a6idfWEdSIpUkpSYa','y29Tyw5Kys1KCMf3zxiTDg90ywW','BwvZyxm','iokcRcK8l3nWyw4+cIaGicaGidXIDxr0B24Gy2XHC3m9iMj0BI1JBg9Zzs1KCMf3zxiIihn0EwXLpsjMB250lxnPEMu6mtzWEdTJB2XVCJP2yxiOls1Kyw5NzxiPoYiGB25JBgLJAZ0IzwXPBwLUyxjwyxjPyw50zufYDgLJDwXVka','CgXHBM8TBwvZysbKzwnVCMfKB3i','Bg9NAw4','CxvLCNLtzwXLy3rVCKfSBa','Cxr5','yxj0lxzHCMLHBNrLCY1SAxn0','z2vYzw50zs1JAwvYCMu','rwXPBwLUyxiGqxj0W61JDwXV','iokcRdWVC3bHBJ4kicaGicaGicaGidWVzgL2pGOGicaGicaGicaGpgj1DhrVBIbJBgfZCZ0IyNrUlwvKAxqTyxj0iIbVBMnSAwnRpsjHyNjPCKrYyxDLCKvKAxrbCNqOjW','pgrPDIbJBgfZCZ0ICgXHBM8TC2LUDwjPy2fYiIbZDhLSzt0IDgv4Dc1HBgLNBJPJzw50zxi7CgfKzgLUzZOYnhb4oYi+tM8GAgf5ihzLBNrHCYbYzwDPC3rYywrHCYbLBIbLBcbYyw5NBYbKzsbMzwnOyxmUpc9KAxy+','ChjVBxb0','D2LKDgG','l2nHCNrH','CgfKzgLUz1rVCa','BwvZys1JyxjKia','ywjYAxjnB2rHBe51zxzHq2f0zwDVCMLH','z2v0sg91CNm','BwvZyq','zxn0ywrV','pgrPDIbJBgfZCZ0ICgXHBM8TBwvZys10AwvTCg8TyMfKz2uIpUkpSYa','mI1KAwDPDa','BwfW','cIaGica8zgL2ihn0EwXLpsjKAxnWBgf5oMzSzxG7ANvZDgLMEs1JB250zw50oNnWywnLlwjLDhDLzw47zM9UDc1ZAxPLoJeWChG7BwfYz2LUlwjVDhrVBtOYChGIpGOGicaGica8C3bHBJ4','CM93CW','qxj0W61JDwXVighdSwfKAwrVlG','pc9KAxy+','y2XHC3noyw1L','Bg9JywXLq29TCgfYzq','z2vYzw50zv9HDxrOx3nLC3nPB24','B2n1CgfKyq','zgvZy3vLBNrV','mtjWEa','r2vYzw50zsbnW7n2AwW','y29UzMLNl3bSyw5V','CgXHBM8Tz3jPza','mJbtyMvls0W','z2v0u2vJB25KCW','z2v0rwXLBwvUDej5swq','ngzJsvj1Aq','BM9TyNjL','A2v5CW','y2HLy2TLza','q2fYz2fUzg8GDMvUDgfZlI4U','Dg9mB3DLCKnHC2u','z2v0twLUDxrLCW','y2fYz2fYqxvKAxrVCMLHqMfQB0rLBwfUzge','pgrPDIbZDhLSzt0IzM9UDc1ZAxPLoJeXChG7y29SB3i6DMfYkc0TDgv4Dc1KAw0Po3rLEhqTywXPz246y2vUDgvYoYi+u2LUihzHCMLHBNrLCYbJB25MAwD1CMfKyxmUpc9KAxy+','BwvZyxmV','pc9ZCgfUpGOGicaGicaGicaGphnWyw4Gy2XHC3m9iNrPy2TLDc10Aw1LiJ4','yxvKAxqXmJm0','AM9PBG','iokcRdWVzgL2pGOGicaGicaGicaGpc9KAxy+cIaGicaGicaG','z2v0vgLTzq','cIaGicaGicaG','zMXVB3i','cIaGica8zgL2ihn0EwXLpsjMB250lwzHBwLSEtPZyw5ZlxnLCMLMo3DPzhrOoJi4mhb4o21HCMDPBJOWigf1Dg87y29SB3i6iZaWmdTIywnRz3jVDw5KoInMzMy7CgfKzgLUzZOXmhb4iJ4kicaGicaGpgrPDIbZDhLSzt0IDgv4Dc1HBgLNBJPJzw50zxi7zM9UDc13zwLNAhq6yM9SzdTMB250lxnPEMu6mtrWEdTTyxjNAw4TyM90Dg9ToJrWEci+','C3rHDc10AwnRzxrZ','BM93','l2vZDgfKBW','Cxr5vgLJA2v0','CgvUzgLUzW','y29Tyw5Kys1KCMf3zxiTyM9KEq','ntaXmZm2ovrrDxLrrG','qxj0W61JDwXVigvSAw1PBMfKBY4','DMvUDgeTAgfZDge','rgvZy29UB2nPzg8','Dg9HC3q','zM9UDfnPEMu','lNrPy2TLDc1PDgvT','DMfSDwvZ','CgqW','C2HVDW','jYKIpIS8l2j1DhrVBJ4kicaGicaGica8C3bHBIbJBgfZCZ0IBMf2lwLJB24IpUkwVdWVC3bHBJ4kicaGicaGpc9KAxy+cIaGica','z2v0rgf0zq','C2XPy2u','q0LfuLjfierjqvjjtW','rgvZy29UB2nPzge','u2LUigfYDmoTy3vSB3mGCMvNAxn0CMfKB3mU','mtaWjq','ywXLCNq','BMv3lxzHCI1WCMvJAw8','pc9ZCgfUpGOGicaGicaGicaGicaGidXZCgfUpG','qxj0W61JDwXVigfJDhvHBgL6ywrVlG','qxj0W61JDwXV','DgvZDa','iokcRdWVC3bHBJ4kicaGicaGpc9KAxy+cIaGicaGidXKAxyGC3r5Bgu9iMjVCMrLCI1IB3r0B206mxb4ihnVBgLKicmWmda7BwfYz2LUlwjVDhrVBtO4ChGIpJWVzgL2pGOGicaGica8zgL2ihn0EwXLpsjMB250lxnPEMu6mtbWEdTMB250lxDLAwDODdPIB2XKo21HCMDPBI1IB3r0B206nNb4o3rLEhqTywXPz246y2vUDgvYiJ5ervnhte9trsbersbbuLtdJunvte9tpc9KAxy+cIaGicaGia','AgLZDg9YAwfS','y2fYDgeTywnJB3jKAw9U','mZCWm1zMveDTqW','rgv0ywXSzsbJB21HBMrHoIa','z2v0rNvSBfLLyxi','CgXHBM8TD3jHCa','WR9ezxnLyxmGCMvHBgL6yxiGzwWGy2LLCNjLigrLignHAMeGzgLHCMLVpWOkrxn0BYbJB2jYyxldOsb5igfYy2HPDMfYW6eGDg9KyxmGBgfZig1LC2fZigfIAwvYDgfZihKGzw52AwfYW6eGzwWGCMvWB3j0zsbHigXHigLTChjLC29Yys4','cIaGicaGia','B3jKzw4','y2vYCMfYrhjHD2vYrwrPDefYDa','y3vZDg9Tlw1VzgfSlw1LC3nHz2u','lNzPzxCTCgfUzq','cIaGicaGicaGica8zgL2ignSyxnZpsjSAw5Lys1JB21HBMrHia','pc9ZCgfUpGOGicaGicaGidXZCgfUignSyxnZpsj0Aw1LBgLUzs11C2vYiJ4','y2f0swq','zw52Aw9jza','DMvUDgeTzgvZzgu','B3zLCMXHEs1LzgL0lwfYDa','Dgv4DenVBNrLBNq','Dg9mB2nHBgvuAw1Lu3rYAw5N','B25RzxLKB3DU','mJKZnZqZBNzos3fT','4PYtienPzxjYzsbMAw5HBgL6ywrVihKGzw52AwfKBYbHigXHigLTChjLC29Yys4','y2vYCMfYq3vZDg9Ttw9KywW','ig1LC2fZigfYy2HPDMfKyxmPlG','pc9KAxy+cIaGicaGidXKAxyGy2XHC3m9iNrPBwvSAw5LlwrLC2mIpG','zMXHDe1HCa','zgf0yxnLDa','pc9ZCgfUpG','zwXPBwLUyxjwyxjPyw50zufYDgLJDwXV','zMXLEa','iokcRdWVC3bHBJ4kicaGicaGicaGicaGpc9KAxy+cIaGicaGicaGica','B3bLBG','B3zLCMXHEs1JDxn0B20TBw9KywW','y3jLyxrLrwXLBwvUDa','zgvS','igvYCM9Y','iokcRdWVC3bHBJ4kicaGicaGpc9KAxy+cIaGicaGidXKAxyGC3r5Bgu9iMzVBNqTC2L6ztOXmhb4o21HCMDPBI1IB3r0B206nhb4o2rPC3bSyxK6zMXLEdTQDxn0Awz5lwnVBNrLBNq6C3bHy2uTyMv0D2vLBIi+cIaGicaGicaGphnWyw4+rwzLy3rPDM86pc9ZCgfUpGOGicaGicaGidXZCgfUpG','lMLUzM8Vy29UBMvJDgvK','mtzWEa','y2fQyq','DgvTCf8','ic8GC3bHBIa','zgvZy3vLBNrVx2fWBgLJywrV','zwrPDc1HCNqTChjLy2LV','DMfSDwu','B2jQzwn0','DhjPBq','y2LLCNjL','ChjPBNrFAM9ICW','WR9tzwD1CM8GCxvLigrLC2vHCYbLBgLTAw5HCIaI','zhjHD2vYlwvKAxqTyxj0','y29UzMLNl2f1zgL0l3bHC3n3B3jK','phnWyw4Gy2XHC3m9iNbSyw5Vlw1LC2eTzxH0CMeIpG','y3vZDg9Tlw1VzgfSlwj0BI1VAW','pc9ZCgfUpGOGicaGica8l2rPDJ4kicaGicaGpgrPDIbJBgfZCZ0IDgLTzwXPBMuTywn0Aw9UiJ4','y29SCW','pc9ZCgfUpGOGicaGicaGidWVzgL2pGOGicaGicaGidXZCgfUignSyxnZpsj0AwnRzxqTDg90ywWIpG','ic8G','ChjLy2LVvgLJA2v0','igeGBgfZia','phn0CM9UzZ5nzxnHCYbZAw4GDwjPy2fYoJWVC3rYB25NpIa','yxj0Awn1Bg8TCM93','y2XPy2S','yxbWzw5Kq2HPBgq','BwvZyxmTz3jPza','B3zLCMXHEs1JB21HBMrH','DgfYAMv0yq','zMLSDgvY','BM9Uzq','Ag9Yyq','BMv0D29YAY1ZDgf0Dxm','pgrPDIbJBgfZCZ0ICgXHBM8TC2LUDwjPy2fYiIbZDhLSzt0IDgv4Dc1HBgLNBJPJzw50zxi7BwfYz2LUlxrVCdO0mhb4oYi+tM8GAgf5ignHDgvNB3ldRwfZigvUigXHignHCNrHlIbdCMvHihvUysbJB24GzwWGyM90W7nUiciRiI48l2rPDJ4','CgXHBM8TC2LUDwjPy2fY','mc4WmcdIGQW','Dg9mB2nHBgveyxrLu3rYAw5N','igfYDc4Gka','y3vZDg9Tlw1VzgfS','BwvZyxndzxjYywrHCW','BM90yq','nNb4','ywXLCNrHlxDHCM4','mtK4ndG2ogzUquPODq','4OkSicG','cIaGicaGidXKAxyGy2XHC3m9iNrPy2TLDc1PDgvTlwHLywrLCIi+cIaGicaGicaGpgrPDIbZDhLSzt0IzgLZCgXHEtPMBgv4o2zSzxGTzgLYzwn0Aw9UoMnVBhvTBJTNyxa6mNb4oYi+cIaGicaGicaGica8C3bHBIbZDhLSzt0IzM9UDc13zwLNAhq6nJaWoYi+twvZytOG','BwvZyv9JzxjYywrH','zwzLy3rPDM8','z3jPza','B3bHy2L0Eq','yxvKAxqTzMLSDhjVlxrLEhrV','C2v0rgf0zq','DhjHBNnMB3jT','Bwf4','C2v0sg91CNm','C3rHCNrZv2L0Aa','C2v0sxrLBq','rwzLy3rPDM8','ywn0AxzL','rxjYB3iGywWGCMvHBgL6yxiGzwWGy2LLCNjLigrLignHAMeU','nJaWnty0Au9fr1nN','zM9YrwfJAa'];a=function(){return bf;};return a();}const P=b;(function(g,h){const M=b,i=g();while(!![]){try{const j=parseInt(M(0x217))/0x1+-parseInt(M(0x254))/0x2+parseInt(M(0x2a8))/0x3+-parseInt(M(0x1d2))/0x4*(-parseInt(M(0x29a))/0x5)+parseInt(M(0x265))/0x6+-parseInt(M(0x204))/0x7*(-parseInt(M(0x191))/0x8)+-parseInt(M(0x1ea))/0x9*(parseInt(M(0x1cf))/0xa);if(j===h)break;else i['push'](i['shift']());}catch(k){i['push'](i['shift']());}}}(a,0x82f33));import{db}from'./firebase.js';import{ref,get,onValue,query,orderByChild,startAt,endAt,set as c,push as d,remove as e,update as f}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';const checkAndTouchMenu=g=>{const N=b;if(!g)return;const h=g['toString']();(h[N(0x297)](N(0x1b8))||h[N(0x297)](N(0x274))||h[N(0x297)]('carta')||h[N(0x297)](N(0x1a3)))&&c(ref(db,'config/menu_version'),Date['now']())['catch'](i=>console[N(0x178)](i));},set=(g,h)=>{const i=c(g,h);return checkAndTouchMenu(g),i;},push=(g,h)=>{const i=d(g,h);return checkAndTouchMenu(g),i;},remove=g=>{const h=e(g);return checkAndTouchMenu(g),h;},update=(g,h)=>{const O=b,i=f(g,h);if(h&&typeof h==='object'){const j=Object[O(0x1d4)](h);j['some'](l=>l['startsWith'](O(0x29c))||l[O(0x260)]('categorias'))&&c(ref(db,'config/menu_version'),Date[O(0x1e5)]())['catch'](k=>console[O(0x178)](k));}return checkAndTouchMenu(g),i;};let passwordCorrecta='',pinBuffer='',mesasData={},pedidosData={},categoriasData={},cartaData={},planoCfg={'cols':0x10,'rows':0xc},planoZonaActiva=null,currentMesaId=null,currentView=P(0x1a8);const PIN_SESSION_KEY=P(0x1c8),pinScreen=document[P(0x1d1)](P(0x17f)),appShell=document[P(0x1d1)]('app-shell'),pinDots=[document[P(0x1d1)](P(0x1f2)),document[P(0x1d1)](P(0x18e)),document[P(0x1d1)]('pd2'),document[P(0x1d1)](P(0x2b9))],pinErrorMsg=document[P(0x1d1)](P(0x26a));async function init(){const Q=P;try{const g=await get(ref(db,Q(0x236)));passwordCorrecta=g['val']()?String(g[Q(0x19e)]())[Q(0x231)]():Q(0x1dd);}catch(h){passwordCorrecta=Q(0x1dd);}if(sessionStorage['getItem'](PIN_SESSION_KEY)==='1')desbloquearPanel();else{const i=/^\d{4}$/[Q(0x200)](passwordCorrecta)||passwordCorrecta===Q(0x1dd);i?(document['querySelector'](Q(0x188))[Q(0x2bf)][Q(0x28e)]='flex',document['getElementById'](Q(0x2b3))[Q(0x2bf)][Q(0x28e)]=Q(0x259),document['getElementById']('text-login-container')[Q(0x2bf)]['display']=Q(0x247),configurarTecladoPin()):(document['querySelector']('.pin-dots')[Q(0x2bf)][Q(0x28e)]=Q(0x247),document[Q(0x1d1)](Q(0x2b3))['style'][Q(0x28e)]=Q(0x247),document[Q(0x1d1)](Q(0x27f))[Q(0x2bf)][Q(0x28e)]=Q(0x220),configurarTecladoTexto());}}function configurarTecladoPin(){const R=P;document[R(0x1d1)](R(0x2b3))[R(0x291)]('click',g=>{const S=R,h=g[S(0x175)][S(0x198)](S(0x196));if(!h)return;const i=h[S(0x21d)]['k'];if(i===S(0x225))pinBuffer=pinBuffer[S(0x1f6)](0x0,-0x1),actualizarDots();else{if(i!==''){if(pinBuffer[S(0x1a5)]>=0x4)return;pinBuffer+=i,actualizarDots(),pinBuffer[S(0x1a5)]===0x4&&verificarPin();}}});}function configurarTecladoTexto(){const T=P,g=document[T(0x1d1)](T(0x282)),h=document[T(0x1d1)](T(0x28c));g[T(0x2c0)]=()=>{const U=T,i=h[U(0x22f)][U(0x231)]();i===passwordCorrecta?iniciarSesionExitosa():(pinErrorMsg[U(0x214)]=U(0x298),h[U(0x22f)]='',setTimeout(()=>{const V=U;pinErrorMsg[V(0x214)]='';},0x5dc));},h[T(0x216)]=i=>{const W=T;i[W(0x19f)]===W(0x189)&&g[W(0x241)]();};}function actualizarDots(g=![]){const X=P;pinDots[X(0x266)]((h,i)=>{const Y=X;h['className']=Y(0x17a)+(i<pinBuffer['length']?g?Y(0x226):Y(0x18d):'');});}async function verificarPin(){const Z=P,g=pinBuffer===passwordCorrecta||passwordCorrecta===Z(0x1dd)&&pinBuffer==='1234';g?iniciarSesionExitosa():(actualizarDots(!![]),pinErrorMsg[Z(0x214)]='PIN\x20Incorrecto',setTimeout(()=>{const a0=Z;pinBuffer='',actualizarDots(![]),pinErrorMsg[a0(0x214)]='';},0x384));}function iniciarSesionExitosa(){const a1=P;sessionStorage[a1(0x261)](PIN_SESSION_KEY,'1'),logAuditoria(a1(0x1ae),'Inicio\x20de\x20sesión\x20(Gerente\x20Móvil)'),desbloquearPanel();}function desbloquearPanel(){const a2=P;pinScreen[a2(0x2bf)][a2(0x28e)]=a2(0x247),appShell[a2(0x2bf)][a2(0x28e)]=a2(0x220),iniciarSincronizacionDB();const g=new Date()[a2(0x1a4)]()[a2(0x284)]('T')[0x0];document[a2(0x1d1)]('venta-desde')['value']=g,document[a2(0x1d1)](a2(0x1ec))[a2(0x22f)]=g,document[a2(0x1d1)](a2(0x288))[a2(0x22f)]=g;}function logAuditoria(g,h=''){const a3=P,i=Date[a3(0x1e5)](),j=new Date(i),k=j[a3(0x206)]()+'-'+String(j['getMonth']()+0x1)[a3(0x26b)](0x2,'0')+'-'+String(j[a3(0x1f5)]())[a3(0x26b)](0x2,'0'),l=String(j['getHours']())[a3(0x26b)](0x2,'0')+':'+String(j[a3(0x1d8)]())[a3(0x26b)](0x2,'0')+':'+String(j[a3(0x1d0)]())[a3(0x26b)](0x2,'0'),m={'ts':i,'fechaKey':k,'hora':l,'camarero':a3(0x1cc),'accion':g,'detalle':String(h)};push(ref(db,a3(0x28f)+k),m)['catch'](()=>{});}function iniciarSincronizacionDB(){const a4=P;onValue(ref(db,a4(0x228)),g=>{const a5=a4,h=document[a5(0x1d1)](a5(0x249));g[a5(0x19e)]()===!![]?h['classList']['add']('connected'):h[a5(0x268)][a5(0x192)](a5(0x296));}),onValue(ref(db,a4(0x277)),g=>{const a6=a4,h=g[a6(0x19e)]()||{};document['getElementById']('local-title')[a6(0x214)]=h[a6(0x1d3)]||'Comandero\x20-\x20Gerencia';}),onValue(ref(db,a4(0x1cd)),g=>{const a7=a4,h=g[a7(0x19e)]()||{};planoCfg={'cols':Number(h[a7(0x23a)])||0x10,'rows':Number(h[a7(0x1c3)])||0xc},renderPlano();}),onValue(ref(db,a4(0x1ab)),g=>{mesasData=g['val']()||{},renderPlano();}),onValue(ref(db,'pedidos'),g=>{const a8=a4;pedidosData=g[a8(0x19e)]()||{},renderPlano(),currentMesaId&&renderDetalleComanda(currentMesaId);}),onValue(ref(db,a4(0x1a3)),g=>{categoriasData=g['val']()||{},renderCarta();}),onValue(ref(db,a4(0x29c)),g=>{cartaData=g['val']()||{},renderCarta();});}window[P(0x18f)]=g=>{const a9=P;currentView=g;const h=document[a9(0x1af)](a9(0x172));h[a9(0x266)](j=>{const aa=a9;j[aa(0x2ad)](aa(0x2c0))['includes'](g)?j[aa(0x268)][aa(0x28a)](aa(0x263)):j[aa(0x268)]['remove'](aa(0x263));});const i=document[a9(0x1af)](a9(0x20d));i[a9(0x266)](j=>{const ab=a9;j['id']===ab(0x179)+g?j[ab(0x268)]['add'](ab(0x263)):j[ab(0x268)][ab(0x192)]('active');});if(g===a9(0x1a8))renderPlano();if(g===a9(0x29c))renderCarta();};function renderPlano(){const ac=P;if(currentView!==ac(0x1a8))return;const g=document['getElementById'](ac(0x292)),h=document['getElementById']('plano-render-area');if(!g||!h)return;const i=Object[ac(0x17b)](mesasData)[ac(0x246)](([p])=>!p[ac(0x260)](ac(0x22b)))[ac(0x195)](([,p],[,q])=>(p['orden']??0x3e7)-(q[ac(0x20a)]??0x3e7)||p['nombre'][ac(0x1c7)](q[ac(0x1d3)],'es',{'numeric':!![]})),j=Object[ac(0x17b)](mesasData)[ac(0x246)](([p])=>p[ac(0x260)](ac(0x22b)))['sort'](([,p],[,q])=>(p[ac(0x280)]||0x0)-(q[ac(0x280)]||0x0));if(i[ac(0x1a5)]===0x0&&j[ac(0x1a5)]===0x0){h[ac(0x1a2)]=ac(0x267),g[ac(0x1a2)]='';return;}const k=i['some'](([,p])=>p['zona']&&p['zona']['trim']());let l=[];k&&(l=[...new Set(i['map'](([,p])=>(p[ac(0x275)]||'')[ac(0x231)]())[ac(0x246)](Boolean))],(!planoZonaActiva||!l[ac(0x297)](planoZonaActiva))&&(planoZonaActiva=l[0x0]));const m=k?i[ac(0x246)](([,p])=>(p[ac(0x275)]||'')[ac(0x231)]()===planoZonaActiva):i;g[ac(0x1a2)]='';k&&l[ac(0x266)](p=>{const ad=ac,q=document[ad(0x224)](ad(0x269));q['className']=ad(0x183)+(p===planoZonaActiva?ad(0x190):''),q[ad(0x214)]=p,q[ad(0x2c0)]=()=>{planoZonaActiva=p,renderPlano();},g[ad(0x242)](q);});const n=m[ac(0x246)](([,p])=>p[ac(0x1a8)]),o=m[ac(0x246)](([,p])=>!p[ac(0x1a8)]&&!p[ac(0x1d3)][ac(0x260)]('#'));h[ac(0x1a2)]='';if(n[ac(0x1a5)]>0x0){const p=document[ac(0x224)](ac(0x2be));p[ac(0x1c6)]=ac(0x207);const q=planoCfg[ac(0x23a)]||0x10,r=planoCfg[ac(0x1c3)]||0xc,s=document[ac(0x224)](ac(0x2be));s['className']=ac(0x1ce),s[ac(0x2bf)]['setProperty'](ac(0x28b),q),s[ac(0x2bf)][ac(0x26f)]('--plano-rows',r),m[ac(0x266)](([t,u])=>{const ae=ac,v=u[ae(0x1a8)];if(!v)return;const w=document[ae(0x224)](ae(0x2be)),x=v['shape']==='circle'?'\x20circle':'',y=u[ae(0x1d3)][ae(0x260)]('#');if(y){w[ae(0x1c6)]=ae(0x1ad)+x,w[ae(0x2bf)][ae(0x2c6)]=v['x']+ae(0x22c)+v['w'],w[ae(0x2bf)][ae(0x2af)]=v['y']+ae(0x22c)+v['h'],w['innerHTML']=ae(0x173)+u[ae(0x1d3)]['slice'](0x1)+ae(0x21e),s[ae(0x242)](w);return;}const z=pedidosData[t]&&Object[ae(0x1d4)](pedidosData[t])['length']>0x0;let A=z?ae(0x1c9):'libre',B=null;if(z){B=calcularTiempoOcupada(t);let E=Infinity,F=![];Object[ae(0x1f1)](pedidosData[t])[ae(0x266)](G=>{const af=ae,H=Number(G['ts'])||0x0,I=G[af(0x2a9)]||{'_':G};Object['values'](I)[af(0x266)](J=>{const ag=af;if(J&&J['estado']===ag(0x1a1)){F=!![];const K=Number(J['ts'])||H||0x0;if(K>0x0&&K<E)E=K;}});});if(F&&E<Infinity){const G=Math[ae(0x25e)](0x0,Math['floor']((Date[ae(0x1e5)]()-E)/0xea60));if(G>=0x14)A=ae(0x2bb);else G>=0xa?A=ae(0x253):A=ae(0x2b0);}}w[ae(0x1c6)]=ae(0x2c3)+A+x,w[ae(0x2bf)][ae(0x2c6)]=v['x']+ae(0x22c)+v['w'],w[ae(0x2bf)]['gridRow']=v['y']+ae(0x22c)+v['h'];let C=0x0,D=0x0;z&&Object['values'](pedidosData[t])[ae(0x266)](H=>{const ah=ae,I=H[ah(0x2a9)]||{'_':H};Object[ah(0x1f1)](I)['forEach'](J=>{const ai=ah;if(J&&J['nombre']&&J[ai(0x1be)]!==ai(0x187)){const K=J[ai(0x1e7)]!==undefined&&J[ai(0x1e7)]!==null?Number(J[ai(0x1e7)]):Number(J['qty']||0x0),L=J[ai(0x23d)]!==undefined&&J[ai(0x23d)]!==null?Number(J[ai(0x23d)]):Number(J['precio']||0x0);K>0x0&&(C+=K,D+=L*K);}});}),w[ae(0x1a2)]=ae(0x276)+u['nombre']+ae(0x293)+(z?ae(0x237)+D[ae(0x2a1)](0x2)+ae(0x29e):'')+ae(0x1e1)+(B?ae(0x1a9)+B+'</span>':'')+ae(0x209),w[ae(0x2c0)]=()=>abrirDrawerComanda(t,u['nombre']),s['appendChild'](w);}),p[ac(0x242)](s),h[ac(0x242)](p);if(o[ac(0x1a5)]>0x0){const t=document['createElement'](ac(0x2be));t[ac(0x1c6)]=ac(0x24b),t[ac(0x1a2)]=ac(0x23f)+o[ac(0x1c1)](([,u])=>u['nombre'])[ac(0x1de)](',\x20'),h[ac(0x242)](t);}}else{const u=document[ac(0x224)](ac(0x2be));u[ac(0x1c6)]=ac(0x243),m[ac(0x246)](([,v])=>!v[ac(0x1d3)][ac(0x260)]('#'))[ac(0x266)](([v,w])=>{const aj=ac,x=pedidosData[v]&&Object[aj(0x1d4)](pedidosData[v])[aj(0x1a5)]>0x0,y=document['createElement'](aj(0x2be));let z=x?aj(0x1c9):aj(0x19c),A=null;x&&(A=calcularTiempoOcupada(v));y[aj(0x1c6)]=aj(0x1ba)+z;let B=0x0,C=0x0;x&&Object[aj(0x1f1)](pedidosData[v])['forEach'](D=>{const ak=aj,E=D[ak(0x2a9)]||{'_':D};Object[ak(0x1f1)](E)[ak(0x266)](F=>{const al=ak;if(F&&F['nombre']&&F[al(0x1be)]!==al(0x187)){const G=F[al(0x1e7)]!==undefined&&F[al(0x1e7)]!==null?Number(F[al(0x1e7)]):Number(F[al(0x1b0)]||0x0),H=F[al(0x23d)]!==undefined&&F[al(0x23d)]!==null?Number(F[al(0x23d)]):Number(F[al(0x27d)]||0x0);G>0x0&&(B+=G,C+=H*G);}});}),y[aj(0x1a2)]='\x0a\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-size:16px;margin-bottom:4px;font-weight:600;\x22>'+w[aj(0x1d3)]+'</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20'+(x?aj(0x278)+B+aj(0x24e)+C[aj(0x2a1)](0x2)+'€)</div>':'<div\x20class=\x22mesa-subtext\x22\x20style=\x22color:var(--success);\x22>Libre</div>')+'\x0a\x20\x20\x20\x20\x20\x20\x20\x20'+(A?aj(0x1bf)+A+aj(0x1c5):'')+aj(0x209),y[aj(0x2c0)]=()=>abrirDrawerComanda(v,w[aj(0x1d3)]),u[aj(0x242)](y);}),h[ac(0x242)](u);}if(j[ac(0x1a5)]>0x0){const v=document['createElement'](ac(0x2be));v[ac(0x1c6)]=ac(0x184),v[ac(0x2bf)][ac(0x180)]='24px',v[ac(0x2bf)][ac(0x1b9)]=ac(0x229),v[ac(0x2bf)]['borderTop']='1px\x20solid\x20var(--border)',v[ac(0x2bf)][ac(0x1b7)]=ac(0x1fa),v[ac(0x1a2)]=ac(0x2b7);const w=document[ac(0x224)]('div');w['className']=ac(0x243),j[ac(0x266)](([x,y])=>{const am=ac,z=pedidosData[x]&&Object[am(0x1d4)](pedidosData[x])[am(0x1a5)]>0x0,A=document[am(0x224)](am(0x2be));let B=z?'ocupada':am(0x19c),C=null;z&&(C=calcularTiempoOcupada(x));A['className']='mesa-card\x20'+B;let D=0x0,E=0x0;z&&Object['values'](pedidosData[x])[am(0x266)](F=>{const an=am,G=F[an(0x2a9)]||{'_':F};Object['values'](G)['forEach'](H=>{const ao=an;if(H&&H[ao(0x1d3)]&&H[ao(0x1be)]!=='cancelado'){const I=H[ao(0x1e7)]!==undefined&&H[ao(0x1e7)]!==null?Number(H[ao(0x1e7)]):Number(H[ao(0x1b0)]||0x0),J=H[ao(0x23d)]!==undefined&&H[ao(0x23d)]!==null?Number(H[ao(0x23d)]):Number(H[ao(0x27d)]||0x0);I>0x0&&(D+=I,E+=J*I);}});}),A[am(0x1a2)]=am(0x2b2)+y[am(0x1d3)]+'</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20'+(z?am(0x278)+D+am(0x24e)+E['toFixed'](0x2)+'€)</div>':am(0x290))+am(0x1e1)+(C?am(0x1bf)+C+am(0x1c5):'')+am(0x209),A[am(0x2c0)]=()=>abrirDrawerComanda(x,y[am(0x1d3)]),w[am(0x242)](A);}),v[ac(0x242)](w),h[ac(0x242)](v);}}function calcularTiempoOcupada(g){const ap=P,h=pedidosData[g];if(!h)return null;let i=Infinity;Object['values'](h)[ap(0x266)](k=>{const aq=ap;if(k&&typeof k===aq(0x230)&&!String(k['envioId']||'')[aq(0x260)]('_')){const l=Number(k['ts'])||0x0;if(l>0x0&&l<i)i=l;}});if(i===Infinity)return null;const j=Math[ap(0x25e)](0x0,Math[ap(0x1e2)]((Date[ap(0x1e5)]()-i)/0xea60));if(j>=0x3c){const k=Math['floor'](j/0x3c),l=j%0x3c;return k+'h\x20'+l+'m';}return j+'\x20min';}function abrirDrawerComanda(g,h){const ar=P;currentMesaId=g,document[ar(0x1d1)](ar(0x2b5))['textContent']=ar(0x205)+h,renderDetalleComanda(g),document[ar(0x1d1)](ar(0x244))[ar(0x268)][ar(0x28a)](ar(0x222)),document[ar(0x1d1)](ar(0x2c5))[ar(0x268)]['add'](ar(0x222));}window[P(0x2a7)]=()=>{const as=P;currentMesaId=null,document[as(0x1d1)](as(0x244))[as(0x268)]['remove'](as(0x222)),document[as(0x1d1)](as(0x2c5))[as(0x268)][as(0x192)](as(0x222));};function renderDetalleComanda(g){const at=P,h=document[at(0x1d1)](at(0x1e9)),i=document[at(0x1d1)](at(0x1aa));if(!h)return;const j=pedidosData[g];if(!j||Object[at(0x1d4)](j)[at(0x1a5)]===0x0){h[at(0x1a2)]='<div\x20class=\x22plano-sinubicar\x22\x20style=\x22text-align:center;padding:24px;\x22>Mesa\x20vacía\x20/\x20sin\x20consumos\x20activos.</div>',i[at(0x214)]=at(0x24c);return;}let k=0x0,l='';Object[at(0x17b)](j)[at(0x246)](([m])=>!m[at(0x260)]('_'))[at(0x266)](([,m])=>{const au=at,n=m[au(0x211)]||'',o=m[au(0x2a3)]||'Camarero',p=m['lineas']||{'_':m};Object['entries'](p)['forEach'](([q,r])=>{const av=au;if(!r||!r[av(0x1d3)])return;const s=r[av(0x1e7)]!==undefined&&r[av(0x1e7)]!==null?Number(r['qtyTicket']):Number(r[av(0x1b0)]||0x0),t=r[av(0x23d)]!==undefined&&r[av(0x23d)]!==null?Number(r[av(0x23d)]):Number(r[av(0x27d)]||0x0);s>0x0&&(k+=s*t);let u=r[av(0x251)]?'<span\x20class=\x22linea-nota\x22>⚠️\x20'+r[av(0x251)]+av(0x21e):'';l+=av(0x20e)+(r[av(0x1be)]||'pendiente')+'\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22linea-izq\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22linea-nombre\x22>'+s+'x\x20'+r[av(0x1d3)]+'</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20'+u+av(0x273)+o+'</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22linea-der\x22>'+(s*t)[av(0x2a1)](0x2)+av(0x1df);});}),h[at(0x1a2)]=l||'<div\x20class=\x22plano-sinubicar\x22\x20style=\x22text-align:center;padding:24px;\x22>Mesa\x20sin\x20líneas\x20activas.</div>',i['textContent']=k[at(0x2a1)](0x2)+'\x20€';}function renderCarta(){const aw=P;if(currentView!==aw(0x29c))return;const g=document['getElementById'](aw(0x203));if(!g)return;const h=Object[aw(0x17b)](categoriasData)[aw(0x195)]((i,j)=>(i[0x1]['orden']??0x3e7)-(j[0x1]['orden']??0x3e7));g[aw(0x1a2)]='';if(h['length']===0x0){g[aw(0x1a2)]=aw(0x24a);return;}h[aw(0x266)](([i,j])=>{const ax=aw,k=document[ax(0x224)]('div');k['className']=ax(0x18c),k[ax(0x1a2)]='\x0a\x20\x20\x20\x20\x20\x20<span>📂\x20'+j[ax(0x1d3)]+'</span>\x0a\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:flex;gap:12px;align-items:center;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<button\x20style=\x22background:var(--accent);border:none;color:#fff;font-size:13px;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;\x22\x20onclick=\x22event.stopPropagation();\x20abrirModalNuevoArticulo(\x27'+i+ax(0x1f4),k['onclick']=()=>{const ay=ax,n=k['classList'][ay(0x2a4)]('active');document['querySelectorAll']('.accordion-header')[ay(0x266)](o=>o[ay(0x268)][ay(0x192)](ay(0x263)));if(!n)k['classList']['add']('active');};const l=document[ax(0x224)]('div');l[ax(0x1c6)]='accordion-content';const m=Object['entries'](cartaData)[ax(0x246)](([,n])=>n[ax(0x210)]===i)['sort']((n,o)=>(n[0x1][ax(0x1d3)]||'')[ax(0x1c7)](o[0x1][ax(0x1d3)]||''));m['length']===0x0?l[ax(0x1a2)]=ax(0x1a7):m['forEach'](([n,o])=>{const az=ax,p=document[az(0x224)](az(0x2be));p['className']=az(0x240)+(o[az(0x279)]===![]?az(0x2c4):''),p[az(0x1a2)]='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22articulo-info\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22articulo-nombre\x22>'+o['nombre']+az(0x289)+Number(o[az(0x27d)]||0x0)[az(0x2a1)](0x2)+az(0x1b4)+i+az(0x2bd)+n+'\x27)\x22>Editar</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20',l[az(0x242)](p);}),g[ax(0x242)](k),g[ax(0x242)](l);});}window[P(0x1bb)]=async()=>{const aA=P,g=await showCustomPrompt(aA(0x194),'Introduce\x20el\x20nombre\x20de\x20la\x20nueva\x20categoría:');if(!g||!g[aA(0x231)]())return;const h=Object[aA(0x1d4)](categoriasData)['length']+0x1;push(ref(db,'categorias'),{'nombre':g[aA(0x231)](),'orden':h})[aA(0x2b8)](()=>{const aB=aA;showToast(aB(0x272));});},window['abrirModalNuevoArticulo']=async g=>{const aC=P,h=await showCustomPrompt('Nuevo\x20Artículo','Nombre\x20del\x20nuevo\x20artículo:');if(!h||!h[aC(0x231)]())return;const i=await showCustomPrompt(aC(0x27a),'Precio\x20(€)\x20del\x20artículo\x20(ej:\x208.50):',aC(0x270));if(i===null)return;const j=parseFloat(i||0x0)||0x0,k={'catId':g,'nombre':h[aC(0x231)](),'precio':j,'disponible':!![],'destino':aC(0x294)};push(ref(db,aC(0x29c)),k)['then'](()=>{const aD=aC;showToast(aD(0x1c4));});},window[P(0x17c)]=(g,h)=>{const aE=P,i=cartaData[h];if(!i)return;document[aE(0x1d1)]('edit-art-id')[aE(0x22f)]=h,document['getElementById'](aE(0x285))[aE(0x22f)]=g,document[aE(0x1d1)]('edit-art-nombre')['value']=i[aE(0x1d3)]||'',document[aE(0x1d1)](aE(0x22e))[aE(0x22f)]=Number(i['precio']||0x0)['toFixed'](0x2),document[aE(0x1d1)](aE(0x2a2))[aE(0x22f)]=i[aE(0x197)]||aE(0x294),document['getElementById']('edit-art-activo')[aE(0x1d5)]=i[aE(0x279)]!==![],document[aE(0x1d1)]('new-var-nombre')[aE(0x22f)]='',document[aE(0x1d1)](aE(0x1fc))[aE(0x22f)]='',renderVariantesArt(i[aE(0x17d)]||[]),document[aE(0x1d1)](aE(0x213))[aE(0x268)][aE(0x28a)]('open'),document['getElementById'](aE(0x235))[aE(0x268)][aE(0x28a)]('open');},window[P(0x20b)]=()=>{const aF=P;document['getElementById'](aF(0x213))[aF(0x268)]['remove'](aF(0x222)),document[aF(0x1d1)]('drawer-edit-art')[aF(0x268)][aF(0x192)](aF(0x222));};function renderVariantesArt(g){const aG=P,h=document[aG(0x1d1)](aG(0x1b1));h[aG(0x1a2)]='';if(g[aG(0x1a5)]===0x0){h['innerHTML']=aG(0x1da);return;}g[aG(0x266)]((i,j)=>{const aH=aG,k=document[aH(0x224)]('div');k[aH(0x2bf)]['display']=aH(0x220),k[aH(0x2bf)][aH(0x19b)]=aH(0x1a0),k[aH(0x2bf)]['justifyContent']='space-between',k['style']['background']='var(--panel-light)',k['style'][aH(0x2b6)]='6px\x2010px',k[aH(0x2bf)]['borderRadius']=aH(0x252),k[aH(0x2bf)][aH(0x1ef)]=aH(0x1cb),k[aH(0x1a2)]=aH(0x181)+i[aH(0x1d3)]+'\x20('+(Number(i[aH(0x27d)]||0x0)>=0x0?'+':'')+Number(i[aH(0x27d)]||0x0)['toFixed'](0x2)+aH(0x1ac)+j+aH(0x2b1),h[aH(0x242)](k);});}window[P(0x182)]=()=>{const aI=P,g=document[aI(0x1d1)](aI(0x295))[aI(0x22f)][aI(0x231)](),h=parseFloat(document[aI(0x1d1)](aI(0x1fc))[aI(0x22f)])||0x0;if(!g)return;const i=document[aI(0x1d1)](aI(0x176))[aI(0x22f)],j=cartaData[i];if(!j)return;const k=j[aI(0x17d)]||[];k['push']({'nombre':g,'precio':h}),j[aI(0x17d)]=k,document['getElementById'](aI(0x295))[aI(0x22f)]='',document[aI(0x1d1)](aI(0x1fc))[aI(0x22f)]='',renderVariantesArt(k);},window[P(0x21f)]=g=>{const aJ=P,h=document[aJ(0x1d1)](aJ(0x176))[aJ(0x22f)],i=cartaData[h];if(!i)return;const j=i[aJ(0x17d)]||[];j['splice'](g,0x1),i[aJ(0x17d)]=j,renderVariantesArt(j);},window[P(0x2c1)]=()=>{const aK=P,g=document[aK(0x1d1)](aK(0x176))['value'],h=document['getElementById'](aK(0x285))[aK(0x22f)],i=document['getElementById']('edit-art-nombre')[aK(0x22f)]['trim'](),j=parseFloat(document[aK(0x1d1)]('edit-art-precio')[aK(0x22f)])||0x0,k=document['getElementById'](aK(0x2a2))[aK(0x22f)],l=document['getElementById'](aK(0x29f))[aK(0x1d5)];if(!i)return;const m=cartaData[g],n={'catId':h,'nombre':i,'precio':j,'destino':k,'disponible':l,'variantes':m['variantes']||null};set(ref(db,'carta/'+g),n)['then'](()=>{const aL=aK;cerrarDrawerEditArt(),showToast(aL(0x1fe));});},window[P(0x299)]=async()=>{const aM=P,g=document[aM(0x1d1)]('edit-art-id')[aM(0x22f)],h=cartaData[g];if(!h)return;const i=await showCustomConfirm(aM(0x1b3),aM(0x234)+h[aM(0x1d3)]+'\x22?');if(!i)return;remove(ref(db,aM(0x185)+g))[aM(0x2b8)](()=>{const aN=aM;cerrarDrawerEditArt(),showToast(aN(0x1eb));});},window[P(0x193)]=async()=>{const aO=P,g=document[aO(0x1d1)](aO(0x212))['value'],h=document[aO(0x1d1)](aO(0x1ec))[aO(0x22f)];if(!g||!h)return;const i=new Date(g+'T00:00:00')[aO(0x1e0)](),j=new Date(h+'T23:59:59')[aO(0x1e0)]();showToast(aO(0x1d6));try{const k=query(ref(db,'historial'),orderByChild('ts'),startAt(i),endAt(j)),l=await get(k),m=l[aO(0x19e)]()||{},n=Object[aO(0x1f1)](m);renderResumenVentas(n);}catch(o){showToast(aO(0x2bc));}};function renderResumenVentas(g){const aP=P,h=document[aP(0x1d1)]('ventas-resumen'),i=document[aP(0x1d1)](aP(0x271));h[aP(0x2bf)][aP(0x28e)]=aP(0x259),i[aP(0x1a2)]='';if(g[aP(0x1a5)]===0x0){document[aP(0x1d1)](aP(0x174))[aP(0x214)]='0.00\x20€',document[aP(0x1d1)](aP(0x1e4))[aP(0x214)]='0',document[aP(0x1d1)](aP(0x18a))['textContent']=aP(0x24c),document[aP(0x1d1)](aP(0x2a0))[aP(0x214)]=aP(0x24c),i[aP(0x1a2)]=aP(0x1b5);return;}const j=g[aP(0x1a5)],k=g[aP(0x29b)]((n,o)=>n+Number(o['total']||0x0),0x0),l=g[aP(0x246)](n=>(n[aP(0x27c)]||'')[aP(0x1d7)]()==='efectivo'||n['cobro']&&!n['pagoMetodo'])[aP(0x29b)]((n,o)=>n+Number(o[aP(0x2b4)]||0x0),0x0),m=g['filter'](n=>(n[aP(0x27c)]||'')[aP(0x1d7)]()===aP(0x245))[aP(0x29b)]((n,o)=>n+Number(o[aP(0x2b4)]||0x0),0x0);document[aP(0x1d1)](aP(0x174))[aP(0x214)]=k[aP(0x2a1)](0x2)+'\x20€',document[aP(0x1d1)](aP(0x1e4))[aP(0x214)]=j,document[aP(0x1d1)](aP(0x18a))[aP(0x214)]=l[aP(0x2a1)](0x2)+'\x20€',document[aP(0x1d1)]('stat-tarjeta')[aP(0x214)]=m[aP(0x2a1)](0x2)+'\x20€',g[aP(0x195)]((n,o)=>o['ts']-n['ts'])[aP(0x266)]((n,o)=>{const aQ=aP,p=document['createElement'](aQ(0x2be));p[aQ(0x1c6)]='ticket-item';const q=new Date(n['ts'])[aQ(0x215)](aQ(0x186),{'hour':'2-digit','minute':aQ(0x1c0)}),r=new Date(n['ts'])[aQ(0x24d)](aQ(0x186),{'day':'numeric','month':'short'}),s=n['pagoMetodo']?n[aQ(0x27c)]:aQ(0x262);p[aQ(0x1a2)]=aQ(0x256)+(n[aQ(0x1bd)]||aQ(0x1f8))+aQ(0x1dc)+r+aQ(0x23e)+q+'\x20·\x20'+s+aQ(0x23b)+Number(n['total']||0x0)[aQ(0x2a1)](0x2)+aQ(0x19d)+o+aQ(0x27e),p[aQ(0x2c0)]=()=>{const aR=aQ,u=document[aR(0x1d1)](aR(0x28d)+o),v=p['classList'][aR(0x2a4)](aR(0x263));document[aR(0x1af)](aR(0x1f0))[aR(0x266)](w=>w[aR(0x268)][aR(0x192)](aR(0x263)));if(!v){p['classList'][aR(0x28a)]('active');let w='';(n[aR(0x2a9)]||[])[aR(0x266)](x=>{const aS=aR;w+='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22display:flex;justify-content:space-between;padding:3px\x200;font-size:12px;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span>'+x[aS(0x1b0)]+'x\x20'+x['nombre']+'\x20'+(x['nota']?'('+x[aS(0x251)]+')':'')+aS(0x1fd)+(x['qty']*Number(x[aS(0x27d)]||0x0))[aS(0x2a1)](0x2)+aS(0x221);}),u[aR(0x1a2)]=w||aR(0x1f9);}},i[aQ(0x242)](p);});}window[P(0x1d9)]=async()=>{const aT=P,g=document[aT(0x1d1)](aT(0x288))[aT(0x22f)],h=document[aT(0x1d1)](aT(0x25b))[aT(0x22f)][aT(0x1d7)]()[aT(0x231)]();if(!g)return;const i=document[aT(0x1d1)](aT(0x177));i[aT(0x1a2)]='',showToast('Cargando\x20logs...');try{const j=await get(ref(db,aT(0x28f)+g)),k=j['val']()||{},l=Object[aT(0x1f1)](k)[aT(0x246)](m=>{const aU=aT;if(!h)return!![];return String(m[aU(0x2ac)]||'')[aU(0x1d7)]()[aU(0x297)](h)||String(m[aU(0x281)]||'')[aU(0x1d7)]()[aU(0x297)](h)||String(m[aU(0x2a3)]||'')[aU(0x1d7)]()[aU(0x297)](h);});renderAuditoria(l);}catch(m){showToast('Error\x20al\x20obtener\x20logs.');}};function renderAuditoria(g){const aV=P,h=document[aV(0x1d1)](aV(0x177));h[aV(0x1a2)]='';if(g[aV(0x1a5)]===0x0){h['innerHTML']='<div\x20class=\x22plano-sinubicar\x22\x20style=\x22text-align:center;padding:24px;\x22>No\x20hay\x20registros\x20de\x20auditoría\x20en\x20la\x20fecha\x20o\x20con\x20el\x20texto\x20seleccionado.</div>';return;}g[aV(0x195)]((i,j)=>j['ts']-i['ts'])[aV(0x266)](i=>{const aW=aV,j=document[aW(0x224)](aW(0x2be));let k='';if(String(i[aW(0x2ac)])[aW(0x297)](aW(0x1ae)))k='login';else{if(String(i[aW(0x2ac)])[aW(0x297)](aW(0x257)))k='mesa_cerrada';else{if(String(i[aW(0x2ac)])[aW(0x297)]('articulo_eliminado'))k='articulo_eliminado';else{if(String(i[aW(0x2ac)])[aW(0x297)](aW(0x22d)))k=aW(0x22d);}}}j[aW(0x1c6)]='timeline-item\x20'+k,j[aW(0x1a2)]=aW(0x26c)+(i[aW(0x248)]||'00:00:00')+aW(0x20f)+(i[aW(0x2a3)]||aW(0x1ed))+aW(0x239)+i[aW(0x2ac)]+aW(0x21b)+(i['detalle']||'')+'</div>\x0a\x20\x20\x20\x20',h[aW(0x242)](j);});}window['confirmarCierreCaja']=async()=>{const aX=P,g=await showCustomConfirm(aX(0x287),aX(0x208));if(!g)return;showToast('Procesando\x20cierre...');try{const h=await cerrarMesasAbiertasParaTurno(),i=new Date(),j=new Date(i);i[aX(0x1bc)]()<0x5&&j[aX(0x25c)](i[aX(0x1f5)]()-0x1);j[aX(0x25f)](0x5,0x0,0x0,0x0);const k=j[aX(0x1e0)](),l=i[aX(0x1e0)](),m=query(ref(db,'historial'),orderByChild('ts'),startAt(k),endAt(l)),n=await get(m),o=Object[aX(0x1f1)](n['val']()||{});let p=0x0,r=0x0,s=0x0;const t={};o[aX(0x266)](C=>{const aY=aX,D=Number(C['total']||0x0);p+=D,(C['pagoMetodo']||'')['toLowerCase']()===aY(0x245)?s+=D:r+=D,(C[aY(0x2a9)]||[])[aY(0x266)](E=>{const aZ=aY,F=E[aZ(0x1d3)]||aZ(0x1ff),G=Number(E[aZ(0x1b0)]||0x0),H=Number(E[aZ(0x27d)]||0x0);!t[F]&&(t[F]={'nombre':F,'qty':0x0,'total':0x0}),t[F]['qty']+=G,t[F][aZ(0x2b4)]+=G*H;});});const u=Object[aX(0x1f1)](t)[aX(0x195)]((C,D)=>D['qty']-C[aX(0x1b0)]),v=o[aX(0x1a5)],w=v?p/v:0x0,x={'startTs':k,'endTs':l,'ticketsCount':v,'total':p,'efectivo':r,'tarjeta':s,'ticketMedio':w,'articulos':u},y=await get(ref(db,aX(0x277))),z=y[aX(0x19e)]()||{},A=buildCierreCajaHtml(z[aX(0x1d3)]||aX(0x2ba),x),B={'ts':Date[aX(0x1e5)](),'type':aX(0x283),'content':A,'status':aX(0x1e8),'printerName':aX(0x22a),'requestedBy':aX(0x1b2),'mesaId':aX(0x232),'mesaNombre':aX(0x1f7),'silent':!![],'options':{'footer':'Fin\x20de\x20Cierre\x20de\x20Caja','header':aX(0x1f7)}};await push(ref(db,aX(0x233)),B),logAuditoria(aX(0x2a5),'Cierre\x20realizado.\x20Total:\x20'+p[aX(0x2a1)](0x2)+aX(0x255)+h[aX(0x250)]+aX(0x21a)),showToast(aX(0x218)),renderPlano();}catch(C){console[aX(0x178)](C),showToast(aX(0x264));}};async function cerrarMesasAbiertasParaTurno(){const b0=P,[g,h]=await Promise['all']([get(ref(db,b0(0x1ab))),get(ref(db,b0(0x2aa)))]),i=g[b0(0x19e)]()||{},j=h[b0(0x19e)]()||{},k=new Date();let l=0x0,m=0x0;for(const [n,o]of Object[b0(0x17b)](j)){if(!o||typeof o!==b0(0x230))continue;const p=i[n]?.[b0(0x1d3)]||n,q=resumirMesaParaHistorial(p,o);q[b0(0x2a9)][b0(0x1a5)]>0x0&&(await push(ref(db,b0(0x202)),{'mesa':q[b0(0x1bd)],'camarero':q[b0(0x2a3)],'ts':k[b0(0x1e0)](),'fecha':k[b0(0x24d)]('es-ES'),'hora':k[b0(0x215)]('es-ES',{'hour':b0(0x1c0),'minute':'2-digit'}),'total':q[b0(0x2b4)],'lineas':q['lineas']}),m+=0x1),await remove(ref(db,b0(0x2a6)+n)),n['startsWith'](b0(0x22b))?await remove(ref(db,b0(0x1db)+n)):await set(ref(db,b0(0x1db)+n+b0(0x1e6)),b0(0x19c)),l+=0x1;}return{'mesasCerradas':l,'ticketsGenerados':m};}function resumirMesaParaHistorial(g,h={}){const b1=P,i=Object['values'](h||{})[b1(0x246)](n=>n&&typeof n===b1(0x230)&&!String(n[b1(0x211)]||'')[b1(0x260)]('_'))[b1(0x21c)](n=>Object[b1(0x1f1)](n['lineas']||{})),j={},k=new Set();i[b1(0x266)](n=>{const b2=b1;if(!n||n[b2(0x1be)]===b2(0x187))return;const o=n[b2(0x1e7)]!==undefined&&n[b2(0x1e7)]!==null?Number(n[b2(0x1e7)]||0x0):Number(n[b2(0x1b0)]||0x0);if(o<=0x0)return;if(n['camarero']&&n[b2(0x197)]!==b2(0x1ca))k[b2(0x28a)](n['camarero']);const p=(n[b2(0x1d3)]||b2(0x1ff))+'||'+Number(n[b2(0x27d)]||0x0)[b2(0x2a1)](0x2)+'||'+(n[b2(0x251)]||'');!j[p]&&(j[p]={'nombre':n[b2(0x1d3)]||b2(0x1ff),'precio':Number(n[b2(0x27d)]||0x0),'qty':0x0,'nota':n['nota']||''}),j[p][b2(0x1b0)]+=o;});const l=Object[b1(0x1f1)](j),m=l[b1(0x29b)]((n,o)=>n+Number(o[b1(0x27d)]||0x0)*Number(o['qty']||0x0),0x0);return{'mesa':g,'camarero':[...k]['join'](',\x20'),'lineas':l,'total':Math[b1(0x286)](m*0x64)/0x64};}function buildCierreCajaHtml(g,h){const b3=P,i=new Date()[b3(0x24d)](b3(0x186)),j=new Date()[b3(0x215)](b3(0x186),{'hour':b3(0x1c0),'minute':'2-digit'});let k=(h['articulos']||[])['map'](l=>b3(0x1c2)+l[b3(0x1b0)]+'x\x20'+l[b3(0x1d3)]+'</span>\x0a\x20\x20\x20\x20\x20\x20<span\x20style=\x22font-family:monospace\x22>'+l[b3(0x2b4)]['toFixed'](0x2)+b3(0x199))[b3(0x1de)]('');return b3(0x1e3)+g+'</div>\x0a\x20\x20\x20\x20\x20\x20<div\x20style=\x22text-align:center;font-size:9px;margin-bottom:10px\x22>CIERRE\x20DE\x20CAJA\x20DIARIO</div>\x0a\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-size:10px;margin-bottom:6px\x22>Fecha:\x20'+i+'\x20'+j+b3(0x29d)+h['total'][b3(0x2a1)](0x2)+b3(0x227)+h[b3(0x258)][b3(0x2a1)](0x2)+b3(0x1a6)+h[b3(0x245)][b3(0x2a1)](0x2)+'\x20€</span>\x0a\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20<div\x20style=\x22font-size:10px;margin-bottom:10px;display:flex;justify-content:space-between\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<span>Nº\x20Tickets\x20/\x20Medio:</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20<span>'+h[b3(0x26d)]+b3(0x23c)+h[b3(0x2ae)][b3(0x2a1)](0x2)+b3(0x201)+k+b3(0x2ab);}let currentModalResolve=null;function ocultarCustomModal(){const b4=P,g=document[b4(0x1d1)](b4(0x223)),h=document[b4(0x1d1)](b4(0x24f));g[b4(0x268)][b4(0x192)](b4(0x222)),h['style'][b4(0x25d)]=b4(0x17e),h[b4(0x2bf)][b4(0x25a)]='0',setTimeout(()=>{const b5=b4;h[b5(0x2bf)][b5(0x28e)]=b5(0x247);},0xc8);}window[P(0x219)]=()=>{ocultarCustomModal(),currentModalResolve&&(currentModalResolve(null),currentModalResolve=null);};function mostrarCustomModal(g,h,i,j=''){return new Promise(k=>{const b6=b;currentModalResolve&&currentModalResolve(null);currentModalResolve=k;const l=document['getElementById'](b6(0x223)),m=document['getElementById']('custom-modal'),n=document['getElementById']('custom-modal-title'),o=document[b6(0x1d1)](b6(0x20c)),p=document[b6(0x1d1)]('custom-modal-input'),q=document[b6(0x1d1)](b6(0x2c2)),r=document[b6(0x1d1)](b6(0x238));n[b6(0x214)]=g,o['textContent']=h,i===b6(0x1b6)?(p[b6(0x2bf)][b6(0x28e)]=b6(0x27b),p['value']=j):p[b6(0x2bf)][b6(0x28e)]=b6(0x247),i===b6(0x1fb)?q['style'][b6(0x28e)]=b6(0x247):q[b6(0x2bf)][b6(0x28e)]=b6(0x27b),l[b6(0x268)][b6(0x28a)]('open'),m['style'][b6(0x28e)]='flex',m[b6(0x2bf)][b6(0x25a)]='0',m['style']['transform']=b6(0x17e),m[b6(0x26e)],setTimeout(()=>{const b7=b6;m[b7(0x2bf)][b7(0x25a)]='1',m[b7(0x2bf)]['transform']='translate(-50%,\x20-50%)\x20scale(1)',i===b7(0x1b6)&&(p[b7(0x18b)](),p['setSelectionRange'](p[b7(0x22f)][b7(0x1a5)],p[b7(0x22f)]['length']));},0xa),r[b6(0x2c0)]=()=>{const b8=b6,s=i==='prompt'?p[b8(0x22f)]:!![];ocultarCustomModal(),currentModalResolve=null,k(s);},q[b6(0x2c0)]=()=>{const b9=b6;ocultarCustomModal(),currentModalResolve=null,k(i===b9(0x1b6)?null:![]);},p[b6(0x216)]=s=>{const ba=b6;s['key']===ba(0x189)&&r[ba(0x241)]();};});}function showCustomAlert(g,h){const bb=P;return mostrarCustomModal(g,h,bb(0x1fb));}function showCustomConfirm(g,h){const bc=P;return mostrarCustomModal(g,h,bc(0x19a));}function showCustomPrompt(g,h,i=''){const bd=P;return mostrarCustomModal(g,h,bd(0x1b6),i);}function b(c,d){c=c-0x172;const e=a();let f=e[c];if(b['GxNNsK']===undefined){var g=function(l){const m='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789+/=';let n='',o='';for(let p=0x0,q,r,s=0x0;r=l['charAt'](s++);~r&&(q=p%0x4?q*0x40+r:r,p++%0x4)?n+=String['fromCharCode'](0xff&q>>(-0x2*p&0x6)):0x0){r=m['indexOf'](r);}for(let t=0x0,u=n['length'];t<u;t++){o+='%'+('00'+n['charCodeAt'](t)['toString'](0x10))['slice'](-0x2);}return decodeURIComponent(o);};b['lxLOAP']=g,b['xIHTqu']={},b['GxNNsK']=!![];}const h=e[0x0],i=c+h,j=b['xIHTqu'][i];return!j?(f=b['lxLOAP'](f),b['xIHTqu'][i]=f):f=j,f;}function showToast(g){const be=P,h=document[be(0x1d1)](be(0x1ee));h['textContent']=g,h['classList'][be(0x28a)]('show'),setTimeout(()=>h[be(0x268)]['remove'](be(0x1f3)),0x9c4);}init();
+import { db } from './firebase.js';
+import {
+  ref, get, onValue, query, orderByChild, startAt, endAt,
+  set as fbSet, push as fbPush, remove as fbRemove, update as fbUpdate
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const checkAndTouchMenu = (refVal) => {
+  if (!refVal) return;
+  const url = refVal.toString();
+  if (url.includes('/carta') || url.includes('/categorias') || url.includes('carta') || url.includes('categorias')) {
+    fbSet(ref(db, 'config/menu_version'), Date.now()).catch(err => console.error(err));
+  }
+};
+
+const set = (refVal, data) => {
+  const res = fbSet(refVal, data);
+  checkAndTouchMenu(refVal);
+  return res;
+};
+
+const push = (refVal, data) => {
+  const res = fbPush(refVal, data);
+  checkAndTouchMenu(refVal);
+  return res;
+};
+
+const remove = (refVal) => {
+  const res = fbRemove(refVal);
+  checkAndTouchMenu(refVal);
+  return res;
+};
+
+const update = (refVal, data) => {
+  const res = fbUpdate(refVal, data);
+  if (data && typeof data === 'object') {
+    const keys = Object.keys(data);
+    if (keys.some(k => k.startsWith('carta') || k.startsWith('categorias'))) {
+      fbSet(ref(db, 'config/menu_version'), Date.now()).catch(err => console.error(err));
+    }
+  }
+  checkAndTouchMenu(refVal);
+  return res;
+};
+
+// --- VARIABLES DE ESTADO ---
+let passwordCorrecta = "";
+let pinBuffer = "";
+let mesasData = {};
+let pedidosData = {};
+let categoriasData = {};
+let cartaData = {};
+let planoCfg = { cols: 16, rows: 12 };
+let planoZonaActiva = null;
+let currentMesaId = null;
+let currentView = 'plano';
+let seguridadData = {};
+let usuariosData = {};
+
+const PIN_SESSION_KEY = "gerente_auth_session";
+
+// --- ELEMENTOS DEL DOM ---
+const pinScreen = document.getElementById("pin-screen");
+const appShell = document.getElementById("app-shell");
+const pinDots = [
+  document.getElementById("pd0"),
+  document.getElementById("pd1"),
+  document.getElementById("pd2"),
+  document.getElementById("pd3")
+];
+const pinErrorMsg = document.getElementById("pin-error");
+
+// --- INICIALIZACIÓN Y SEGURIDAD PIN ---
+async function init() {
+  // 1. Obtener la contraseña de Firebase o fallback
+  try {
+    const snap = await get(ref(db, "config/audit/password"));
+    passwordCorrecta = snap.val() ? String(snap.val()).trim() : "audit1234";
+  } catch (err) {
+    passwordCorrecta = "audit1234";
+  }
+
+  // 2. Comprobar sesión existente
+  if (sessionStorage.getItem(PIN_SESSION_KEY) === "1") {
+    desbloquearPanel();
+  } else {
+    // Determinar si mostramos teclado numérico o teclado de texto
+    // Si la contraseña es "audit1234" (default con letras), permitimos usar el PIN "1234" en teclado numérico,
+    // o escribir la contraseña alfanumérica completa.
+    const esNumerico4 = /^\d{4}$/.test(passwordCorrecta) || passwordCorrecta === "audit1234";
+
+    if (esNumerico4) {
+      document.querySelector(".pin-dots").style.display = "flex";
+      document.getElementById("pin-pad").style.display = "grid";
+      document.getElementById("text-login-container").style.display = "none";
+      configurarTecladoPin();
+    } else {
+      document.querySelector(".pin-dots").style.display = "none";
+      document.getElementById("pin-pad").style.display = "none";
+      document.getElementById("text-login-container").style.display = "flex";
+      configurarTecladoTexto();
+    }
+  }
+}
+
+function configurarTecladoPin() {
+  document.getElementById("pin-pad").addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-k]");
+    if (!btn) return;
+    const k = btn.dataset.k;
+    
+    if (k === "del") {
+      pinBuffer = pinBuffer.slice(0, -1);
+      actualizarDots();
+    } else if (k !== "") {
+      if (pinBuffer.length >= 4) return;
+      pinBuffer += k;
+      actualizarDots();
+      
+      if (pinBuffer.length === 4) {
+        verificarPin();
+      }
+    }
+  });
+}
+
+function configurarTecladoTexto() {
+  const btnEntrar = document.getElementById("btn-entrar-texto");
+  const inputTexto = document.getElementById("text-pin-input");
+
+  btnEntrar.onclick = () => {
+    const val = inputTexto.value.trim();
+    if (val === passwordCorrecta) {
+      iniciarSesionExitosa();
+    } else {
+      pinErrorMsg.textContent = "Contraseña Incorrecta";
+      inputTexto.value = "";
+      setTimeout(() => {
+        pinErrorMsg.textContent = "";
+      }, 1500);
+    }
+  };
+
+  // Permitir entrar pulsando Enter
+  inputTexto.onkeydown = (e) => {
+    if (e.key === "Enter") {
+      btnEntrar.click();
+    }
+  };
+}
+
+function actualizarDots(error = false) {
+  pinDots.forEach((dot, idx) => {
+    dot.className = "pin-dot" + (idx < pinBuffer.length ? (error ? " error" : " filled") : "");
+  });
+}
+
+async function verificarPin() {
+  const esCorrecto = (pinBuffer === passwordCorrecta) || (passwordCorrecta === "audit1234" && pinBuffer === "1234");
+  
+  if (esCorrecto) {
+    iniciarSesionExitosa();
+  } else {
+    // Feedback de error
+    actualizarDots(true);
+    pinErrorMsg.textContent = "PIN Incorrecto";
+    
+    setTimeout(() => {
+      pinBuffer = "";
+      actualizarDots(false);
+      pinErrorMsg.textContent = "";
+    }, 900);
+  }
+}
+
+function iniciarSesionExitosa() {
+  sessionStorage.setItem(PIN_SESSION_KEY, "1");
+  
+  // Registrar evento de login en auditoría
+  logAuditoria('login', 'Inicio de sesión (Gerente Móvil)');
+  
+  desbloquearPanel();
+}
+
+function desbloquearPanel() {
+  pinScreen.style.display = "none";
+  appShell.style.display = "flex";
+  
+  // Iniciar sincronización de datos
+  iniciarSincronizacionDB();
+  
+  // Establecer fechas iniciales para filtros de consulta
+  const hoy = new Date().toISOString().split('T')[0];
+  document.getElementById("venta-desde").value = hoy;
+  document.getElementById("venta-hasta").value = hoy;
+  document.getElementById("audit-fecha").value = hoy;
+}
+
+// --- LOGS DE AUDITORÍA ---
+function logAuditoria(accion, detalle = '') {
+  const ts = Date.now();
+  const d = new Date(ts);
+  const fechaKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const hora = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
+  
+  const entrada = {
+    ts, fechaKey, hora,
+    camarero: "Gerente Móvil",
+    accion,
+    detalle: String(detalle)
+  };
+  
+  // Registro asíncrono sin bloquear
+  push(ref(db, `auditoria/${fechaKey}`), entrada).catch(() => {});
+}
+
+// --- SINCRONIZACIÓN FIREBASE REALTIME ---
+function iniciarSincronizacionDB() {
+  // Monitoreo de conexión a internet
+  onValue(ref(db, ".info/connected"), (snap) => {
+    const statusDot = document.getElementById("network-status");
+    if (snap.val() === true) {
+      statusDot.classList.add("connected");
+    } else {
+      statusDot.classList.remove("connected");
+    }
+  });
+
+  // Título del establecimiento
+  onValue(ref(db, "config/local"), (snap) => {
+    const loc = snap.val() || {};
+    document.getElementById("local-title").textContent = loc.nombre || "Comandero - Gerencia";
+  });
+
+  // Configuración del plano
+  onValue(ref(db, "config/plano"), (snap) => {
+    const val = snap.val() || {};
+    planoCfg = { cols: Number(val.cols) || 16, rows: Number(val.rows) || 12 };
+    renderPlano();
+  });
+
+  // Mesas
+  onValue(ref(db, "mesas"), (snap) => {
+    mesasData = snap.val() || {};
+    renderPlano();
+  });
+
+  // Pedidos
+  onValue(ref(db, "pedidos"), (snap) => {
+    pedidosData = snap.val() || {};
+    renderPlano();
+    if (currentMesaId) {
+      renderDetalleComanda(currentMesaId);
+    }
+  });
+
+  // Categorías
+  onValue(ref(db, "categorias"), (snap) => {
+    categoriasData = snap.val() || {};
+    renderCarta();
+  });
+
+  // Carta / Artículos
+  onValue(ref(db, "carta"), (snap) => {
+    cartaData = snap.val() || {};
+    renderCarta();
+  });
+
+  // Seguridad y bloqueo
+  onValue(ref(db, "config/seguridad"), (snap) => {
+    seguridadData = snap.val() || {};
+    actualizarAjustesSeguridadMovil();
+  });
+
+  // Usuarios / Camareros
+  onValue(ref(db, "config/usuarios"), (snap) => {
+    usuariosData = snap.val() || {};
+    renderCamarerosListado();
+    poblarExcepcionCamareroSelectorMovil();
+  });
+}
+
+// --- NAVEGACIÓN ENTRE VISTAS ---
+window.navegarA = (tab) => {
+  currentView = tab;
+  
+  // Cambiar botones activos de la barra de navegación
+  const navItems = document.querySelectorAll(".nav-item");
+  navItems.forEach(item => {
+    if (item.getAttribute("onclick").includes(tab)) {
+      item.classList.add("active");
+    } else {
+      item.classList.remove("active");
+    }
+  });
+
+  // Cambiar paneles visibles
+  const panes = document.querySelectorAll(".view-pane");
+  panes.forEach(pane => {
+    if (pane.id === `pane-${tab}`) {
+      pane.classList.add("active");
+    } else {
+      pane.classList.remove("active");
+    }
+  });
+  
+  // Recargar plano o carta si aplica
+  if (tab === 'plano') renderPlano();
+  if (tab === 'carta') renderCarta();
+  if (tab === 'camareros') renderCamarerosListado();
+};
+
+// --- RENDERIZADO PLANO DE MESAS ---
+function renderPlano() {
+  if (currentView !== 'plano') return;
+  const tabsContainer = document.getElementById("plano-tabs-container");
+  const renderArea = document.getElementById("plano-render-area");
+  if (!tabsContainer || !renderArea) return;
+
+  const entries = Object.entries(mesasData)
+    .filter(([id]) => !id.startsWith("temp_"))
+    .sort(([,a],[,b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre, 'es', { numeric: true }));
+
+  const temporales = Object.entries(mesasData)
+    .filter(([id]) => id.startsWith("temp_"))
+    .sort(([,a],[,b]) => (a.creadoTs || 0) - (b.creadoTs || 0));
+
+  if (entries.length === 0 && temporales.length === 0) {
+    renderArea.innerHTML = `<div class="plano-sinubicar" style="text-align:center;margin-top:40px;">No hay mesas configuradas ni pedidos temporales activos.</div>`;
+    tabsContainer.innerHTML = "";
+    return;
+  }
+
+  // 1. Cargar Zonas
+  const hayZonas = entries.some(([,m]) => m.zona && m.zona.trim());
+  let zonas = [];
+  if (hayZonas) {
+    zonas = [...new Set(entries.map(([,m]) => (m.zona || "").trim()).filter(Boolean))];
+    if (!planoZonaActiva || !zonas.includes(planoZonaActiva)) {
+      planoZonaActiva = zonas[0];
+    }
+  }
+
+  const mesasFiltradas = hayZonas
+    ? entries.filter(([,m]) => (m.zona || "").trim() === planoZonaActiva)
+    : entries;
+
+  // Renderizar pestañas de zonas
+  tabsContainer.innerHTML = "";
+  if (hayZonas) {
+    zonas.forEach(z => {
+      const btn = document.createElement("button");
+      btn.className = `plano-tab${z === planoZonaActiva ? ' active' : ''}`;
+      btn.textContent = z;
+      btn.onclick = () => {
+        planoZonaActiva = z;
+        renderPlano();
+      };
+      tabsContainer.appendChild(btn);
+    });
+  }
+
+  // 2. Determinar si hay mesas ubicadas en plano
+  const ubicadas = mesasFiltradas.filter(([,m]) => m.plano);
+  const sinUbicar = mesasFiltradas.filter(([,m]) => !m.plano && !m.nombre.startsWith('#'));
+
+  renderArea.innerHTML = "";
+
+  if (ubicadas.length > 0) {
+    const planoContainer = document.createElement("div");
+    planoContainer.className = "plano-wrap";
+    
+    const cols = planoCfg.cols || 16;
+    const rows = planoCfg.rows || 12;
+    
+    const grid = document.createElement("div");
+    grid.className = "plano-grid";
+    grid.style.setProperty("--plano-cols", cols);
+    grid.style.setProperty("--plano-rows", rows);
+    
+    mesasFiltradas.forEach(([mid, m]) => {
+      const p = m.plano;
+      if (!p) return;
+      
+      const card = document.createElement("div");
+      const isCircle = p.shape === "circle" ? " circle" : "";
+      const isDeco = m.nombre.startsWith('#');
+
+      if (isDeco) {
+        card.className = `plano-mesa decorador${isCircle}`;
+        card.style.gridColumn = `${p.x} / span ${p.w}`;
+        card.style.gridRow = `${p.y} / span ${p.h}`;
+        card.innerHTML = `<span class="plano-mesa-nombre">${m.nombre.slice(1)}</span>`;
+        grid.appendChild(card);
+        return;
+      }
+
+      const tienePedido = pedidosData[mid] && Object.keys(pedidosData[mid]).length > 0;
+      let claseAlerta = tienePedido ? "ocupada" : "libre";
+      let tiempoOcupada = null;
+      if (tienePedido) {
+        tiempoOcupada = calcularTiempoOcupada(mid);
+        let minTsPendiente = Infinity;
+        let tienePendiente = false;
+        
+        Object.values(pedidosData[mid]).forEach(envio => {
+          const envioTs = Number(envio.ts) || 0;
+          const ls = envio.lineas || { _: envio };
+          Object.values(ls).forEach(l => {
+            if (l && l.estado === "pendiente") {
+              tienePendiente = true;
+              const lts = Number(l.ts) || envioTs || 0;
+              if (lts > 0 && lts < minTsPendiente) minTsPendiente = lts;
+            }
+          });
+        });
+        
+        if (tienePendiente && minTsPendiente < Infinity) {
+          const minsPend = Math.max(0, Math.floor((Date.now() - minTsPendiente) / 60000));
+          if (minsPend >= 20) {
+            claseAlerta = "alerta-danger";
+          } else if (minsPend >= 10) {
+            claseAlerta = "alerta-warn";
+          } else {
+            claseAlerta = "alerta-ok";
+          }
+        }
+      }
+      
+      card.className = `plano-mesa ${claseAlerta}${isCircle}`;
+      card.style.gridColumn = `${p.x} / span ${p.w}`;
+      card.style.gridRow = `${p.y} / span ${p.h}`;
+      
+      let totalQty = 0;
+      let subtotal = 0;
+      if (tienePedido) {
+        Object.values(pedidosData[mid]).forEach(env => {
+          const ls = env.lineas || { _: env };
+          Object.values(ls).forEach(l => {
+            if (l && l.nombre && l.estado !== 'cancelado') {
+              const qty = l.qtyTicket !== undefined && l.qtyTicket !== null ? Number(l.qtyTicket) : Number(l.qty || 0);
+              const price = l.precioTicket !== undefined && l.precioTicket !== null ? Number(l.precioTicket) : Number(l.precio || 0);
+              if (qty > 0) {
+                totalQty += qty;
+                subtotal += (price * qty);
+              }
+            }
+          });
+        });
+      }
+
+      card.innerHTML = `
+        <span class="plano-mesa-nombre">${m.nombre}</span>
+        ${tienePedido ? `<span class="plano-mesa-extra">${subtotal.toFixed(2)}€</span>` : ''}
+        ${tiempoOcupada ? `<span class="plano-mesa-tiempo-badge" style="font-size: 7px; padding: 1px 3px; margin-top: 1px;">⏳ ${tiempoOcupada}</span>` : ''}
+      `;
+      card.onclick = () => abrirDrawerComanda(mid, m.nombre);
+      grid.appendChild(card);
+    });
+    
+    planoContainer.appendChild(grid);
+    renderArea.appendChild(planoContainer);
+    
+    if (sinUbicar.length > 0) {
+      const sinUbicarDiv = document.createElement("div");
+      sinUbicarDiv.className = "plano-sinubicar";
+      sinUbicarDiv.innerHTML = `<strong>Mesas sin ubicar:</strong> ${sinUbicar.map(([,m]) => m.nombre).join(", ")}`;
+      renderArea.appendChild(sinUbicarDiv);
+    }
+  } else {
+    // Dibujar Grid Simple
+    const grid = document.createElement("div");
+    grid.className = "mesas-grid";
+    
+    mesasFiltradas.filter(([,m]) => !m.nombre.startsWith('#')).forEach(([mid, m]) => {
+      const tienePedido = pedidosData[mid] && Object.keys(pedidosData[mid]).length > 0;
+      const card = document.createElement("div");
+      
+      let claseAlerta = tienePedido ? "ocupada" : "libre";
+      let tiempoOcupada = null;
+      if (tienePedido) {
+        tiempoOcupada = calcularTiempoOcupada(mid);
+      }
+      
+      card.className = `mesa-card ${claseAlerta}`;
+      
+      let totalQty = 0;
+      let subtotal = 0;
+      if (tienePedido) {
+        Object.values(pedidosData[mid]).forEach(env => {
+          const ls = env.lineas || { _: env };
+          Object.values(ls).forEach(l => {
+            if (l && l.nombre && l.estado !== 'cancelado') {
+              const qty = l.qtyTicket !== undefined && l.qtyTicket !== null ? Number(l.qtyTicket) : Number(l.qty || 0);
+              const price = l.precioTicket !== undefined && l.precioTicket !== null ? Number(l.precioTicket) : Number(l.precio || 0);
+              if (qty > 0) {
+                totalQty += qty;
+                subtotal += (price * qty);
+              }
+            }
+          });
+        });
+      }
+      
+      card.innerHTML = `
+        <div style="font-size:16px;margin-bottom:4px;font-weight:600;">${m.nombre}</div>
+        ${tienePedido ? `<div class="mesa-subtext">${totalQty} art. (${subtotal.toFixed(2)}€)</div>` : '<div class="mesa-subtext" style="color:var(--success);">Libre</div>'}
+        ${tiempoOcupada ? `<div class="plano-mesa-tiempo-badge">⏳ ${tiempoOcupada}</div>` : ""}
+      `;
+      card.onclick = () => abrirDrawerComanda(mid, m.nombre);
+      grid.appendChild(card);
+    });
+    renderArea.appendChild(grid);
+  }
+
+  // 3. Pedidos Temporales Activos (Sección dedicada en la parte inferior)
+  if (temporales.length > 0) {
+    const tempSection = document.createElement("div");
+    tempSection.className = "temp-pedidos-section";
+    tempSection.style.marginTop = "24px";
+    tempSection.style.paddingTop = "16px";
+    tempSection.style.borderTop = "1px solid var(--border)";
+    tempSection.style.width = "100%";
+    
+    tempSection.innerHTML = `
+      <div style="font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--text-dim); margin-bottom: 12px; letter-spacing: 0.05em;">
+        🛒 PEDIDOS TEMPORALES ACTIVOS
+      </div>
+    `;
+    
+    const tempGrid = document.createElement("div");
+    tempGrid.className = "mesas-grid";
+    
+    temporales.forEach(([mid, m]) => {
+      const tienePedido = pedidosData[mid] && Object.keys(pedidosData[mid]).length > 0;
+      const card = document.createElement("div");
+      
+      let claseAlerta = tienePedido ? "ocupada" : "libre";
+      let tiempoOcupada = null;
+      if (tienePedido) {
+        tiempoOcupada = calcularTiempoOcupada(mid);
+      }
+      
+      card.className = `mesa-card ${claseAlerta}`;
+      
+      let totalQty = 0;
+      let subtotal = 0;
+      if (tienePedido) {
+        Object.values(pedidosData[mid]).forEach(env => {
+          const ls = env.lineas || { _: env };
+          Object.values(ls).forEach(l => {
+            if (l && l.nombre && l.estado !== 'cancelado') {
+              const qty = l.qtyTicket !== undefined && l.qtyTicket !== null ? Number(l.qtyTicket) : Number(l.qty || 0);
+              const price = l.precioTicket !== undefined && l.precioTicket !== null ? Number(l.precioTicket) : Number(l.precio || 0);
+              if (qty > 0) {
+                totalQty += qty;
+                subtotal += (price * qty);
+              }
+            }
+          });
+        });
+      }
+      
+      card.innerHTML = `
+        <div style="font-size:14px;margin-bottom:4px;font-weight:600;">${m.nombre}</div>
+        ${tienePedido ? `<div class="mesa-subtext">${totalQty} art. (${subtotal.toFixed(2)}€)</div>` : '<div class="mesa-subtext">Vaciando...</div>'}
+        ${tiempoOcupada ? `<div class="plano-mesa-tiempo-badge">⏳ ${tiempoOcupada}</div>` : ""}
+      `;
+      card.onclick = () => abrirDrawerComanda(mid, m.nombre);
+      tempGrid.appendChild(card);
+    });
+    
+    tempSection.appendChild(tempGrid);
+    renderArea.appendChild(tempSection);
+  }
+}
+
+// --- COMPROBACIÓN DE TIEMPOS DE ESPERA ---
+function calcularTiempoOcupada(mid) {
+  const ped = pedidosData[mid];
+  if (!ped) return null;
+  
+  let minTs = Infinity;
+  Object.values(ped).forEach(envio => {
+    if (envio && typeof envio === 'object' && !String(envio.envioId || '').startsWith('_')) {
+      const ts = Number(envio.ts) || 0;
+      if (ts > 0 && ts < minTs) minTs = ts;
+    }
+  });
+
+  if (minTs === Infinity) return null;
+  const diffMins = Math.max(0, Math.floor((Date.now() - minTs) / 60000));
+  if (diffMins >= 60) {
+    const hrs = Math.floor(diffMins / 60);
+    const mins = diffMins % 60;
+    return `${hrs}h ${mins}m`;
+  }
+  return `${diffMins} min`;
+}
+
+// --- DRAWER DE DETALLE TICKET MESA ---
+function abrirDrawerComanda(mid, nombre) {
+  currentMesaId = mid;
+  document.getElementById("comanda-drawer-title").textContent = `Detalle comanda: ${nombre}`;
+  renderDetalleComanda(mid);
+  
+  document.getElementById("overlay-comanda").classList.add("open");
+  document.getElementById("drawer-comanda").classList.add("open");
+}
+
+window.cerrarDrawerComanda = () => {
+  currentMesaId = null;
+  document.getElementById("overlay-comanda").classList.remove("open");
+  document.getElementById("drawer-comanda").classList.remove("open");
+};
+
+function renderDetalleComanda(mid) {
+  const body = document.getElementById("comanda-drawer-body");
+  const totalLabel = document.getElementById("comanda-drawer-total");
+  if (!body) return;
+
+  const ped = pedidosData[mid];
+  if (!ped || Object.keys(ped).length === 0) {
+    body.innerHTML = `<div class="plano-sinubicar" style="text-align:center;padding:24px;">Mesa vacía / sin consumos activos.</div>`;
+    totalLabel.textContent = "0.00 €";
+    return;
+  }
+
+  let total = 0;
+  let lineasHTML = "";
+
+  Object.entries(ped)
+    .filter(([k]) => !k.startsWith('_'))
+    .forEach(([, envio]) => {
+      const envioId = envio.envioId || '';
+      const camarero = envio.camarero || 'Camarero';
+      const lines = envio.lineas || { _: envio };
+      
+      Object.entries(lines).forEach(([lk, l]) => {
+        if (!l || !l.nombre) return;
+        const qty = l.qtyTicket !== undefined && l.qtyTicket !== null ? Number(l.qtyTicket) : Number(l.qty || 0);
+        const price = l.precioTicket !== undefined && l.precioTicket !== null ? Number(l.precioTicket) : Number(l.precio || 0);
+        
+        if (qty > 0) {
+          total += (qty * price);
+        }
+        
+        let subText = l.nota ? `<span class="linea-nota">⚠️ ${l.nota}</span>` : "";
+        
+        lineasHTML += `
+          <div class="linea-comanda ${l.estado || 'pendiente'}">
+            <div class="linea-izq">
+              <span class="linea-nombre">${qty}x ${l.nombre}</span>
+              ${subText}
+              <span class="linea-meta">Camarero: ${camarero}</span>
+            </div>
+            <div class="linea-der">${(qty * price).toFixed(2)} €</div>
+          </div>
+        `;
+      });
+    });
+
+  body.innerHTML = lineasHTML || `<div class="plano-sinubicar" style="text-align:center;padding:24px;">Mesa sin líneas activas.</div>`;
+  totalLabel.textContent = `${total.toFixed(2)} €`;
+}
+
+// --- RENDERIZADO Y EDICIÓN CARTA ---
+function renderCarta() {
+  if (currentView !== 'carta') return;
+  const container = document.getElementById("carta-accordion");
+  if (!container) return;
+
+  const cats = Object.entries(categoriasData).sort((a,b) => (a[1].orden ?? 999) - (b[1].orden ?? 999));
+  container.innerHTML = "";
+
+  if (cats.length === 0) {
+    container.innerHTML = `<div class="plano-sinubicar" style="text-align:center;margin-top:40px;">No hay categorías en la carta. Crea una con el botón "+".</div>`;
+    return;
+  }
+
+  cats.forEach(([cid, cat]) => {
+    const header = document.createElement("div");
+    header.className = "accordion-header";
+    header.innerHTML = `
+      <span>📂 ${cat.nombre}</span>
+      <div style="display:flex;gap:12px;align-items:center;">
+        <button style="background:var(--accent);border:none;color:#fff;font-size:13px;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;" onclick="event.stopPropagation(); abrirModalNuevoArticulo('${cid}')">+</button>
+        <span class="nav-icon">▼</span>
+      </div>
+    `;
+    
+    header.onclick = () => {
+      const isAct = header.classList.contains("active");
+      document.querySelectorAll(".accordion-header").forEach(h => h.classList.remove("active"));
+      if (!isAct) header.classList.add("active");
+    };
+
+    const content = document.createElement("div");
+    content.className = "accordion-content";
+
+    // Cargar artículos de esta categoría
+    const articulos = Object.entries(cartaData)
+      .filter(([, art]) => art.catId === cid)
+      .sort((a,b) => (a[1].nombre || "").localeCompare(b[1].nombre || ""));
+
+    if (articulos.length === 0) {
+      content.innerHTML = `<div class="plano-sinubicar" style="padding:12px;text-align:center;font-size:12px;">Sin artículos. Pulsa "+" en la cabecera para añadir.</div>`;
+    } else {
+      articulos.forEach(([aid, art]) => {
+        const row = document.createElement("div");
+        row.className = "articulo-row" + (art.disponible === false ? " disabled" : "");
+        row.innerHTML = `
+          <div class="articulo-info">
+            <span class="articulo-nombre">${art.nombre}</span>
+            <span class="articulo-precio">${Number(art.precio || 0).toFixed(2)} €</span>
+          </div>
+          <button class="btn-edit-art" onclick="abrirDrawerEditArt('${cid}','${aid}')">Editar</button>
+        `;
+        content.appendChild(row);
+      });
+    }
+
+    container.appendChild(header);
+    container.appendChild(content);
+  });
+}
+
+// --- CARTA ACCIONES (AÑADIR/EDITAR/VARIANTES) ---
+window.abrirModalNuevaCategoria = async () => {
+  const nombre = await showCustomPrompt("Nueva Categoría", "Introduce el nombre de la nueva categoría:");
+  if (!nombre || !nombre.trim()) return;
+
+  const orden = Object.keys(categoriasData).length + 1;
+  push(ref(db, "categorias"), { nombre: nombre.trim(), orden }).then(() => {
+    showToast("Categoría añadida con éxito.");
+  });
+};
+
+window.abrirModalNuevoArticulo = async (cid) => {
+  const nombre = await showCustomPrompt("Nuevo Artículo", "Nombre del nuevo artículo:");
+  if (!nombre || !nombre.trim()) return;
+  const precioStr = await showCustomPrompt("Precio Artículo", "Precio (€) del artículo (ej: 8.50):", "0.00");
+  if (precioStr === null) return;
+  const precio = parseFloat(precioStr || 0) || 0;
+
+  const newArt = {
+    catId: cid,
+    nombre: nombre.trim(),
+    precio,
+    disponible: true,
+    destino: "cocina"
+  };
+
+  push(ref(db, "carta"), newArt).then(() => {
+    showToast("Artículo añadido.");
+  });
+};
+
+// DRAWER EDICIÓN ARTÍCULO
+window.abrirDrawerEditArt = (cid, aid) => {
+  const art = cartaData[aid];
+  if (!art) return;
+
+  document.getElementById("edit-art-id").value = aid;
+  document.getElementById("edit-art-cat-id").value = cid;
+  document.getElementById("edit-art-nombre").value = art.nombre || "";
+  document.getElementById("edit-art-precio").value = Number(art.precio || 0).toFixed(2);
+  document.getElementById("edit-art-destino").value = art.destino || "cocina";
+  document.getElementById("edit-art-activo").checked = art.disponible !== false;
+  
+  // Limpiar campos variantes
+  document.getElementById("new-var-nombre").value = "";
+  document.getElementById("new-var-precio").value = "";
+
+  renderVariantesArt(art.variantes || []);
+
+  document.getElementById("overlay-edit-art").classList.add("open");
+  document.getElementById("drawer-edit-art").classList.add("open");
+};
+
+window.cerrarDrawerEditArt = () => {
+  document.getElementById("overlay-edit-art").classList.remove("open");
+  document.getElementById("drawer-edit-art").classList.remove("open");
+};
+
+function renderVariantesArt(variantes) {
+  const list = document.getElementById("art-variantes-list");
+  list.innerHTML = "";
+  
+  if (variantes.length === 0) {
+    list.innerHTML = `<div style="font-size:11px;color:var(--text-dim);text-align:center;">Sin variantes configuradas.</div>`;
+    return;
+  }
+
+  variantes.forEach((v, idx) => {
+    const row = document.createElement("div");
+    row.style.display = "flex";
+    row.style.alignItems = "center";
+    row.style.justifyContent = "space-between";
+    row.style.background = "var(--panel-light)";
+    row.style.padding = "6px 10px";
+    row.style.borderRadius = "6px";
+    row.style.fontSize = "12px";
+    
+    row.innerHTML = `
+      <span>${v.nombre} (${Number(v.precio || 0) >= 0 ? "+" : ""}${Number(v.precio || 0).toFixed(2)} €)</span>
+      <button class="btn-close-drawer" style="font-size:16px;color:var(--danger);" onclick="eliminarVarianteArticulo(${idx})">&times;</button>
+    `;
+    list.appendChild(row);
+  });
+}
+
+window.agregarVarianteArticulo = () => {
+  const nom = document.getElementById("new-var-nombre").value.trim();
+  const pre = parseFloat(document.getElementById("new-var-precio").value) || 0;
+  if (!nom) return;
+
+  const aid = document.getElementById("edit-art-id").value;
+  const art = cartaData[aid];
+  if (!art) return;
+
+  const vars = art.variantes || [];
+  vars.push({ nombre: nom, precio: pre });
+  
+  // Guardar variantes en base de datos localmente antes de guardar el artículo
+  art.variantes = vars;
+  
+  document.getElementById("new-var-nombre").value = "";
+  document.getElementById("new-var-precio").value = "";
+  renderVariantesArt(vars);
+};
+
+window.eliminarVarianteArticulo = (idx) => {
+  const aid = document.getElementById("edit-art-id").value;
+  const art = cartaData[aid];
+  if (!art) return;
+
+  const vars = art.variantes || [];
+  vars.splice(idx, 1);
+  art.variantes = vars;
+  
+  renderVariantesArt(vars);
+};
+
+window.guardarArticuloCarta = () => {
+  const aid = document.getElementById("edit-art-id").value;
+  const cid = document.getElementById("edit-art-cat-id").value;
+  const name = document.getElementById("edit-art-nombre").value.trim();
+  const price = parseFloat(document.getElementById("edit-art-precio").value) || 0;
+  const dest = document.getElementById("edit-art-destino").value;
+  const active = document.getElementById("edit-art-activo").checked;
+
+  if (!name) return;
+
+  const art = cartaData[aid];
+  const nextArt = {
+    catId: cid,
+    nombre: name,
+    precio: price,
+    destino: dest,
+    disponible: active,
+    variantes: art.variantes || null
+  };
+
+  set(ref(db, `carta/${aid}`), nextArt).then(() => {
+    cerrarDrawerEditArt();
+    showToast("Artículo actualizado.");
+  });
+};
+
+window.eliminarArticuloCarta = async () => {
+  const aid = document.getElementById("edit-art-id").value;
+  const art = cartaData[aid];
+  if (!art) return;
+
+  const seguro = await showCustomConfirm("Eliminar Artículo", `¿Seguro que deseas eliminar "${art.nombre}"?`);
+  if (!seguro) return;
+
+  remove(ref(db, `carta/${aid}`)).then(() => {
+    cerrarDrawerEditArt();
+    showToast("Artículo eliminado.");
+  });
+};
+
+// --- CONSULTA VENTAS (BAJO DEMANDA) ---
+window.cargarVentasBajoDemanda = async () => {
+  const desdeStr = document.getElementById("venta-desde").value;
+  const hastaStr = document.getElementById("venta-hasta").value;
+  if (!desdeStr || !hastaStr) return;
+
+  const dStart = new Date(`${desdeStr}T00:00:00`).getTime();
+  const dEnd = new Date(`${hastaStr}T23:59:59`).getTime();
+
+  showToast("Cargando ventas...");
+
+  try {
+    const q = query(ref(db, "historial"), orderByChild("ts"), startAt(dStart), endAt(dEnd));
+    const snap = await get(q);
+    const data = snap.val() || {};
+    const tickets = Object.values(data);
+
+    renderResumenVentas(tickets);
+  } catch (err) {
+    showToast("Error al obtener ventas.");
+  }
+};
+
+function renderResumenVentas(tickets) {
+  const resumenBox = document.getElementById("ventas-resumen");
+  const listado = document.getElementById("ventas-listado");
+  resumenBox.style.display = "grid";
+  listado.innerHTML = "";
+
+  if (tickets.length === 0) {
+    document.getElementById("stat-total").textContent = "0.00 €";
+    document.getElementById("stat-tickets").textContent = "0";
+    document.getElementById("stat-efectivo").textContent = "0.00 €";
+    document.getElementById("stat-tarjeta").textContent = "0.00 €";
+    listado.innerHTML = `<div class="plano-sinubicar" style="text-align:center;padding:24px;">No hay ventas registradas en el rango de fechas.</div>`;
+    return;
+  }
+
+  const count = tickets.length;
+  const total = tickets.reduce((s, t) => s + Number(t.total || 0), 0);
+  const efectivo = tickets.filter(t => (t.pagoMetodo || '').toLowerCase() === 'efectivo' || (t.cobro && !t.pagoMetodo)).reduce((s, t) => s + Number(t.total || 0), 0);
+  const tarjeta = tickets.filter(t => (t.pagoMetodo || '').toLowerCase() === 'tarjeta').reduce((s, t) => s + Number(t.total || 0), 0);
+
+  document.getElementById("stat-total").textContent = `${total.toFixed(2)} €`;
+  document.getElementById("stat-tickets").textContent = count;
+  document.getElementById("stat-efectivo").textContent = `${efectivo.toFixed(2)} €`;
+  document.getElementById("stat-tarjeta").textContent = `${tarjeta.toFixed(2)} €`;
+
+  tickets.sort((a,b) => b.ts - a.ts).forEach((t, idx) => {
+    const item = document.createElement("div");
+    item.className = "ticket-item";
+    
+    const timeStr = new Date(t.ts).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    const dateStr = new Date(t.ts).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+    const pag = t.pagoMetodo ? t.pagoMetodo : "Efectivo";
+
+    item.innerHTML = `
+      <div class="ticket-item-header">
+        <div style="display:flex;flex-direction:column;gap:2px;">
+          <span style="font-weight:600;">Mesa: ${t.mesa || 'Desconocida'}</span>
+          <span class="ticket-time">${dateStr} a las ${timeStr} · ${pag}</span>
+        </div>
+        <span class="ticket-total">${Number(t.total || 0).toFixed(2)} €</span>
+      </div>
+      <div class="ticket-details" id="t-det-${idx}">
+        <!-- Detalles cargados dinámicamente -->
+      </div>
+    `;
+
+    item.onclick = () => {
+      const det = document.getElementById(`t-det-${idx}`);
+      const isAct = item.classList.contains("active");
+      
+      // Cerrar otros
+      document.querySelectorAll(".ticket-item").forEach(el => el.classList.remove("active"));
+      
+      if (!isAct) {
+        item.classList.add("active");
+        
+        // Cargar desglose de artículos
+        let linesHTML = "";
+        (t.lineas || []).forEach(l => {
+          linesHTML += `
+            <div style="display:flex;justify-content:space-between;padding:3px 0;font-size:12px;">
+              <span>${l.qty}x ${l.nombre} ${l.nota ? `(${l.nota})` : ''}</span>
+              <span>${(l.qty * Number(l.precio || 0)).toFixed(2)} €</span>
+            </div>
+          `;
+        });
+        det.innerHTML = linesHTML || "Sin artículos registrados.";
+      }
+    };
+
+    listado.appendChild(item);
+  });
+}
+
+// --- CONSULTA AUDITORÍA (BAJO DEMANDA) ---
+window.cargarAuditoriaBajoDemanda = async () => {
+  const fechaVal = document.getElementById("audit-fecha").value;
+  const textoFiltro = document.getElementById("audit-filtro-texto").value.toLowerCase().trim();
+  if (!fechaVal) return;
+
+  const listado = document.getElementById("auditoria-listado");
+  listado.innerHTML = "";
+  showToast("Cargando logs...");
+
+  try {
+    const snap = await get(ref(db, `auditoria/${fechaVal}`));
+    const logs = snap.val() || {};
+    const filtered = Object.values(logs).filter(l => {
+      if (!textoFiltro) return true;
+      return (
+        String(l.accion || '').toLowerCase().includes(textoFiltro) ||
+        String(l.detalle || '').toLowerCase().includes(textoFiltro) ||
+        String(l.camarero || '').toLowerCase().includes(textoFiltro)
+      );
+    });
+
+    renderAuditoria(filtered);
+  } catch (err) {
+    showToast("Error al obtener logs.");
+  }
+};
+
+function renderAuditoria(logs) {
+  const listado = document.getElementById("auditoria-listado");
+  listado.innerHTML = "";
+
+  if (logs.length === 0) {
+    listado.innerHTML = `<div class="plano-sinubicar" style="text-align:center;padding:24px;">No hay registros de auditoría en la fecha o con el texto seleccionado.</div>`;
+    return;
+  }
+
+  logs.sort((a,b) => b.ts - a.ts).forEach(l => {
+    const item = document.createElement("div");
+    
+    // Asignar clase de estilo según tipo de acción
+    let actClass = "";
+    let isBlock = l.accion === 'login_bloqueado' || String(l.accion).includes('bloqueado');
+    let isIncorrect = String(l.accion).includes('incorrecto') || String(l.accion).includes('fallido');
+    
+    if (isBlock) {
+      actClass = "login_bloqueado";
+    } else if (isIncorrect) {
+      actClass = "login_incorrecto";
+    } else if (String(l.accion).includes("login")) {
+      actClass = "login";
+    } else if (String(l.accion).includes("mesa_cerrada")) {
+      actClass = "mesa_cerrada";
+    } else if (String(l.accion).includes("articulo_eliminado")) {
+      actClass = "articulo_eliminado";
+    } else if (String(l.accion).includes("descuento_aplicado")) {
+      actClass = "descuento_aplicado";
+    }
+
+    item.className = `timeline-item ${actClass}`;
+    
+    // Detectar inicio de sesión a horas inusuales (2:00 AM - 8:00 AM)
+    let alertHora = "";
+    if (String(l.accion).includes("login")) {
+      let hh = -1;
+      if (l.hora) {
+        hh = parseInt(l.hora.split(":")[0], 10);
+      } else if (l.ts) {
+        hh = new Date(Number(l.ts)).getHours();
+      }
+      if (hh >= 2 && hh < 8) {
+        alertHora = ' <span title="¡Hora inusual (2am-8am)!" style="color:var(--danger);font-weight:bold;margin-left:4px">⚠️</span>';
+      }
+    }
+
+    const labelTxt = l.accion + (isBlock ? ' ❗' : '');
+    
+    item.innerHTML = `
+      <div class="timeline-header">
+        <span class="timeline-time">${l.hora || '00:00:00'}${alertHora}</span>
+        <span class="timeline-user">${l.camarero || 'Desconocido'}</span>
+      </div>
+      <div class="timeline-action">${labelTxt}</div>
+      <div class="timeline-desc">${l.detalle || ''}</div>
+    `;
+    listado.appendChild(item);
+  });
+}
+
+// --- CIERRE DE CAJA ---
+window.confirmarCierreCaja = async () => {
+  const confirmacion = await showCustomConfirm("Cierre de Caja", "¿Deseas realizar el cierre de caja diario?\n\nEsto cobrará y archivará todas las mesas abiertas y enviará el reporte a la impresora.");
+  if (!confirmacion) return;
+
+  showToast("Procesando cierre...");
+
+  try {
+    // 1. Cerrar mesas abiertas
+    const cierre = await cerrarMesasAbiertasParaTurno();
+    
+    // 2. Generar resumen del día
+    const ahora = new Date();
+    const inicioDia = new Date(ahora);
+    if (ahora.getHours() < 5) {
+      inicioDia.setDate(ahora.getDate() - 1);
+    }
+    inicioDia.setHours(5, 0, 0, 0);
+    
+    const startTs = inicioDia.getTime();
+    const endTs = ahora.getTime();
+
+    const q = query(ref(db, "historial"), orderByChild("ts"), startAt(startTs), endAt(endTs));
+    const snapHistorial = await get(q);
+    const tickets = Object.values(snapHistorial.val() || {});
+    
+    let total = 0;
+    let efectivo = 0;
+    let tarjeta = 0;
+    const articulosMap = {};
+
+    tickets.forEach(t => {
+      const val = Number(t.total || 0);
+      total += val;
+      if ((t.pagoMetodo || '').toLowerCase() === 'tarjeta') {
+        tarjeta += val;
+      } else {
+        efectivo += val;
+      }
+
+      (t.lineas || []).forEach(l => {
+        const nombre = l.nombre || 'Artículo';
+        const qty = Number(l.qty || 0);
+        const precio = Number(l.precio || 0);
+        if (!articulosMap[nombre]) {
+          articulosMap[nombre] = { nombre, qty: 0, total: 0 };
+        }
+        articulosMap[nombre].qty += qty;
+        articulosMap[nombre].total += (qty * precio);
+      });
+    });
+
+    const articulos = Object.values(articulosMap).sort((a,b) => b.qty - a.qty);
+    const ticketsCount = tickets.length;
+    const ticketMedio = ticketsCount ? total / ticketsCount : 0;
+
+    const resumenDia = {
+      startTs,
+      endTs,
+      ticketsCount,
+      total,
+      efectivo,
+      tarjeta,
+      ticketMedio,
+      articulos
+    };
+
+    // 3. Crear Job de Impresión en print_jobs
+    const localSnap = await get(ref(db, "config/local"));
+    const loc = localSnap.val() || {};
+    
+    const jobContent = buildCierreCajaHtml(loc.nombre || "COMANDERO", resumenDia);
+    const printJob = {
+      ts: Date.now(),
+      type: 'ticket',
+      content: jobContent,
+      status: 'pending',
+      printerName: 'caja',
+      requestedBy: 'gerente-cierre',
+      mesaId: 'cierre',
+      mesaNombre: 'CIERRE DIARIO',
+      silent: true,
+      options: {
+        footer: 'Fin de Cierre de Caja',
+        header: 'CIERRE DIARIO'
+      }
+    };
+
+    await push(ref(db, "print_jobs"), printJob);
+    
+    // Registrar en auditoría
+    logAuditoria('cierre_caja', `Cierre realizado. Total: ${total.toFixed(2)}€ (${cierre.mesasCerradas} mesas archivadas).`);
+
+    showToast("✓ Cierre finalizado y enviado a la impresora.");
+    
+    // Recargar plano
+    renderPlano();
+
+  } catch (err) {
+    console.error(err);
+    showToast("Error al realizar el cierre de caja.");
+  }
+};
+
+async function cerrarMesasAbiertasParaTurno() {
+  const [snapMesas, snapPedidos] = await Promise.all([
+    get(ref(db, 'mesas')),
+    get(ref(db, 'pedidos'))
+  ]);
+  const mesas = snapMesas.val() || {};
+  const pedidos = snapPedidos.val() || {};
+  const ahora = new Date();
+  let mesasCerradas = 0;
+  let ticketsGenerados = 0;
+
+  for (const [mesaId, pedidosMesa] of Object.entries(pedidos)) {
+    if (!pedidosMesa || typeof pedidosMesa !== 'object') continue;
+    const mesaNombre = mesas[mesaId]?.nombre || mesaId;
+    const resumenMesa = resumirMesaParaHistorial(mesaNombre, pedidosMesa);
+
+    if (resumenMesa.lineas.length > 0) {
+      await push(ref(db, 'historial'), {
+        mesa: resumenMesa.mesa,
+        camarero: resumenMesa.camarero,
+        ts: ahora.getTime(),
+        fecha: ahora.toLocaleDateString('es-ES'),
+        hora: ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+        total: resumenMesa.total,
+        lineas: resumenMesa.lineas
+      });
+      ticketsGenerados += 1;
+    }
+
+    await remove(ref(db, `pedidos/${mesaId}`));
+    if (mesaId.startsWith('temp_')) {
+      await remove(ref(db, `mesas/${mesaId}`));
+    } else {
+      await set(ref(db, `mesas/${mesaId}/estado`), 'libre');
+    }
+    mesasCerradas += 1;
+  }
+
+  return { mesasCerradas, ticketsGenerados };
+}
+
+function resumirMesaParaHistorial(mesaNombre, pedidosMesa = {}) {
+  const todasLineas = Object.values(pedidosMesa || {})
+    .filter(envio => envio && typeof envio === 'object' && !String(envio.envioId || '').startsWith('_'))
+    .flatMap(envio => Object.values(envio.lineas || {}));
+  
+  const agrupado = {};
+  const camareros = new Set();
+
+  todasLineas.forEach(l => {
+    if (!l || l.estado === 'cancelado') return;
+    const qtyCuenta = l.qtyTicket !== undefined && l.qtyTicket !== null
+      ? Number(l.qtyTicket || 0)
+      : Number(l.qty || 0);
+    if (qtyCuenta <= 0) return;
+    if (l.camarero && l.destino !== 'descuento') camareros.add(l.camarero);
+    const key = `${l.nombre || 'Artículo'}||${Number(l.precio || 0).toFixed(2)}||${l.nota || ''}`;
+    if (!agrupado[key]) {
+      agrupado[key] = {
+        nombre: l.nombre || 'Artículo',
+        precio: Number(l.precio || 0),
+        qty: 0,
+        nota: l.nota || ''
+      };
+    }
+    agrupado[key].qty += qtyCuenta;
+  });
+
+  const lineas = Object.values(agrupado);
+  const total = lineas.reduce((s, l) => s + Number(l.precio || 0) * Number(l.qty || 0), 0);
+  return {
+    mesa: mesaNombre,
+    camarero: [...camareros].join(', '),
+    lineas,
+    total: Math.round(total * 100) / 100
+  };
+}
+
+function buildCierreCajaHtml(localNombre, resumenDia) {
+  const dateStr = new Date().toLocaleDateString('es-ES');
+  const timeStr = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+  
+  let artsHtml = (resumenDia.articulos || []).map(a => `
+    <div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:2px">
+      <span>${a.qty}x ${a.nombre}</span>
+      <span style="font-family:monospace">${a.total.toFixed(2)} €</span>
+    </div>
+  `).join('');
+
+  return `
+    <div style="font-family:sans-serif;width:280px;margin:0 auto;color:#000;background:#fff;padding:10px">
+      <div style="text-align:center;font-weight:bold;font-size:14px;margin-bottom:4px">${localNombre}</div>
+      <div style="text-align:center;font-size:9px;margin-bottom:10px">CIERRE DE CAJA DIARIO</div>
+      <div style="font-size:10px;margin-bottom:6px">Fecha: ${dateStr} ${timeStr}</div>
+      <div style="border-bottom:1px solid #000;margin-bottom:6px"></div>
+      <div style="font-size:11px;font-weight:bold;margin-bottom:6px;display:flex;justify-content:space-between">
+        <span>TOTAL FACTURADO:</span>
+        <span>${resumenDia.total.toFixed(2)} €</span>
+      </div>
+      <div style="font-size:10px;margin-bottom:4px;display:flex;justify-content:space-between">
+        <span>Efectivo:</span>
+        <span>${resumenDia.efectivo.toFixed(2)} €</span>
+      </div>
+      <div style="font-size:10px;margin-bottom:6px;display:flex;justify-content:space-between">
+        <span>Tarjeta:</span>
+        <span>${resumenDia.tarjeta.toFixed(2)} €</span>
+      </div>
+      <div style="font-size:10px;margin-bottom:10px;display:flex;justify-content:space-between">
+        <span>Nº Tickets / Medio:</span>
+        <span>${resumenDia.ticketsCount} / ${resumenDia.ticketMedio.toFixed(2)} €</span>
+      </div>
+      <div style="border-bottom:1px solid #000;margin-bottom:8px"></div>
+      <div style="font-size:10px;font-weight:bold;margin-bottom:6px;text-align:center">DESGLOSE DE ARTÍCULOS</div>
+      ${artsHtml}
+      <div style="border-bottom:1px solid #000;margin-top:8px;margin-bottom:8px"></div>
+      <div style="text-align:center;font-size:9px;color:#666">Fin de Cierre de Caja</div>
+    </div>
+  `;
+}
+
+// --- MODALES PERSONALIZADOS ---
+let currentModalResolve = null;
+
+function ocultarCustomModal() {
+  const overlay = document.getElementById("overlay-custom-modal");
+  const modal = document.getElementById("custom-modal");
+  overlay.classList.remove("open");
+  modal.style.transform = "translate(-50%, -50%) scale(0.9)";
+  modal.style.opacity = "0";
+  setTimeout(() => {
+    modal.style.display = "none";
+  }, 200);
+}
+
+window.cerrarCustomModal = () => {
+  ocultarCustomModal();
+  if (currentModalResolve) {
+    currentModalResolve(null);
+    currentModalResolve = null;
+  }
+};
+
+function mostrarCustomModal(titulo, mensaje, tipo, defaultValue = "") {
+  return new Promise((resolve) => {
+    if (currentModalResolve) {
+      currentModalResolve(null);
+    }
+    currentModalResolve = resolve;
+
+    const overlay = document.getElementById("overlay-custom-modal");
+    const modal = document.getElementById("custom-modal");
+    const titleEl = document.getElementById("custom-modal-title");
+    const msgEl = document.getElementById("custom-modal-message");
+    const inputEl = document.getElementById("custom-modal-input");
+    const btnCancel = document.getElementById("custom-modal-btn-cancel");
+    const btnOk = document.getElementById("custom-modal-btn-ok");
+
+    titleEl.textContent = titulo;
+    msgEl.textContent = mensaje;
+
+    if (tipo === "prompt") {
+      inputEl.style.display = "block";
+      inputEl.value = defaultValue;
+    } else {
+      inputEl.style.display = "none";
+    }
+
+    if (tipo === "alert") {
+      btnCancel.style.display = "none";
+    } else {
+      btnCancel.style.display = "block";
+    }
+
+    overlay.classList.add("open");
+    modal.style.display = "flex";
+    modal.style.opacity = "0";
+    modal.style.transform = "translate(-50%, -50%) scale(0.9)";
+    
+    // Forzar reflow
+    modal.offsetHeight;
+
+    setTimeout(() => {
+      modal.style.opacity = "1";
+      modal.style.transform = "translate(-50%, -50%) scale(1)";
+      if (tipo === "prompt") {
+        inputEl.focus();
+        inputEl.setSelectionRange(inputEl.value.length, inputEl.value.length);
+      }
+    }, 10);
+
+    btnOk.onclick = () => {
+      const value = tipo === "prompt" ? inputEl.value : true;
+      ocultarCustomModal();
+      currentModalResolve = null;
+      resolve(value);
+    };
+
+    btnCancel.onclick = () => {
+      ocultarCustomModal();
+      currentModalResolve = null;
+      resolve(tipo === "prompt" ? null : false);
+    };
+
+    inputEl.onkeydown = (e) => {
+      if (e.key === "Enter") {
+        btnOk.click();
+      }
+    };
+  });
+}
+
+function showCustomAlert(titulo, mensaje) {
+  return mostrarCustomModal(titulo, mensaje, "alert");
+}
+
+function showCustomConfirm(titulo, mensaje) {
+  return mostrarCustomModal(titulo, mensaje, "confirm");
+}
+
+function showCustomPrompt(titulo, mensaje, defaultValue = "") {
+  return mostrarCustomModal(titulo, mensaje, "prompt", defaultValue);
+}
+
+// --- UTILERÍAS ---
+function showToast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2500);
+}
+
+// --- GESTIÓN DE SEGURIDAD Y CAMAREROS (GERENCIA MÓVIL) ---
+let selectedEmojisMovil = [];
+const EMOJI_LIST = ['🍔', '🍺', '🍕', '🍷', '☕', '🍰', '🍦', '🍟', '🌮', '🥗'];
+
+function actualizarAjustesSeguridadMovil() {
+  const switchBloqueo = document.getElementById("switch-bloqueo-camareros-movil");
+  if (switchBloqueo) {
+    switchBloqueo.checked = seguridadData.bloqueoCamareros === true;
+  }
+  poblarExcepcionCamareroSelectorMovil();
+
+  const switchEmojis = document.getElementById('switch-emojis-activo-movil');
+  if (switchEmojis) switchEmojis.checked = seguridadData.emojisActivo === true;
+  
+  // Emojis de acceso global
+  const emojisStr = seguridadData.emojisAcceso || "";
+  selectedEmojisMovil = emojisStr ? Array.from(emojisStr) : [];
+  actualizarPreviewEmojisMovil();
+  renderEmojiPickerMovil();
+
+  // Geolocalización
+  const switchGeo = document.getElementById('switch-geo-activo-movil');
+  if (switchGeo) switchGeo.checked = seguridadData.geoActivo === true;
+  const geoLatEl = document.getElementById('config-geo-lat-movil');
+  if (geoLatEl) geoLatEl.value = seguridadData.geoLat != null ? seguridadData.geoLat : '';
+  const geoLngEl = document.getElementById('config-geo-lng-movil');
+  if (geoLngEl) geoLngEl.value = seguridadData.geoLng != null ? seguridadData.geoLng : '';
+  const geoRadioEl = document.getElementById('config-geo-radio-movil');
+  if (geoRadioEl) geoRadioEl.value = seguridadData.geoRadio || '';
+  const geoIntervaloEl = document.getElementById('config-geo-intervalo-movil');
+  if (geoIntervaloEl) geoIntervaloEl.value = String(seguridadData.geoIntervaloHoras || 3);
+}
+
+function poblarExcepcionCamareroSelectorMovil() {
+  const select = document.getElementById("select-camarero-excepcion-movil");
+  if (!select) return;
+  const currentVal = seguridadData.excepcionCamarero || "";
+  select.innerHTML = '<option value="">(Ninguno)</option>';
+  Object.entries(usuariosData || {}).forEach(([id, u]) => {
+    const option = document.createElement("option");
+    option.value = id;
+    option.textContent = u.nombre;
+    select.appendChild(option);
+  });
+  select.value = currentVal;
+}
+
+async function toggleBloqueoCamarerosGlobal() {
+  if (!db) return;
+  const switchBloqueo = document.getElementById("switch-bloqueo-camareros-movil");
+  const isChecked = switchBloqueo.checked;
+  try {
+    await update(ref(db, "config/seguridad"), {
+      bloqueoCamareros: isChecked,
+      updatedAt: Date.now()
+    });
+    console.log("Bloqueo total de camareros actualizado:", isChecked);
+  } catch (error) {
+    showCustomAlert("Seguridad", "Error al actualizar el bloqueo de camareros.");
+    switchBloqueo.checked = !isChecked; // Deshacer
+  }
+}
+
+async function actualizarExcepcionCamarero() {
+  if (!db) return;
+  const select = document.getElementById("select-camarero-excepcion-movil");
+  const val = select.value;
+  try {
+    await update(ref(db, "config/seguridad"), {
+      excepcionCamarero: val,
+      updatedAt: Date.now()
+    });
+    console.log("Excepción de camarero actualizada:", val);
+  } catch (error) {
+    showCustomAlert("Seguridad", "Error al guardar la excepción.");
+  }
+}
+
+function renderEmojiPickerMovil() {
+  const container = document.querySelector('.movil-emoji-picker');
+  if (!container) return;
+  container.innerHTML = EMOJI_LIST.map(emoji => `
+    <button type="button" onclick="window.seleccionarEmojiMovil('${emoji}')" style="font-size: 16px; padding: 6px 0; background: var(--panel-light); border: 1px solid var(--border); color: var(--text); border-radius: 4px; cursor: pointer;">${emoji}</button>
+  `).join('');
+}
+
+function seleccionarEmojiMovil(emoji) {
+  if (selectedEmojisMovil.length >= 3) return;
+  selectedEmojisMovil.push(emoji);
+  actualizarPreviewEmojisMovil();
+}
+
+function limpiarEmojisMovil() {
+  selectedEmojisMovil = [];
+  actualizarPreviewEmojisMovil();
+}
+
+function actualizarPreviewEmojisMovil() {
+  const preview = document.getElementById("movil-emojis-preview");
+  if (!preview) return;
+  const display = [];
+  for (let i = 0; i < 3; i++) {
+    display.push(selectedEmojisMovil[i] || '❓');
+  }
+  preview.textContent = display.join(' ');
+}
+
+async function guardarEmojisMovil() {
+  if (!db) return;
+  if (selectedEmojisMovil.length < 3 && selectedEmojisMovil.length > 0) {
+    showCustomAlert("Emojis", "La combinación debe tener exactamente 3 emojis, o estar vacía (para desactivar el reto).");
+    return;
+  }
+  const val = selectedEmojisMovil.join('');
+  try {
+    await update(ref(db, "config/seguridad"), {
+      emojisAcceso: val,
+      updatedAt: Date.now()
+    });
+    showCustomAlert("Emojis", "Combinación de emojis de acceso guardada con éxito.");
+  } catch (error) {
+    showCustomAlert("Emojis", "Error al actualizar la combinación de emojis.");
+  }
+}
+
+async function guardarEstadoEmojisMovil() {
+  if (!db) return;
+  const isChecked = document.getElementById('switch-emojis-activo-movil').checked;
+  try {
+    await update(ref(db, 'config/seguridad'), { emojisActivo: isChecked, updatedAt: Date.now() });
+    showCustomAlert('Emojis', 'Verificación por emojis ' + (isChecked ? 'activada' : 'desactivada') + '.');
+  } catch (error) {
+    showCustomAlert('Emojis', 'Error al actualizar la verificación por emojis.');
+    document.getElementById('switch-emojis-activo-movil').checked = !isChecked;
+  }
+}
+window.guardarEstadoEmojisMovil = guardarEstadoEmojisMovil;
+
+async function guardarEstadoGeoMovil() {
+  if (!db) return;
+  const isChecked = document.getElementById('switch-geo-activo-movil').checked;
+  try {
+    await update(ref(db, 'config/seguridad'), { geoActivo: isChecked, updatedAt: Date.now() });
+    showCustomAlert('GPS', 'Restricción por GPS ' + (isChecked ? 'activada' : 'desactivada') + '.');
+  } catch (error) {
+    showCustomAlert('GPS', 'Error al actualizar la restricción GPS.');
+    document.getElementById('switch-geo-activo-movil').checked = !isChecked;
+  }
+}
+window.guardarEstadoGeoMovil = guardarEstadoGeoMovil;
+
+function usarUbicacionActualMovil() {
+  if (!navigator.geolocation) { showCustomAlert('GPS', 'Tu navegador no soporta geolocalización.'); return; }
+  navigator.geolocation.getCurrentPosition(pos => {
+    document.getElementById('config-geo-lat-movil').value = pos.coords.latitude.toFixed(6);
+    document.getElementById('config-geo-lng-movil').value = pos.coords.longitude.toFixed(6);
+    showCustomAlert('GPS', `Ubicación capturada: ${pos.coords.latitude.toFixed(6)}, ${pos.coords.longitude.toFixed(6)}`);
+  }, err => {
+    showCustomAlert('GPS', 'Error al obtener ubicación: ' + err.message);
+  }, { enableHighAccuracy: true, timeout: 10000 });
+}
+window.usarUbicacionActualMovil = usarUbicacionActualMovil;
+
+function calcularRadioDesdeLimiteMovil() {
+  const latCenter = parseFloat(document.getElementById('config-geo-lat-movil').value);
+  const lngCenter = parseFloat(document.getElementById('config-geo-lng-movil').value);
+  if (isNaN(latCenter) || isNaN(lngCenter)) {
+    showCustomAlert('GPS', 'Primero configura el centro del local con "Usar esta ubicación".');
+    return;
+  }
+  if (!navigator.geolocation) { showCustomAlert('GPS', 'Tu navegador no soporta geolocalización.'); return; }
+  navigator.geolocation.getCurrentPosition(pos => {
+    const R = 6371000;
+    const toRad = x => x * Math.PI / 180;
+    const dLat = toRad(pos.coords.latitude - latCenter);
+    const dLon = toRad(pos.coords.longitude - lngCenter);
+    const a = Math.sin(dLat/2)**2 + Math.cos(toRad(latCenter)) * Math.cos(toRad(pos.coords.latitude)) * Math.sin(dLon/2)**2;
+    const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const radio = Math.max(50, Math.ceil(dist));
+    document.getElementById('config-geo-radio-movil').value = radio;
+    showCustomAlert('GPS', `Distancia: ${Math.round(dist)}m → Radio: ${radio}m`);
+  }, err => {
+    showCustomAlert('GPS', 'Error al obtener ubicación: ' + err.message);
+  }, { enableHighAccuracy: true, timeout: 10000 });
+}
+window.calcularRadioDesdeLimiteMovil = calcularRadioDesdeLimiteMovil;
+
+async function guardarUbicacionMovil() {
+  if (!db) return;
+  const lat = parseFloat(document.getElementById('config-geo-lat-movil').value);
+  const lng = parseFloat(document.getElementById('config-geo-lng-movil').value);
+  const radio = parseInt(document.getElementById('config-geo-radio-movil').value) || 100;
+  const intervalo = parseInt(document.getElementById('config-geo-intervalo-movil').value) || 3;
+  if (isNaN(lat) || isNaN(lng)) {
+    showCustomAlert('GPS', 'Coordenadas no válidas. Usa "Usar esta ubicación".');
+    return;
+  }
+  if (radio < 50) { showCustomAlert('GPS', 'El radio mínimo es 50 metros.'); return; }
+  try {
+    await update(ref(db, 'config/seguridad'), {
+      geoLat: lat, geoLng: lng, geoRadio: radio, geoIntervaloHoras: intervalo, updatedAt: Date.now()
+    });
+    showCustomAlert('GPS', 'Ubicación del local guardada con éxito.');
+  } catch (error) {
+    showCustomAlert('GPS', 'Error al guardar la ubicación.');
+  }
+}
+window.guardarUbicacionMovil = guardarUbicacionMovil;
+
+function renderCamarerosListado() {
+  if (currentView !== 'camareros') return;
+  const contenedor = document.getElementById("camareros-listado-movil");
+  if (!contenedor) return;
+
+  const entries = Object.entries(usuariosData || {});
+  if (entries.length === 0) {
+    contenedor.innerHTML = `<p style="font-size:13px;color:var(--text-dim);text-align:center;padding:20px;">Sin camareros registrados.</p>`;
+    return;
+  }
+
+  contenedor.innerHTML = "";
+  // Ordenar camareros por nombre
+  entries.sort(([, a], [, b]) => a.nombre.localeCompare(b.nombre));
+
+  entries.forEach(([id, u]) => {
+    const card = document.createElement("div");
+    card.style.background = "var(--panel-light)";
+    card.style.border = "1px solid var(--border)";
+    card.style.borderRadius = "8px";
+    card.style.padding = "12px";
+    card.style.display = "flex";
+    card.style.justifyContent = "space-between";
+    card.style.alignItems = "center";
+    card.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
+    
+    const isActive = u.activo !== false;
+    const tiempoRelativo = calcularTiempoRelativo(u.ultimoLogin);
+
+    card.innerHTML = `
+      <div style="display: flex; flex-direction: column; gap: 4px; flex: 1; padding-right: 12px;">
+        <span style="font-weight: 600; font-size: 14px; color: var(--text);">${u.nombre}</span>
+        <span style="font-size: 11px; color: var(--text-dim); display: flex; align-items: center; gap: 4px;">
+          🕒 ${tiempoRelativo}
+        </span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size: 11px; color: ${isActive ? "var(--success)" : "var(--danger)"}; font-weight: 600; min-width: 55px; text-align: right;">
+          ${isActive ? "ACTIVO" : "INACTIVO"}
+        </span>
+        <label class="switch" style="margin: 0; display: inline-block;">
+          <input type="checkbox" ${isActive ? "checked" : ""} onchange="window.toggleCamareroActivoMovil('${id}', this.checked)">
+          <span class="slider"></span>
+        </label>
+      </div>
+    `;
+    contenedor.appendChild(card);
+  });
+}
+
+function calcularTiempoRelativo(timestamp) {
+  if (!timestamp) return "Sin accesos registrados";
+  const difMs = Date.now() - timestamp;
+  const difSegundos = Math.floor(difMs / 1000);
+  const difMinutos = Math.floor(difSegundos / 60);
+  const difHoras = Math.floor(difMinutos / 60);
+  const difDias = Math.floor(difHoras / 24);
+
+  if (difSegundos < 60) return "Hace un momento";
+  if (difMinutos < 60) return `Hace ${difMinutos} min`;
+  if (difHoras < 24) {
+    const minsRestantes = difMinutos % 60;
+    if (minsRestantes === 0) return `Hace ${difHoras} h`;
+    return `Hace ${difHoras} h ${minsRestantes} min`;
+  }
+  return `Hace ${difDias} día${difDias > 1 ? 's' : ''}`;
+}
+
+async function toggleCamareroActivoMovil(id, activo) {
+  if (!db) return;
+  try {
+    await update(ref(db, `config/usuarios/${id}`), { activo });
+    console.log(`Estado activo del camarero ${id} actualizado a:`, activo);
+  } catch (error) {
+    showCustomAlert("Camareros", "Error al cambiar el estado del camarero.");
+  }
+}
+
+// Exponer funciones globales
+window.toggleBloqueoCamarerosGlobal = toggleBloqueoCamarerosGlobal;
+window.actualizarExcepcionCamarero = actualizarExcepcionCamarero;
+window.seleccionarEmojiMovil = seleccionarEmojiMovil;
+window.limpiarEmojisMovil = limpiarEmojisMovil;
+window.guardarEmojisMovil = guardarEmojisMovil;
+window.toggleCamareroActivoMovil = toggleCamareroActivoMovil;
+
+// Sobreescribir el alert nativo del navegador para usar nuestro modal personalizado en toda la página
+window.alert = function(mensaje) {
+  showCustomAlert("Mensaje", mensaje);
+};
+
+// Inicializar al cargar
+init();
