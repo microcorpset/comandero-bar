@@ -5264,7 +5264,6 @@ window.show = v => {
   }
   
   document.body.classList.toggle('plano-active', v === 'mesas' && mesasViewMode === 'plano');
-  document.body.classList.toggle('no-pull-refresh', v === 'carta' || v === 'ticket');
 };
 
 // ── CLIENTES AUTOCOMPLETE ──────────────────────────────────────────────────────

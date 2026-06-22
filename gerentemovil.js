@@ -1599,7 +1599,7 @@ async function guardarUbicacionMovil() {
     showCustomAlert('GPS', 'Coordenadas no válidas. Usa "Usar esta ubicación".');
     return;
   }
-  if (radio < 50) { showCustomAlert('GPS', 'El radio mínimo es 50 metros.'); return; }
+  if (radio < 1) { showCustomAlert('GPS', 'El radio mínimo es 1 metro.'); return; }
   try {
     await update(ref(db, 'config/seguridad'), {
       geoLat: lat, geoLng: lng, geoRadio: radio, geoIntervaloHoras: intervalo, updatedAt: Date.now()

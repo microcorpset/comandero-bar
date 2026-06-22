@@ -36,6 +36,9 @@
     --shadow:0 22px 70px rgba(18,27,49,.14);
   }
   *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html, body {
+    overscroll-behavior-y: contain !important;
+  }
   body{
     min-height:100vh;
     overflow-x:clip;
@@ -1173,7 +1176,6 @@
     animation: pop-bounce 0.45s ease-in-out;
   }
   #topbar-camarero, #topbar-mesa { display: none !important; }
-  body.no-pull-refresh { overscroll-behavior-y: contain !important; }
 </style>
 </head>
 <body>
@@ -1376,6 +1378,26 @@
   </div>
 </div>
 
+<script>
+  // Bloquear el gesto pull-to-refresh de forma robusta
+  let touchStartYSafari = 0;
+  window.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 1) {
+      touchStartYSafari = e.touches[0].clientY;
+    }
+  }, { passive: false });
+
+  window.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 1) {
+      const touchY = e.touches[0].clientY;
+      const touchDiff = touchY - touchStartYSafari;
+      // Si el usuario intenta deslizar hacia abajo (touchDiff > 0) y el scroll está en el tope
+      if (window.scrollY <= 0 && touchDiff > 0) {
+        e.preventDefault();
+      }
+    }
+  }, { passive: false });
+</script>
 <script type="module" src="camarero.js"></script>
 </body>
 </html>

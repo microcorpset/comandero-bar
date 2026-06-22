@@ -1339,7 +1339,7 @@ async function guardarUbicacionDev() {
     alert('Las coordenadas no son válidas. Usa "Usar esta ubicación" para capturarlas.');
     return;
   }
-  if (radio < 50) { alert('El radio mínimo es 50 metros.'); return; }
+  if (radio < 1) { alert('El radio mínimo es 1 metro.'); return; }
   try {
     await update(ref(db, 'config/seguridad'), {
       geoLat: lat, geoLng: lng, geoRadio: radio, geoIntervaloHoras: intervalo, updatedAt: Date.now()
