@@ -1149,6 +1149,25 @@
 
           <div class="toggle-row" style="margin-top: 14px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px;">
             <div class="switch-info" style="flex: 1; padding-right: 12px;">
+              <div class="toggle-label">Acceso Encargado Activo</div>
+              <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">Permitir el acceso a encargado.html</div>
+            </div>
+            <label class="switch" style="margin: 0;">
+              <input type="checkbox" id="switch-encargado-activo-movil" onchange="window.guardarEstadoEncargadoMovil()">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div style="margin-top: 10px;">
+            <label style="font-size: 12px; margin-bottom: 4px; display: block;">Contraseña Encargado</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" id="config-encargado-pass-movil" class="filter-input" placeholder="PIN o Contraseña" style="height: 32px; padding: 0 8px; font-size: 12px; flex: 1; box-sizing: border-box;">
+              <button type="button" class="btn-action" onclick="window.guardarPassEncargadoMovil()" style="height: 32px; padding: 0 10px; font-size: 11px; margin: 0; background: var(--accent); color: var(--panel); border: none; width: auto; font-weight: bold;">Guardar</button>
+            </div>
+          </div>
+
+          <div class="toggle-row" style="margin-top: 14px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px;">
+            <div class="switch-info" style="flex: 1; padding-right: 12px;">
               <div class="toggle-label">Verificación por Emojis</div>
               <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">Exigir combinación de emojis tras el PIN.</div>
             </div>
