@@ -1418,6 +1418,107 @@ window.confirmarCierreCaja = async () => {
   }
 };
 
+window.cierreDiaPasado = async () => {
+  const dateVal = document.getElementById("cierre-fecha-pasada").value;
+  if (!dateVal) {
+    showCustomAlert("Cierre Pasado", "Por favor, selecciona una fecha.");
+    return;
+  }
+  const parts = dateVal.split("-");
+  const year = parseInt(parts[0]);
+  const month = parseInt(parts[1]) - 1;
+  const day = parseInt(parts[2]);
+  
+  const startDia = new Date(year, month, day, 5, 0, 0, 0);
+  const endDia = new Date(year, month, day + 1, 5, 0, 0, 0);
+  
+  const startTs = startDia.getTime();
+  const endTs = endDia.getTime();
+
+  showToast("Buscando historial...");
+
+  try {
+    const q = query(ref(db, "historial"), orderByChild("ts"), startAt(startTs), endAt(endTs));
+    const snapHistorial = await get(q);
+    
+    if (!snapHistorial.exists()) {
+      showCustomAlert("Cierre Pasado", `No se encontraron tickets en el historial para la fecha ${parts[2]}/${parts[1]}/${parts[0]}.`);
+      return;
+    }
+
+    const tickets = Object.values(snapHistorial.val() || {});
+    let total = 0;
+    let efectivo = 0;
+    let tarjeta = 0;
+    const articulosMap = {};
+
+    tickets.forEach(t => {
+      const val = Number(t.total || 0);
+      total += val;
+      if ((t.pagoMetodo || '').toLowerCase() === 'tarjeta') {
+        tarjeta += val;
+      } else {
+        efectivo += val;
+      }
+
+      (t.lineas || []).forEach(l => {
+        const nombre = l.nombre || 'Artículo';
+        const qty = Number(l.qty || 0);
+        const precio = Number(l.precio || 0);
+        if (!articulosMap[nombre]) {
+          articulosMap[nombre] = { nombre, qty: 0, total: 0 };
+        }
+        articulosMap[nombre].qty += qty;
+        articulosMap[nombre].total += (qty * precio);
+      });
+    });
+
+    const articles = Object.values(articulosMap).sort((a,b) => b.qty - a.qty);
+    const ticketsCount = tickets.length;
+    const ticketMedio = ticketsCount ? total / ticketsCount : 0;
+
+    const resumenDia = {
+      startTs,
+      endTs,
+      ticketsCount,
+      total,
+      efectivo,
+      tarjeta,
+      ticketMedio,
+      articulos: articles
+    };
+
+    const localSnap = await get(ref(db, "config/local"));
+    const loc = localSnap.val() || {};
+    const fechaCierreTxt = `${parts[2]}/${parts[1]}/${parts[0]}`;
+    
+    const jobContent = buildCierreCajaPasadoHtml(loc.nombre || "COMANDERO", resumenDia, fechaCierreTxt);
+    const printJob = {
+      ts: Date.now(),
+      type: 'ticket',
+      content: jobContent,
+      status: 'pending',
+      printerName: 'caja',
+      requestedBy: 'gerente-cierre-pasado',
+      mesaId: 'cierre_pasado',
+      mesaNombre: 'REIMPRESION CIERRE',
+      silent: true,
+      options: {
+        footer: 'Fin de Reimpresión de Cierre',
+        header: 'REIMPRESION CIERRE'
+      }
+    };
+
+    await push(ref(db, "print_jobs"), printJob);
+    
+    logAuditoria('cierre_caja_reimpresion', `Cierre del ${fechaCierreTxt} reimpreso. Total: ${total.toFixed(2)}€`);
+    showCustomAlert("Cierre Reimpreso", `✓ Cierre del día ${fechaCierreTxt} generado y enviado a la impresora.`);
+  } catch (err) {
+    console.error(err);
+    showToast("Error al generar el cierre del día pasado.");
+  }
+};
+
 async function cerrarMesasAbiertasParaTurno() {
   const [snapMesas, snapPedidos] = await Promise.all([
     get(ref(db, 'mesas')),
@@ -1494,6 +1595,46 @@ function resumirMesaParaHistorial(mesaNombre, pedidosMesa = {}) {
     lineas,
     total: Math.round(total * 100) / 100
   };
+}
+
+function buildCierreCajaPasadoHtml(localNombre, resumenDia, fechaCierreTxt) {
+  let artsHtml = (resumenDia.articulos || []).map(a => `
+    <div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:2px">
+      <span>${a.qty}x ${a.nombre}</span>
+      <span style="font-family:monospace">${a.total.toFixed(2)} €</span>
+    </div>
+  `).join('');
+
+  return `
+    <div style="font-family:sans-serif;width:280px;margin:0 auto;color:#000;background:#fff;padding:10px">
+      <div style="text-align:center;font-weight:bold;font-size:14px;margin-bottom:4px">${localNombre}</div>
+      <div style="text-align:center;font-size:9px;margin-bottom:10px;color:#d97706;font-weight:bold;">*** REIMPRESIÓN CIERRE PASADO ***</div>
+      <div style="font-size:10px;margin-bottom:6px">Fecha del Cierre: ${fechaCierreTxt}</div>
+      <div style="font-size:9px;margin-bottom:6px;color:#555;">Reimpreso el: ${new Date().toLocaleDateString('es-ES')} ${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</div>
+      <div style="border-bottom:1px solid #000;margin-bottom:6px"></div>
+      <div style="font-size:11px;font-weight:bold;margin-bottom:6px;display:flex;justify-content:space-between">
+        <span>TOTAL FACTURADO:</span>
+        <span>${resumenDia.total.toFixed(2)} €</span>
+      </div>
+      <div style="font-size:10px;margin-bottom:4px;display:flex;justify-content:space-between">
+        <span>Efectivo:</span>
+        <span>${resumenDia.efectivo.toFixed(2)} €</span>
+      </div>
+      <div style="font-size:10px;margin-bottom:6px;display:flex;justify-content:space-between">
+        <span>Tarjeta:</span>
+        <span>${resumenDia.tarjeta.toFixed(2)} €</span>
+      </div>
+      <div style="font-size:10px;margin-bottom:10px;display:flex;justify-content:space-between">
+        <span>Nº Tickets / Medio:</span>
+        <span>${resumenDia.ticketsCount} / ${resumenDia.ticketMedio.toFixed(2)} €</span>
+      </div>
+      <div style="border-bottom:1px solid #000;margin-bottom:8px"></div>
+      <div style="font-size:10px;font-weight:bold;margin-bottom:6px;text-align:center">DESGLOSE DE ARTÍCULOS</div>
+      ${artsHtml}
+      <div style="border-bottom:1px solid #000;margin-top:8px;margin-bottom:8px"></div>
+      <div style="text-align:center;font-size:9px;color:#666">Fin de Reimpresión de Cierre</div>
+    </div>
+  `;
 }
 
 function buildCierreCajaHtml(localNombre, resumenDia) {

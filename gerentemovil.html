@@ -1232,6 +1232,16 @@
             <button type="button" class="btn-action" onclick="window.guardarUbicacionMovil()" style="width:100%; margin-top:6px; height:36px; font-size:12px; background:var(--accent); color:var(--panel); border:none; font-weight:bold;">💾 Guardar Ubicación</button>
           </div>
         </div>
+
+        <!-- Cierre de Caja Pasado -->
+        <div class="filter-card" style="margin-bottom: 16px;">
+          <h3 style="margin-top: 0; margin-bottom: 12px; font-size: 15px; color: var(--warn); border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 8px;">Reimprimir Cierre Pasado</h3>
+          <p style="font-size: 11px; color: var(--text-dim); margin-bottom: 10px;">Genera y envía a la impresora de caja el reporte completo de un día anterior en base al historial de tickets.</p>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <input type="date" id="cierre-fecha-pasada" class="filter-input" style="height: 38px; padding: 0 8px; font-size: 13px; flex: 1; box-sizing: border-box; background-color: var(--panel-light); border: 1px solid var(--border); color: var(--text); border-radius: 8px;">
+            <button type="button" class="btn-action" onclick="window.cierreDiaPasado()" style="height: 38px; padding: 0 12px; font-size: 12px; margin: 0; background: var(--warn); color: var(--panel); border: none; width: auto; font-weight: bold; border-radius: 8px;">Imprimir Cierre</button>
+          </div>
+        </div>
         
         <!-- Listado de Camareros -->
         <h3 style="margin-left: 4px; margin-bottom: 10px; font-size: 14px; color: var(--text-dim);">Estado de Camareros</h3>

@@ -262,11 +262,13 @@ function renderCarta() {
     const esAbierta = accordionState[cid] === true;
     
     // Obtener artículos de la categoría
-    const artsCat = Object.entries(cartaData).filter(([_, art]) => art.categoria === cid);
+    const artsCat = Object.entries(cartaData)
+      .filter(([_, art]) => art.catId === cid)
+      .sort((a, b) => (a[1].nombre || "").localeCompare(b[1].nombre || ""));
     
     const artsHtml = artsCat.length > 0 
       ? artsCat.map(([aid, art]) => `
-          <div class="art-item ${art.activo === false ? 'inactive' : ''}">
+          <div class="art-item ${art.disponible === false ? 'inactive' : ''}">
             <div class="art-info">
               <div class="art-name">${art.nombre}</div>
               <div class="art-price">${Number(art.precio || 0).toFixed(2)} €</div>
@@ -316,7 +318,7 @@ function abrirDrawerEditCat(cid) {
   
   document.getElementById("edit-cat-id").value = cid;
   document.getElementById("edit-cat-nombre").value = cat.nombre || "";
-  document.getElementById("edit-cat-notas").value = cat.notasPredefinidas ? cat.notasPredefinidas.join(", ") : "";
+  document.getElementById("edit-cat-notas").value = cat.notasPredefinidas || "";
   
   renderVariantesCat(cat.variantes || []);
   
@@ -389,30 +391,21 @@ async function abrirModalNuevaCategoria() {
 async function guardarCategoriaCarta() {
   const cid = document.getElementById("edit-cat-id").value;
   const nombre = document.getElementById("edit-cat-nombre").value.trim();
-  const notasStr = document.getElementById("edit-cat-notas").value.trim();
+  const notas = document.getElementById("edit-cat-notas").value.trim() || null;
   
   if (!nombre) {
     toast("El nombre no puede estar vacío");
     return;
   }
   
-  const notas = notasStr ? notasStr.split(",").map(n => n.trim()).filter(n => n) : null;
   const catActual = categoriasData[cid] || {};
   
   const updatedData = {
     ...catActual,
     nombre,
-    variantes: tempVariantesCat
+    variantes: tempVariantesCat,
+    notasPredefinidas: notas
   };
-  
-  if (notas) {
-    updatedData.notasPredefinidas = notas;
-  } else {
-    // Si está vacío, borrar el nodo en Firebase
-    if (updatedData.hasOwnProperty("notasPredefinidas")) {
-      delete updatedData.notasPredefinidas;
-    }
-  }
 
   try {
     await set(ref(db, `categorias/${cid}`), updatedData);
@@ -435,7 +428,7 @@ async function eliminarCategoriaCarta() {
     if (!conf) return;
     try {
       // 1. Borrar artículos vinculados
-      const artsCat = Object.keys(cartaData).filter(aid => cartaData[aid].categoria === cid);
+      const artsCat = Object.keys(cartaData).filter(aid => cartaData[aid].catId === cid);
       for (const aid of artsCat) {
         await remove(ref(db, `carta/${aid}`));
       }
@@ -463,13 +456,13 @@ function abrirDrawerEditArt(cid, aid) {
   document.getElementById("edit-art-nombre").value = art.nombre || "";
   document.getElementById("edit-art-precio").value = art.precio != null ? art.precio : "";
   document.getElementById("edit-art-destino").value = art.destino || "cocina";
-  document.getElementById("edit-art-activo").checked = art.activo !== false;
-  document.getElementById("edit-art-notas").value = art.notasPredefinidas ? art.notasPredefinidas.join(", ") : "";
+  document.getElementById("edit-art-activo").checked = art.disponible !== false;
+  document.getElementById("edit-art-notas").value = art.notasPredefinidas || "";
   
   // Combo flag y panel
   const esCombo = art.esCombo === true;
   document.getElementById("edit-art-escombo").checked = esCombo;
-  tempComboGroups = art.comboGroups ? [...art.comboGroups] : [];
+  tempComboGroups = getComboGroupsMovil(aid);
   
   const comboPanel = document.getElementById("combo-panel-movil");
   comboPanel.style.display = esCombo ? "flex" : "none";
@@ -492,6 +485,25 @@ function toggleComboPanelMovil() {
   document.getElementById("combo-panel-movil").style.display = isChecked ? "flex" : "none";
 }
 
+function getComboGroupsMovil(aid) {
+  const art = cartaData[aid];
+  const raw = art?.comboGroups;
+  if (!raw) return [];
+  const arr = Array.isArray(raw) ? raw : Object.values(raw);
+  return arr.map(g => {
+    if (!g) return null;
+    const itemsRaw = g.items;
+    const itemsArr = itemsRaw ? (Array.isArray(itemsRaw) ? itemsRaw : Object.values(itemsRaw)) : [];
+    return {
+      nombre: g.nombre || '',
+      items: itemsArr.filter(Boolean).map(item => ({
+        artId: item.artId || '',
+        suplemento: parseFloat(item.suplemento) || 0
+      }))
+    };
+  }).filter(Boolean);
+}
+
 // --- LOGICA DE COMBOS MOVIL ---
 function updateEditComboGroupsListMovil(aid) {
   const container = document.getElementById("combo-groups-lista-movil");
@@ -502,78 +514,96 @@ function updateEditComboGroupsListMovil(aid) {
     return;
   }
 
-  // Filtrar artículos que no sean combos para poder elegirlos
-  const todosLosArticulos = Object.entries(cartaData).filter(([id]) => id !== aid);
-
-  container.innerHTML = tempComboGroups.map((group, gIdx) => {
-    const opcionesHtml = (group.opciones || []).map((op, itemIdx) => {
-      // Selector de artículo
-      let selHtml = `<select class="form-input" style="height:32px;font-size:12px;padding:0 6px;flex:2;" onchange="window.cambiarOpcionComboArticuloMovil(${gIdx}, ${itemIdx}, this.value)">`;
-      selHtml += `<option value="">-- Elige artículo --</option>`;
-      todosLosArticulos.forEach(([id, a]) => {
-        const selected = op.articuloId === id ? 'selected' : '';
-        selHtml += `<option value="${id}" ${selected}>${a.nombre}</option>`;
-      });
-      selHtml += `</select>`;
-
-      return `
-        <div style="display:flex;gap:6px;align-items:center;">
-          ${selHtml}
-          <input type="number" step="0.01" class="form-input" placeholder="+0.00" value="${op.suplemento || ''}" style="height:32px;font-size:12px;padding:0 6px;flex:1;" onchange="window.cambiarOpcionComboSuplementoMovil(${gIdx}, ${itemIdx}, this.value)">
-          <button class="btn-close-drawer" onclick="window.eliminarOpcionComboMovil(${gIdx}, ${itemIdx})" style="font-size:14px;color:var(--danger);background:none;border:none;cursor:pointer;">&times;</button>
-        </div>
-      `;
+  // Cargar lista de otros artículos ordenada
+  const otherArticlesHTML = Object.entries(categoriasData)
+    .sort(([, ca], [, cb]) => (ca.orden ?? 999) - (cb.orden ?? 999) || ca.nombre.localeCompare(cb.nombre, 'es'))
+    .map(([catId, cat]) => {
+      const catArts = Object.entries(cartaData)
+        .filter(([itemId, item]) => item.catId === catId && itemId !== aid)
+        .sort(([, artA], [, artB]) => (artA.orden || 0) - (artB.orden || 0) || artA.nombre.localeCompare(artB.nombre, 'es'));
+      if (!catArts.length) return '';
+      return `<optgroup label="${cat.nombre}">
+        ${catArts.map(([itemId, item]) => `<option value="${itemId}">${item.nombre} (${Number(item.precio).toFixed(2)} €)</option>`).join('')}
+      </optgroup>`;
     }).join('');
 
-    return `
-      <div style="border: 1px solid var(--border); border-radius: 8px; padding: 10px; background: rgba(0,0,0,0.15); display:flex; flex-direction:column; gap:8px;">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <input type="text" class="form-input" placeholder="Nombre grupo (ej: Bebida)" value="${group.nombre || ''}" style="height:30px;font-size:13px;padding:0 8px;font-weight:600;flex:1;" onchange="window.cambiarNombreGrupoComboMovil(${gIdx}, this.value)">
-          <button class="btn-close-drawer" onclick="window.eliminarGrupoComboMovil(${gIdx})" style="font-size:16px;color:var(--danger);background:none;border:none;cursor:pointer;">&times;</button>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:6px;margin-left:8px;border-left:2px solid var(--border);padding-left:8px;">
-          ${opcionesHtml}
-          <button class="btn-edit-art" onclick="window.agregarOpcionComboMovil(${gIdx})" style="padding:0 8px;font-size:11px;height:30px;background:var(--accent);color:white;border-color:var(--accent);align-self:flex-start;width:auto;">+ Añadir Opción</button>
-        </div>
+  container.innerHTML = tempComboGroups.map((g, gIdx) => `
+    <div style="background:var(--panel-light);border:1px solid var(--border);border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:6px;margin-bottom:6px">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);padding-bottom:4px">
+        <span style="font-weight:bold;font-size:12px;color:var(--text)">Grupo: ${g.nombre}</span>
+        <button class="btn-close-drawer" onclick="window.eliminarGrupoComboMovil(${gIdx})" style="font-size:16px;color:var(--danger);background:none;border:none;cursor:pointer;">&times;</button>
       </div>
-    `;
-  }).join('');
+      <div style="display:flex;flex-direction:column;gap:4px">
+        ${(g.items || []).map((item, itemIdx) => {
+          const subArt = cartaData[item.artId];
+          const subArtNombre = subArt ? subArt.nombre : '[Artículo Eliminado]';
+          return `
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:2px 0">
+              <span>${subArtNombre} ${item.suplemento > 0 ? `<b style="color:var(--accent2)">+${Number(item.suplemento).toFixed(2)} €</b>` : '<span style="color:var(--text-dim)">Sin supl.</span>'}</span>
+              <button class="btn-close-drawer" onclick="window.eliminarOpcionComboMovil(${gIdx}, ${itemIdx})" style="font-size:14px;color:var(--danger);background:none;border:none;cursor:pointer;">&times;</button>
+            </div>
+          `;
+        }).join('')}
+      </div>
+      <div style="display:flex;gap:4px;margin-top:4px;align-items:center">
+        <select id="combo-art-select-movil-${gIdx}" class="form-input" style="flex:1;font-size:11px;height:30px;padding:2px 6px;">
+          <option value="">— Seleccionar artículo —</option>
+          ${otherArticlesHTML}
+        </select>
+        <input type="number" id="combo-supl-input-movil-${gIdx}" placeholder="Supl. €" step="0.05" min="0" class="form-input" style="width:70px;font-size:11px;height:30px;padding:2px 6px;" />
+        <button class="btn-edit-art" onclick="window.agregarOpcionComboMovil(${gIdx})" style="padding:0 8px;font-size:11px;height:30px;background:var(--accent);color:white;border-color:var(--accent);">+ Añadir</button>
+      </div>
+    </div>
+  `).join('');
 }
 
-window.cambiarNombreGrupoComboMovil = (gIdx, val) => {
-  tempComboGroups[gIdx].nombre = val.trim();
-};
-
-window.cambiarOpcionComboArticuloMovil = (gIdx, itemIdx, val) => {
-  tempComboGroups[gIdx].opciones[itemIdx].articuloId = val;
-};
-
-window.cambiarOpcionComboSuplementoMovil = (gIdx, itemIdx, val) => {
-  tempComboGroups[gIdx].opciones[itemIdx].suplemento = parseFloat(val) || 0;
-};
-
-window.agregarGrupoComboMovil = () => {
-  tempComboGroups.push({ nombre: "Nuevo Grupo", opciones: [] });
+window.agregarGrupoComboMovil = async () => {
   const aid = document.getElementById("edit-art-id").value;
+  const nombre = await showCustomPrompt("Nuevo Grupo", "Nombre del grupo (ej: Primeros, Segundos, Postres):");
+  if (!nombre || !nombre.trim()) return;
+  const groups = getComboGroupsMovil(aid);
+  groups.push({ nombre: nombre.trim(), items: [] });
+  const art = cartaData[aid];
+  art.comboGroups = groups;
   updateEditComboGroupsListMovil(aid);
 };
 
-window.eliminarGrupoComboMovil = (groupIdx) => {
-  tempComboGroups.splice(groupIdx, 1);
+window.eliminarGrupoComboMovil = async (groupIdx) => {
   const aid = document.getElementById("edit-art-id").value;
+  const seguro = await showCustomConfirm("Eliminar Grupo", "¿Deseas eliminar este grupo del combo?");
+  if (!seguro) return;
+  const groups = getComboGroupsMovil(aid).filter((_, idx) => idx !== groupIdx);
+  const art = cartaData[aid];
+  art.comboGroups = groups.length ? groups : null;
   updateEditComboGroupsListMovil(aid);
 };
 
 window.agregarOpcionComboMovil = (groupIdx) => {
-  if (!tempComboGroups[groupIdx].opciones) tempComboGroups[groupIdx].opciones = [];
-  tempComboGroups[groupIdx].opciones.push({ articuloId: "", suplemento: 0 });
   const aid = document.getElementById("edit-art-id").value;
+  const selectEl = document.getElementById(`combo-art-select-movil-${groupIdx}`);
+  const suplEl = document.getElementById(`combo-supl-input-movil-${groupIdx}`);
+  if (!selectEl || !suplEl) return;
+  const artId = selectEl.value;
+  const suplemento = parseFloat(suplEl.value) || 0;
+  if (!artId) { toast("Elige un artículo"); return; }
+  
+  const groups = getComboGroupsMovil(aid);
+  if (!groups[groupIdx]) return;
+  groups[groupIdx].items.push({ artId, suplemento });
+  
+  const art = cartaData[aid];
+  art.comboGroups = groups;
   updateEditComboGroupsListMovil(aid);
 };
 
 window.eliminarOpcionComboMovil = (groupIdx, itemIdx) => {
-  tempComboGroups[groupIdx].opciones.splice(itemIdx, 1);
   const aid = document.getElementById("edit-art-id").value;
+  const groups = getComboGroupsMovil(aid);
+  if (!groups[groupIdx]) return;
+  groups[groupIdx].items = groups[groupIdx].items.filter((_, idx) => idx !== itemIdx);
+  
+  const art = cartaData[aid];
+  art.comboGroups = groups.length ? groups : null;
   updateEditComboGroupsListMovil(aid);
 };
 
@@ -622,10 +652,10 @@ async function abrirModalNuevoArticulo(cid) {
     try {
       const newRef = push(ref(db, "carta"), {
         nombre: nombre.trim(),
-        categoria: cid,
+        catId: cid,
         precio: 0.00,
         destino: "cocina",
-        activo: true
+        disponible: true
       });
       toast("Artículo creado");
       setTimeout(() => abrirDrawerEditArt(cid, newRef.key), 300);
@@ -641,8 +671,8 @@ async function guardarArticuloCarta() {
   const nombre = document.getElementById("edit-art-nombre").value.trim();
   const precio = parseFloat(document.getElementById("edit-art-precio").value) || 0;
   const destino = document.getElementById("edit-art-destino").value;
-  const activo = document.getElementById("edit-art-activo").checked;
-  const notasStr = document.getElementById("edit-art-notes").value.trim();
+  const disponible = document.getElementById("edit-art-activo").checked;
+  const notas = document.getElementById("edit-art-notas").value.trim() || null;
   const esCombo = document.getElementById("edit-art-escombo").checked;
 
   if (!nombre) {
@@ -650,7 +680,6 @@ async function guardarArticuloCarta() {
     return;
   }
 
-  const notas = notasStr ? notasStr.split(",").map(n => n.trim()).filter(n => n) : null;
   const artActual = cartaData[aid] || {};
 
   const updatedData = {
@@ -658,18 +687,19 @@ async function guardarArticuloCarta() {
     nombre,
     precio,
     destino,
-    activo,
-    categoria: cid,
+    disponible,
+    catId: cid,
     variantes: tempVariantesArt,
-    esCombo
+    esCombo,
+    notasPredefinidas: notas
   };
 
   if (esCombo) {
     // Validar nombres de grupo vacíos o sin opciones
     const validGroups = tempComboGroups.map(g => ({
       nombre: (g.nombre || "Selección").trim(),
-      opciones: (g.opciones || []).filter(o => o.articuloId !== "")
-    })).filter(g => g.opciones.length > 0);
+      items: (g.items || []).filter(o => o.artId !== "")
+    })).filter(g => g.items.length > 0);
 
     updatedData.comboGroups = validGroups;
   } else {
@@ -678,9 +708,7 @@ async function guardarArticuloCarta() {
     }
   }
 
-  if (notas) {
-    updatedData.notasPredefinidas = notas;
-  } else {
+  if (!notas) {
     if (updatedData.hasOwnProperty("notasPredefinidas")) {
       delete updatedData.notasPredefinidas;
     }
