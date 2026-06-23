@@ -653,6 +653,14 @@ document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && autoWake) activarWakeLock();
 });
 
+// Evitar recarga accidental de la página cuando se está en una mesa
+window.addEventListener('beforeunload', (e) => {
+  if (mesaId) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
 window.toggleCatsPanel = () => {
   const panel = document.getElementById('cats-panel');
   if (!panel) return;
