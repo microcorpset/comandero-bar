@@ -1306,6 +1306,29 @@
         </label>
       </div>
 
+      <!-- NOTAS PREDEFINIDAS DEL ARTÍCULO -->
+      <div class="form-group" style="margin-top: 12px;">
+        <label>Notas Predefinidas (separadas por comas)</label>
+        <input type="text" id="edit-art-notas" class="form-input" placeholder="Ej: Poco hecho, Sin cebolla, Salsa aparte">
+      </div>
+
+      <!-- SECCIÓN COMBOS (MENÚ / DESAYUNOS) -->
+      <div style="margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px;">
+        <div class="toggle-row" style="margin-bottom: 8px;">
+          <span class="toggle-label" style="font-weight: 600;">Es un Combo (Menú / Desayuno)</span>
+          <label class="switch">
+            <input type="checkbox" id="edit-art-escombo" onchange="toggleComboPanelMovil()">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div id="combo-panel-movil" style="display: none; flex-direction: column; gap: 10px;">
+          <div id="combo-groups-lista-movil" style="display: flex; flex-direction: column; gap: 8px;">
+            <!-- Listado de grupos de combo y sus opciones -->
+          </div>
+          <button class="btn-edit-art" style="background: var(--success); border-color: var(--success); color: white; width: 100%; height: 36px; font-size: 12px;" onclick="agregarGrupoComboMovil()">+ Añadir Grupo</button>
+        </div>
+      </div>
+
       <!-- SECCIÓN VARIANTES -->
       <div style="margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px;">
         <div style="font-size: 13px; font-weight: 600; color: var(--text-dim); margin-bottom: 8px;">VARIANTES (OPCIONES)</div>
@@ -1323,6 +1346,45 @@
     <div class="drawer-footer" style="display: flex; gap: 8px;">
       <button class="btn-action" style="background: var(--panel-light); border: 1px solid var(--border); color: var(--text); flex: 1;" onclick="eliminarArticuloCarta()">Eliminar</button>
       <button class="btn-action" style="flex: 2;" onclick="guardarArticuloCarta()">Guardar Cambios</button>
+    </div>
+  </div>
+
+  <!-- DRAWER: EDICIÓN DE CATEGORÍA -->
+  <div class="drawer-overlay" id="overlay-edit-cat" onclick="cerrarDrawerEditCat()"></div>
+  <div class="drawer" id="drawer-edit-cat">
+    <div class="drawer-header">
+      <div class="drawer-title" id="edit-cat-title">Editar Categoría</div>
+      <button class="btn-close-drawer" onclick="cerrarDrawerEditCat()">&times;</button>
+    </div>
+    <div class="drawer-body">
+      <input type="hidden" id="edit-cat-id">
+      
+      <div class="form-group">
+        <label>Nombre de la Categoría</label>
+        <input type="text" id="edit-cat-nombre" class="form-input">
+      </div>
+      
+      <div class="form-group" style="margin-top: 12px;">
+        <label>Notas Predefinidas (separadas por comas)</label>
+        <input type="text" id="edit-cat-notas" class="form-input" placeholder="Ej: Sin hielo, Sin sal, Para llevar">
+      </div>
+
+      <!-- SECCIÓN VARIANTES DE CATEGORÍA -->
+      <div style="margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px;">
+        <div style="font-size: 13px; font-weight: 600; color: var(--text-dim); margin-bottom: 8px;">VARIANTES COMPARTIDAS (OPCIONES)</div>
+        <div id="cat-variantes-list" style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px;">
+          <!-- Listado de variantes de la categoría -->
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <input type="text" id="new-cat-var-nombre" class="form-input" placeholder="Nombre (ej: Doble)" style="flex: 2;">
+          <input type="number" step="0.01" id="new-cat-var-precio" class="form-input" placeholder="+0.00" style="flex: 1;">
+          <button class="btn-edit-art" onclick="agregarVarianteCategoria()" style="background: var(--accent); border-color: var(--accent); color: white; padding: 0 12px;">Añadir</button>
+        </div>
+      </div>
+    </div>
+    <div class="drawer-footer" style="display: flex; gap: 8px;">
+      <button class="btn-action" style="background: var(--panel-light); border: 1px solid var(--border); color: var(--text); flex: 1;" onclick="eliminarCategoriaCarta()">Eliminar</button>
+      <button class="btn-action" style="flex: 2;" onclick="guardarCategoriaCarta()">Guardar Cambios</button>
     </div>
   </div>
 

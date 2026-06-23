@@ -682,7 +682,8 @@ function renderCarta() {
     header.className = "accordion-header";
     header.innerHTML = `
       <span>📂 ${cat.nombre}</span>
-      <div style="display:flex;gap:12px;align-items:center;">
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button style="background:var(--panel-light);border:1px solid var(--border);color:var(--text);font-size:12px;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;" onclick="event.stopPropagation(); abrirDrawerEditCat('${cid}')">⚙</button>
         <button style="background:var(--accent);border:none;color:#fff;font-size:13px;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;" onclick="event.stopPropagation(); abrirModalNuevoArticulo('${cid}')">+</button>
         <span class="nav-icon">▼</span>
       </div>
@@ -766,12 +767,18 @@ window.abrirDrawerEditArt = (cid, aid) => {
   document.getElementById("edit-art-precio").value = Number(art.precio || 0).toFixed(2);
   document.getElementById("edit-art-destino").value = art.destino || "cocina";
   document.getElementById("edit-art-activo").checked = art.disponible !== false;
+  document.getElementById("edit-art-notas").value = art.notasPredefinidas || "";
+  
+  const esCombo = art.esCombo === true;
+  document.getElementById("edit-art-escombo").checked = esCombo;
+  document.getElementById("combo-panel-movil").style.display = esCombo ? "flex" : "none";
   
   // Limpiar campos variantes
   document.getElementById("new-var-nombre").value = "";
   document.getElementById("new-var-precio").value = "";
 
   renderVariantesArt(art.variantes || []);
+  updateEditComboGroupsListMovil(aid);
 
   document.getElementById("overlay-edit-art").classList.add("open");
   document.getElementById("drawer-edit-art").classList.add("open");
@@ -803,7 +810,7 @@ function renderVariantesArt(variantes) {
     
     row.innerHTML = `
       <span>${v.nombre} (${Number(v.precio || 0) >= 0 ? "+" : ""}${Number(v.precio || 0).toFixed(2)} €)</span>
-      <button class="btn-close-drawer" style="font-size:16px;color:var(--danger);" onclick="eliminarVarianteArticulo(${idx})">&times;</button>
+      <button class="btn-close-drawer" style="font-size:16px;color:var(--danger);background:none;border:none;cursor:pointer;" onclick="eliminarVarianteArticulo(${idx})">&times;</button>
     `;
     list.appendChild(row);
   });
@@ -841,6 +848,241 @@ window.eliminarVarianteArticulo = (idx) => {
   renderVariantesArt(vars);
 };
 
+// --- GESTIÓN DE COMBOS EN MÓVIL ---
+window.toggleComboPanelMovil = () => {
+  const aid = document.getElementById("edit-art-id").value;
+  const chk = document.getElementById("edit-art-escombo");
+  const panel = document.getElementById("combo-panel-movil");
+  if (chk && panel) {
+    const esCombo = chk.checked;
+    panel.style.display = esCombo ? "flex" : "none";
+    if (esCombo) {
+      updateEditComboGroupsListMovil(aid);
+    }
+  }
+};
+
+function getComboGroupsMovil(aid) {
+  const art = cartaData[aid];
+  const raw = art?.comboGroups;
+  if (!raw) return [];
+  const arr = Array.isArray(raw) ? raw : Object.values(raw);
+  return arr.map(g => {
+    if (!g) return null;
+    const itemsRaw = g.items;
+    const itemsArr = itemsRaw ? (Array.isArray(itemsRaw) ? itemsRaw : Object.values(itemsRaw)) : [];
+    return {
+      nombre: g.nombre || '',
+      items: itemsArr.filter(Boolean).map(item => ({
+        artId: item.artId || '',
+        suplemento: parseFloat(item.suplemento) || 0
+      }))
+    };
+  }).filter(Boolean);
+}
+
+window.updateEditComboGroupsListMovil = (aid) => {
+  const el = document.getElementById("combo-groups-lista-movil");
+  if (!el) return;
+  const comboGroups = getComboGroupsMovil(aid);
+  
+  const otherArticlesHTML = Object.entries(categoriasData)
+    .sort(([, ca], [, cb]) => (ca.orden ?? 999) - (cb.orden ?? 999) || ca.nombre.localeCompare(cb.nombre, 'es'))
+    .map(([catId, cat]) => {
+      const catArts = Object.entries(cartaData)
+        .filter(([itemId, item]) => item.catId === catId && itemId !== aid)
+        .sort(([, artA], [, artB]) => (artA.orden || 0) - (artB.orden || 0) || artA.nombre.localeCompare(artB.nombre, 'es'));
+      if (!catArts.length) return '';
+      return `<optgroup label="${cat.nombre}">
+        ${catArts.map(([itemId, item]) => `<option value="${itemId}">${item.nombre} (${Number(item.precio).toFixed(2)} €)</option>`).join('')}
+      </optgroup>`;
+    }).join('');
+
+  el.innerHTML = comboGroups.map((g, gIdx) => `
+    <div style="background:var(--panel-light);border:1px solid var(--border);border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:6px;margin-bottom:6px">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);padding-bottom:4px">
+        <span style="font-weight:bold;font-size:12px;color:var(--text)">Grupo: ${g.nombre}</span>
+        <button class="btn-close-drawer" onclick="window.eliminarGrupoComboMovil(${gIdx})" style="font-size:16px;color:var(--danger);background:none;border:none;cursor:pointer;">&times;</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        ${(g.items || []).map((item, itemIdx) => {
+          const subArt = cartaData[item.artId];
+          const subArtNombre = subArt ? subArt.nombre : '[Artículo Eliminado]';
+          return `
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:2px 0">
+              <span>${subArtNombre} ${item.suplemento > 0 ? `<b style="color:var(--accent2)">+${Number(item.suplemento).toFixed(2)} €</b>` : '<span style="color:var(--text-dim)">Sin supl.</span>'}</span>
+              <button class="btn-close-drawer" onclick="window.eliminarOpcionComboMovil(${gIdx}, ${itemIdx})" style="font-size:14px;color:var(--danger);background:none;border:none;cursor:pointer;">&times;</button>
+            </div>
+          `;
+        }).join('')}
+      </div>
+      <div style="display:flex;gap:4px;margin-top:4px;align-items:center">
+        <select id="combo-art-select-movil-${gIdx}" class="form-input" style="flex:1;font-size:11px;height:30px;padding:2px 6px;">
+          <option value="">— Seleccionar artículo —</option>
+          ${otherArticlesHTML}
+        </select>
+        <input type="number" id="combo-supl-input-movil-${gIdx}" placeholder="Supl. €" step="0.05" min="0" class="form-input" style="width:70px;font-size:11px;height:30px;padding:2px 6px;" />
+        <button class="btn-edit-art" onclick="window.agregarOpcionComboMovil(${gIdx})" style="padding:0 8px;font-size:11px;height:30px;background:var(--accent);color:white;border-color:var(--accent);">+ Añadir</button>
+      </div>
+    </div>
+  `).join('');
+};
+
+window.agregarGrupoComboMovil = async () => {
+  const aid = document.getElementById("edit-art-id").value;
+  const nombre = await showCustomPrompt("Nuevo Grupo", "Nombre del grupo (ej: Primeros, Segundos, Postres):");
+  if (!nombre || !nombre.trim()) return;
+  const groups = getComboGroupsMovil(aid);
+  groups.push({ nombre: nombre.trim(), items: [] });
+  const art = cartaData[aid];
+  art.comboGroups = groups;
+  updateEditComboGroupsListMovil(aid);
+};
+
+window.eliminarGrupoComboMovil = async (groupIdx) => {
+  const aid = document.getElementById("edit-art-id").value;
+  const seguro = await showCustomConfirm("Eliminar Grupo", "¿Deseas eliminar este grupo del combo?");
+  if (!seguro) return;
+  const groups = getComboGroupsMovil(aid).filter((_, idx) => idx !== groupIdx);
+  const art = cartaData[aid];
+  art.comboGroups = groups.length ? groups : null;
+  updateEditComboGroupsListMovil(aid);
+};
+
+window.agregarOpcionComboMovil = (groupIdx) => {
+  const aid = document.getElementById("edit-art-id").value;
+  const selectEl = document.getElementById(`combo-art-select-movil-${groupIdx}`);
+  const suplEl = document.getElementById(`combo-supl-input-movil-${groupIdx}`);
+  if (!selectEl || !suplEl) return;
+  const artId = selectEl.value;
+  const suplemento = parseFloat(suplEl.value) || 0;
+  if (!artId) { showToast("Elige un artículo"); return; }
+  
+  const groups = getComboGroupsMovil(aid);
+  if (!groups[groupIdx]) return;
+  groups[groupIdx].items.push({ artId, suplemento });
+  
+  const art = cartaData[aid];
+  art.comboGroups = groups;
+  updateEditComboGroupsListMovil(aid);
+};
+
+window.eliminarOpcionComboMovil = (groupIdx, itemIdx) => {
+  const aid = document.getElementById("edit-art-id").value;
+  const groups = getComboGroupsMovil(aid);
+  if (!groups[groupIdx]) return;
+  groups[groupIdx].items = groups[groupIdx].items.filter((_, idx) => idx !== itemIdx);
+  
+  const art = cartaData[aid];
+  art.comboGroups = groups.length ? groups : null;
+  updateEditComboGroupsListMovil(aid);
+};
+
+// --- GESTIÓN DE CATEGORÍAS EN DRAWER MÓVIL ---
+window.abrirDrawerEditCat = (cid) => {
+  const cat = categoriasData[cid];
+  if (!cat) return;
+  document.getElementById("edit-cat-id").value = cid;
+  document.getElementById("edit-cat-nombre").value = cat.nombre || "";
+  document.getElementById("edit-cat-notas").value = cat.notasPredefinidas || "";
+  
+  document.getElementById("new-cat-var-nombre").value = "";
+  document.getElementById("new-cat-var-precio").value = "";
+  
+  renderVariantesCat(cat.variantes || []);
+  
+  document.getElementById("overlay-edit-cat").classList.add("open");
+  document.getElementById("drawer-edit-cat").classList.add("open");
+};
+
+window.cerrarDrawerEditCat = () => {
+  document.getElementById("overlay-edit-cat").classList.remove("open");
+  document.getElementById("drawer-edit-cat").classList.remove("open");
+};
+
+function renderVariantesCat(variantes) {
+  const list = document.getElementById("cat-variantes-list");
+  list.innerHTML = "";
+  if (variantes.length === 0) {
+    list.innerHTML = `<div style="font-size:11px;color:var(--text-dim);text-align:center;">Sin variantes configuradas.</div>`;
+    return;
+  }
+  variantes.forEach((v, idx) => {
+    const row = document.createElement("div");
+    row.style.display = "flex";
+    row.style.alignItems = "center";
+    row.style.justifyContent = "space-between";
+    row.style.background = "var(--panel-light)";
+    row.style.padding = "6px 10px";
+    row.style.borderRadius = "6px";
+    row.style.fontSize = "12px";
+    row.innerHTML = `
+      <span>${v.nombre} (${Number(v.precio || 0) >= 0 ? "+" : ""}${Number(v.precio || 0).toFixed(2)} €)</span>
+      <button class="btn-close-drawer" style="font-size:16px;color:var(--danger);background:none;border:none;cursor:pointer;" onclick="window.eliminarVarianteCategoria(${idx})">&times;</button>
+    `;
+    list.appendChild(row);
+  });
+}
+
+window.agregarVarianteCategoria = () => {
+  const nom = document.getElementById("new-cat-var-nombre").value.trim();
+  const pre = parseFloat(document.getElementById("new-cat-var-precio").value) || 0;
+  if (!nom) return;
+  const cid = document.getElementById("edit-cat-id").value;
+  const cat = categoriasData[cid];
+  if (!cat) return;
+  const vars = cat.variantes || [];
+  vars.push({ nombre: nom, precio: pre });
+  cat.variantes = vars;
+  document.getElementById("new-cat-var-nombre").value = "";
+  document.getElementById("new-cat-var-precio").value = "";
+  renderVariantesCat(vars);
+};
+
+window.eliminarVarianteCategoria = (idx) => {
+  const cid = document.getElementById("edit-cat-id").value;
+  const cat = categoriasData[cid];
+  if (!cat) return;
+  const vars = cat.variantes || [];
+  vars.splice(idx, 1);
+  cat.variantes = vars;
+  renderVariantesCat(vars);
+};
+
+window.guardarCategoriaCarta = () => {
+  const cid = document.getElementById("edit-cat-id").value;
+  const name = document.getElementById("edit-cat-nombre").value.trim();
+  const notes = document.getElementById("edit-cat-notas").value.trim() || null;
+  if (!name) return;
+  const cat = categoriasData[cid];
+  const nextCat = {
+    nombre: name,
+    orden: cat.orden || 1,
+    notasPredefinidas: notes,
+    variantes: cat.variantes || null
+  };
+  set(ref(db, `categorias/${cid}`), nextCat).then(() => {
+    cerrarDrawerEditCat();
+    showToast("Categoría actualizada.");
+  });
+};
+
+window.eliminarCategoriaCarta = async () => {
+  const cid = document.getElementById("edit-cat-id").value;
+  const cat = categoriasData[cid];
+  if (!cat) return;
+  const seguro = await showCustomConfirm("Eliminar Categoría", `¿Seguro que deseas eliminar la categoría "${cat.nombre}" y todos sus artículos?`);
+  if (!seguro) return;
+  
+  const arts = Object.entries(cartaData).filter(([, a]) => a.catId === cid);
+  const promises = arts.map(([aid]) => remove(ref(db, `carta/${aid}`)));
+  promises.push(remove(ref(db, `categorias/${cid}`)));
+  Promise.all(promises).then(() => {
+    cerrarDrawerEditCat();
+    showToast("Categoría eliminada.");
+  });
+};
+
 window.guardarArticuloCarta = () => {
   const aid = document.getElementById("edit-art-id").value;
   const cid = document.getElementById("edit-art-cat-id").value;
@@ -848,6 +1090,8 @@ window.guardarArticuloCarta = () => {
   const price = parseFloat(document.getElementById("edit-art-precio").value) || 0;
   const dest = document.getElementById("edit-art-destino").value;
   const active = document.getElementById("edit-art-activo").checked;
+  const notes = document.getElementById("edit-art-notas").value.trim() || null;
+  const esCombo = document.getElementById("edit-art-escombo").checked;
 
   if (!name) return;
 
@@ -858,7 +1102,10 @@ window.guardarArticuloCarta = () => {
     precio: price,
     destino: dest,
     disponible: active,
-    variantes: art.variantes || null
+    notasPredefinidas: notes,
+    variantes: art.variantes || null,
+    esCombo: esCombo,
+    comboGroups: esCombo ? (art.comboGroups || null) : null
   };
 
   set(ref(db, `carta/${aid}`), nextArt).then(() => {
@@ -1696,6 +1943,18 @@ window.seleccionarEmojiMovil = seleccionarEmojiMovil;
 window.limpiarEmojisMovil = limpiarEmojisMovil;
 window.guardarEmojisMovil = guardarEmojisMovil;
 window.toggleCamareroActivoMovil = toggleCamareroActivoMovil;
+
+window.abrirDrawerEditCat = abrirDrawerEditCat;
+window.cerrarDrawerEditCat = cerrarDrawerEditCat;
+window.agregarVarianteCategoria = agregarVarianteCategoria;
+window.eliminarVarianteCategoria = eliminarVarianteCategoria;
+window.guardarCategoriaCarta = guardarCategoriaCarta;
+window.eliminarCategoriaCarta = eliminarCategoriaCarta;
+window.toggleComboPanelMovil = toggleComboPanelMovil;
+window.agregarGrupoComboMovil = agregarGrupoComboMovil;
+window.eliminarGrupoComboMovil = eliminarGrupoComboMovil;
+window.agregarOpcionComboMovil = agregarOpcionComboMovil;
+window.eliminarOpcionComboMovil = eliminarOpcionComboMovil;
 
 // Sobreescribir el alert nativo del navegador para usar nuestro modal personalizado en toda la página
 window.alert = function(mensaje) {

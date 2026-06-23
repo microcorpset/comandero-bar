@@ -2270,6 +2270,16 @@
           <label for="form-cat-notas">Notas Predefinidas (separadas por comas)</label>
           <input type="text" class="input-text" id="form-cat-notas" placeholder="Ej. Sin cebolla, Poco hecho, Para llevar">
         </div>
+        <!-- VARIANTES COMPARTIDAS DE LA CATEGORÍA -->
+        <div style="margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px;">
+          <label style="font-weight: bold; font-size: 12px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px;">Variantes de la Categoría</label>
+          <div id="form-cat-variantes-lista" style="display: flex; flex-direction: column; gap: 6px; margin: 8px 0;"></div>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="new-form-cat-var-nombre" class="input-text" placeholder="Nombre (ej: Doble)" style="flex: 2; height: 36px;">
+            <input type="number" step="0.01" id="new-form-cat-var-precio" class="input-text" placeholder="+0.00" style="flex: 1; height: 36px;">
+            <button type="button" class="btn" onclick="agregarVarianteCategoriaDev()" style="padding: 0 12px; height: 36px; font-size: 12px;">+ Añadir</button>
+          </div>
+        </div>
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary" onclick="cerrarModalCategoria()">Cancelar</button>
@@ -2285,7 +2295,7 @@
         <div class="modal-title" id="modal-prod-title">Añadir Artículo</div>
         <button class="btn-icon" onclick="cerrarModalProducto()">&times;</button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body" style="max-height: 60vh; overflow-y: auto;">
         <input type="hidden" id="form-prod-id">
         <div class="form-group">
           <label for="form-prod-nombre">Nombre del Artículo</label>
@@ -2306,6 +2316,28 @@
         <div class="form-group">
           <label for="form-prod-notas">Notas Predefinidas (separadas por comas)</label>
           <input type="text" class="input-text" id="form-prod-notas" placeholder="Ej. Poco hecho, Sin cebolla, Salsa aparte">
+        </div>
+        <!-- VARIANTES DEL PRODUCTO -->
+        <div style="margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px;">
+          <label style="font-weight: bold; font-size: 12px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px;">Variantes del Producto</label>
+          <div id="form-prod-variantes-lista" style="display: flex; flex-direction: column; gap: 6px; margin: 8px 0;"></div>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="new-form-prod-var-nombre" class="input-text" placeholder="Nombre (ej: Doble)" style="flex: 2; height: 36px;">
+            <input type="number" step="0.01" id="new-form-prod-var-precio" class="input-text" placeholder="+0.00" style="flex: 1; height: 36px;">
+            <button type="button" class="btn" onclick="agregarVarianteProductoDev()" style="padding: 0 12px; height: 36px; font-size: 12px;">+ Añadir</button>
+          </div>
+        </div>
+
+        <!-- SECCIÓN COMBOS (MENÚ / DESAYUNOS) -->
+        <div style="margin-top: 15px; border-top: 1px solid var(--border); padding-top: 15px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+            <label style="font-weight: bold; font-size: 12px; text-transform: uppercase; color: var(--muted); margin: 0;">Es un Combo (Menú / Desayuno)</label>
+            <input type="checkbox" id="form-prod-escombo" onchange="toggleComboPanelDev()" style="width: 16px; height: 16px;">
+          </div>
+          <div id="form-prod-combo-panel" style="display: none; flex-direction: column; gap: 8px;">
+            <div id="form-prod-combo-groups-lista" style="display: flex; flex-direction: column; gap: 6px;"></div>
+            <button type="button" class="btn" style="background: var(--success); border-color: var(--success); color: white; font-size: 11px; padding: 6px 12px; width: 100%; height: 36px;" onclick="agregarGrupoComboDev()">+ Añadir Grupo</button>
+          </div>
         </div>
       </div>
       <div class="modal-footer">

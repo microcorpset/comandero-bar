@@ -70,6 +70,9 @@ const VENTAS_POR_PAGINA = 15;
 
 // ID de categoría seleccionada actualmente en el editor de carta
 let categoriaSeleccionadaId = null;
+let currentCatVarsDev = [];
+let currentProdVarsDev = [];
+let currentProdComboGroupsDev = [];
 // Mesa seleccionada en la vista de salón
 let mesaSeleccionadaId = null;
 
@@ -112,6 +115,16 @@ document.addEventListener("DOMContentLoaded", () => {
   window.guardarProducto = guardarProducto;
   window.editarProducto = editarProducto;
   window.eliminarProducto = eliminarProducto;
+  
+  window.agregarVarianteCategoriaDev = agregarVarianteCategoriaDev;
+  window.eliminarVarianteCategoriaDev = eliminarVarianteCategoriaDev;
+  window.agregarVarianteProductoDev = agregarVarianteProductoDev;
+  window.eliminarVarianteProductoDev = eliminarVarianteProductoDev;
+  window.toggleComboPanelDev = toggleComboPanelDev;
+  window.agregarGrupoComboDev = agregarGrupoComboDev;
+  window.eliminarGrupoComboDev = eliminarGrupoComboDev;
+  window.agregarOpcionComboDev = agregarOpcionComboDev;
+  window.eliminarOpcionComboDev = eliminarOpcionComboDev;
 
   window.guardarEstadoSeguridadWifi = guardarEstadoSeguridadWifi;
   window.guardarEstadoBloqueoCamarerosDev = guardarEstadoBloqueoCamarerosDev;
@@ -1428,19 +1441,65 @@ function editarLocal(id) {
 // --- CRUD DE CATEGORÍAS (CARTA) ---
 function abrirModalCategoria(id = null, nombre = "") {
   document.getElementById("modal-categoria").classList.add("open");
+  
+  document.getElementById("new-form-cat-var-nombre").value = "";
+  document.getElementById("new-form-cat-var-precio").value = "";
+  
   if (id) {
     document.getElementById("modal-cat-title").textContent = "Editar Categoría";
     document.getElementById("form-cat-id").value = id;
     document.getElementById("form-cat-nombre").value = nombre;
     const cat = categoriasData[id];
     document.getElementById("form-cat-notas").value = cat?.notasPredefinidas || "";
+    currentCatVarsDev = cat?.variantes ? JSON.parse(JSON.stringify(cat.variantes)) : [];
   } else {
     document.getElementById("modal-cat-title").textContent = "Añadir Categoría";
     document.getElementById("form-cat-id").value = "";
     document.getElementById("form-cat-nombre").value = "";
     document.getElementById("form-cat-notas").value = "";
+    currentCatVarsDev = [];
   }
+  renderVariantesCategoriaDev();
 }
+
+function renderVariantesCategoriaDev() {
+  const list = document.getElementById("form-cat-variantes-lista");
+  if (!list) return;
+  list.innerHTML = "";
+  
+  if (currentCatVarsDev.length === 0) {
+    list.innerHTML = `<div style="font-size:11px;color:var(--muted);text-align:center;">Sin variantes configuradas.</div>`;
+    return;
+  }
+  
+  currentCatVarsDev.forEach((v, idx) => {
+    const row = document.createElement("div");
+    row.style.cssText = "display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.04);padding:6px 10px;border-radius:6px;font-size:12px;";
+    row.innerHTML = `
+      <span>${v.nombre} (${Number(v.precio || 0) >= 0 ? "+" : ""}${Number(v.precio || 0).toFixed(2)} €)</span>
+      <button type="button" class="btn-icon" style="color:var(--danger);font-size:16px;cursor:pointer;background:none;border:none;" onclick="eliminarVarianteCategoriaDev(${idx})">&times;</button>
+    `;
+    list.appendChild(row);
+  });
+}
+
+window.agregarVarianteCategoriaDev = () => {
+  const nomEl = document.getElementById("new-form-cat-var-nombre");
+  const preEl = document.getElementById("new-form-cat-var-precio");
+  if (!nomEl || !preEl) return;
+  const nombre = nomEl.value.trim();
+  const precio = parseFloat(preEl.value) || 0;
+  if (!nombre) return;
+  currentCatVarsDev.push({ nombre, precio });
+  nomEl.value = "";
+  preEl.value = "";
+  renderVariantesCategoriaDev();
+};
+
+window.eliminarVarianteCategoriaDev = (idx) => {
+  currentCatVarsDev.splice(idx, 1);
+  renderVariantesCategoriaDev();
+};
 
 function cerrarModalCategoria() {
   document.getElementById("modal-categoria").classList.remove("open");
@@ -1457,7 +1516,11 @@ async function guardarCategoria() {
   try {
     if (id) {
       // Editar existente en Firebase
-      await update(ref(db, `categorias/${id}`), { nombre, notasPredefinidas: notasPredefinidas || null });
+      await update(ref(db, `categorias/${id}`), { 
+        nombre, 
+        notasPredefinidas: notasPredefinidas || null,
+        variantes: currentCatVarsDev.length ? currentCatVarsDev : null
+      });
     } else {
       // Crear nueva en Firebase
       const listRef = ref(db, "categorias");
@@ -1467,7 +1530,8 @@ async function guardarCategoria() {
       await set(newRef, {
         nombre,
         orden: maxOrden + 1,
-        notasPredefinidas: notasPredefinidas || null
+        notasPredefinidas: notasPredefinidas || null,
+        variantes: currentCatVarsDev.length ? currentCatVarsDev : null
       });
     }
     cerrarModalCategoria();
@@ -1510,6 +1574,18 @@ function abrirModalProducto() {
   document.getElementById("form-prod-precio").value = "";
   document.getElementById("form-prod-destino").value = "barra";
   document.getElementById("form-prod-notas").value = "";
+  
+  document.getElementById("new-form-prod-var-nombre").value = "";
+  document.getElementById("new-form-prod-var-precio").value = "";
+  
+  document.getElementById("form-prod-escombo").checked = false;
+  document.getElementById("form-prod-combo-panel").style.display = "none";
+  
+  currentProdVarsDev = [];
+  currentProdComboGroupsDev = [];
+  
+  renderVariantesProductoDev();
+  updateEditComboGroupsListDev();
 }
 
 function cerrarModalProducto() {
@@ -1527,7 +1603,167 @@ function editarProducto(pid) {
   document.getElementById("form-prod-precio").value = p.precio;
   document.getElementById("form-prod-destino").value = p.destino || "barra";
   document.getElementById("form-prod-notas").value = p.notasPredefinidas || "";
+  
+  document.getElementById("new-form-prod-var-nombre").value = "";
+  document.getElementById("new-form-prod-var-precio").value = "";
+  
+  const esCombo = p.esCombo === true;
+  document.getElementById("form-prod-escombo").checked = esCombo;
+  document.getElementById("form-prod-combo-panel").style.display = esCombo ? "flex" : "none";
+  
+  currentProdVarsDev = p.variantes ? JSON.parse(JSON.stringify(p.variantes)) : [];
+  
+  const rawCombo = p.comboGroups;
+  if (rawCombo) {
+    const arr = Array.isArray(rawCombo) ? rawCombo : Object.values(rawCombo);
+    currentProdComboGroupsDev = arr.map(g => {
+      if (!g) return null;
+      const itemsRaw = g.items;
+      const itemsArr = itemsRaw ? (Array.isArray(itemsRaw) ? itemsRaw : Object.values(itemsRaw)) : [];
+      return {
+        nombre: g.nombre || '',
+        items: itemsArr.filter(Boolean).map(item => ({
+          artId: item.artId || '',
+          suplemento: parseFloat(item.suplemento) || 0
+        }))
+      };
+    }).filter(Boolean);
+  } else {
+    currentProdComboGroupsDev = [];
+  }
+  
+  renderVariantesProductoDev();
+  updateEditComboGroupsListDev();
 }
+
+function renderVariantesProductoDev() {
+  const list = document.getElementById("form-prod-variantes-lista");
+  if (!list) return;
+  list.innerHTML = "";
+  
+  if (currentProdVarsDev.length === 0) {
+    list.innerHTML = `<div style="font-size:11px;color:var(--muted);text-align:center;">Sin variantes configuradas.</div>`;
+    return;
+  }
+  
+  currentProdVarsDev.forEach((v, idx) => {
+    const row = document.createElement("div");
+    row.style.cssText = "display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.04);padding:6px 10px;border-radius:6px;font-size:12px;";
+    row.innerHTML = `
+      <span>${v.nombre} (${Number(v.precio || 0) >= 0 ? "+" : ""}${Number(v.precio || 0).toFixed(2)} €)</span>
+      <button type="button" class="btn-icon" style="color:var(--danger);font-size:16px;cursor:pointer;background:none;border:none;" onclick="eliminarVarianteProductoDev(${idx})">&times;</button>
+    `;
+    list.appendChild(row);
+  });
+}
+
+window.agregarVarianteProductoDev = () => {
+  const nomEl = document.getElementById("new-form-prod-var-nombre");
+  const preEl = document.getElementById("new-form-prod-var-precio");
+  if (!nomEl || !preEl) return;
+  const nombre = nomEl.value.trim();
+  const precio = parseFloat(preEl.value) || 0;
+  if (!nombre) return;
+  currentProdVarsDev.push({ nombre, precio });
+  nomEl.value = "";
+  preEl.value = "";
+  renderVariantesProductoDev();
+};
+
+window.eliminarVarianteProductoDev = (idx) => {
+  currentProdVarsDev.splice(idx, 1);
+  renderVariantesProductoDev();
+};
+
+// --- GESTIÓN DE COMBOS EN DESARROLLADOR ---
+window.toggleComboPanelDev = () => {
+  const chk = document.getElementById("form-prod-escombo");
+  const panel = document.getElementById("form-prod-combo-panel");
+  if (chk && panel) {
+    panel.style.display = chk.checked ? "flex" : "none";
+  }
+};
+
+window.updateEditComboGroupsListDev = () => {
+  const el = document.getElementById("form-prod-combo-groups-lista");
+  if (!el) return;
+  
+  const id = document.getElementById("form-prod-id").value;
+  
+  const otherArticlesHTML = Object.entries(categoriasData)
+    .sort(([, ca], [, cb]) => (ca.orden ?? 999) - (cb.orden ?? 999) || ca.nombre.localeCompare(cb.nombre, 'es'))
+    .map(([catId, cat]) => {
+      const catArts = Object.entries(cartaData)
+        .filter(([itemId, item]) => item.catId === catId && itemId !== id)
+        .sort(([, artA], [, artB]) => (artA.orden || 0) - (artB.orden || 0) || artA.nombre.localeCompare(artB.nombre, 'es'));
+      if (!catArts.length) return '';
+      return `<optgroup label="${cat.nombre}">
+        ${catArts.map(([itemId, item]) => `<option value="${itemId}">${item.nombre} (${Number(item.precio).toFixed(2)} €)</option>`).join('')}
+      </optgroup>`;
+    }).join('');
+
+  el.innerHTML = currentProdComboGroupsDev.map((g, gIdx) => `
+    <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:8px;display:flex;flex-direction:column;gap:6px;margin-bottom:6px">
+      <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);padding-bottom:4px">
+        <span style="font-weight:bold;font-size:12px;color:var(--text)">Grupo: ${g.nombre}</span>
+        <button type="button" class="btn-icon" onclick="window.eliminarGrupoComboDev(${gIdx})" style="font-size:16px;color:var(--danger);background:none;border:none;cursor:pointer;">&times;</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        ${(g.items || []).map((item, itemIdx) => {
+          const subArt = cartaData[item.artId];
+          const subArtNombre = subArt ? subArt.nombre : '[Artículo Eliminado]';
+          return `
+            <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:2px 0">
+              <span>${subArtNombre} ${item.suplemento > 0 ? `<b style="color:var(--accent)">+${Number(item.suplemento).toFixed(2)} €</b>` : '<span style="color:var(--muted)">Sin supl.</span>'}</span>
+              <button type="button" class="btn-icon" onclick="window.eliminarOpcionComboDev(${gIdx}, ${itemIdx})" style="font-size:14px;color:var(--danger);background:none;border:none;cursor:pointer;">&times;</button>
+            </div>
+          `;
+        }).join('')}
+      </div>
+      <div style="display:flex;gap:4px;margin-top:4px;align-items:center">
+        <select id="combo-art-select-dev-${gIdx}" class="input-text" style="flex:1;font-size:11px;height:30px;padding:2px 6px;">
+          <option value="">— Seleccionar artículo —</option>
+          ${otherArticlesHTML}
+        </select>
+        <input type="number" id="combo-supl-input-dev-${gIdx}" placeholder="Supl. €" step="0.05" min="0" class="input-text" style="width:70px;font-size:11px;height:30px;padding:2px 6px;" />
+        <button type="button" class="btn" onclick="window.agregarOpcionComboDev(${gIdx})" style="padding:0 8px;font-size:11px;height:30px;">+ Añadir</button>
+      </div>
+    </div>
+  `).join('');
+};
+
+window.agregarGrupoComboDev = async () => {
+  const nombre = await showCustomPrompt("Nuevo Grupo", "Nombre del grupo (ej: Primeros, Segundos, Postres):");
+  if (!nombre || !nombre.trim()) return;
+  currentProdComboGroupsDev.push({ nombre: nombre.trim(), items: [] });
+  updateEditComboGroupsListDev();
+};
+
+window.eliminarGrupoComboDev = async (groupIdx) => {
+  const seguro = await showCustomConfirm("Eliminar Grupo", "¿Deseas eliminar este grupo del combo?");
+  if (!seguro) return;
+  currentProdComboGroupsDev = currentProdComboGroupsDev.filter((_, idx) => idx !== groupIdx);
+  updateEditComboGroupsListDev();
+};
+
+window.agregarOpcionComboDev = (groupIdx) => {
+  const selectEl = document.getElementById(`combo-art-select-dev-${groupIdx}`);
+  const suplEl = document.getElementById(`combo-supl-input-dev-${groupIdx}`);
+  if (!selectEl || !suplEl) return;
+  const artId = selectEl.value;
+  const suplemento = parseFloat(suplEl.value) || 0;
+  if (!artId) { alert("Elige un artículo"); return; }
+  
+  if (!currentProdComboGroupsDev[groupIdx]) return;
+  currentProdComboGroupsDev[groupIdx].items.push({ artId, suplemento });
+  updateEditComboGroupsListDev();
+};
+
+window.eliminarOpcionComboDev = (groupIdx, itemIdx) => {
+  if (!currentProdComboGroupsDev[groupIdx]) return;
+  currentProdComboGroupsDev[groupIdx].items = currentProdComboGroupsDev[groupIdx].items.filter((_, idx) => idx !== itemIdx);
+  updateEditComboGroupsListDev();
+};
 
 async function guardarProducto() {
   if (!db || !categoriaSeleccionadaId) return;
@@ -1537,6 +1773,7 @@ async function guardarProducto() {
   const precio = parseFloat(document.getElementById("form-prod-precio").value);
   const destino = document.getElementById("form-prod-destino").value;
   const notasPredefinidas = document.getElementById("form-prod-notas").value.trim();
+  const esCombo = document.getElementById("form-prod-escombo").checked;
   
   if (!nombre || isNaN(precio) || precio < 0) {
     alert("Por favor, rellena todos los campos correctamente.");
@@ -1544,14 +1781,19 @@ async function guardarProducto() {
   }
   
   try {
+    const payload = {
+      nombre,
+      precio,
+      destino,
+      notasPredefinidas: notasPredefinidas || null,
+      variantes: currentProdVarsDev.length ? currentProdVarsDev : null,
+      esCombo: esCombo,
+      comboGroups: esCombo && currentProdComboGroupsDev.length ? currentProdComboGroupsDev : null
+    };
+
     if (id) {
       // Editar
-      await update(ref(db, `carta/${id}`), {
-        nombre,
-        precio,
-        destino,
-        notasPredefinidas: notasPredefinidas || null
-      });
+      await update(ref(db, `carta/${id}`), payload);
     } else {
       // Crear nuevo
       const newRef = push(ref(db, "carta"));
@@ -1560,14 +1802,10 @@ async function guardarProducto() {
         .filter(p => p.catId === categoriaSeleccionadaId)
         .reduce((max, p) => Math.max(max, p.orden || 0), 0);
         
-      await set(newRef, {
-        catId: categoriaSeleccionadaId,
-        nombre,
-        precio,
-        destino,
-        orden: maxOrden + 1,
-        notasPredefinidas: notasPredefinidas || null
-      });
+      payload.catId = categoriaSeleccionadaId;
+      payload.orden = maxOrden + 1;
+
+      await set(newRef, payload);
     }
     cerrarModalProducto();
   } catch (error) {

@@ -1583,13 +1583,37 @@ function abrirMesa(id, nombre, ocupada) {
 }
 
 window.volverMesas = () => {
+  if (Object.keys(carrito).length > 0) {
+    showModal({
+      title: '⚠️ ¿Salir de la mesa?',
+      body: 'Tienes artículos en el pedido actual que aún no has enviado. Si sales de la mesa, estos artículos se perderán.',
+      buttons: [
+        {
+          label: 'Salir y borrar pedido',
+          style: 'danger',
+          action: () => {
+            confirmarSalidaMesa();
+          }
+        },
+        {
+          label: 'Permanecer en la mesa',
+          style: 'primary'
+        }
+      ]
+    });
+  } else {
+    confirmarSalidaMesa();
+  }
+};
+
+function confirmarSalidaMesa() {
   mesaId = null; mesaNombre = null; carrito = {};
   ticketEditMode = false; ticketSimplificado = false;
   document.getElementById('topbar-mesa').style.display = 'none';
   actualizarCabecera();
   cerrarDrawer(); show('mesas');
   if (Object.keys(mesasData).length) renderMesas();
-};
+}
 
 // ── CARTA ─────────────────────────────────────────────────────────────────────
 function renderCarta() {
