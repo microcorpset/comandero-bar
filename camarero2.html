@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#111a2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Camarero 2">
+<link rel="manifest" href="manifest-camarero2.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/camarero-192.png">
+<link rel="apple-touch-icon" href="icons/camarero-180.png">
+<title>Comandero · Camarero 2</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="camarero2.css">
+<script>
+  // Anti-parpadeo: aplicar tema antes del primer render
+  (function(){
+    try{
+      var guardado = localStorage.getItem('cam2_theme');
+      var h = new Date().getHours();
+      var dark = guardado ? guardado === 'dark' : (h < 7 || h >= 20);
+      if (dark) document.documentElement.setAttribute('data-theme','dark');
+    }catch(e){}
+  })();
+</script>
+</head>
+<body>
+
+<!-- ── PIN ─────────────────────────────────────────────────────────────── -->
+<div id="pin-screen">
+  <div class="pin-loading" id="pin-loading">
+    <div class="spinner"></div>
+    <span style="font-size:13px;color:rgba(255,255,255,.5);font-family:var(--mono)">Iniciando conexión…</span>
+  </div>
+  <div class="pin-box">
+    <div class="pin-logo">
+      <div class="pin-logo-icon">🗒</div>
+      <div class="pin-title">Camarero 2</div>
+    </div>
+    <div class="pin-sub">Introduce tu PIN</div>
+    <div class="pin-dots">
+      <div class="pin-dot" id="pd0"></div>
+      <div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div>
+      <div class="pin-dot" id="pd3"></div>
+    </div>
+    <div class="pin-error-msg" id="pin-error">PIN incorrecto</div>
+    <div class="pin-pad" id="pin-pad">
+      <button class="pin-key" data-k="1">1</button>
+      <button class="pin-key" data-k="2">2</button>
+      <button class="pin-key" data-k="3">3</button>
+      <button class="pin-key" data-k="4">4</button>
+      <button class="pin-key" data-k="5">5</button>
+      <button class="pin-key" data-k="6">6</button>
+      <button class="pin-key" data-k="7">7</button>
+      <button class="pin-key" data-k="8">8</button>
+      <button class="pin-key" data-k="9">9</button>
+      <button class="pin-key empty" data-k=""></button>
+      <button class="pin-key" data-k="0">0</button>
+      <button class="pin-key del" data-k="del">⌫</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Modal global ────────────────────────────────────────────────────── -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-title" id="modal-title"></div>
+    <div class="modal-body" id="modal-body"></div>
+    <div class="modal-actions" id="modal-actions"></div>
+  </div>
+</div>
+
+<!-- ── Action sheet (pulsación larga en mesa) ──────────────────────────── -->
+<div class="sheet-overlay" id="sheet-overlay"></div>
+<div class="sheet" id="sheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title" id="sheet-title">Mesa</div>
+  <div class="sheet-sub" id="sheet-sub"></div>
+  <div class="sheet-actions" id="sheet-actions"></div>
+</div>
+
+<!-- ── Toasts ──────────────────────────────────────────────────────────── -->
+<div id="toast-host"></div>
+
+<!-- ── Banner offline ──────────────────────────────────────────────────── -->
+<div id="offline-banner">📡 Sin conexión — los cambios se sincronizarán al reconectar</div>
+
+<div class="app">
+  <!-- ── Topbar ────────────────────────────────────────────────────────── -->
+  <header class="topbar" id="topbar">
+    <span class="brand-badge">🗒</span>
+    <div class="brand-text">
+      <strong id="topbar-title">Camarero 2</strong>
+      <small id="topbar-sub">Cargando…</small>
+    </div>
+    <div class="topbar-actions">
+      <label class="toggle-pill" id="tgl-wake" title="Pantalla siempre encendida">
+        <div class="dot"></div><span class="lbl">Wake</span>
+      </label>
+      <label class="toggle-pill" id="tgl-txt" title="Descargar TXT de comanda al enviar">
+        <div class="dot"></div><span class="lbl">TXT</span>
+      </label>
+      <label class="toggle-pill" id="tgl-copia" title="Abrir copia visual del ticket al cobrar">
+        <div class="dot"></div><span class="lbl">Copia</span>
+      </label>
+      <button class="icon-btn" id="btn-theme" title="Cambiar tema claro/oscuro">🌙</button>
+    </div>
+  </header>
+
+  <!-- ── Vista: MESAS ──────────────────────────────────────────────────── -->
+  <main id="view-mesas" class="vista">
+    <div class="kpis" id="kpis"></div>
+    <div class="mesas-toolbar">
+      <div class="segmented">
+        <button id="btn-vista-grid" class="active">▦ Grid</button>
+        <button id="btn-vista-plano">⌂ Plano</button>
+      </div>
+      <button class="chip-btn" id="btn-mias">👤 Mis mesas</button>
+      <button class="chip-btn" id="btn-urgentes" title="Ordenar mesas por tiempo sin atender">⏱ Urgentes</button>
+      <div style="flex:1"></div>
+      <button class="chip-btn primary" id="btn-nuevo-pedido">🛍️ Pedido</button>
+    </div>
+    <div id="mesas-grid" class="mesas-grid"><div class="loading">Cargando mesas…</div></div>
+    <div id="plano-contenedor" hidden></div>
+  </main>
+
+  <!-- ── Vista: CARTA ──────────────────────────────────────────────────── -->
+  <main id="view-carta" class="vista" hidden>
+    <div class="carta-head">
+      <button class="icon-btn" id="btn-back-mesas" title="Volver a mesas">←</button>
+      <span class="mesa-pill" id="carta-mesa-pill">Mesa</span>
+      <div class="search-wrap">
+        <span class="s-ico">🔍</span>
+        <input type="text" id="carta-search" placeholder="Buscar artículo…" autocomplete="off">
+        <button class="s-clear" id="btn-clear-search" hidden>✕</button>
+      </div>
+    </div>
+    <div class="frecuentes" id="frecuentes" hidden>
+      <div class="sec-label">⚡ Frecuentes</div>
+      <div class="freq-scroll" id="freq-scroll"></div>
+    </div>
+    <div class="cat-chips" id="cat-chips"></div>
+    <div id="carta-body"><div class="loading">Cargando carta…</div></div>
+  </main>
+
+  <!-- ── Vista: TICKET / CUENTA ────────────────────────────────────────── -->
+  <main id="view-ticket" class="vista" hidden>
+    <div class="ticket-toolbar">
+      <button class="icon-btn" id="btn-ticket-back">←</button>
+      <span class="tt-title">Cuenta</span>
+      <button class="icon-btn" id="btn-ticket-refresh" title="Actualizar">⟳</button>
+    </div>
+    <div class="ticket-card" id="ticket-card"></div>
+  </main>
+</div>
+
+<!-- ── Barra de acción de la carta (fija abajo) ────────────────────────── -->
+<div class="carta-actionbar" id="carta-actionbar" hidden>
+  <button class="btn-cart-open" id="btn-abrir-drawer" title="Ver pedido">
+    🧾<span class="badge" id="cart-badge">0</span>
+  </button>
+  <div class="total-info">
+    <span id="res-uds">Sin artículos</span>
+    <strong id="res-total">0,00 €</strong>
+  </div>
+  <button class="btn-ghost" id="btn-cuenta-bar" hidden>Cuenta</button>
+  <button class="btn-primary" id="btn-enviar" disabled>Enviar</button>
+</div>
+
+<!-- ── FAB cuenta (en vista carta, mesa ocupada) ───────────────────────── -->
+<button class="btn-cuenta-fab" id="btn-cuenta-fab">🧾 Cuenta</button>
+
+<!-- ── Drawer del pedido ───────────────────────────────────────────────── -->
+<div class="drawer-overlay" id="drawer-overlay"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-header">
+    <span class="drawer-title" id="drawer-title">Pedido</span>
+    <button class="btn-clear-cart" id="btn-vaciar-cart" hidden>🧹 Vaciar</button>
+    <button class="drawer-close" id="drawer-close">✕</button>
+  </div>
+  <div class="drawer-body" id="drawer-body"><div class="drawer-empty">Sin artículos aún</div></div>
+  <div class="drawer-footer">
+    <span class="drawer-total" id="drawer-total">0,00 €</span>
+    <button class="btn-primary" id="btn-enviar-drawer" disabled>Enviar pedido</button>
+  </div>
+</div>
+
+<script type="module" src="camarero2.js"></script>
+</body>
+</html>
+

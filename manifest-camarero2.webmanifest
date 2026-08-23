@@ -1,0 +1,22 @@
+{
+  "name": "Comandero - Camarero 2",
+  "short_name": "Camarero 2",
+  "description": "Interfaz renovada para tomar comandas y gestionar mesas desde el móvil.",
+  "start_url": "./camarero2.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b101c",
+  "theme_color": "#111a2e",
+  "icons": [
+    {
+      "src": "./icons/camarero-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./icons/camarero-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
