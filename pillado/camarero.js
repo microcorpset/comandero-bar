@@ -244,19 +244,30 @@ async function enviarAlerta(pinProbado) {
         ? datosDispositivo.modeloComercial 
         : datosDispositivo.platform;
 
+      const tactilStr = datosDispositivo.touchPoints > 0 ? `Sí (${datosDispositivo.touchPoints} puntos)` : 'No (Ratón)';
+      const redStr = datosDispositivo.conexionTipo 
+        ? `${datosDispositivo.conexionTipo.toUpperCase()} (${datosDispositivo.conexionDownlink || 'N/A'})` 
+        : 'N/A';
+
       const msgTelegram = `🚨 <b>¡INTRUSO CAZADO EN COMANDERO!</b>\n\n` +
         `🔑 <b>PIN Probado:</b> <code>${pinProbado}</code>\n` +
-        `⏱ <b>Velocidad:</b> ${velocidadTecleo}\n\n` +
+        `⏱ <b>Velocidad Tecleo:</b> ${velocidadTecleo}\n\n` +
         `🌐 <b>IP Pública:</b> <code>${ipTexto}</code>\n` +
         `📍 <b>Ubicación:</b> ${ubicacionTexto}\n` +
         `🏢 <b>ISP / Compañía:</b> ${ipData.isp || 'N/A'}\n` +
         `🗺 <b>Google Maps:</b> ${mapaUrl}\n\n` +
         `📱 <b>Dispositivo:</b> ${modeloStr}\n` +
+        `🖥 <b>Pantalla:</b> ${datosDispositivo.screenResolution || 'N/A'}\n` +
+        `👆 <b>Táctil:</b> ${tactilStr}\n` +
         `🎮 <b>GPU / Gráfica:</b> <code>${datosDispositivo.gpuRenderer || 'N/A'}</code>\n` +
         `🧬 <b>Huella Hardware:</b> <code>${datosDispositivo.canvasFingerprint}</code>\n` +
         `🕵️ <b>Navegación:</b> ${datosDispositivo.modoIncognito}\n` +
         `👁 <b>Visitas del terminal:</b> ${datosDispositivo.visitasRegistradas}\n` +
         `🔋 <b>Batería:</b> ${datosDispositivo.bateriaNivel || 'N/A'} (Cargando: ${datosDispositivo.bateriaCargando || 'N/A'})\n` +
+        `📶 <b>Conexión:</b> ${redStr}\n` +
+        `🧠 <b>Hardware:</b> ${datosDispositivo.coresCPU} núcleos CPU | ${datosDispositivo.ramGB} RAM\n` +
+        `🌐 <b>Idioma y Zona:</b> ${datosDispositivo.language} | ${datosDispositivo.timeZone}\n` +
+        `🧭 <b>Navegador:</b> <code>${datosDispositivo.userAgent || 'N/A'}</code>\n\n` +
         `⏰ <b>Fecha:</b> ${fechaActual}`;
 
       await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
