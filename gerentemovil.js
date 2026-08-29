@@ -3,6 +3,7 @@ import {
   ref, get, onValue, query, orderByChild, startAt, endAt,
   set as fbSet, push as fbPush, remove as fbRemove, update as fbUpdate
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import qrcode from "./qrcode.mjs";
 
 const checkAndTouchMenu = (refVal) => {
   if (!refVal) return;
@@ -2430,7 +2431,10 @@ function actualizarAjustesSeguridadMovil() {
   }
   const passEncargadoMovil = document.getElementById("config-encargado-pass-movil");
   if (passEncargadoMovil) {
-    passEncargadoMovil.value = seguridadData.encargadoPassword || "encargado1234";
+    passEncargadoMovil.value = seguridadData.encargadoPassword || "";
+    passEncargadoMovil.placeholder = seguridadData.encargadoPassword
+      ? ""
+      : "Sin contraseña configurada";
   }
 
   // Emparejamiento de Dispositivos por QR (Token del Local)
@@ -2449,7 +2453,11 @@ function actualizarAjustesSeguridadMovil() {
       const dir = lastSlash >= 0 ? basePath.substring(0, lastSlash + 1) : '/';
       const camareroUrl = window.location.origin + dir + 'camarero.html';
       const pairUrl = `${camareroUrl}?pair=${encodeURIComponent(tokenValMovil)}`;
-      qrImgMovil.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(pairUrl)}`;
+      // Se genera en el propio navegador: no depende de un servicio QR externo.
+      const qr = qrcode(0, 'M');
+      qr.addData(pairUrl);
+      qr.make();
+      qrImgMovil.src = qr.createDataURL(4, 2);
       qrImgMovil.style.display = "block";
     } else {
       qrImgMovil.style.display = "none";
@@ -2570,6 +2578,13 @@ async function guardarPassEncargadoMovil() {
       encargadoPassword: val,
       updatedAt: Date.now()
     });
+    // No se registra la contraseña: sólo el cambio y su origen para auditoría.
+    await push(ref(db, `auditoria/${new Date().toISOString().slice(0, 10)}`), {
+      ts: Date.now(),
+      accion: 'encargado_password_actualizada',
+      detalle: 'Contraseña de encargado actualizada desde Gerente Móvil',
+      origen: 'gerente_movil'
+    }).catch(() => {});
     showCustomAlert("Seguridad", "Contraseña de encargado guardada correctamente.");
   } catch (error) {
     showCustomAlert("Seguridad", "Error al guardar la contraseña de encargado.");
