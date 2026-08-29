@@ -2444,8 +2444,11 @@ function actualizarAjustesSeguridadMovil() {
 
   if (qrImgMovil) {
     if (tokenValMovil) {
-      const baseUrl = window.location.href.replace(/gerentemovil\.html.*$/, 'camarero.html');
-      const pairUrl = `${baseUrl}?pair=${encodeURIComponent(tokenValMovil)}`;
+      const basePath = window.location.pathname;
+      const lastSlash = basePath.lastIndexOf('/');
+      const dir = lastSlash >= 0 ? basePath.substring(0, lastSlash + 1) : '/';
+      const camareroUrl = window.location.origin + dir + 'camarero.html';
+      const pairUrl = `${camareroUrl}?pair=${encodeURIComponent(tokenValMovil)}`;
       qrImgMovil.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(pairUrl)}`;
       qrImgMovil.style.display = "block";
     } else {
