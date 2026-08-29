@@ -446,11 +446,44 @@ const queuedPedidosLocal = {};          // pedidos locales pendientes de sync
 // ── USUARIOS / PIN multi-camarero ─────────────────────────────────────────────
 const PIN_SESSION = 'cam_auth';
 const USER_SESSION = 'cam_user';
+// La sesión permanece activa mientras la app queda en segundo plano, pero se
+// vuelve a confirmar el PIN antes de operar tras este tiempo (2 horas).
+const PIN_REVALIDATION_MS = 2 * 60 * 60 * 1000;
+const PIN_AUTH_AT = 'cam_auth_at';
 let usuariosData = {};
 let camareroActual = sessionStorage.getItem(USER_SESSION) || '';
 let pinBuffer = '';
 let seguridadData = {};
 let camareroKeyActual = '';
+let accionTrasRevalidarPin = null;
+
+function sesionPinVigente() {
+  const autenticado = sessionStorage.getItem(PIN_SESSION) === '1';
+  const autenticadoEn = Number(sessionStorage.getItem(PIN_AUTH_AT) || 0);
+  return autenticado && Boolean(camareroActual) && autenticadoEn > 0
+    && (Date.now() - autenticadoEn) < PIN_REVALIDATION_MS;
+}
+
+function solicitarRevalidacionPin(accion) {
+  accionTrasRevalidarPin = accion;
+  sessionStorage.removeItem(PIN_SESSION);
+  sessionStorage.removeItem(PIN_AUTH_AT);
+  pinBuffer = '';
+  updatePinDots(false);
+  document.getElementById('emoji-screen').style.display = 'none';
+  document.getElementById('pin-screen').style.display = 'flex';
+  const sub = document.getElementById('pin-sub');
+  if (sub) sub.textContent = 'Por seguridad, confirma tu PIN para continuar';
+  const error = document.getElementById('pin-error');
+  if (error) error.style.display = 'none';
+}
+
+// Devuelve false cuando debe pedir el PIN; la acción se reanuda al validarlo.
+function requerirPinVigente(accion) {
+  if (sesionPinVigente()) return true;
+  solicitarRevalidacionPin(accion);
+  return false;
+}
 
 // --- AUTO-VINCULACIÓN POR QR (Device Pairing Token) ---
 try {
@@ -475,11 +508,15 @@ onValue(ref(db, 'config/usuarios'), s => {
   usuariosData['_default'] = { nombre: 'Camarero', pin: '1234' };
 });
 
-if (sessionStorage.getItem(PIN_SESSION) === '1' && camareroActual) {
+if (sesionPinVigente()) {
   document.getElementById('pin-screen').style.display = 'none';
   document.getElementById('topbar-camarero').textContent = camareroActual;
   comprobarNovedadesFirebase();
   setTimeout(() => { if (typeof actualizarCabecera === 'function') actualizarCabecera(); }, 50);
+} else if (sessionStorage.getItem(PIN_SESSION) === '1') {
+  // Una sesión anterior sin marca de hora no se considera válida por seguridad.
+  sessionStorage.removeItem(PIN_SESSION);
+  sessionStorage.removeItem(PIN_AUTH_AT);
 }
 
 // Fallback to hide PIN screen connection loader after 3 seconds
@@ -800,8 +837,11 @@ let selectedEmojis = [];
 function loginExitosoCompleto(detalleAuditoria) {
   sessionStorage.setItem(PIN_SESSION, '1');
   sessionStorage.setItem(USER_SESSION, camareroActual);
+  sessionStorage.setItem(PIN_AUTH_AT, String(Date.now()));
   document.getElementById('pin-screen').style.display = 'none';
   document.getElementById('emoji-screen').style.display = 'none';
+  const pinSub = document.getElementById('pin-sub');
+  if (pinSub) pinSub.textContent = 'Introduce tu PIN';
   document.getElementById('topbar-camarero').textContent = camareroActual;
   actualizarCabecera();
   if (typeof actualizarBotonMias === 'function') actualizarBotonMias();
@@ -814,6 +854,10 @@ function loginExitosoCompleto(detalleAuditoria) {
       ultimoLogin: Date.now()
     }).catch(e => console.error("Error al registrar ultimoLogin:", e));
   }
+
+  const accionPendiente = accionTrasRevalidarPin;
+  accionTrasRevalidarPin = null;
+  if (accionPendiente) accionPendiente();
 }
 
 function initReels() {
@@ -2162,6 +2206,7 @@ function fmtMinutos(mins) {
 
 // ── ACTION SHEET & ACCIONES RÁPIDAS DE MESA ──────────────────────────────────
 function abrirSheetMesa(id, m) {
+  if (!requerirPinVigente(() => abrirSheetMesa(id, m))) return;
   if (!m) m = mesasData[id] || { nombre: id };
   const ocupada = m.estado === 'ocupada' || localOcupada.has(id);
   const esTemporal = m.temporal === true || id.startsWith('temp_');
@@ -2846,6 +2891,7 @@ function renderPlano() {
 }
 
 function abrirMesa(id, nombre, ocupada) {
+  if (!requerirPinVigente(() => abrirMesa(id, nombre, ocupada))) return;
   mesaId = id; mesaNombre = nombre; carrito = {};
   ticketPreciosCustom = {}; ticketPreciosMode = false;
   document.getElementById('topbar-mesa').textContent = 'Mesa ' + nombre;
@@ -4317,6 +4363,7 @@ async function logAuditoria(accion, detalle = '', extras = {}) {
 
 // ── ENVIAR PEDIDO ─────────────────────────────────────────────────────────────
 window.enviarPedido = async () => {
+  if (!requerirPinVigente(() => window.enviarPedido())) return;
   if (!mesaId || !Object.keys(carrito).length) return;
 
   const esTemporal = mesaId.startsWith('temp_');
