@@ -1315,6 +1315,26 @@
 
           <div class="toggle-row" style="margin-top: 14px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px;">
             <div class="switch-info" style="flex: 1; padding-right: 12px;">
+              <div class="toggle-label">🔐 Emparejamiento QR Dispositivos</div>
+              <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">Exige escanear el QR del local para validar el móvil.</div>
+            </div>
+            <label class="switch" style="margin: 0;">
+              <input type="checkbox" id="switch-device-token-movil" onchange="window.toggleDeviceTokenActivoMovil()">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div id="box-device-token-movil" style="margin-top: 10px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+            <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 11px; color: var(--text-dim);">Clave: <strong id="lbl-device-token-movil" style="color: var(--accent); font-family: var(--font-code);">---</strong></span>
+              <button type="button" class="btn-action" onclick="window.rotarDeviceTokenMovil()" style="height: 26px; padding: 0 8px; font-size: 10px; margin: 0; background: #e24d4d; color: #fff; border: none; width: auto; font-weight: bold; border-radius: 4px;">🔄 Rotar Clave</button>
+            </div>
+            <img id="qr-device-token-img-movil" style="width: 150px; height: 150px; border-radius: 8px; background: #fff; padding: 4px; display: none;" alt="QR Camareros">
+            <span style="font-size: 10px; color: var(--text-dim); text-align: center;">Muestra este QR a los camareros desde tu pantalla.</span>
+          </div>
+
+          <div class="toggle-row" style="margin-top: 14px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 12px;">
+            <div class="switch-info" style="flex: 1; padding-right: 12px;">
               <div class="toggle-label">Verificación por Emojis</div>
               <div style="font-size: 11px; color: var(--text-dim); margin-top: 2px;">Exigir combinación de emojis tras el PIN.</div>
             </div>
