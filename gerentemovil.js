@@ -54,6 +54,26 @@ let planoCfg = { cols: 16, rows: 12 };
 let planoZonaActiva = null;
 let currentMesaId = null;
 let currentView = 'plano';
+
+function abrirQrDeviceTokenMovil() {
+  const qrOriginal = document.getElementById('qr-device-token-img-movil');
+  const overlay = document.getElementById('qr-device-token-overlay-movil');
+  const qrAmpliado = document.getElementById('qr-device-token-full-img-movil');
+  if (!qrOriginal?.src || !overlay || !qrAmpliado || qrOriginal.style.display === 'none') return;
+  qrAmpliado.src = qrOriginal.currentSrc || qrOriginal.src;
+  overlay.style.display = 'flex';
+}
+
+function cerrarQrDeviceTokenMovil() {
+  const overlay = document.getElementById('qr-device-token-overlay-movil');
+  if (overlay) overlay.style.display = 'none';
+}
+
+window.abrirQrDeviceTokenMovil = abrirQrDeviceTokenMovil;
+window.cerrarQrDeviceTokenMovil = cerrarQrDeviceTokenMovil;
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') cerrarQrDeviceTokenMovil();
+});
 let seguridadData = {};
 let usuariosData = {};
 let configLocal = {};
@@ -2459,8 +2479,10 @@ function actualizarAjustesSeguridadMovil() {
       qr.make();
       qrImgMovil.src = qr.createDataURL(4, 2);
       qrImgMovil.style.display = "block";
+      qrImgMovil.onclick = abrirQrDeviceTokenMovil;
     } else {
       qrImgMovil.style.display = "none";
+      cerrarQrDeviceTokenMovil();
     }
   }
 }
