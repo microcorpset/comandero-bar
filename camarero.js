@@ -451,6 +451,7 @@ const USER_SESSION = 'cam_user';
 const PIN_AUTH_AT = 'cam_auth_at';
 const USER_KEY_SESSION = 'cam_user_key';
 const CAMARERO_SESSION_ID = 'cam_session_id';
+const DEVICE_ID_STORAGE = 'cmd_device_id';
 const SESION_DESCONECTADA_GRACIA_MS = 5 * 60 * 1000;
 let usuariosData = {};
 let camareroActual = sessionStorage.getItem(USER_SESSION) || '';
@@ -466,6 +467,15 @@ function generarIdSesion() {
   return crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
 
+function obtenerIdDispositivo() {
+  let deviceId = localStorage.getItem(DEVICE_ID_STORAGE);
+  if (!deviceId) {
+    deviceId = generarIdSesion();
+    localStorage.setItem(DEVICE_ID_STORAGE, deviceId);
+  }
+  return deviceId;
+}
+
 function limpiarSesionLocal() {
   sessionStorage.removeItem(PIN_SESSION);
   sessionStorage.removeItem(PIN_AUTH_AT);
@@ -474,7 +484,7 @@ function limpiarSesionLocal() {
   sessionStorage.removeItem(CAMARERO_SESSION_ID);
 }
 
-async function bloquearSesionCamarero(motivo = 'Tu sesión ya no está autorizada.') {
+async function bloquearSesionCamarero(motivo = 'Tu sesión ya no está autorizada.', eliminarRemota = false) {
   if (!sesionRemotaIniciada && !sesionRemotaValida) return;
   sesionRemotaValida = false;
   sesionRemotaIniciada = false;
@@ -484,7 +494,7 @@ async function bloquearSesionCamarero(motivo = 'Tu sesión ya no está autorizad
   if (key) {
     try {
       await onDisconnect(ref(db, `config/sesionesCamareros/${key}`)).cancel();
-      await remove(ref(db, `config/sesionesCamareros/${key}`));
+      if (eliminarRemota) await remove(ref(db, `config/sesionesCamareros/${key}`));
     } catch (_) {}
   }
   limpiarSesionLocal();
@@ -504,16 +514,23 @@ async function registrarSesionCamarero() {
   const key = camareroKeyActual;
   if (!key) return false;
   const sessionId = sessionStorage.getItem(CAMARERO_SESSION_ID) || generarIdSesion();
+  const deviceId = obtenerIdDispositivo();
   const sessionRef = ref(db, `config/sesionesCamareros/${key}`);
   const resultado = await runTransaction(sessionRef, anterior => {
     const desconectadaHace = Date.now() - Number(anterior?.desconectadoEn || 0);
     const sesionCaducada = anterior?.estado === 'desconectado'
       && Number(anterior?.desconectadoEn || 0) > 0
       && desconectadaHace >= SESION_DESCONECTADA_GRACIA_MS;
-    if (anterior && anterior.sessionId && anterior.sessionId !== sessionId && !sesionCaducada) return;
+    const mismoDispositivo = anterior?.deviceId === deviceId;
+    // Las sesiones anteriores a esta mejora no incluían deviceId: se pueden
+    // recuperar una vez con el PIN y quedarán migradas al nuevo formato.
+    const sesionLegacy = anterior && anterior.sessionId && !anterior.deviceId;
+    if (anterior && anterior.sessionId && anterior.sessionId !== sessionId
+        && !mismoDispositivo && !sesionCaducada && !sesionLegacy) return;
     return {
       sessionId,
       nombre: camareroActual,
+      deviceId,
       inicio: anterior?.sessionId === sessionId ? (anterior?.inicio || Date.now()) : Date.now(),
       ultimaActividad: Date.now(),
       estado: document.visibilityState === 'visible' ? 'activo' : 'segundo_plano',
@@ -529,8 +546,10 @@ async function registrarSesionCamarero() {
   if (cancelarEscuchaSesion) cancelarEscuchaSesion();
   cancelarEscuchaSesion = onValue(sessionRef, snap => {
     const sesion = snap.val();
-    if (sesionRemotaIniciada && (!sesion || sesion.sessionId !== sessionId)) {
+    if (sesionRemotaIniciada && !sesion) {
       bloquearSesionCamarero('Sesión cerrada desde gerencia. Introduce tu PIN para volver a acceder.');
+    } else if (sesionRemotaIniciada && sesion.sessionId !== sessionId) {
+      bloquearSesionCamarero('Esta sesión se ha abierto desde otra pestaña o dispositivo. Introduce tu PIN para continuar.');
     }
   });
   return true;
@@ -595,7 +614,7 @@ onValue(ref(db, 'config/usuarios'), s => {
   }
   const keySesion = camareroKeyActual || sessionStorage.getItem(USER_KEY_SESSION);
   if (keySesion && usuariosData[keySesion]?.activo === false) {
-    bloquearSesionCamarero('Tu acceso ha sido desactivado desde gerencia.');
+    bloquearSesionCamarero('Tu acceso ha sido desactivado desde gerencia.', true);
   }
 }, () => {
   usuariosData['_default'] = { nombre: 'Camarero', pin: '1234' };
@@ -1832,11 +1851,11 @@ onValue(ref(db, 'config/verifacti'), snap => { configVf = snap.val() || {}; });
 onValue(ref(db, 'config/seguridad'), snap => {
   seguridadData = snap.val() || {};
   if (sesionRemotaValida && seguridadData.bloqueoCamareros === true && seguridadData.excepcionCamarero !== camareroKeyActual) {
-    bloquearSesionCamarero('El comandero ha sido bloqueado desde gerencia.');
+    bloquearSesionCamarero('El comandero ha sido bloqueado desde gerencia.', true);
   }
   if (sesionRemotaValida && seguridadData.deviceTokenActivo === true
       && localStorage.getItem('cmd_device_token') !== seguridadData.deviceToken) {
-    bloquearSesionCamarero('La autorización de este dispositivo ha sido revocada. Escanea el nuevo QR.');
+    bloquearSesionCamarero('La autorización de este dispositivo ha sido revocada. Escanea el nuevo QR.', true);
   }
 });
 onValue(ref(db, 'pedidos'), snap => {
