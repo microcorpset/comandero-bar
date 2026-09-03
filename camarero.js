@@ -11,7 +11,7 @@ if (!_dominiosPermitidos.some(d => location.hostname === d || location.hostname.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { authReady, db } from './firebase.js';
-import { ref, onValue, push, set, remove, get, update, query, orderByChild, limitToLast }
+import { ref, onValue, push, set, remove, get, update, query, orderByChild, limitToLast, runTransaction, onDisconnect }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import {
   fmtFechaVf, buildLineasVf, siguienteNumero, verNumeroActual,
@@ -446,22 +446,101 @@ const queuedPedidosLocal = {};          // pedidos locales pendientes de sync
 // ── USUARIOS / PIN multi-camarero ─────────────────────────────────────────────
 const PIN_SESSION = 'cam_auth';
 const USER_SESSION = 'cam_user';
-// La sesión permanece activa mientras la app queda en segundo plano, pero se
-// vuelve a confirmar el PIN antes de operar tras este tiempo (2 horas).
-const PIN_REVALIDATION_MS = 2 * 60 * 60 * 1000;
+// La sesión permanece activa durante el turno mientras el camarero siga
+// autorizado. La revocación se recibe en tiempo real desde Firebase.
 const PIN_AUTH_AT = 'cam_auth_at';
+const USER_KEY_SESSION = 'cam_user_key';
+const CAMARERO_SESSION_ID = 'cam_session_id';
 let usuariosData = {};
 let camareroActual = sessionStorage.getItem(USER_SESSION) || '';
 let pinBuffer = '';
 let seguridadData = {};
 let camareroKeyActual = '';
 let accionTrasRevalidarPin = null;
+let sesionRemotaValida = false;
+let sesionRemotaIniciada = false;
+let cancelarEscuchaSesion = null;
+
+function generarIdSesion() {
+  return crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+function limpiarSesionLocal() {
+  sessionStorage.removeItem(PIN_SESSION);
+  sessionStorage.removeItem(PIN_AUTH_AT);
+  sessionStorage.removeItem(USER_SESSION);
+  sessionStorage.removeItem(USER_KEY_SESSION);
+  sessionStorage.removeItem(CAMARERO_SESSION_ID);
+}
+
+async function bloquearSesionCamarero(motivo = 'Tu sesión ya no está autorizada.') {
+  if (!sesionRemotaIniciada && !sesionRemotaValida) return;
+  sesionRemotaValida = false;
+  sesionRemotaIniciada = false;
+  accionTrasRevalidarPin = null;
+  if (cancelarEscuchaSesion) { cancelarEscuchaSesion(); cancelarEscuchaSesion = null; }
+  const key = camareroKeyActual || sessionStorage.getItem(USER_KEY_SESSION);
+  if (key) {
+    try {
+      await onDisconnect(ref(db, `config/sesionesCamareros/${key}`)).cancel();
+      await remove(ref(db, `config/sesionesCamareros/${key}`));
+    } catch (_) {}
+  }
+  limpiarSesionLocal();
+  camareroActual = '';
+  camareroKeyActual = '';
+  pinBuffer = '';
+  updatePinDots(false);
+  document.getElementById('emoji-screen').style.display = 'none';
+  document.getElementById('pin-screen').style.display = 'flex';
+  const sub = document.getElementById('pin-sub');
+  if (sub) sub.textContent = motivo;
+  const error = document.getElementById('pin-error');
+  if (error) { error.textContent = motivo; error.style.display = 'block'; }
+}
+
+async function registrarSesionCamarero() {
+  const key = camareroKeyActual;
+  if (!key) return false;
+  const sessionId = sessionStorage.getItem(CAMARERO_SESSION_ID) || generarIdSesion();
+  const sessionRef = ref(db, `config/sesionesCamareros/${key}`);
+  const resultado = await runTransaction(sessionRef, anterior => {
+    if (anterior && anterior.sessionId && anterior.sessionId !== sessionId) return;
+    return {
+      sessionId,
+      nombre: camareroActual,
+      inicio: anterior?.inicio || Date.now(),
+      ultimaActividad: Date.now(),
+      estado: document.visibilityState === 'visible' ? 'activo' : 'segundo_plano'
+    };
+  });
+  if (!resultado.committed) return false;
+  sessionStorage.setItem(CAMARERO_SESSION_ID, sessionId);
+  sessionStorage.setItem(USER_KEY_SESSION, key);
+  sesionRemotaValida = true;
+  sesionRemotaIniciada = true;
+  await onDisconnect(sessionRef).remove();
+  if (cancelarEscuchaSesion) cancelarEscuchaSesion();
+  cancelarEscuchaSesion = onValue(sessionRef, snap => {
+    const sesion = snap.val();
+    if (sesionRemotaIniciada && (!sesion || sesion.sessionId !== sessionId)) {
+      bloquearSesionCamarero('Sesión cerrada desde gerencia. Introduce tu PIN para volver a acceder.');
+    }
+  });
+  return true;
+}
+
+function actualizarPresenciaCamarero() {
+  if (!sesionRemotaValida || !camareroKeyActual) return;
+  update(ref(db, `config/sesionesCamareros/${camareroKeyActual}`), {
+    ultimaActividad: Date.now(),
+    estado: document.visibilityState === 'visible' ? 'activo' : 'segundo_plano'
+  }).catch(() => {});
+}
 
 function sesionPinVigente() {
   const autenticado = sessionStorage.getItem(PIN_SESSION) === '1';
-  const autenticadoEn = Number(sessionStorage.getItem(PIN_AUTH_AT) || 0);
-  return autenticado && Boolean(camareroActual) && autenticadoEn > 0
-    && (Date.now() - autenticadoEn) < PIN_REVALIDATION_MS;
+  return autenticado && Boolean(camareroActual) && sesionRemotaValida;
 }
 
 function solicitarRevalidacionPin(accion) {
@@ -480,7 +559,10 @@ function solicitarRevalidacionPin(accion) {
 
 // Devuelve false cuando debe pedir el PIN; la acción se reanuda al validarlo.
 function requerirPinVigente(accion) {
-  if (sesionPinVigente()) return true;
+  if (sesionPinVigente()) {
+    actualizarPresenciaCamarero();
+    return true;
+  }
   solicitarRevalidacionPin(accion);
   return false;
 }
@@ -504,20 +586,17 @@ onValue(ref(db, 'config/usuarios'), s => {
       else usuariosData['_default'] = { nombre: 'Camarero', pin: '1234' };
     });
   }
+  const keySesion = camareroKeyActual || sessionStorage.getItem(USER_KEY_SESSION);
+  if (keySesion && usuariosData[keySesion]?.activo === false) {
+    bloquearSesionCamarero('Tu acceso ha sido desactivado desde gerencia.');
+  }
 }, () => {
   usuariosData['_default'] = { nombre: 'Camarero', pin: '1234' };
 });
 
-if (sesionPinVigente()) {
-  document.getElementById('pin-screen').style.display = 'none';
-  document.getElementById('topbar-camarero').textContent = camareroActual;
-  comprobarNovedadesFirebase();
-  setTimeout(() => { if (typeof actualizarCabecera === 'function') actualizarCabecera(); }, 50);
-} else if (sessionStorage.getItem(PIN_SESSION) === '1') {
-  // Una sesión anterior sin marca de hora no se considera válida por seguridad.
-  sessionStorage.removeItem(PIN_SESSION);
-  sessionStorage.removeItem(PIN_AUTH_AT);
-}
+if (sessionStorage.getItem(PIN_SESSION) === '1') limpiarSesionLocal();
+
+document.addEventListener('visibilitychange', actualizarPresenciaCamarero);
 
 // Fallback to hide PIN screen connection loader after 3 seconds
 setTimeout(() => {
@@ -834,7 +913,28 @@ async function verificarPin() {
 
 let selectedEmojis = [];
 
-function loginExitosoCompleto(detalleAuditoria) {
+async function loginExitosoCompleto(detalleAuditoria) {
+  try {
+    const sesionIniciada = await registrarSesionCamarero();
+    if (!sesionIniciada) {
+      pinBuffer = '';
+      updatePinDots(true);
+      const error = document.getElementById('pin-error');
+      if (error) {
+        error.textContent = 'Este camarero ya tiene una sesión activa en otro dispositivo.';
+        error.style.display = 'block';
+      }
+      return;
+    }
+  } catch (error) {
+    console.error('No se pudo iniciar la sesión del camarero:', error);
+    const errorEl = document.getElementById('pin-error');
+    if (errorEl) {
+      errorEl.textContent = 'No se pudo verificar la sesión. Comprueba la conexión.';
+      errorEl.style.display = 'block';
+    }
+    return;
+  }
   sessionStorage.setItem(PIN_SESSION, '1');
   sessionStorage.setItem(USER_SESSION, camareroActual);
   sessionStorage.setItem(PIN_AUTH_AT, String(Date.now()));
@@ -1331,6 +1431,7 @@ window.npSumarMinutos = (mins) => {
 };
 
 window.abrirNuevoPedidoModal = () => {
+  if (!requerirPinVigente(() => window.abrirNuevoPedidoModal())) return;
   npTipoPedido = 'Llevar';
   showModal({ title: '🛍️ Nuevo Pedido', body: '', buttons: [] });
 
@@ -1721,7 +1822,16 @@ onValue(ref(db, 'config/local'), snap => {
   if (mesasLinks) mesasLinks.style.display = configLocal.comandaAutoServir ? 'none' : '';
 });
 onValue(ref(db, 'config/verifacti'), snap => { configVf = snap.val() || {}; });
-onValue(ref(db, 'config/seguridad'), snap => { seguridadData = snap.val() || {}; });
+onValue(ref(db, 'config/seguridad'), snap => {
+  seguridadData = snap.val() || {};
+  if (sesionRemotaValida && seguridadData.bloqueoCamareros === true && seguridadData.excepcionCamarero !== camareroKeyActual) {
+    bloquearSesionCamarero('El comandero ha sido bloqueado desde gerencia.');
+  }
+  if (sesionRemotaValida && seguridadData.deviceTokenActivo === true
+      && localStorage.getItem('cmd_device_token') !== seguridadData.deviceToken) {
+    bloquearSesionCamarero('La autorización de este dispositivo ha sido revocada. Escanea el nuevo QR.');
+  }
+});
 onValue(ref(db, 'pedidos'), snap => {
   pedidosData = snap.val() || {};
   // Merge local queued orders so UI reflects offline-saved orders
@@ -4809,7 +4919,15 @@ async function upsertHistorial(datos, targetMesaId = null) {
       ventaKey = ventaKeySnap.val();
     }
     if (ventaKey) {
-      await set(ref(db, 'historial/' + ventaKey), datos);
+      // Un cierre posterior no debe borrar el vínculo fiscal guardado al emitir
+      // la factura. Se conserva también el resto de datos ya existentes.
+      const ventaExistenteSnap = await get(ref(db, 'historial/' + ventaKey));
+      const ventaExistente = ventaExistenteSnap.val() || {};
+      await set(ref(db, 'historial/' + ventaKey), {
+        ...ventaExistente,
+        ...datos,
+        verifactu: datos.verifactu ?? ventaExistente.verifactu ?? null
+      });
     } else {
       const newRef = await push(ref(db, 'historial'), datos);
       if (mId) {
@@ -6381,6 +6499,7 @@ async function ejecutarCierreMesaConMetodo(targetMesaId, targetMesaNombre, metod
 }
 
 window.cerrarMesaEspecifica = async (targetMesaId, targetMesaNombre) => {
+  if (!requerirPinVigente(() => window.cerrarMesaEspecifica(targetMesaId, targetMesaNombre))) return;
   const snap = await get(ref(db, 'pedidos/' + targetMesaId));
   const pedidos = snap.val() || {};
 

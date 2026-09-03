@@ -4,6 +4,7 @@ import {
   set as fbSet, push as fbPush, remove as fbRemove, update as fbUpdate
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import qrcode from "./qrcode.mjs";
+import { cargarOperacionesFiscales } from './facturas-completas.js';
 
 const checkAndTouchMenu = (refVal) => {
   if (!refVal) return;
@@ -76,6 +77,7 @@ document.addEventListener('keydown', event => {
 });
 let seguridadData = {};
 let usuariosData = {};
+let sesionesCamarerosData = {};
 let configLocal = {};
 let ventasCache = [];
 let ventasSubtabActiva = 'tickets';
@@ -304,6 +306,10 @@ function iniciarSincronizacionDB() {
     usuariosData = snap.val() || {};
     renderCamarerosListado();
     poblarExcepcionCamareroSelectorMovil();
+  });
+  onValue(ref(db, "config/sesionesCamareros"), (snap) => {
+    sesionesCamarerosData = snap.val() || {};
+    renderCamarerosListado();
   });
 }
 
@@ -773,16 +779,16 @@ window.abrirModalNuevaCategoria = async () => {
 window.abrirModalNuevoArticulo = async (cid) => {
   const nombre = await showCustomPrompt("Nuevo Artículo", "Nombre del nuevo artículo:");
   if (!nombre || !nombre.trim()) return;
-  const precioStr = await showCustomPrompt("Precio Artículo", "Precio (€) del artículo (ej: 8.50):", "0.00");
-  if (precioStr === null) return;
-  const precio = parseFloat(precioStr || 0) || 0;
+  const detalles = await showCustomArticleDetailsPrompt();
+  if (detalles === null) return;
+  const precio = parseFloat(detalles.precio || 0) || 0;
 
   const newArt = {
     catId: cid,
     nombre: nombre.trim(),
     precio,
     disponible: true,
-    destino: "cocina"
+    destino: detalles.destino
   };
 
   push(ref(db, "carta"), newArt).then(() => {
@@ -1597,7 +1603,12 @@ window.exportarPDFVentas = async () => {
     "¿Deseas incluir el desglose de Artículos vendidos en el PDF?\n\n• Aceptar: Informe Completo (+ Desglose de Artículos)\n• Cancelar: Solo Resumen de Días y Totales (Recomendado para el gestor)"
   );
 
-  generarDocumentoPDFVentas(incluirArticulos === true);
+  const incluirDocumentos = await showCustomConfirm(
+    "Detalle fiscal",
+    "¿Deseas incluir la relación de documentos fiscales?\n\n• Aceptar: añade el listado de tickets y facturas vinculadas\n• Cancelar: informe resumido (recomendado)"
+  );
+
+  await generarDocumentoPDFVentas(incluirArticulos === true, incluirDocumentos === true);
 };
 
 function formatFechaEsp(dateStr) {
@@ -1614,7 +1625,7 @@ function formatFechaEsp(dateStr) {
   return s;
 }
 
-function generarDocumentoPDFVentas(incluirArticulos = false) {
+async function generarDocumentoPDFVentas(incluirArticulos = false, incluirDocumentos = false) {
   const desdeStr = document.getElementById("venta-desde").value;
   const hastaStr = document.getElementById("venta-hasta").value;
   const desdeFmt = formatFechaEsp(desdeStr);
@@ -1630,8 +1641,30 @@ function generarDocumentoPDFVentas(incluirArticulos = false) {
   const totalEf = ventasCache.filter(t => (t.pagoMetodo || '').toLowerCase() !== 'tarjeta').reduce((s, t) => s + Number(t.total || 0), 0);
   const totalTj = ventasCache.filter(t => (t.pagoMetodo || '').toLowerCase() === 'tarjeta').reduce((s, t) => s + Number(t.total || 0), 0);
   const totalArts = ventasCache.reduce((s, t) => s + (t.lineas || []).reduce((acc, l) => acc + Number(l.qty || 0), 0), 0);
+  const fmtUnidadesPDF = valor => {
+    const redondeado = Math.round(Number(valor || 0) * 1000) / 1000;
+    return Number.isInteger(redondeado) ? String(redondeado) : redondeado.toLocaleString('es-ES', { maximumFractionDigits: 3 });
+  };
 
   const dias = agruparVentasPorDia(ventasCache);
+
+  let relacionDocumentosHTML = '';
+  if (incluirDocumentos) {
+    let operacionesConDocumento = [];
+    try {
+      const desdeTs = new Date(`${desdeStr}T00:00:00`).getTime();
+      const hastaTs = new Date(`${hastaStr}T23:59:59.999`).getTime();
+      ({ operaciones: operacionesConDocumento } = await cargarOperacionesFiscales(db, desdeTs, hastaTs));
+    } catch (error) {
+      console.warn('No se pudieron cargar las facturas vinculadas:', error);
+    }
+    relacionDocumentosHTML = `
+      <h3 style="margin-top:20px;">${incluirArticulos ? '3. ' : '2. '}Relación de documentos fiscales</h3>
+      <div style="font-size:11px;color:#4b5563;margin:-4px 0 10px">Las operaciones facturadas se muestran por su factura vinculada; no se duplican como ticket.</div>
+      <table><thead><tr><th>Fecha</th><th>Documento</th><th>Destinatario / Mesa</th><th class="text-right">Importe</th></tr></thead><tbody>
+        ${operacionesConDocumento.map(({ ticket, factura }) => `<tr><td>${escapeHtml(ticket.fecha || '—')}</td><td>${factura ? `Factura ${escapeHtml(factura.serie || '')}-${escapeHtml(factura.numero || '')}` : 'Ticket'}</td><td>${factura ? escapeHtml(factura.destinatario?.nombre || factura.tipo || '—') : escapeHtml(ticket.mesa || ticket.mesaNombre || '—')}</td><td class="text-right mono">${Number(ticket.total || 0).toFixed(2)} €</td></tr>`).join('')}
+      </tbody></table>`;
+  }
 
   let seccionArticulosHTML = '';
   if (incluirArticulos) {
@@ -1660,7 +1693,7 @@ function generarDocumentoPDFVentas(incluirArticulos = false) {
           ${rankingArts.slice(0, 45).map(a => `
             <tr>
               <td>${escapeHtml(a.nombre)}</td>
-              <td class="text-right mono">${a.qty}</td>
+              <td class="text-right mono">${fmtUnidadesPDF(a.qty)}</td>
               <td class="text-right mono">${a.total.toFixed(2)} €</td>
             </tr>
           `).join('')}
@@ -1668,7 +1701,7 @@ function generarDocumentoPDFVentas(incluirArticulos = false) {
         <tfoot>
           <tr class="t-foot">
             <td>TOTAL ARTÍCULOS (${rankingArts.length})</td>
-            <td class="text-right mono">${totalArts}</td>
+            <td class="text-right mono">${fmtUnidadesPDF(totalArts)}</td>
             <td class="text-right mono">${totalGen.toFixed(2)} €</td>
           </tr>
         </tfoot>
@@ -1706,6 +1739,7 @@ function generarDocumentoPDFVentas(incluirArticulos = false) {
     .mono { font-family: monospace; font-size: 12px; }
     .t-foot td { background: #f9fafb; font-weight: 800; font-size: 13px; border-top: 2px solid #111827; border-bottom: 2px solid #111827; }
     .footer-doc { margin-top: 30px; font-size: 10px; color: #9ca3af; text-align: center; border-top: 1px solid #e5e7eb; padding-top: 12px; }
+    .factura-anexo { page-break-before: always; break-before: page; border: 1px solid #d1d5db; padding: 18px; margin-top: 24px; }.factura-titulo { font-size: 21px; font-weight: 800; }.factura-fecha { color:#4b5563; margin-top:4px; }.factura-dest { margin:18px 0; line-height:1.55; }.factura-total { text-align:right; font-size:18px; font-weight:800; margin-top:16px; }
     @media print {
       body { padding: 0; }
       .no-print { display: none !important; }
@@ -1746,7 +1780,7 @@ function generarDocumentoPDFVentas(incluirArticulos = false) {
       <div class="kpi-val">${totalTj.toFixed(2)} €</div>
     </div>
     <div class="kpi-card">
-      <div class="kpi-lbl">Nº Tickets / Cierres</div>
+      <div class="kpi-lbl">Nº Operaciones</div>
       <div class="kpi-val">${totalTickets}</div>
     </div>
   </div>
@@ -1771,7 +1805,7 @@ function generarDocumentoPDFVentas(incluirArticulos = false) {
           <tr>
             <td><strong style="text-transform:capitalize;">${fTxt}</strong></td>
             <td class="text-right mono">${d.tickets}</td>
-            <td class="text-right mono">${d.lineas}</td>
+            <td class="text-right mono">${fmtUnidadesPDF(d.lineas)}</td>
             <td class="text-right mono">${d.efectivo.toFixed(2)} €</td>
             <td class="text-right mono">${d.tarjeta.toFixed(2)} €</td>
             <td class="text-right mono" style="font-weight:700;">${d.total.toFixed(2)} €</td>
@@ -1783,7 +1817,7 @@ function generarDocumentoPDFVentas(incluirArticulos = false) {
       <tr class="t-foot">
         <td>TOTAL GENERAL (${dias.length} días)</td>
         <td class="text-right mono">${totalTickets}</td>
-        <td class="text-right mono">${totalArts}</td>
+        <td class="text-right mono">${fmtUnidadesPDF(totalArts)}</td>
         <td class="text-right mono">${totalEf.toFixed(2)} €</td>
         <td class="text-right mono">${totalTj.toFixed(2)} €</td>
         <td class="text-right mono" style="color:#059669;">${totalGen.toFixed(2)} €</td>
@@ -1792,6 +1826,8 @@ function generarDocumentoPDFVentas(incluirArticulos = false) {
   </table>
 
   ${seccionArticulosHTML}
+
+  ${relacionDocumentosHTML}
 
   <div class="footer-doc">
     Documento generado el ${new Date().toLocaleDateString('es-ES')} a las ${new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })} · Comandero TPVSmart
@@ -2303,6 +2339,7 @@ function buildCierreCajaHtml(localNombre, resumenDia) {
 
 // --- MODALES PERSONALIZADOS ---
 let currentModalResolve = null;
+let customModalHideTimer = null;
 
 function ocultarCustomModal() {
   const overlay = document.getElementById("overlay-custom-modal");
@@ -2310,8 +2347,11 @@ function ocultarCustomModal() {
   overlay.classList.remove("open");
   modal.style.transform = "translate(-50%, -50%) scale(0.9)";
   modal.style.opacity = "0";
-  setTimeout(() => {
+  if (customModalHideTimer) clearTimeout(customModalHideTimer);
+  customModalHideTimer = setTimeout(() => {
     modal.style.display = "none";
+    overlay.classList.remove("open");
+    customModalHideTimer = null;
   }, 200);
 }
 
@@ -2323,8 +2363,14 @@ window.cerrarCustomModal = () => {
   }
 };
 
-function mostrarCustomModal(titulo, mensaje, tipo, defaultValue = "") {
+function mostrarCustomModal(titulo, mensaje, tipo, defaultValue = "", options = {}) {
   return new Promise((resolve) => {
+    // Un prompt puede abrir otro inmediatamente (nombre -> precio). En ese
+    // caso, evitamos que el temporizador de cierre del anterior oculte el nuevo.
+    if (customModalHideTimer) {
+      clearTimeout(customModalHideTimer);
+      customModalHideTimer = null;
+    }
     if (currentModalResolve) {
       currentModalResolve(null);
     }
@@ -2335,6 +2381,8 @@ function mostrarCustomModal(titulo, mensaje, tipo, defaultValue = "") {
     const titleEl = document.getElementById("custom-modal-title");
     const msgEl = document.getElementById("custom-modal-message");
     const inputEl = document.getElementById("custom-modal-input");
+    const selectLabelEl = document.getElementById("custom-modal-select-label");
+    const selectEl = document.getElementById("custom-modal-select");
     const btnCancel = document.getElementById("custom-modal-btn-cancel");
     const btnOk = document.getElementById("custom-modal-btn-ok");
 
@@ -2346,6 +2394,21 @@ function mostrarCustomModal(titulo, mensaje, tipo, defaultValue = "") {
       inputEl.value = defaultValue;
     } else {
       inputEl.style.display = "none";
+    }
+
+    const selectOptions = options.selectOptions || [];
+    if (selectOptions.length) {
+      selectLabelEl.textContent = options.selectLabel || "Destino";
+      selectEl.innerHTML = selectOptions.map(option =>
+        `<option value="${option.value}">${option.label}</option>`
+      ).join("");
+      selectEl.value = options.selectValue || selectOptions[0].value;
+      selectLabelEl.style.display = "block";
+      selectEl.style.display = "block";
+    } else {
+      selectLabelEl.style.display = "none";
+      selectEl.style.display = "none";
+      selectEl.innerHTML = "";
     }
 
     if (tipo === "alert") {
@@ -2372,7 +2435,9 @@ function mostrarCustomModal(titulo, mensaje, tipo, defaultValue = "") {
     }, 10);
 
     btnOk.onclick = () => {
-      const value = tipo === "prompt" ? inputEl.value : true;
+      const value = tipo === "prompt"
+        ? (selectOptions.length ? { value: inputEl.value, selectValue: selectEl.value } : inputEl.value)
+        : true;
       ocultarCustomModal();
       currentModalResolve = null;
       resolve(value);
@@ -2402,6 +2467,27 @@ function showCustomConfirm(titulo, mensaje) {
 
 function showCustomPrompt(titulo, mensaje, defaultValue = "") {
   return mostrarCustomModal(titulo, mensaje, "prompt", defaultValue);
+}
+
+function showCustomArticleDetailsPrompt() {
+  return mostrarCustomModal(
+    "Datos del artículo",
+    "Precio (€) del artículo (ej: 8.50):",
+    "prompt",
+    "0.00",
+    {
+      selectLabel: "Enviar a",
+      selectOptions: [
+        { value: "cocina", label: "Cocina" },
+        { value: "barra", label: "Barra" },
+        { value: "pizza", label: "Pizza" },
+        { value: "ambos", label: "Ambos" }
+      ]
+    }
+  ).then(value => value === null ? null : {
+    precio: value.value,
+    destino: value.selectValue
+  });
 }
 
 // --- UTILERÍAS ---
@@ -2772,12 +2858,18 @@ function renderCamarerosListado() {
     
     const isActive = u.activo !== false;
     const tiempoRelativo = calcularTiempoRelativo(u.ultimoLogin);
+    const sesion = sesionesCamarerosData[id];
+    const sesionActiva = Boolean(sesion?.sessionId);
+    const presencia = sesion?.estado === 'segundo_plano' ? 'EN SEGUNDO PLANO' : 'EN USO';
 
     card.innerHTML = `
       <div style="display: flex; flex-direction: column; gap: 4px; flex: 1; padding-right: 12px;">
         <span style="font-weight: 600; font-size: 14px; color: var(--text);">${u.nombre}</span>
         <span style="font-size: 11px; color: var(--text-dim); display: flex; align-items: center; gap: 4px;">
           🕒 ${tiempoRelativo}
+        </span>
+        <span style="font-size: 11px; color: ${sesionActiva ? 'var(--success)' : 'var(--text-dim)'}; font-weight: 700;">
+          ${sesionActiva ? `● ${presencia}` : '○ SIN SESIÓN'}
         </span>
       </div>
       <div style="display: flex; align-items: center; gap: 12px;">
@@ -2788,6 +2880,7 @@ function renderCamarerosListado() {
           <input type="checkbox" ${isActive ? "checked" : ""} onchange="window.toggleCamareroActivoMovil('${id}', this.checked)">
           <span class="slider"></span>
         </label>
+        ${sesionActiva ? `<button type="button" onclick="window.cerrarSesionCamareroMovil('${id}')" title="Cerrar sesión remota" style="border:1px solid var(--border);background:transparent;color:var(--danger);border-radius:6px;padding:5px 7px;cursor:pointer;">⏏</button>` : ''}
       </div>
     `;
     contenedor.appendChild(card);
@@ -2816,9 +2909,22 @@ async function toggleCamareroActivoMovil(id, activo) {
   if (!db) return;
   try {
     await update(ref(db, `config/usuarios/${id}`), { activo });
+    if (!activo) await remove(ref(db, `config/sesionesCamareros/${id}`));
     console.log(`Estado activo del camarero ${id} actualizado a:`, activo);
   } catch (error) {
     showCustomAlert("Camareros", "Error al cambiar el estado del camarero.");
+  }
+}
+
+async function cerrarSesionCamareroMovil(id) {
+  if (!db) return;
+  const camarero = usuariosData[id]?.nombre || 'este camarero';
+  const ok = await showCustomConfirm('Cerrar sesión', `¿Cerrar remotamente la sesión de ${camarero}?`);
+  if (!ok) return;
+  try {
+    await remove(ref(db, `config/sesionesCamareros/${id}`));
+  } catch (_) {
+    showCustomAlert('Cerrar sesión', 'No se pudo cerrar la sesión remota.');
   }
 }
 
@@ -2862,6 +2968,7 @@ window.seleccionarEmojiMovil = seleccionarEmojiMovil;
 window.limpiarEmojisMovil = limpiarEmojisMovil;
 window.guardarEmojisMovil = guardarEmojisMovil;
 window.toggleCamareroActivoMovil = toggleCamareroActivoMovil;
+window.cerrarSesionCamareroMovil = cerrarSesionCamareroMovil;
 window.guardarEstadoEncargadoMovil = guardarEstadoEncargadoMovil;
 window.guardarPassEncargadoMovil = guardarPassEncargadoMovil;
 

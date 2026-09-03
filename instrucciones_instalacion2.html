@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instrucciones de Instalación - Comandero App</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #111a2e;
+    --accent: #3d7aff;
+    --accent-light: #eef4ff;
+    --text: #1a2238;
+    --text-muted: #5e6b87;
+    --border: #e2e8f0;
+    --bg-card: #ffffff;
+    --apple-color: #0071e3;
+    --chrome-color: #ea4335;
+    --samsung-color: #1259a4;
+    --xiaomi-color: #ff6900;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    background: #f1f5f9;
+    padding: 20px;
+    line-height: 1.4;
+  }
+
+  .container {
+    max-width: 780px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 26px 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+    border: 1px solid var(--border);
+  }
+
+  .header {
+    text-align: center;
+    border-bottom: 2px dashed var(--border);
+    padding-bottom: 14px;
+    margin-bottom: 16px;
+  }
+
+  .header-badge {
+    display: inline-block;
+    background: #eef2ff;
+    color: #3730a3;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 6px;
+  }
+
+  h1 {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--primary);
+    letter-spacing: -0.03em;
+    margin-bottom: 4px;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .alert-box {
+    background: #fffbeb;
+    border: 1px solid #fef3c7;
+    border-left: 4px solid #f59e0b;
+    padding: 9px 14px;
+    border-radius: 10px;
+    font-size: 12px;
+    color: #92400e;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .grid-devices {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .device-card {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 14px;
+    position: relative;
+  }
+
+  .device-card.apple { border-top: 3px solid var(--apple-color); }
+  .device-card.chrome { border-top: 3px solid var(--chrome-color); }
+  .device-card.samsung { border-top: 3px solid var(--samsung-color); }
+  .device-card.xiaomi { border-top: 3px solid var(--xiaomi-color); }
+
+  .device-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .device-icon {
+    font-size: 17px;
+    width: 28px;
+    height: 28px;
+    background: #ffffff;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+
+  .device-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  .steps-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .steps-list li {
+    font-size: 11.5px;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    color: #334155;
+    line-height: 1.35;
+  }
+
+  .step-num {
+    background: #e2e8f0;
+    color: #475569;
+    font-size: 10px;
+    font-weight: 700;
+    min-width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+    flex-shrink: 0;
+  }
+
+  .highlight {
+    font-weight: 700;
+    color: var(--primary);
+    background: #e2e8f0;
+    padding: 0 4px;
+    border-radius: 3px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+  }
+
+  /* SECCIÓN DEL CÓDIGO QR */
+  .qr-section {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    border-radius: 16px;
+    padding: 16px 20px;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 14px;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 6px 20px rgba(15,23,42,0.12);
+  }
+
+  .qr-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .qr-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(216, 255, 97, 0.15);
+    color: #d8ff61;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    width: fit-content;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .qr-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: -0.02em;
+    margin-top: 2px;
+  }
+
+  .qr-desc {
+    font-size: 12px;
+    color: #cbd5e1;
+    line-height: 1.4;
+  }
+
+  .qr-box {
+    background: #ffffff;
+    padding: 8px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .qr-img {
+    width: 115px;
+    height: 115px;
+    display: block;
+    object-fit: contain;
+    border-radius: 4px;
+  }
+
+  .footer-note {
+    text-align: center;
+    border-top: 1px solid var(--border);
+    padding-top: 10px;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .btn-print {
+    display: block;
+    width: 100%;
+    background: var(--primary);
+    color: #ffffff;
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 16px;
+    box-shadow: 0 4px 14px rgba(17,26,46,0.25);
+    transition: transform 0.1s;
+  }
+
+  .btn-print:active {
+    transform: scale(0.98);
+  }
+
+  /* REGLAS DE IMPRESIÓN (Ctrl + P) - Mantiene el ancho y diseño exacto de pantalla */
+  @page {
+    size: A4 portrait;
+    margin: 1.2cm auto;
+  }
+
+  @media print {
+    body {
+      background: #ffffff !important;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      max-width: 680px !important;
+      width: 680px !important;
+      margin: 0 auto !important;
+      padding: 22px 26px !important;
+      border: 1px solid #cbd5e1 !important;
+      border-radius: 16px !important;
+      box-shadow: none !important;
+      page-break-inside: avoid;
+    }
+    .btn-print {
+      display: none !important;
+    }
+    .grid-devices {
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .device-card {
+      padding: 10px 12px;
+      page-break-inside: avoid;
+      border: 1px solid #e2e8f0 !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .qr-section {
+      page-break-inside: avoid;
+      background: #0f172a !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      padding: 12px 18px;
+    }
+    .qr-img {
+      width: 105px;
+      height: 105px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="header-badge">Uso Interno Personal</div>
+    <h1>📲 Cómo Instalar la App de Comandas</h1>
+    <p class="subtitle">Sigue estos sencillos pasos tras escanear el código QR para tener el icono en tu pantalla de inicio como una App real.</p>
+  </div>
+
+  <div class="alert-box">
+    <span style="font-size: 16px;">⚠️</span>
+    <div><strong>Requisito clave:</strong> Si el enlace se abre dentro del escáner de la cámara o de WhatsApp, pulsa los 3 puntos y elige <strong>"Abrir en el navegador"</strong> (Safari o Chrome) antes de añadirlo.</div>
+  </div>
+
+  <div class="grid-devices">
+    <!-- IPHONE / IPAD -->
+    <div class="device-card apple">
+      <div class="device-header">
+        <div class="device-icon">🍏</div>
+        <div class="device-title">iPhone / iPad (Safari)</div>
+      </div>
+      <ol class="steps-list">
+        <li>
+          <span class="step-num">1</span>
+          <span>Abre la web en el navegador <strong>Safari</strong>.</span>
+        </li>
+        <li>
+          <span class="step-num">2</span>
+          <span>Toca el botón <strong>Compartir</strong> (icono del cuadrado con flecha hacia arriba <span class="highlight">⬆️</span> abajo en el centro).</span>
+        </li>
+        <li>
+          <span class="step-num">3</span>
+          <span>Baja un poco y pulsa en <span class="highlight">Añadir a pantalla de inicio ➕</span>.</span>
+        </li>
+        <li>
+          <span class="step-num">4</span>
+          <span>Pulsa <strong>"Añadir"</strong> arriba a la derecha. ¡Listo!</span>
+        </li>
+      </ol>
+    </div>
+
+    <!-- ANDROID / CHROME -->
+    <div class="device-card chrome">
+      <div class="device-header">
+        <div class="device-icon">🌐</div>
+        <div class="device-title">Android (Google Chrome)</div>
+      </div>
+      <ol class="steps-list">
+        <li>
+          <span class="step-num">1</span>
+          <span>Abre el enlace en <strong>Google Chrome</strong>.</span>
+        </li>
+        <li>
+          <span class="step-num">2</span>
+          <span>Toca los <strong>3 puntos verticales</strong> <span class="highlight">⋮</span> arriba a la derecha.</span>
+        </li>
+        <li>
+          <span class="step-num">3</span>
+          <span>Selecciona <span class="highlight">Instalar aplicación</span> o <strong>"Añadir a la pantalla de inicio"</strong>.</span>
+        </li>
+        <li>
+          <span class="step-num">4</span>
+          <span>Confirma pulsando en <strong>"Instalar"</strong>.</span>
+        </li>
+      </ol>
+    </div>
+
+    <!-- SAMSUNG -->
+    <div class="device-card samsung">
+      <div class="device-header">
+        <div class="device-icon">🪐</div>
+        <div class="device-title">Samsung (Internet / Chrome)</div>
+      </div>
+      <ol class="steps-list">
+        <li>
+          <span class="step-num">1</span>
+          <span>En Samsung Internet, pulsa el botón del <strong>menú de 3 líneas</strong> <span class="highlight">☰</span> abajo a la derecha.</span>
+        </li>
+        <li>
+          <span class="step-num">2</span>
+          <span>Pulsa en <span class="highlight">+ Añadir página a</span>.</span>
+        </li>
+        <li>
+          <span class="step-num">3</span>
+          <span>Selecciona <span class="highlight">Pantalla de inicio</span>.</span>
+        </li>
+        <li>
+          <span class="step-num">4</span>
+          <span>Pulsa <strong>"Añadir"</strong> para fijar el acceso directo.</span>
+        </li>
+      </ol>
+    </div>
+
+    <!-- XIAOMI / REDMI -->
+    <div class="device-card xiaomi">
+      <div class="device-header">
+        <div class="device-icon">📱</div>
+        <div class="device-title">Xiaomi / Redmi (Mi Browser)</div>
+      </div>
+      <ol class="steps-list">
+        <li>
+          <span class="step-num">1</span>
+          <span>Se recomienda abrir el enlace con <strong>Google Chrome</strong>.</span>
+        </li>
+        <li>
+          <span class="step-num">2</span>
+          <span>Si usas el navegador de Xiaomi, pulsa el menú inferior <span class="highlight">☰</span> o <span class="highlight">⋮</span>.</span>
+        </li>
+        <li>
+          <span class="step-num">3</span>
+          <span>Busca y pulsa la opción <span class="highlight">Herramientas &gt; Acceso directo</span> o <strong>"Añadir al escritorio"</strong>.</span>
+        </li>
+        <li>
+          <span class="step-num">4</span>
+          <span>Si pide permisos de inicio, dale a <strong>"Permitir"</strong>.</span>
+        </li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- ── SECCIÓN QR ACCESO DIRECTO ──────────────────────────────────────── -->
+  <div class="qr-section">
+    <div class="qr-info">
+      <div class="qr-badge">📷 Escanear con la cámara</div>
+      <div class="qr-title">Código QR de Acceso al Comandero</div>
+      <div class="qr-desc">
+        Escanea el código QR que te muestre el gerente para abrir directamente la aplicación en tu navegador e instalarla siguiendo las instrucciones de arriba.
+      </div>
+    </div>
+    <div class="qr-box">
+      <img src="images/qr-code.png" alt="Código QR Comandero" class="qr-img">
+    </div>
+  </div>
+
+  <div class="footer-note">
+    🔒 <strong>Documento confidencial:</strong> Mantener esta tarjeta en lugar seguro bajo llave.
+  </div>
+
+  <button class="btn-print" onclick="window.print()">🖨️ Imprimir estas instrucciones</button>
+</div>
+
+</body>
+</html>
