@@ -452,7 +452,9 @@ const PIN_AUTH_AT = 'cam_auth_at';
 const USER_KEY_SESSION = 'cam_user_key';
 const CAMARERO_SESSION_ID = 'cam_session_id';
 const DEVICE_ID_STORAGE = 'cmd_device_id';
+const DEVICE_LABEL_STORAGE = 'cmd_device_label';
 const SESION_DESCONECTADA_GRACIA_MS = 5 * 60 * 1000;
+const PRESENCIA_INTERVALO_MS = 60 * 1000;
 let usuariosData = {};
 let camareroActual = sessionStorage.getItem(USER_SESSION) || '';
 let pinBuffer = '';
@@ -462,6 +464,8 @@ let accionTrasRevalidarPin = null;
 let sesionRemotaValida = false;
 let sesionRemotaIniciada = false;
 let cancelarEscuchaSesion = null;
+let ultimaPresenciaEnviadaEn = 0;
+let ultimoEstadoPresencia = '';
 
 function generarIdSesion() {
   return crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -474,6 +478,18 @@ function obtenerIdDispositivo() {
     localStorage.setItem(DEVICE_ID_STORAGE, deviceId);
   }
   return deviceId;
+}
+
+function obtenerEtiquetaDispositivo() {
+  return String(localStorage.getItem(DEVICE_LABEL_STORAGE) || '').trim() || 'Sin identificar';
+}
+
+function solicitarEtiquetaDispositivo() {
+  const actual = localStorage.getItem(DEVICE_LABEL_STORAGE) || '';
+  const etiqueta = window.prompt('Dispositivo verificado.\n\nNombre del dispositivo (ej.: iPhone Jon):', actual);
+  if (etiqueta === null) return;
+  const limpia = String(etiqueta).trim().slice(0, 40);
+  if (limpia) localStorage.setItem(DEVICE_LABEL_STORAGE, limpia);
 }
 
 function limpiarSesionLocal() {
@@ -515,6 +531,7 @@ async function registrarSesionCamarero() {
   if (!key) return false;
   const sessionId = sessionStorage.getItem(CAMARERO_SESSION_ID) || generarIdSesion();
   const deviceId = obtenerIdDispositivo();
+  const deviceLabel = obtenerEtiquetaDispositivo();
   const sessionRef = ref(db, `config/sesionesCamareros/${key}`);
   const resultado = await runTransaction(sessionRef, anterior => {
     const desconectadaHace = Date.now() - Number(anterior?.desconectadoEn || 0);
@@ -531,6 +548,7 @@ async function registrarSesionCamarero() {
       sessionId,
       nombre: camareroActual,
       deviceId,
+      deviceLabel,
       inicio: anterior?.sessionId === sessionId ? (anterior?.inicio || Date.now()) : Date.now(),
       ultimaActividad: Date.now(),
       estado: document.visibilityState === 'visible' ? 'activo' : 'segundo_plano',
@@ -542,6 +560,8 @@ async function registrarSesionCamarero() {
   sessionStorage.setItem(USER_KEY_SESSION, key);
   sesionRemotaValida = true;
   sesionRemotaIniciada = true;
+  ultimaPresenciaEnviadaEn = Date.now();
+  ultimoEstadoPresencia = document.visibilityState === 'visible' ? 'activo' : 'segundo_plano';
   await onDisconnect(sessionRef).update({ estado: 'desconectado', desconectadoEn: serverTimestamp() });
   if (cancelarEscuchaSesion) cancelarEscuchaSesion();
   cancelarEscuchaSesion = onValue(sessionRef, snap => {
@@ -555,13 +575,20 @@ async function registrarSesionCamarero() {
   return true;
 }
 
-function actualizarPresenciaCamarero() {
+function actualizarPresenciaCamarero(forzar = false) {
   if (!sesionRemotaValida || !camareroKeyActual) return;
+  const ahora = Date.now();
+  const estado = document.visibilityState === 'visible' ? 'activo' : 'segundo_plano';
+  if (!forzar && estado === ultimoEstadoPresencia && (ahora - ultimaPresenciaEnviadaEn) < PRESENCIA_INTERVALO_MS) return;
+  ultimaPresenciaEnviadaEn = ahora;
+  ultimoEstadoPresencia = estado;
   update(ref(db, `config/sesionesCamareros/${camareroKeyActual}`), {
-    ultimaActividad: Date.now(),
-    estado: document.visibilityState === 'visible' ? 'activo' : 'segundo_plano',
+    ultimaActividad: ahora,
+    estado,
     desconectadoEn: null
-  }).catch(() => {});
+  }).catch(() => {
+    ultimaPresenciaEnviadaEn = 0;
+  });
 }
 
 function sesionPinVigente() {
@@ -599,6 +626,8 @@ try {
   const pairParam = urlParams.get('pair') || urlParams.get('token');
   if (pairParam) {
     localStorage.setItem('cmd_device_token', pairParam.trim());
+    solicitarEtiquetaDispositivo();
+    logAuditoria('dispositivo_vinculado', `Dispositivo vinculado: ${obtenerEtiquetaDispositivo()}`);
     const cleanUrl = window.location.origin + window.location.pathname + window.location.hash;
     window.history.replaceState({}, document.title, cleanUrl);
   }
@@ -622,7 +651,7 @@ onValue(ref(db, 'config/usuarios'), s => {
 
 if (sessionStorage.getItem(PIN_SESSION) === '1') limpiarSesionLocal();
 
-document.addEventListener('visibilitychange', actualizarPresenciaCamarero);
+document.addEventListener('visibilitychange', () => actualizarPresenciaCamarero(true));
 
 // Fallback to hide PIN screen connection loader after 3 seconds
 setTimeout(() => {
@@ -774,7 +803,7 @@ async function verificarPin() {
       errEl.textContent = '⚠️ Dispositivo no vinculado. Escanea el QR de la barra.';
       errEl.style.display = 'block';
       updatePinDots(true);
-      logAuditoria('login_bloqueado_dispositivo', `Intento de acceso desde móvil no emparejado. PIN probado: ${pinBuffer}`);
+      logAuditoria('login_bloqueado_dispositivo', 'Intento de acceso desde móvil no emparejado.');
       setTimeout(() => {
         pinBuffer = '';
         updatePinDots(false);
@@ -790,10 +819,10 @@ async function verificarPin() {
     updatePinDots(true);
     document.getElementById('pin-error').textContent = 'PIN incorrecto';
     document.getElementById('pin-error').style.display = 'block';
-    logAuditoria('login_incorrecto_pin', `Intento fallido de PIN. PIN probado: ${pinBuffer}`, { intento: pinFailCount });
+    logAuditoria('login_incorrecto_pin', 'Intento fallido de PIN.', { intento: pinFailCount });
     
     if (pinFailCount >= 3) {
-      logAuditoria('login_bloqueado', `Acceso bloqueado tras 3 fallos de PIN. PIN probado: ${pinBuffer}`);
+      logAuditoria('login_bloqueado', 'Acceso bloqueado tras 3 fallos de PIN.');
       pinFailCount = 0;
       lockoutDevice(30);
     } else {
@@ -929,12 +958,12 @@ async function verificarPin() {
         return;
       }
       // Emojis ya validados en este dispositivo
-      loginExitosoCompleto(`Inicio de sesión (Acceso rápido por emojis del local): ${camareroActual} (PIN: ${pin})`);
+      loginExitosoCompleto(`Inicio de sesión (acceso rápido por emojis del local): ${camareroActual}`);
       return;
     }
   }
   // Emojis desactivados o sin combinación → login directo
-  loginExitosoCompleto(`Inicio de sesión: ${camareroActual} (PIN: ${pin})`);
+  loginExitosoCompleto(`Inicio de sesión: ${camareroActual}`);
 }
 
 let selectedEmojis = [];
@@ -1083,16 +1112,16 @@ async function confirmarEmojis() {
   if (selectedStr === targetStr) {
     localStorage.setItem('emoji_auth_global', selectedStr);
     emojiFailCount = 0;
-    loginExitosoCompleto(`Inicio de sesión (Emojis verificados): ${camareroActual} (PIN: ${pin}, Emojis: ${selectedStr})`);
+    loginExitosoCompleto(`Inicio de sesión (emojis verificados): ${camareroActual}`);
   } else {
     emojiFailCount++;
     const errEl = document.getElementById('emoji-error');
     errEl.textContent = 'Combinación incorrecta';
     errEl.style.display = 'block';
-    logAuditoria('login_incorrecto_emojis', `Intento fallido de emojis: ${selectedStr} (PIN: ${pin})`, { intento: emojiFailCount });
+    logAuditoria('login_incorrecto_emojis', 'Intento fallido de emojis.', { intento: emojiFailCount });
     
     if (emojiFailCount >= 3) {
-      logAuditoria('login_bloqueado', `Acceso bloqueado tras 3 fallos de verificación de emojis. PIN: ${pin}. Emojis: ${selectedStr}`);
+      logAuditoria('login_bloqueado', 'Acceso bloqueado tras 3 fallos de verificación de emojis.');
       emojiFailCount = 0;
       lockoutDevice(30);
     } else {
@@ -1893,7 +1922,7 @@ onValue(ref(db, '.info/connected'), snap => {
   if (pLoad) pLoad.style.display = 'none';
   if (!eraConectado && isFirebaseConnected) {
     vaciarCola();
-    actualizarPresenciaCamarero();
+    actualizarPresenciaCamarero(true);
   }
 });
 
@@ -4486,6 +4515,8 @@ async function logAuditoria(accion, detalle = '', extras = {}) {
     const entrada = {
       ts, fechaKey, hora,
       camarero: camareroActual || '(sin identificar)',
+      dispositivo: obtenerEtiquetaDispositivo(),
+      dispositivoId: obtenerIdDispositivo(),
       accion,
       mesaId: mesaId || extras.mesaId || null,
       mesa: mesaNombre || extras.mesa || null,

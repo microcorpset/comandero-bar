@@ -1863,7 +1863,8 @@ window.cargarAuditoriaBajoDemanda = async () => {
       return (
         String(l.accion || '').toLowerCase().includes(textoFiltro) ||
         String(l.detalle || '').toLowerCase().includes(textoFiltro) ||
-        String(l.camarero || '').toLowerCase().includes(textoFiltro)
+        String(l.camarero || '').toLowerCase().includes(textoFiltro) ||
+        String(l.dispositivo || '').toLowerCase().includes(textoFiltro)
       );
     });
 
@@ -1928,7 +1929,7 @@ function renderAuditoria(logs) {
         <span class="timeline-user">${l.camarero || 'Desconocido'}</span>
       </div>
       <div class="timeline-action">${labelTxt}</div>
-      <div class="timeline-desc">${l.detalle || ''}</div>
+      <div class="timeline-desc">${l.detalle || ''}${l.dispositivo ? `<br><span style="font-size:11px;color:var(--text-dim)">📱 ${escapeHtml(l.dispositivo)}</span>` : ''}</div>
     `;
     listado.appendChild(item);
   });
@@ -2863,6 +2864,7 @@ function renderCamarerosListado() {
     const presencia = sesion?.estado === 'desconectado'
       ? 'DESCONECTADO'
       : (sesion?.estado === 'segundo_plano' ? 'EN SEGUNDO PLANO' : 'EN USO');
+    const dispositivo = escapeHtml(sesion?.deviceLabel || 'Sin etiqueta');
 
     card.innerHTML = `
       <div style="display: flex; flex-direction: column; gap: 4px; flex: 1; padding-right: 12px;">
@@ -2871,7 +2873,7 @@ function renderCamarerosListado() {
           🕒 ${tiempoRelativo}
         </span>
         <span style="font-size: 11px; color: ${sesionActiva ? (sesion?.estado === 'desconectado' ? '#f59e0b' : 'var(--success)') : 'var(--text-dim)'}; font-weight: 700;">
-          ${sesionActiva ? `● ${presencia}` : '○ SIN SESIÓN'}
+          ${sesionActiva ? `● ${presencia} · ${dispositivo}` : '○ SIN SESIÓN'}
         </span>
       </div>
       <div style="display: flex; align-items: center; gap: 12px;">
