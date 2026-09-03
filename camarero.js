@@ -466,6 +466,7 @@ let sesionRemotaIniciada = false;
 let cancelarEscuchaSesion = null;
 let ultimaPresenciaEnviadaEn = 0;
 let ultimoEstadoPresencia = '';
+let dialogoEtiquetaAbierto = false;
 
 function generarIdSesion() {
   return crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -485,11 +486,33 @@ function obtenerEtiquetaDispositivo() {
 }
 
 function solicitarEtiquetaDispositivo() {
-  const actual = localStorage.getItem(DEVICE_LABEL_STORAGE) || '';
-  const etiqueta = window.prompt('Dispositivo verificado.\n\nNombre del dispositivo (ej.: iPhone Jon):', actual);
-  if (etiqueta === null) return;
-  const limpia = String(etiqueta).trim().slice(0, 40);
-  if (limpia) localStorage.setItem(DEVICE_LABEL_STORAGE, limpia);
+  if (localStorage.getItem(DEVICE_LABEL_STORAGE) || dialogoEtiquetaAbierto) return;
+  const mostrar = () => {
+    if (localStorage.getItem(DEVICE_LABEL_STORAGE) || dialogoEtiquetaAbierto) return;
+    dialogoEtiquetaAbierto = true;
+    const capa = document.createElement('div');
+    capa.id = 'dialogo-etiqueta-dispositivo';
+    capa.style.cssText = 'position:fixed;inset:0;z-index:1000;background:rgba(4,9,18,.82);display:flex;align-items:center;justify-content:center;padding:20px;font-family:var(--sans,Arial,sans-serif)';
+    capa.innerHTML = '<div style="width:min(360px,100%);background:#16213a;border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:24px;color:#fff;box-shadow:0 18px 55px rgba(0,0,0,.45)"><div style="font-size:22px;margin-bottom:8px">📱 Dispositivo verificado</div><div style="font-size:13px;color:#b8c3d9;line-height:1.5;margin-bottom:18px">Pon un nombre para reconocer este móvil en las sesiones y la auditoría.</div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:7px">Nombre del dispositivo</label><input id="input-etiqueta-dispositivo" maxlength="40" placeholder="Ej.: iPhone Jon" style="width:100%;box-sizing:border-box;border:1px solid #45608b;border-radius:9px;padding:12px;background:#0e1729;color:#fff;font-size:16px"><button id="guardar-etiqueta-dispositivo" type="button" style="width:100%;margin-top:14px;border:0;border-radius:9px;padding:12px;background:#cfff4d;color:#0b1324;font-size:14px;font-weight:800;cursor:pointer">Guardar dispositivo</button></div>';
+    document.body.appendChild(capa);
+    const input = capa.querySelector('#input-etiqueta-dispositivo');
+    const guardar = () => {
+      const etiqueta = String(input.value || '').trim().slice(0, 40);
+      if (!etiqueta) { input.focus(); return; }
+      localStorage.setItem(DEVICE_LABEL_STORAGE, etiqueta);
+      capa.remove();
+      dialogoEtiquetaAbierto = false;
+      if (sesionRemotaValida && camareroKeyActual) {
+        update(ref(db, `config/sesionesCamareros/${camareroKeyActual}`), { deviceLabel: etiqueta }).catch(() => {});
+      }
+      logAuditoria('dispositivo_etiquetado', `Dispositivo etiquetado: ${etiqueta}`);
+    };
+    capa.querySelector('#guardar-etiqueta-dispositivo').addEventListener('click', guardar);
+    input.addEventListener('keydown', event => { if (event.key === 'Enter') guardar(); });
+    setTimeout(() => input.focus(), 0);
+  };
+  if (document.body) mostrar();
+  else document.addEventListener('DOMContentLoaded', mostrar, { once: true });
 }
 
 function limpiarSesionLocal() {
@@ -1879,6 +1902,11 @@ onValue(ref(db, 'config/local'), snap => {
 onValue(ref(db, 'config/verifacti'), snap => { configVf = snap.val() || {}; });
 onValue(ref(db, 'config/seguridad'), snap => {
   seguridadData = snap.val() || {};
+  if (seguridadData.deviceTokenActivo === true
+      && localStorage.getItem('cmd_device_token') === seguridadData.deviceToken
+      && !localStorage.getItem(DEVICE_LABEL_STORAGE)) {
+    solicitarEtiquetaDispositivo();
+  }
   if (sesionRemotaValida && seguridadData.bloqueoCamareros === true && seguridadData.excepcionCamarero !== camareroKeyActual) {
     bloquearSesionCamarero('El comandero ha sido bloqueado desde gerencia.', true);
   }
