@@ -467,6 +467,7 @@ let cancelarEscuchaSesion = null;
 let ultimaPresenciaEnviadaEn = 0;
 let ultimoEstadoPresencia = '';
 let dialogoEtiquetaAbierto = false;
+let cancelarEscuchaEtiquetaDispositivo = null;
 
 function generarIdSesion() {
   return crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -505,6 +506,10 @@ function solicitarEtiquetaDispositivo() {
       if (sesionRemotaValida && camareroKeyActual) {
         update(ref(db, `config/sesionesCamareros/${camareroKeyActual}`), { deviceLabel: etiqueta }).catch(() => {});
       }
+      update(ref(db, `config/dispositivosCamareros/${obtenerIdDispositivo()}`), {
+        etiqueta,
+        actualizadoEn: Date.now()
+      }).catch(() => {});
       logAuditoria('dispositivo_etiquetado', `Dispositivo etiquetado: ${etiqueta}`);
     };
     capa.querySelector('#guardar-etiqueta-dispositivo').addEventListener('click', guardar);
@@ -513,6 +518,18 @@ function solicitarEtiquetaDispositivo() {
   };
   if (document.body) mostrar();
   else document.addEventListener('DOMContentLoaded', mostrar, { once: true });
+}
+
+function escucharEtiquetaDispositivo(deviceId) {
+  if (cancelarEscuchaEtiquetaDispositivo) cancelarEscuchaEtiquetaDispositivo();
+  cancelarEscuchaEtiquetaDispositivo = onValue(ref(db, `config/dispositivosCamareros/${deviceId}`), snap => {
+    const etiqueta = String(snap.val()?.etiqueta || '').trim();
+    if (!etiqueta || etiqueta === obtenerEtiquetaDispositivo()) return;
+    localStorage.setItem(DEVICE_LABEL_STORAGE, etiqueta);
+    if (sesionRemotaValida && camareroKeyActual) {
+      update(ref(db, `config/sesionesCamareros/${camareroKeyActual}`), { deviceLabel: etiqueta }).catch(() => {});
+    }
+  });
 }
 
 function limpiarSesionLocal() {
@@ -529,6 +546,7 @@ async function bloquearSesionCamarero(motivo = 'Tu sesión ya no está autorizad
   sesionRemotaIniciada = false;
   accionTrasRevalidarPin = null;
   if (cancelarEscuchaSesion) { cancelarEscuchaSesion(); cancelarEscuchaSesion = null; }
+  if (cancelarEscuchaEtiquetaDispositivo) { cancelarEscuchaEtiquetaDispositivo(); cancelarEscuchaEtiquetaDispositivo = null; }
   const key = camareroKeyActual || sessionStorage.getItem(USER_KEY_SESSION);
   if (key) {
     try {
@@ -586,6 +604,12 @@ async function registrarSesionCamarero() {
   ultimaPresenciaEnviadaEn = Date.now();
   ultimoEstadoPresencia = document.visibilityState === 'visible' ? 'activo' : 'segundo_plano';
   await onDisconnect(sessionRef).update({ estado: 'desconectado', desconectadoEn: serverTimestamp() });
+  await update(ref(db, `config/dispositivosCamareros/${deviceId}`), {
+    etiqueta: deviceLabel,
+    camareroKey: key,
+    ultimoUso: Date.now()
+  }).catch(() => {});
+  escucharEtiquetaDispositivo(deviceId);
   if (cancelarEscuchaSesion) cancelarEscuchaSesion();
   cancelarEscuchaSesion = onValue(sessionRef, snap => {
     const sesion = snap.val();

@@ -2884,7 +2884,7 @@ function renderCamarerosListado() {
           <input type="checkbox" ${isActive ? "checked" : ""} onchange="window.toggleCamareroActivoMovil('${id}', this.checked)">
           <span class="slider"></span>
         </label>
-        ${sesionActiva ? `<button type="button" onclick="window.cerrarSesionCamareroMovil('${id}')" title="Cerrar sesión remota" style="border:1px solid var(--border);background:transparent;color:var(--danger);border-radius:6px;padding:5px 7px;cursor:pointer;">⏏</button>` : ''}
+        ${sesionActiva ? `<button type="button" onclick="window.editarEtiquetaDispositivoMovil('${id}')" title="Renombrar dispositivo" style="border:1px solid var(--border);background:transparent;color:var(--text);border-radius:6px;padding:5px 7px;cursor:pointer;">✎</button><button type="button" onclick="window.cerrarSesionCamareroMovil('${id}')" title="Cerrar sesión remota" style="border:1px solid var(--border);background:transparent;color:var(--danger);border-radius:6px;padding:5px 7px;cursor:pointer;">⏏</button>` : ''}
       </div>
     `;
     contenedor.appendChild(card);
@@ -2932,6 +2932,21 @@ async function cerrarSesionCamareroMovil(id) {
   }
 }
 
+async function editarEtiquetaDispositivoMovil(id) {
+  const sesion = sesionesCamarerosData[id];
+  if (!db || !sesion?.sessionId) return;
+  const etiqueta = await showCustomPrompt('Renombrar dispositivo', 'Nombre visible para esta sesión y la auditoría:', sesion.deviceLabel || '');
+  const limpia = String(etiqueta || '').trim().slice(0, 40);
+  if (!limpia) return;
+  const cambios = { [`config/sesionesCamareros/${id}/deviceLabel`]: limpia };
+  if (sesion.deviceId) cambios[`config/dispositivosCamareros/${sesion.deviceId}/etiqueta`] = limpia;
+  try {
+    await update(ref(db), cambios);
+  } catch (_) {
+    showCustomAlert('Dispositivo', 'No se pudo guardar el nuevo nombre.');
+  }
+}
+
 async function moverArt(id, catId, idx, dir) {
   const arts = Object.entries(cartaData)
     .filter(([_, p]) => p.catId === catId)
@@ -2973,6 +2988,7 @@ window.limpiarEmojisMovil = limpiarEmojisMovil;
 window.guardarEmojisMovil = guardarEmojisMovil;
 window.toggleCamareroActivoMovil = toggleCamareroActivoMovil;
 window.cerrarSesionCamareroMovil = cerrarSesionCamareroMovil;
+window.editarEtiquetaDispositivoMovil = editarEtiquetaDispositivoMovil;
 window.guardarEstadoEncargadoMovil = guardarEstadoEncargadoMovil;
 window.guardarPassEncargadoMovil = guardarPassEncargadoMovil;
 
