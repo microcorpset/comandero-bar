@@ -2860,7 +2860,9 @@ function renderCamarerosListado() {
     const tiempoRelativo = calcularTiempoRelativo(u.ultimoLogin);
     const sesion = sesionesCamarerosData[id];
     const sesionActiva = Boolean(sesion?.sessionId);
-    const presencia = sesion?.estado === 'segundo_plano' ? 'EN SEGUNDO PLANO' : 'EN USO';
+    const presencia = sesion?.estado === 'desconectado'
+      ? 'DESCONECTADO'
+      : (sesion?.estado === 'segundo_plano' ? 'EN SEGUNDO PLANO' : 'EN USO');
 
     card.innerHTML = `
       <div style="display: flex; flex-direction: column; gap: 4px; flex: 1; padding-right: 12px;">
@@ -2868,7 +2870,7 @@ function renderCamarerosListado() {
         <span style="font-size: 11px; color: var(--text-dim); display: flex; align-items: center; gap: 4px;">
           🕒 ${tiempoRelativo}
         </span>
-        <span style="font-size: 11px; color: ${sesionActiva ? 'var(--success)' : 'var(--text-dim)'}; font-weight: 700;">
+        <span style="font-size: 11px; color: ${sesionActiva ? (sesion?.estado === 'desconectado' ? '#f59e0b' : 'var(--success)') : 'var(--text-dim)'}; font-weight: 700;">
           ${sesionActiva ? `● ${presencia}` : '○ SIN SESIÓN'}
         </span>
       </div>

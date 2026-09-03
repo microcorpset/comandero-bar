@@ -11,7 +11,7 @@ if (!_dominiosPermitidos.some(d => location.hostname === d || location.hostname.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { authReady, db } from './firebase.js';
-import { ref, onValue, push, set, remove, get, update, query, orderByChild, limitToLast, runTransaction, onDisconnect }
+import { ref, onValue, push, set, remove, get, update, query, orderByChild, limitToLast, runTransaction, onDisconnect, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import {
   fmtFechaVf, buildLineasVf, siguienteNumero, verNumeroActual,
@@ -451,6 +451,7 @@ const USER_SESSION = 'cam_user';
 const PIN_AUTH_AT = 'cam_auth_at';
 const USER_KEY_SESSION = 'cam_user_key';
 const CAMARERO_SESSION_ID = 'cam_session_id';
+const SESION_DESCONECTADA_GRACIA_MS = 5 * 60 * 1000;
 let usuariosData = {};
 let camareroActual = sessionStorage.getItem(USER_SESSION) || '';
 let pinBuffer = '';
@@ -505,13 +506,18 @@ async function registrarSesionCamarero() {
   const sessionId = sessionStorage.getItem(CAMARERO_SESSION_ID) || generarIdSesion();
   const sessionRef = ref(db, `config/sesionesCamareros/${key}`);
   const resultado = await runTransaction(sessionRef, anterior => {
-    if (anterior && anterior.sessionId && anterior.sessionId !== sessionId) return;
+    const desconectadaHace = Date.now() - Number(anterior?.desconectadoEn || 0);
+    const sesionCaducada = anterior?.estado === 'desconectado'
+      && Number(anterior?.desconectadoEn || 0) > 0
+      && desconectadaHace >= SESION_DESCONECTADA_GRACIA_MS;
+    if (anterior && anterior.sessionId && anterior.sessionId !== sessionId && !sesionCaducada) return;
     return {
       sessionId,
       nombre: camareroActual,
-      inicio: anterior?.inicio || Date.now(),
+      inicio: anterior?.sessionId === sessionId ? (anterior?.inicio || Date.now()) : Date.now(),
       ultimaActividad: Date.now(),
-      estado: document.visibilityState === 'visible' ? 'activo' : 'segundo_plano'
+      estado: document.visibilityState === 'visible' ? 'activo' : 'segundo_plano',
+      desconectadoEn: null
     };
   });
   if (!resultado.committed) return false;
@@ -519,7 +525,7 @@ async function registrarSesionCamarero() {
   sessionStorage.setItem(USER_KEY_SESSION, key);
   sesionRemotaValida = true;
   sesionRemotaIniciada = true;
-  await onDisconnect(sessionRef).remove();
+  await onDisconnect(sessionRef).update({ estado: 'desconectado', desconectadoEn: serverTimestamp() });
   if (cancelarEscuchaSesion) cancelarEscuchaSesion();
   cancelarEscuchaSesion = onValue(sessionRef, snap => {
     const sesion = snap.val();
@@ -534,7 +540,8 @@ function actualizarPresenciaCamarero() {
   if (!sesionRemotaValida || !camareroKeyActual) return;
   update(ref(db, `config/sesionesCamareros/${camareroKeyActual}`), {
     ultimaActividad: Date.now(),
-    estado: document.visibilityState === 'visible' ? 'activo' : 'segundo_plano'
+    estado: document.visibilityState === 'visible' ? 'activo' : 'segundo_plano',
+    desconectadoEn: null
   }).catch(() => {});
 }
 
@@ -1865,7 +1872,10 @@ onValue(ref(db, '.info/connected'), snap => {
   actualizarBannerOffline();
   const pLoad = document.getElementById('pin-loading');
   if (pLoad) pLoad.style.display = 'none';
-  if (!eraConectado && isFirebaseConnected) vaciarCola();
+  if (!eraConectado && isFirebaseConnected) {
+    vaciarCola();
+    actualizarPresenciaCamarero();
+  }
 });
 
 // ── HELPERS ───────────────────────────────────────────────────────────────────
