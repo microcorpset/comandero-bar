@@ -1,0 +1,12 @@
+{
+  "name": "TPV Bar",
+  "short_name": "TPV",
+  "start_url": "./comandero.html?modo=tpv",
+  "display": "standalone",
+  "background_color": "#eef2f8",
+  "theme_color": "#111a2e",
+  "icons": [
+    { "src": "./icons/camarero-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "./icons/camarero-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

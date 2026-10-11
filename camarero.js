@@ -1,8 +1,10 @@
 // ── PROTECCIÓN DE DOMINIO ─────────────────────────────────────────────────────
 const _dominiosPermitidos = [
+  'jongt23.github.io',
   'microcorpset.github.io',
   'localhost',
-  '127.0.0.1'
+  '127.0.0.1',
+  '192.168.1.198'
 ];
 if (!_dominiosPermitidos.some(d => location.hostname === d || location.hostname.endsWith('.' + d))) {
   document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:monospace;color:#888">Acceso no autorizado</div>';
@@ -11,6 +13,7 @@ if (!_dominiosPermitidos.some(d => location.hostname === d || location.hostname.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { authReady, db } from './firebase.js';
+import { iniciarAccesoCorreo } from './auth-email.js';
 import { ref, onValue, push, set, remove, get, update, query, orderByChild, limitToLast, runTransaction, onDisconnect, serverTimestamp }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import {
@@ -20,6 +23,7 @@ import {
   labelTipoFactura
 } from './verifacti.js';
 
+let clientesCache = [];
 
 await authReady;
 cargarClientesAutocomplete();
@@ -139,6 +143,20 @@ function mostrarAyudaContextual() {
     `;
   }
 
+  // La parte fiscal sólo se muestra cuando el comercio ha activado el
+  // proveedor directo. Así no mezclamos esta guía con Verifacti heredado.
+  if (isTicket && configVfAeat?.habilitado === true) {
+    html += `
+      <div style="margin-top:14px;padding-top:13px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:9px;font-family:var(--sans);font-size:13px;line-height:1.55;color:var(--text)">
+        <div style="font-weight:700;color:var(--accent)">🧾 Facturación VERI*FACTU</div>
+        <div><strong>F2:</strong> factura simplificada. <strong>F1:</strong> factura completa, con los datos del destinatario.</div>
+        <div><strong>F3:</strong> sustituye una simplificada por una completa y debe identificar la F2 sustituida. <strong>R:</strong> rectifica una factura ya emitida y debe identificar la factura rectificada.</div>
+        <div>Una factura enviada no se vuelve a emitir para imprimirla: utiliza <strong>Reimprimir</strong>. Si hay un error, se emite la rectificativa que corresponda; no se borra la original.</div>
+        <button type="button" class="modal-btn" id="btn-ayuda-declaracion-responsable" style="align-self:flex-start">Ver declaración responsable</button>
+      </div>
+    `;
+  }
+
   // Render modal
   const modalTitle = document.getElementById('modal-title');
   const modalBody = document.getElementById('modal-body');
@@ -155,6 +173,53 @@ function mostrarAyudaContextual() {
   acts.appendChild(btnClose);
 
   document.getElementById('modal-overlay').classList.add('open');
+  document.getElementById('btn-ayuda-declaracion-responsable')?.addEventListener('click', mostrarDeclaracionResponsableVerifactu);
+}
+
+function mostrarDeclaracionResponsableVerifactu() {
+  const sif = configVfAeat?.sistemaInformatico || {};
+  // Valores de identificación del productor ya declarados para Comandero. La
+  // configuración guardada puede actualizarse desde Desarrollador.
+  const productor = {
+    razonSocial: 'José González Ortega', nif: '74937161X',
+    direccion: 'El Mayorazgo, s/n', codigoPostal: '11692', municipio: 'Setenil de las Bodegas', provincia: 'Cádiz', email: 'jongt23@gmail.com',
+    ...(configVfAeat?.desarrollador || {})
+  };
+  const declaracion = { fechaFirma: '2026-09-26', ...(configVfAeat?.declaracionResponsable || {}) };
+  const pendiente = !productor.nif || !productor.razonSocial || !productor.direccion || !productor.municipio || !productor.provincia || !sif.nombre || !sif.id || !sif.version || !declaracion.fechaFirma;
+  const dato = value => value ? String(value) : '<em>pendiente de completar en Desarrollador</em>';
+  const fecha = declaracion.fechaFirma
+    ? new Date(`${declaracion.fechaFirma}T12:00:00`).toLocaleDateString('es-ES', { day: '2-digit', month: 'long', year: 'numeric' })
+    : '<em>pendiente de indicar en Desarrollador</em>';
+  const html = `
+    <div style="display:flex;flex-direction:column;gap:11px;font-family:var(--sans);font-size:13px;line-height:1.55;color:var(--text)">
+      <p><strong>DECLARACIÓN RESPONSABLE DEL SISTEMA INFORMÁTICO DE FACTURACIÓN</strong></p>
+      ${pendiente ? '<div style="padding:9px;border-radius:8px;background:#fff3cd;color:#7a5600">Borrador incompleto: no debe firmarse ni presentarse hasta completar los datos del productor y realizar la revisión final de cumplimiento.</div>' : ''}
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div><strong>1.a) Nombre del sistema informático:</strong><br>${dato(sif.nombre)}</div>
+        <div><strong>1.b) Código identificador del sistema informático:</strong><br>${dato(sif.id)}</div>
+        <div><strong>1.c) Identificador completo de la versión concreta:</strong><br>${dato(sif.version)}</div>
+        <div><strong>1.d) Componentes, instalación y funcionalidades principales:</strong><br>Comandero es una aplicación de gestión de comandas y facturación instalada para su uso mediante navegador web. El componente fiscal se ejecuta en el PC fiscal con sistema Windows mediante el servicio local psVF.exe, que mantiene el libro fiscal y la numeración correlativa en una base de datos SQLite local, usa el certificado electrónico instalado localmente para comunicarse con la AEAT y genera la impresión fiscal y el código QR. La aplicación web conserva la operativa de sala y consulta registros publicados. El sistema permite expedir facturas completas, simplificadas, sustitutivas y rectificativas; generar el registro de facturación, encadenarlo mediante huella, remitirlo a AEAT, consultar los registros y reimprimir sin emitir una factura nueva.</div>
+        <div><strong>1.e) Uso exclusivo como VERI*FACTU:</strong><br>S - Sí. El sistema fiscal se ha producido para funcionar exclusivamente en modalidad VERI*FACTU.</div>
+        <div><strong>1.f) Uso por varios obligados tributarios en una misma instalación:</strong><br>N - No. Cada instalación fiscal se configura para un único obligado tributario emisor.</div>
+        <div><strong>1.g) Tipos de firma de los registros en modo no VERI*FACTU:</strong><br>No aplica. Al tratarse de un sistema de uso exclusivamente VERI*FACTU, no se realiza una firma electrónica expresa de los registros de facturación; su remisión se efectúa a los servicios electrónicos de la AEAT con la debida autenticación mediante certificado electrónico.</div>
+        <div><strong>1.h) Nombre y apellidos de la persona productora:</strong><br>${dato(productor.razonSocial)}</div>
+        <div><strong>1.i) NIF español de la persona productora:</strong><br>${dato(productor.nif)}</div>
+        <div><strong>1.j) Dirección postal completa de contacto de la persona productora:</strong><br>${dato(productor.direccion)}<br>${dato(productor.codigoPostal)} - ${dato(productor.municipio)} (${dato(productor.provincia)})<br>España.</div>
+        <div><strong>1.k) Declaración de cumplimiento:</strong><br>La persona productora del sistema informático hace constar que dicho sistema, en la versión indicada, cumple con lo dispuesto en el artículo 29.2.j) de la Ley 58/2003, de 17 de diciembre, General Tributaria; en el Reglamento aprobado por el Real Decreto 1007/2023, de 5 de diciembre; en la Orden HAC/1177/2024, de 17 de octubre; y en la sede electrónica de la Agencia Estatal de Administración Tributaria para aquello que complete sus especificaciones.</div>
+        <div><strong>1.l) Fecha y lugar de suscripción:</strong><br>${fecha}.<br>${dato(productor.municipio)} (${dato(productor.provincia)}) - España.</div>
+        <div><strong>ANEXO - 2.a) Otra forma de contacto:</strong><br>Correo electrónico: ${dato(productor.email)}</div>
+        <div><strong>ANEXO - 2.c) Aplicación de las especificaciones:</strong><br>La emisión y generación del registro se consolida en una única operación local antes de su remisión. El registro incorpora la huella de su registro previo y se conserva localmente junto con su respuesta de envío. El certificado y su contraseña no se almacenan en la aplicación web ni en Firebase: permanecen protegidos en el PC fiscal.</div>
+      </div>
+      <div style="margin-top:10px;padding-top:32px;border-top:1px solid var(--border)"><strong>Firma de la persona productora:</strong><br><span style="color:var(--muted)">${dato(productor.razonSocial)} · NIF ${dato(productor.nif)}</span></div>
+    </div>`;
+  const buttons = [];
+  const pdfFirmado = String(declaracion.urlPdfFirmado || '').trim();
+  if (pdfFirmado) {
+    buttons.push({ label: 'Ver PDF firmado', action: () => window.open(pdfFirmado, '_blank', 'noopener') });
+  }
+  buttons.push({ label: 'Cerrar', style: 'primary' });
+  showModalHTML('📄 Declaración responsable', html, buttons);
 }
 
 function initPedidosBoton() {
@@ -425,6 +490,7 @@ let catsReady = !!menuCache.categorias;
 let cartaReady = !!menuCache.carta;
 let configLocal = {};
 let configVf = {};
+let configVfAeat = {};
 let ticketEditMode = false;
 let ticketSimplificado = true;
 let ticketPreciosMode = false;
@@ -451,6 +517,7 @@ const USER_SESSION = 'cam_user';
 const PIN_AUTH_AT = 'cam_auth_at';
 const USER_KEY_SESSION = 'cam_user_key';
 const CAMARERO_SESSION_ID = 'cam_session_id';
+const CAMARERO_SESSION_DESPLAZADA = 'cam_session_desplazada';
 const DEVICE_ID_STORAGE = 'cmd_device_id';
 const DEVICE_LABEL_STORAGE = 'cmd_device_label';
 const SESION_DESCONECTADA_GRACIA_MS = 5 * 60 * 1000;
@@ -463,11 +530,15 @@ let camareroKeyActual = '';
 let accionTrasRevalidarPin = null;
 let sesionRemotaValida = false;
 let sesionRemotaIniciada = false;
+let sesionDesplazada = sessionStorage.getItem(CAMARERO_SESSION_DESPLAZADA) === '1';
 let cancelarEscuchaSesion = null;
 let ultimaPresenciaEnviadaEn = 0;
 let ultimoEstadoPresencia = '';
 let dialogoEtiquetaAbierto = false;
 let cancelarEscuchaEtiquetaDispositivo = null;
+let modoAccesoCorreo = false;
+let cancelarPerfilAccesoCorreo = null;
+let controlAccesoCorreo = null;
 
 function generarIdSesion() {
   return crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -532,18 +603,21 @@ function escucharEtiquetaDispositivo(deviceId) {
   });
 }
 
-function limpiarSesionLocal() {
+function limpiarSesionLocal(conservarAvisoDesplazado = false) {
   sessionStorage.removeItem(PIN_SESSION);
   sessionStorage.removeItem(PIN_AUTH_AT);
   sessionStorage.removeItem(USER_SESSION);
   sessionStorage.removeItem(USER_KEY_SESSION);
   sessionStorage.removeItem(CAMARERO_SESSION_ID);
+  if (!conservarAvisoDesplazado) sessionStorage.removeItem(CAMARERO_SESSION_DESPLAZADA);
 }
 
-async function bloquearSesionCamarero(motivo = 'Tu sesión ya no está autorizada.', eliminarRemota = false) {
+async function bloquearSesionCamarero(motivo = 'Tu sesión ya no está autorizada.', eliminarRemota = false, porOtraSesion = false) {
   if (!sesionRemotaIniciada && !sesionRemotaValida) return;
   sesionRemotaValida = false;
   sesionRemotaIniciada = false;
+  sesionDesplazada = porOtraSesion;
+  if (porOtraSesion) sessionStorage.setItem(CAMARERO_SESSION_DESPLAZADA, '1');
   accionTrasRevalidarPin = null;
   if (cancelarEscuchaSesion) { cancelarEscuchaSesion(); cancelarEscuchaSesion = null; }
   if (cancelarEscuchaEtiquetaDispositivo) { cancelarEscuchaEtiquetaDispositivo(); cancelarEscuchaEtiquetaDispositivo = null; }
@@ -554,13 +628,17 @@ async function bloquearSesionCamarero(motivo = 'Tu sesión ya no está autorizad
       if (eliminarRemota) await remove(ref(db, `config/sesionesCamareros/${key}`));
     } catch (_) {}
   }
-  limpiarSesionLocal();
+  limpiarSesionLocal(porOtraSesion);
   camareroActual = '';
   camareroKeyActual = '';
   pinBuffer = '';
   updatePinDots(false);
   document.getElementById('emoji-screen').style.display = 'none';
   document.getElementById('pin-screen').style.display = 'flex';
+  if (modoAccesoCorreo && controlAccesoCorreo) {
+    controlAccesoCorreo.mostrar(motivo);
+    return;
+  }
   const sub = document.getElementById('pin-sub');
   if (sub) sub.textContent = motivo;
   const error = document.getElementById('pin-error');
@@ -583,8 +661,8 @@ async function registrarSesionCamarero() {
     // Las sesiones anteriores a esta mejora no incluían deviceId: se pueden
     // recuperar una vez con el PIN y quedarán migradas al nuevo formato.
     const sesionLegacy = anterior && anterior.sessionId && !anterior.deviceId;
-    if (anterior && anterior.sessionId && anterior.sessionId !== sessionId
-        && !mismoDispositivo && !sesionCaducada && !sesionLegacy) return;
+    // La cuenta tiene un único móvil activo: un acceso válido desde otro
+    // dispositivo sustituye esta sesión y el listener del móvil anterior la cierra.
     return {
       sessionId,
       nombre: camareroActual,
@@ -616,7 +694,8 @@ async function registrarSesionCamarero() {
     if (sesionRemotaIniciada && !sesion) {
       bloquearSesionCamarero('Sesión cerrada desde gerencia. Introduce tu PIN para volver a acceder.');
     } else if (sesionRemotaIniciada && sesion.sessionId !== sessionId) {
-      bloquearSesionCamarero('Esta sesión se ha abierto desde otra pestaña o dispositivo. Introduce tu PIN para continuar.');
+      logAuditoria('sesion_sustituida', 'La cuenta ha iniciado sesión en otro dispositivo; esta sesión se ha cerrado.');
+      bloquearSesionCamarero('Esta cuenta se ha iniciado en otro dispositivo. Esta sesión se ha cerrado. Si no has sido tú, avisa al gerente o administrador y restablece tu contraseña.', false, true);
     }
   });
   return true;
@@ -697,6 +776,71 @@ onValue(ref(db, 'config/usuarios'), s => {
 });
 
 if (sessionStorage.getItem(PIN_SESSION) === '1') limpiarSesionLocal();
+
+async function autorizarCamareroPorCorreo(user, perfil) {
+  if (sesionDesplazada) {
+    controlAccesoCorreo?.mostrar('Esta cuenta se ha iniciado en otro dispositivo. Esta sesión permanece cerrada para no interrumpir al otro móvil. Si no has sido tú, avisa al gerente o administrador y restablece tu contraseña. Usa “Cambiar de cuenta” si lo necesitas.');
+    return;
+  }
+  const uid = user.uid;
+  if (sesionRemotaValida && camareroKeyActual === uid) return;
+  camareroActual = String(perfil.nombre || user.email || 'Camarero').trim();
+  camareroKeyActual = uid;
+  usuariosData[uid] = { nombre: camareroActual, activo: true };
+  try {
+    const iniciada = await registrarSesionCamarero();
+    if (!iniciada) throw new Error('No se pudo registrar el dispositivo');
+    sessionStorage.setItem(PIN_SESSION, '1');
+    sessionStorage.setItem(USER_SESSION, camareroActual);
+    sessionStorage.setItem(PIN_AUTH_AT, String(Date.now()));
+    document.getElementById('pin-screen').style.display = 'none';
+    document.getElementById('emoji-screen').style.display = 'none';
+    document.getElementById('topbar-camarero').textContent = camareroActual;
+    actualizarCabecera();
+    if (typeof actualizarBotonMias === 'function') actualizarBotonMias();
+    logAuditoria('login', `Inicio de sesión por correo: ${camareroActual}`);
+    comprobarNovedadesFirebase();
+    update(ref(db, `config/authUsuarios/${uid}`), { ultimoLogin: Date.now() }).catch(() => {});
+  } catch (error) {
+    console.error('No se pudo autorizar al camarero:', error);
+    controlAccesoCorreo?.mostrar('No se pudo abrir la sesión. Comprueba tu conexión.');
+  }
+}
+
+function iniciarAccesoCorreoCamarero() {
+  modoAccesoCorreo = true;
+  controlAccesoCorreo = iniciarAccesoCorreo({
+    contenedor: document.getElementById('pin-screen'),
+    titulo: 'Comandero · Sala',
+    subtitulo: 'Accede con la cuenta creada por el responsable del local.',
+    alSalir: () => {
+      sesionDesplazada = false;
+      sessionStorage.removeItem(CAMARERO_SESSION_DESPLAZADA);
+      if (cancelarPerfilAccesoCorreo) { cancelarPerfilAccesoCorreo(); cancelarPerfilAccesoCorreo = null; }
+      if (!sesionRemotaValida) document.getElementById('emoji-screen').style.display = 'none';
+    },
+    alAutenticar: (user, mostrar) => {
+      if (cancelarPerfilAccesoCorreo) cancelarPerfilAccesoCorreo();
+      cancelarPerfilAccesoCorreo = onValue(ref(db, `config/authUsuarios/${user.uid}`), snap => {
+        const perfil = snap.val() || {};
+        if (perfil.rol !== 'camarero') {
+          mostrar('Esta cuenta no tiene permiso para acceder a Sala.');
+          return;
+        }
+        if (perfil.activo !== true) {
+          if (sesionRemotaValida) bloquearSesionCamarero('No estás autorizado para este turno.', true);
+          else mostrar('No estás autorizado para este turno. Pide al gerente que active tu cuenta.');
+          return;
+        }
+        autorizarCamareroPorCorreo(user, perfil);
+      }, () => mostrar('No se pudo comprobar el permiso de esta cuenta.'));
+    }
+  });
+}
+
+// Esperamos a que el módulo termine de declarar todo su estado antes de que
+// Firebase pueda responder con una sesión ya persistida.
+queueMicrotask(iniciarAccesoCorreoCamarero);
 
 document.addEventListener('visibilitychange', () => actualizarPresenciaCamarero(true));
 
@@ -1232,7 +1376,7 @@ async function comprobarNovedadesFirebase() {
   }
 }
 
-document.getElementById('pin-pad').addEventListener('click', e => {
+document.getElementById('pin-pad')?.addEventListener('click', e => {
   const btn = e.target.closest('[data-k]');
   if (!btn) return;
   const k = btn.dataset.k;
@@ -1241,7 +1385,7 @@ document.getElementById('pin-pad').addEventListener('click', e => {
 });
 
 // EMOJI SLOT MACHINE LISTENERS
-document.getElementById('emoji-btn-confirm').addEventListener('click', confirmarEmojis);
+document.getElementById('emoji-btn-confirm')?.addEventListener('click', confirmarEmojis);
 
 // ── MODAL ─────────────────────────────────────────────────────────────────────
 function showModal({ title, body, buttons }) {
@@ -1924,9 +2068,11 @@ onValue(ref(db, 'config/local'), snap => {
   if (mesasLinks) mesasLinks.style.display = configLocal.comandaAutoServir ? 'none' : '';
 });
 onValue(ref(db, 'config/verifacti'), snap => { configVf = snap.val() || {}; });
+// Proveedor directo AEAT: independiente de la configuración heredada Verifacti.
+onValue(ref(db, 'config/verifactuAeat'), snap => { configVfAeat = snap.val() || {}; });
 onValue(ref(db, 'config/seguridad'), snap => {
   seguridadData = snap.val() || {};
-  if (seguridadData.deviceTokenActivo === true
+  if (!modoAccesoCorreo && seguridadData.deviceTokenActivo === true
       && localStorage.getItem('cmd_device_token') === seguridadData.deviceToken
       && !localStorage.getItem(DEVICE_LABEL_STORAGE)) {
     solicitarEtiquetaDispositivo();
@@ -1934,7 +2080,7 @@ onValue(ref(db, 'config/seguridad'), snap => {
   if (sesionRemotaValida && seguridadData.bloqueoCamareros === true && seguridadData.excepcionCamarero !== camareroKeyActual) {
     bloquearSesionCamarero('El comandero ha sido bloqueado desde gerencia.', true);
   }
-  if (sesionRemotaValida && seguridadData.deviceTokenActivo === true
+  if (!modoAccesoCorreo && sesionRemotaValida && seguridadData.deviceTokenActivo === true
       && localStorage.getItem('cmd_device_token') !== seguridadData.deviceToken) {
     bloquearSesionCamarero('La autorización de este dispositivo ha sido revocada. Escanea el nuevo QR.', true);
   }
@@ -3160,13 +3306,16 @@ function confirmarSalidaMesa() {
 // ── CARTA ─────────────────────────────────────────────────────────────────────
 function renderCarta() {
   const body = document.getElementById('carta-body');
-  const cats = Object.entries(categoriasData).sort(([, a], [, b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre, 'es'));
+  // Sin la propiedad `visible` se conserva el comportamiento histórico: mostrar.
+  const cats = Object.entries(categoriasData)
+    .filter(([, cat]) => cat.visible !== false)
+    .sort(([, a], [, b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre, 'es'));
   if (!cats.length) { body.innerHTML = '<div class="loading">Sin categorías.</div>'; return; }
   body.innerHTML = '';
 
   cats.forEach(([catId, cat]) => {
     const arts = Object.entries(cartaData)
-      .filter(([, a]) => a.catId === catId)
+      .filter(([, a]) => a.catId === catId && a.visible !== false)
       .sort(([, a], [, b]) => (a.orden ?? 999) - (b.orden ?? 999) || a.nombre.localeCompare(b.nombre, 'es'));
     if (!arts.length) return;
 
@@ -3290,6 +3439,10 @@ function renderCarta() {
     body.appendChild(section);
   });
 
+  if (!body.childElementCount) {
+    body.innerHTML = '<div class="loading">No hay artículos visibles.</div>';
+  }
+
   // Evento delegado para botones qty
   body.onclick = e => {
     const btn = e.target.closest('[data-d]');
@@ -3306,7 +3459,7 @@ function renderCarta() {
       <button type="button" class="category-chip ${!activeCatId ? 'active' : ''}" onclick="window.cambiarChipCategoria('')">Todas</button>
     `;
     cats.forEach(([catId, cat]) => {
-      const arts = Object.entries(cartaData).filter(([, a]) => a.catId === catId);
+      const arts = Object.entries(cartaData).filter(([, a]) => a.catId === catId && a.visible !== false);
       if (!arts.length) return;
       chipsHtml += `
         <button type="button" class="category-chip ${activeCatId === catId ? 'active' : ''}" onclick="window.cambiarChipCategoria('${catId}')">${cat.nombre}</button>
@@ -3347,7 +3500,7 @@ function renderCarta() {
 
     // 2. Cada categoría
     cats.forEach(([catId, cat]) => {
-      const arts = Object.entries(cartaData).filter(([, a]) => a.catId === catId);
+      const arts = Object.entries(cartaData).filter(([, a]) => a.catId === catId && a.visible !== false);
       if (!arts.length) return;
       
       const isActiva = activeCatId === catId;
@@ -3407,7 +3560,7 @@ function renderCarta() {
 
     // 2. Cada categoría
     cats.forEach(([catId, cat]) => {
-      const arts = Object.entries(cartaData).filter(([, a]) => a.catId === catId);
+      const arts = Object.entries(cartaData).filter(([, a]) => a.catId === catId && a.visible !== false);
       if (!arts.length) return;
       
       const isActiva = activeCatId === catId;
@@ -3758,6 +3911,7 @@ function abrirComboModal(artId, art) {
             artId: optArtId,
             nombre: subArt.nombre,
             destino: subArt.destino || 'barra',
+            iva: Number(subArt.iva ?? 10),
             suplemento: item.suplemento || 0,
             variante: null
           };
@@ -3818,6 +3972,7 @@ window.confirmarCombo = (artId, art, selections, qty) => {
       artId: s.artId,
       nombre: s.nombre,
       destino: s.destino,
+      iva: Number(s.iva ?? 10),
       suplemento: s.suplemento,
       variante: s.variante
     })),
@@ -4760,6 +4915,7 @@ async function realizarEnvioPedido(tableUpdates) {
         artId,
         nombre: art.nombre,
         precio: Number(basePrecio),
+        iva: Number(art.iva ?? 10),
         qty,
         destino: 'none',
         estado: estadoInicial,
@@ -4782,6 +4938,7 @@ async function realizarEnvioPedido(tableUpdates) {
           artId: s.artId,
           nombre: subNombre,
           precio: Number(s.suplemento || 0),
+          iva: Number(s.iva ?? 10),
           qty,
           destino: s.destino || 'barra',
           estado: estadoInicial,
@@ -4801,6 +4958,7 @@ async function realizarEnvioPedido(tableUpdates) {
         artId,
         nombre: art.nombre,
         precio: Number(art.precio),
+        iva: Number(art.iva ?? 10),
         qty,
         destino: art.destino,
         estado: estadoInicial,
@@ -5040,18 +5198,21 @@ async function upsertHistorial(datos, targetMesaId = null) {
         ...datos,
         verifactu: datos.verifactu ?? ventaExistente.verifactu ?? null
       });
+      return ventaKey;
     } else {
       const newRef = await push(ref(db, 'historial'), datos);
       if (mId) {
         await set(ref(db, `pedidos/${mId}/_meta/ventaKey`), newRef.key);
       }
+      return newRef.key;
     }
   } catch (e) {
     console.error('Error en upsertHistorial:', e);
+    return null;
   }
 }
 
-async function enviarTicketFinalAServicio(lineasServidas, total, cobro = null, verifactu = null) {
+async function enviarTicketFinalAServicio(lineasServidas, total, cobro = null, verifactu = null, verifactuAeat = null) {
   const paperCfg = getTicketPaperConfig(configLocal);
   const serviceId = String(configLocal?.ticketPrintServiceId || 'local-print-service-1').trim() || 'local-print-service-1';
   const payload = {
@@ -5084,10 +5245,12 @@ async function enviarTicketFinalAServicio(lineasServidas, total, cobro = null, v
       nombre: l.nombre,
       qty: Number(l.qtyCuenta || 0),
       precio: Math.round(Number(l.precio || 0) * 100) / 100,
+      iva: Number(l.iva ?? 10),
       nota: configLocal?.ticketShowNotes === false ? '' : limpiarNotaTicket(l.nota)
     })),
     cobro: cobro ? { recibido: Math.round(cobro.recibido * 100) / 100, cambio: Math.round(cobro.cambio * 100) / 100 } : null,
-    verifactu: verifactu || null
+    verifactu: verifactu || null,
+    verifactuAeat: verifactuAeat || null
   };
 
   // Guardar en historial ANTES de enviar al servicio (por si el servicio falla)
@@ -5706,7 +5869,7 @@ function renderTicket(pedidos) {
     '<button class="btn-print no-print-btn" style="flex:1;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:11px 14px;font-family:var(--mono);font-size:13px;font-weight:bold;cursor:pointer;margin-top:0;">Imprimir ticket</button>' +
     '<button class="btn-cobrar no-print" style="flex:1;background:rgba(53,199,119,.15);color:var(--success);border:1px solid rgba(53,199,119,.5);border-radius:12px;padding:10px 14px;font-family:var(--mono);font-size:13px;font-weight:bold;cursor:pointer">Cobrar</button>' +
     '</div>' +
-    (configVf?.habilitado ? renderVfButtons(vfRef) : renderStandardBillingButtons(pedidos['_standard_factura'] || null)) +
+    ((configVfAeat?.habilitado || configVf?.habilitado) ? renderVfButtons(vfRef) : renderStandardBillingButtons(pedidos['_standard_factura'] || null)) +
     '<button class="btn-refresh no-print">Actualizar ticket</button>' +
     '<button class="btn-cerrar">Cerrar mesa y limpiar</button>';
 
@@ -5793,7 +5956,8 @@ function renderTicket(pedidos) {
       const ref_ = vfRef || {};
       window.showVfRectificativaModal({ serie: ref_.serie, numero: ref_.numero, fecha: ref_.fecha, tipo: ref_.tipo });
     } else if (e.target.classList.contains('btn-vf-reimp')) {
-      if (vfRef?.fbKey) reimprimirFacturaVfMesa(vfRef.fbKey);
+      if (vfRef?.aeat) reimprimirFacturaAeatMesa(vfRef.tipo);
+      else if (vfRef?.fbKey) reimprimirFacturaVfMesa(vfRef.fbKey);
     } else if (e.target.classList.contains('btn-standard-factura')) {
       const lp = aplicarPreciosCustom(agruparLineasSimplificado(lineasServidas));
       showStandardCompletaModal(lp, total);
@@ -5826,6 +5990,13 @@ function renderVfButtons(vfRef) {
 
   const tipo = vfRef.tipo || '';
   const badge = `<div style="font-size:11px;margin-bottom:6px;padding:4px 8px;border-radius:6px;background:rgba(53,199,119,.12);color:var(--success);display:inline-block">✓ ${tipo} emitida — ${vfRef.serie}-${vfRef.numero}</div>`;
+
+  if (vfRef.aeat === true && !/^\d+$/.test(String(vfRef.numero || ''))) {
+    return wrap(
+      badge +
+      '<div style="font-size:11px;color:var(--muted);margin-top:6px">Esperando asignación del número fiscal por el PC de impresión.</div>'
+    );
+  }
 
   if (tipo === 'F2') {
     return wrap(
@@ -6553,7 +6724,7 @@ async function ejecutarCierreMesaConMetodo(targetMesaId, targetMesaNombre, metod
 
     if (lineas.length > 0 && !sinConsumo) {
       const ahora = new Date();
-      await upsertHistorial({
+      const ticketIdCreado = await upsertHistorial({
         mesa: targetMesaNombre,
         camarero: [...camareros].join(', ') || camareroActual || 'Camarero',
         ts: ahora.getTime(),
@@ -6567,7 +6738,7 @@ async function ejecutarCierreMesaConMetodo(targetMesaId, targetMesaNombre, metod
 
       logAuditoria('mesa_cerrada',
         `Mesa ${targetMesaNombre} cerrada · Total ${fmtEu(total)} (${metodo})`,
-        { mesaId: targetMesaId, mesa: targetMesaNombre, total: Math.round(total * 100) / 100, pagoMetodo: metodo, articulos: lineas.length }
+        { mesaId: targetMesaId, mesa: targetMesaNombre, total: Math.round(total * 100) / 100, pagoMetodo: metodo, articulos: lineas.length, ticketId: ticketIdCreado || undefined }
       );
     } else {
       logAuditoria('mesa_cerrada', `Mesa ${targetMesaNombre} cerrada sin consumo`, { mesaId: targetMesaId, mesa: targetMesaNombre, total: 0 });
@@ -6702,7 +6873,97 @@ function vfConfigCheck() {
   return null;
 }
 
+function vfAeatConfigCheck() {
+  if (!configVfAeat?.habilitado) return 'VERI*FACTU AEAT directo no está activado.';
+  if (!configVfAeat?.nifEmisor || !configVfAeat?.razonSocialEmisor) return 'Faltan los datos fiscales del emisor en VERI*FACTU AEAT.';
+  if (!configVfAeat?.desarrollador?.nif || !configVfAeat?.desarrollador?.razonSocial) return 'Faltan los datos del productor del SIF en VERI*FACTU AEAT.';
+  const mode = String(configLocal?.ticketPrintMode || 'browser');
+  if (mode !== 'service' && mode !== 'both') return 'VERI*FACTU AEAT directo requiere el servicio local de impresión activo.';
+  return null;
+}
+
+async function vfAeatEmitirYPrint({ tipo, lineas, total, cobro = null, destinatario = null, facturasRef = null, metodoRectificativa = 'I' }) {
+  const err = vfAeatConfigCheck();
+  if (err) { showModal({ title: 'VERI*FACTU AEAT', body: err, buttons: [{ label: 'Cerrar' }] }); return null; }
+  try {
+    const ivaDefault = Number(configVfAeat?.ivaDefault ?? 10);
+    const series = configVfAeat.series || {};
+    const serie = series[tipo] || (tipo.startsWith('R') ? series.R : '') || tipo;
+    // Go Live/local puede no exponer randomUUID en todos los navegadores.
+    const uid = globalThis.crypto?.randomUUID?.()
+      || `vf-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
+    const draft = {
+      uid, tipo, serie,
+      fecha: fmtFechaVf(Date.now()), total: Math.round(Number(total) * 100) / 100,
+      descripcion: configVfAeat.descripcionDefault || `Mesa ${mesaNombre}`,
+      lineasIva: buildLineasVf(lineas, ivaDefault),
+      destinatario: destinatario || null,
+      facturasRef: facturasRef || [],
+      metodoRectificativa
+    };
+
+    // Una factura VERI*FACTU ya emitida no se puede volver a crear por un
+    // segundo clic. El marcador vive dentro del pedido de la mesa y se borra
+    // al cerrar la mesa, por lo que una nueva ocupación puede facturarse con
+    // normalidad. La operación Firebase es atómica entre varios dispositivos.
+    if (mesaId) {
+      const markerRef = ref(db, `pedidos/${mesaId}/_vfAeat/${tipo}`);
+      const marker = {
+        uid: draft.uid,
+        tipo: draft.tipo,
+        serie: draft.serie,
+        fecha: draft.fecha,
+        total: draft.total,
+        lineas,
+        cobro,
+        draft,
+        creadoEn: Date.now()
+      };
+      const claim = await runTransaction(markerRef, current => current || marker);
+      if (!claim.committed) {
+        const original = claim.snapshot.val() || {};
+        const refFactura = `${original.tipo || tipo} ${original.serie || serie}${original.numero ? `-${original.numero}` : ''}`;
+        showModal({
+          title: 'Factura ya emitida',
+          body: `Esta mesa ya tiene creada la ${refFactura}. No se emitirá otra factura fiscal.\n\n¿Quieres reimprimir la factura existente?`,
+          buttons: [
+            { label: 'Cancelar' },
+            { label: 'Reimprimir', style: 'primary', action: async () => {
+              try {
+                const savedDraft = original.draft;
+                if (!savedDraft?.uid) throw new Error('No se encontró el registro fiscal original');
+                await enviarTicketFinalAServicio(original.lineas || lineas, Number(original.total ?? total), original.cobro || null, null, savedDraft);
+                showModal({ title: 'Reimpresión', body: 'Reimpresión enviada al PC fiscal. No se ha creado ninguna factura nueva.', buttons: [{ label: 'Aceptar' }] });
+              } catch (reprintError) {
+                showModal({ title: 'Error de reimpresión', body: reprintError.message, buttons: [{ label: 'Cerrar' }] });
+              }
+            } }
+          ]
+        });
+        return { ...original, status: 'Factura existente' };
+      }
+      await set(ref(db, `pedidos/${mesaId}/_vf`), {
+        tipo, serie, numero: 'pendiente', fecha: draft.fecha, aeat: true,
+        estado: 'Enviada al PC fiscal'
+      });
+      // Misma actualización que el botón «Actualizar ticket»: el camarero ve
+      // el bloqueo fiscal en el acto, sin tener que cambiar de mesa.
+      await cargarTicketActual();
+    }
+    await enviarTicketFinalAServicio(lineas, total, cobro, null, draft);
+    logAuditoria('factura_aeat_encolada', `${tipo} ${serie} · ${fmtEu(total)}`, { tipo, serie, total: draft.total, uid: draft.uid });
+    showModal({ title: 'VERI*FACTU AEAT', body: 'Factura enviada al PC fiscal. Espera la impresión y consulta su estado en la pestaña AEAT.', buttons: [{ label: 'Aceptar' }] });
+    return { ...draft, status: 'Enviada al PC fiscal' };
+  } catch (e) {
+    showModal({ title: 'Error VERI*FACTU AEAT', body: `No se pudo entregar la factura al PC fiscal:\n${e.message}`, buttons: [{ label: 'Cerrar' }] });
+    return null;
+  }
+}
+
 async function vfEmitirYPrint({ tipo, lineas, total, cobro = null, destinatario = null, facturasRef = null }) {
+  if (configVfAeat?.habilitado === true) {
+    return vfAeatEmitirYPrint({ tipo, lineas, total, cobro, destinatario, facturasRef });
+  }
   const err = vfConfigCheck();
   if (err) { showModal({ title: 'Verifactu', body: err, buttons: [{ label: 'Cerrar' }] }); return; }
 
@@ -6738,9 +6999,18 @@ async function vfEmitirYPrint({ tipo, lineas, total, cobro = null, destinatario 
   const qr = resultado.qr_code || resultado.qr || resultado.qrCode || resultado.QRCode || null;
   const uuid = resultado.uuid || resultado.UUID || resultado.id || null;
 
+  const lineasArticulos = (lineas || []).map(l => ({
+    nombre: l.nombre || '',
+    qty: Number(l.qtyCuenta ?? l.qty ?? 1),
+    precio: Number(l.precio || 0),
+    nota: l.nota || ''
+  }));
+
   const vfData = {
     tipo, serie, numero, fecha, uuid, qr,
-    total: totalNum, lineasIva: lineasVf,
+    total: totalNum,
+    lineas: lineasArticulos,
+    lineasIva: lineasVf,
     status: resultado.status || 'Pending',
     mesa: mesaNombre, camarero: camareroActual,
     destinatario: destinatario || null,
@@ -7021,6 +7291,18 @@ window.showVfRectificativaModal = function ({ serie, numero, fecha, nif, nombre,
     if (isNaN(importeNum)) { document.getElementById('vf-err').style.display = 'block'; return; }
     document.getElementById('modal-overlay').classList.remove('open');
 
+    if (configVfAeat?.habilitado === true) {
+      const iva = Number(configVfAeat?.ivaDefault ?? 10);
+      await vfAeatEmitirYPrint({
+        tipo: tipoRect, total: importeNum,
+        lineas: [{ nombre: desc, qtyCuenta: 1, precio: importeNum, iva }],
+        destinatario: nif ? { nif, nombre } : null,
+        facturasRef: [{ serie, numero, fecha_expedicion: fecha }],
+        metodoRectificativa: metodo
+      });
+      return;
+    }
+
     const err = vfConfigCheck();
     if (err) { showModal({ title: 'Verifactu', body: err, buttons: [{ label: 'Cerrar' }] }); return; }
 
@@ -7199,6 +7481,22 @@ async function reimprimirFacturaVfMesa(fbKey) {
   }
 }
 
+async function reimprimirFacturaAeatMesa(tipo) {
+  try {
+    if (!mesaId) throw new Error('No hay una mesa seleccionada');
+    const snap = await get(ref(db, `pedidos/${mesaId}/_vfAeat/${tipo}`));
+    const original = snap.val() || {};
+    if (!original.draft?.uid) throw new Error('No se encontró el registro fiscal original');
+    await enviarTicketFinalAServicio(
+      original.lineas || [], Number(original.total || 0), original.cobro || null,
+      null, original.draft
+    );
+    showModal({ title: 'Reimpresión', body: 'Reimpresión enviada al PC fiscal. No se ha creado una factura nueva.', buttons: [{ label: 'Aceptar' }] });
+  } catch (error) {
+    showModal({ title: 'Error de reimpresión', body: error.message, buttons: [{ label: 'Cerrar' }] });
+  }
+}
+
 // Reimprimir una factura emitida (desde historial admin)
 window.reimprimirFacturaVf = function (vfData) {
   if (!vfData) return;
@@ -7269,8 +7567,6 @@ window.show = v => {
 };
 
 // ── CLIENTES AUTOCOMPLETE ──────────────────────────────────────────────────────
-let clientesCache = [];
-
 async function cargarClientesAutocomplete() {
   try {
     const snap = await get(ref(db, 'verifactu/facturas'));
@@ -7453,17 +7749,17 @@ function renderStandardBillingButtons(standardRef) {
 }
 
 function showStandardCompletaModal(lineas, total) {
-  const iva = Number(configVf?.ivaDefault ?? 10);
-  const factor = 1 + iva / 100;
-  const base = Math.round(total / factor * 100) / 100;
-  const cuota = Math.round((total - base) * 100) / 100;
+  const lineasIva = buildLineasVf(lineas, Number(configVf?.ivaDefault ?? 10));
+  const desgloseIva = lineasIva.map(l =>
+    `Base ${fmtEu(l.base_imponible)} + IVA ${l.tipo_impositivo}% ${fmtEu(l.cuota_repercutida)}`
+  ).join(' · ');
 
   document.getElementById('modal-title').textContent = 'Crear Factura Completa';
   document.getElementById('modal-body').innerHTML = `
     <div style="font-family:var(--mono);font-size:13px;display:flex;flex-direction:column;gap:8px">
       <div style="padding:10px;background:var(--surface3);border-radius:10px">
         <div>Serie: <strong>${configVf.serieFact || 'FACT'}</strong> | Total: <strong>${fmtEu(total)}</strong></div>
-        <div style="font-size:11px;color:var(--muted)">Base imp. (${iva}%): ${fmtEu(base)} | IVA: ${fmtEu(cuota)}</div>
+        <div style="font-size:11px;color:var(--muted)">${desgloseIva}</div>
       </div>
       <label style="font-size:12px;color:var(--muted)">NIF / CIF destinatario *</label>
       <input id="vf-nif" type="text" placeholder="B12345678 / 12345678A" list="clientes-nif-list" maxlength="20"
@@ -7500,11 +7796,21 @@ function showStandardCompletaModal(lineas, total) {
 }
 
 async function emitirFacturaEstandarCompleta(lineas, total, destinatario) {
+  if (configVfAeat?.habilitado === true) {
+    return vfAeatEmitirYPrint({ tipo: 'F1', lineas, total, destinatario });
+  }
   const serie = configVf.serieFact || 'FACT';
   const numero = await siguienteNumero(serie);
   const fecha = fmtFechaVf(Date.now());
   const totalNum = Math.round(Number(total) * 100) / 100;
   const lineasVf = buildLineasVf(lineas, Number(configVf?.ivaDefault ?? 10));
+
+  const lineasArticulos = (lineas || []).map(l => ({
+    nombre: l.nombre || '',
+    qty: Number(l.qtyCuenta ?? l.qty ?? 1),
+    precio: Number(l.precio || 0),
+    nota: l.nota || ''
+  }));
 
   const factData = {
     tipo: 'F1',
@@ -7512,6 +7818,7 @@ async function emitirFacturaEstandarCompleta(lineas, total, destinatario) {
     numero,
     fecha,
     total: totalNum,
+    lineas: lineasArticulos,
     lineasIva: lineasVf,
     status: 'Local',
     mesa: mesaNombre,

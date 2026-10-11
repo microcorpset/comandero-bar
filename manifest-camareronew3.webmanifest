@@ -1,0 +1,14 @@
+{
+  "name": "TPV BAR 3",
+  "short_name": "TPV BAR 3",
+  "description": "Terminal TPV de barra con panel de cuenta acoplable lateral o inferior.",
+  "start_url": "./camareronew3.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#eef2f8",
+  "theme_color": "#111a2e",
+  "icons": [
+    { "src": "./icons/camarero-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "./icons/camarero-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}

@@ -18,6 +18,12 @@ import { ref, onValue, push, set, remove, get, update }
 // Esperar a la autenticación anónima antes de registrar listeners
 await authReady;
 
+// Ocultar pantalla de carga inicial de PIN
+setTimeout(() => {
+  const pLoad = document.getElementById('pin-loading');
+  if (pLoad) pLoad.style.display = 'none';
+}, 1200);
+
 // ── HELPERS ──────────────────────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
 const fmtEu = n => Number(n || 0).toFixed(2).replace('.', ',') + ' €';
@@ -417,6 +423,8 @@ async function logAuditoria(accion, detalle = '', extras = {}) {
 // ── LISTENERS FIREBASE ───────────────────────────────────────────────────────
 onValue(ref(db, 'config/usuarios'), s => {
   usuariosData = s.val() || {};
+  const pLoad = $('pin-loading');
+  if (pLoad) pLoad.style.display = 'none';
   if (!Object.keys(usuariosData).length) {
     get(ref(db, 'config/pins/camarero')).then(p => {
       if (p.val()) usuariosData['_default'] = { nombre: 'Camarero', pin: p.val() };
@@ -425,6 +433,8 @@ onValue(ref(db, 'config/usuarios'), s => {
   }
 }, () => {
   usuariosData['_default'] = { nombre: 'Camarero', pin: '1234' };
+  const pLoad = $('pin-loading');
+  if (pLoad) pLoad.style.display = 'none';
 });
 
 onValue(ref(db, 'mesas'), snap => {
@@ -629,6 +639,7 @@ function infoMesa(id, m) {
 
   const data = pedidosData[id] || {};
   let primeraTs = Infinity, ultimaTs = 0;
+  const atendidaTs = Number(m.atendidaTs) || 0;
 
   Object.entries(data).forEach(([envioId, envio]) => {
     if (envioId.startsWith('_')) return;
@@ -640,7 +651,8 @@ function infoMesa(id, m) {
     if (envio.camarero) info.camareros.add(envio.camarero);
     const ls = envio.lineas || { _: envio };
     Object.values(ls).forEach(l => {
-      if (l.estado === 'pendiente') {
+      const lineaTs = Number(l.ts) || ts;
+      if (l.estado === 'pendiente' && lineaTs > atendidaTs) {
         info.nPend++;
         if (l.destino && !info.destinosPend.includes(l.destino)) info.destinosPend.push(l.destino);
       }
@@ -667,7 +679,6 @@ function infoMesa(id, m) {
     ? Math.max(0, Math.floor((Date.now() - primeraTs) / 60000)) : 0;
 
   // ── Color por última interacción ──
-  const atendidaTs = Number(m.atendidaTs) || 0;
   const baseTs = Math.max(ultimaTs, atendidaTs);
   info.minsAtencion = Math.max(0, Math.floor((Date.now() - baseTs) / 60000));
 
@@ -767,9 +778,9 @@ function crearMesaCard({ id, m, info }) {
     : `<div class="mesa-mid"><span class="mesa-estado-txt">${info.ocupada ? 'ocupada' : info.esTemporal ? 'temporal' : 'libre'}</span></div>`;
 
   const pend = info.ocupada && info.nPend > 0
-    ? `<div class="mesa-pend">${iconosDestino(info.destinosPend)} ${info.nPend} pend · sentados ${fmtDur(info.minsSentada)}</div>`
+    ? `<div class="mesa-pend">${iconosDestino(info.destinosPend)} ${info.nPend} pend · ⏳ ${fmtDur(info.minsSentada)}</div>`
     : (info.ocupada && info.tienePedidos
-      ? `<div class="mesa-pend">sentados ${fmtDur(info.minsSentada)}</div>` : '');
+      ? `<div class="mesa-pend">⏳ ${fmtDur(info.minsSentada)}</div>` : '');
 
   card.innerHTML = `
     ${badges.length ? `<div class="mesa-badges">${badges.join('')}</div>` : ''}
@@ -876,14 +887,19 @@ function renderPlano() {
           <span class="pm-nombre">${escapeHtml(m.nombre.slice(1))}</span></div>`;
       }
 
-      const lineaInfo = info.ocupada && info.tienePedidos
-        ? `${fmtEu(info.total)} · ⏱${fmtDur(info.minsAtencion)}`
-        : (info.ocupada ? 'ocupada' : 'libre');
+      let extraHTML = '';
+      if (info.ocupada && info.tienePedidos) {
+        extraHTML = `
+          <span class="pm-total">${fmtEu(info.total)}</span>
+          <span class="pm-tiempo">⏱${fmtDur(info.minsAtencion)} · ⏳${fmtDur(info.minsSentada)}</span>`;
+      } else if (info.ocupada) {
+        extraHTML = `<span class="pm-estado">ocupada</span>`;
+      }
 
       return `<div class="plano-mesa ${info.clase}${p.shape === 'circle' ? ' circle' : ''}"
         data-id="${id}" style="${style}">
         <span class="pm-nombre">${escapeHtml(m.nombre)}${queuedMesas.has(id) ? ' ⏳' : ''}</span>
-        <span class="pm-info">${lineaInfo}</span>
+        ${extraHTML}
       </div>`;
     }).join('');
 
@@ -893,7 +909,7 @@ function renderPlano() {
 
     return `<div class="plano-zona">
       ${zona ? `<div class="plano-zona-label">${escapeHtml(zona)}</div>` : ''}
-      <div class="plano-scroll"><div class="plano-zona-box">
+      <div class="plano-wrap"><div class="plano-zona-box">
         <div class="plano-grid" style="--plano-cols:${cols};--plano-rows:${rows}">${celdas}</div>
       </div></div>
       ${sinUbicarHTML}
@@ -921,7 +937,7 @@ function renderPlano() {
   });
 }
 
-// ── PULSACIÓN LARGA → ACTION SHEET con acciones rápidas ──────────────────────
+// ── PULSACIÓN LARGA → ACCIÓN RÁPIDA / CERRAR MESA ───────────────────────────
 function asignarLongPress(el, id, m, info) {
   let timer = null;
   let longPress = false;
@@ -933,8 +949,13 @@ function asignarLongPress(el, id, m, info) {
       longPress = true;
       timer = null;
       haptic(30);
-      abrirSheetMesa(id, m, infoMesa(id, m));
-    }, 550);
+      const esTemporal = (info && info.esTemporal) || m.temporal === true || id.startsWith('temp_');
+      if (esTemporal) {
+        cerrarMesaEspecifica(id, m.nombre);
+      } else {
+        abrirSheetMesa(id, m, infoMesa(id, m));
+      }
+    }, 750);
   };
   const cancel = () => { if (timer) { clearTimeout(timer); timer = null; } };
 
@@ -946,7 +967,7 @@ function asignarLongPress(el, id, m, info) {
   el.addEventListener('click', e => {
     if (longPress) { e.preventDefault(); e.stopPropagation(); longPress = false; return; }
     cancel();
-    abrirMesa(id, m.nombre, info.ocupada);
+    abrirMesa(id, m.nombre, info ? info.ocupada : false);
   });
   el.addEventListener('mouseup', cancel);
   el.addEventListener('touchend', cancel);
@@ -958,7 +979,7 @@ function asignarLongPress(el, id, m, info) {
 function abrirSheetMesa(id, m, info) {
   const ocupada = info.ocupada;
   const sub = ocupada && info.tienePedidos
-    ? `${fmtEu(info.total)} · ${info.uds} uds · ${fmtDur(info.minsSentada)} sentados`
+    ? `${fmtEu(info.total)} · ${info.uds} uds · ⏳ ${fmtDur(info.minsSentada)}`
     : (ocupada ? 'Ocupada sin consumo' : 'Libre');
 
   const acciones = [];
@@ -970,6 +991,11 @@ function abrirSheetMesa(id, m, info) {
       fn: () => marcarAtendida(id, m.nombre)
     });
     acciones.push({ icono: '🧾', label: 'Ver cuenta', fn: async () => { abrirMesa(id, m.nombre, true); await verCuenta(); } });
+    acciones.push({
+      icono: '🔀', label: 'Transferir mesa',
+      sub: 'Traspasar comanda a otra mesa libre',
+      fn: () => abrirTransferirMesaModal(id, m.nombre)
+    });
     acciones.push({ icono: '🔁', label: 'Repetir última comanda', sub: 'Con revisión previa', fn: () => abrirRepetirModal(id, m.nombre) });
     acciones.push({
       icono: '🧹', label: 'Vaciar mesa',
@@ -989,10 +1015,13 @@ function abrirSheetMesa(id, m, info) {
 // ── ACCIONES DE MESA ─────────────────────────────────────────────────────────
 async function marcarAtendida(id, nombre) {
   try {
-    await update(ref(db, 'mesas/' + id), { atendidaTs: Date.now() });
+    const now = Date.now();
+    if (mesasData[id]) mesasData[id].atendidaTs = now;
+    await update(ref(db, 'mesas/' + id), { atendidaTs: now });
     haptic(20);
     toast(`✓ Mesa ${escapeHtml(nombre)} marcada como atendida`);
     logAuditoria('mesa_atendida', `Mesa ${nombre} marcada como atendida`, { mesaId: id });
+    renderVistaMesas();
   } catch (e) {
     toast('No se pudo guardar');
   }
@@ -1001,17 +1030,28 @@ async function marcarAtendida(id, nombre) {
 function vaciarMesa(id, nombre) {
   showModal({
     title: `Vaciar mesa ${nombre}`,
-    body: 'Se borrarán los pedidos de esta mesa SIN guardar historial. Útil si se abrió por error.',
+    body: 'Se borrarán los pedidos de esta mesa SIN guardar historial de ventas. Esta acción quedará registrada en auditoría.',
     buttons: [
       { label: 'Cancelar' },
       {
         label: 'Vaciar', style: 'danger', action: async () => {
+          const snap = await get(ref(db, 'pedidos/' + id));
+          const lineas = aplanarPedidos(snap.val() || {}).filter(l => qtyEnCuenta(l) > 0 && l.destino !== 'descuento');
+          const totalVal = lineas.reduce((s, l) => s + Number(l.precio || 0) * qtyEnCuenta(l), 0);
+          const totalUds = lineas.reduce((s, l) => s + qtyEnCuenta(l), 0);
+
           await remove(ref(db, 'pedidos/' + id));
           if (id.startsWith('temp_')) await remove(ref(db, 'mesas/' + id));
           else await update(ref(db, 'mesas/' + id), { estado: 'libre', atendidaTs: null });
-          logAuditoria('mesa_vaciada', `Mesa ${nombre} vaciada sin historial`, { mesaId: id });
+
+          logAuditoria('mesa_vaciada',
+            `Mesa ${nombre} vaciada sin guardar venta (${totalUds} uds · ${fmtEu(totalVal)})`,
+            { mesaId: id, mesa: nombre, uds: totalUds, total: Math.round(totalVal * 100) / 100 }
+          );
+
           toast(`Mesa ${escapeHtml(nombre)} vaciada`);
           if (mesaId === id) volverMesas(true);
+          else renderVistaMesas();
         }
       }
     ]
@@ -1045,7 +1085,7 @@ function qtyEnCuenta(linea) {
   return Number(linea.qty || 0);
 }
 
-// ── REPETIR ÚLTIMA COMANDA (con previsualización editable) ───────────────────
+// ── REPETIR ÚLTIMA COMANDA (con filtro por departamento y cantidades a 0) ──
 async function abrirRepetirModal(targetMesaId, nombreMesa) {
   try {
     const snap = await get(ref(db, 'pedidos/' + targetMesaId));
@@ -1053,57 +1093,151 @@ async function abrirRepetirModal(targetMesaId, nombreMesa) {
       .filter(l => qtyEnCuenta(l) > 0 && l.destino !== 'descuento');
 
     if (!todas.length) {
-      showModal({ title: 'Repetir comanda', body: 'Esta mesa no tiene comandas anteriores.', buttons: [{ label: 'Cerrar', style: 'primary' }] });
+      showModal({ title: 'Repetir comanda', body: 'Esta mesa no tiene artículos consumidos.', buttons: [{ label: 'Cerrar', style: 'primary' }] });
       return;
     }
 
-    // Agrupar por nombre+precio+nota para la previsualización
     const grupos = {};
+    const destinosEncontrados = new Set();
     todas.forEach(l => {
+      let d = l.destino || (cartaData[String(l.artId || '').split('__')[0]]?.destino) || 'barra';
+      if (d === 'caja' || d === 'pizza') d = 'pizzas';
+      destinosEncontrados.add(d);
       const k = `${l.nombre}||${Number(l.precio).toFixed(2)}||${(l.nota || '').trim()}`;
-      if (!grupos[k]) grupos[k] = { nombre: l.nombre, precio: Number(l.precio), nota: l.nota || '', artId: String(l.artId).split('__')[0], destino: l.destino, qty: 0 };
-      grupos[k].qty += qtyEnCuenta(l);
+      if (!grupos[k]) {
+        grupos[k] = {
+          nombre: l.nombre,
+          precio: Number(l.precio),
+          nota: l.nota || '',
+          artId: String(l.artId || '').split('__')[0],
+          destino: d,
+          qty: 0,
+          prevQty: 0
+        };
+      }
+      grupos[k].prevQty += qtyEnCuenta(l);
     });
-    const filas = Object.values(grupos);
+
+    const filasTotales = Object.values(grupos);
+    const destinosArr = [...destinosEncontrados];
+
+    if (destinosArr.length <= 1) {
+      mostrarModalFilasRepetir(targetMesaId, nombreMesa, filasTotales);
+      return;
+    }
+
+    const mapaDestinos = {
+      barra: { emoji: '🍺', label: 'Barra / Bebidas' },
+      cocina: { emoji: '🍳', label: 'Cocina' },
+      pizzas: { emoji: '🍕', label: 'Pizzas' },
+      pizza: { emoji: '🍕', label: 'Pizzas' },
+      ambos: { emoji: '🍺🍳', label: 'Barra y Cocina' }
+    };
+
+    const opciones = destinosArr.map(d => ({
+      destino: d,
+      emoji: mapaDestinos[d]?.emoji || '🍽️',
+      label: mapaDestinos[d]?.label || d
+    }));
 
     showModalHTML(`Repetir · Mesa ${nombreMesa}`, `
-      <div style="font-size:12px;color:var(--muted);margin-bottom:10px">
-        Esto es lo que se va a repetir. Ajusta cantidades o quita líneas antes de cargarlo al pedido.
+      <div style="font-size:12px;color:var(--muted);margin-bottom:12px;font-family:var(--sans)">
+        Selecciona qué departamento quieres repetir:
       </div>
-      <div id="rep-list" style="display:flex;flex-direction:column;gap:8px"></div>`,
-      [
-        { label: 'Cancelar' },
-        {
-          label: 'Cargar al pedido', style: 'primary',
-          action: () => cargarRepetido(targetMesaId, nombreMesa, filas)
-        }
-      ]);
+      <div style="display:flex;flex-direction:column;gap:8px">
+        ${opciones.map((op) => `
+          <button type="button" class="modal-btn" data-rep-dest="${op.destino}" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;width:100%;font-size:14px;text-align:left;cursor:pointer;background:var(--surface-2);border:1px solid var(--border)">
+            <span style="font-size:18px">${op.emoji}</span>
+            <span style="font-weight:600;flex:1">${escapeHtml(op.label)}</span>
+            <span>›</span>
+          </button>
+        `).join('')}
+        <button type="button" class="modal-btn primary" data-rep-dest="todo" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:12px;width:100%;font-size:14px;text-align:left;cursor:pointer;margin-top:4px">
+          <span style="font-size:18px">✨</span>
+          <span style="font-weight:600;flex:1">Todos los departamentos</span>
+          <span>›</span>
+        </button>
+      </div>
+    `, [
+      { label: 'Cancelar' }
+    ]);
 
-    const list = $('rep-list');
-    filas.forEach((f, i) => {
-      const row = document.createElement('div');
-      row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px';
-      row.innerHTML = `
-        <div style="flex:1;min-width:0">
-          <div style="font-size:13.5px;font-weight:600">${escapeHtml(f.nombre)}</div>
-          <div style="font-size:11px;color:var(--muted);font-family:var(--mono)">${fmtEu(f.precio)}${f.nota ? ' · ' + escapeHtml(f.nota) : ''}</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:4px">
-          <button class="tk-qty-btn" data-act="dec">−</button>
-          <span class="tk-qty-num" data-qty>${f.qty}</span>
-          <button class="tk-qty-btn" data-act="inc">+</button>
-        </div>`;
-      row.querySelector('[data-act="dec"]').onclick = () => {
-        if (f.qty > 0) { f.qty--; row.querySelector('[data-qty]').textContent = f.qty; row.style.opacity = f.qty ? '1' : '.4'; }
+    document.querySelectorAll('[data-rep-dest]').forEach(btn => {
+      btn.onclick = () => {
+        const dest = btn.dataset.repDest;
+        const filtradas = dest === 'todo'
+          ? filasTotales
+          : filasTotales.filter(f => f.destino === dest);
+        mostrarModalFilasRepetir(targetMesaId, nombreMesa, filtradas, dest === 'todo' ? 'Todos' : (mapaDestinos[dest]?.label || dest));
       };
-      row.querySelector('[data-act="inc"]').onclick = () => {
-        f.qty++; row.querySelector('[data-qty]').textContent = f.qty; row.style.opacity = '1';
-      };
-      list.appendChild(row);
     });
+
   } catch (e) {
     console.error(e);
     toast('No se pudo cargar la comanda');
+  }
+}
+
+function mostrarModalFilasRepetir(targetMesaId, nombreMesa, filas, subTitulo = '') {
+  const items = filas.map(f => ({ ...f, qty: 0 }));
+
+  showModalHTML(`Repetir · Mesa ${nombreMesa}`, `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div style="font-size:12px;color:var(--muted);font-family:var(--sans)">
+        ${subTitulo ? `<b>${escapeHtml(subTitulo)}</b> · ` : ''}Indica cuántos quieres repetir:
+      </div>
+      <button type="button" id="btn-rep-todo-uno" class="modal-btn" style="padding:4px 8px;font-size:11px;border-radius:8px">+1 a todo</button>
+    </div>
+    <div id="rep-list" style="display:flex;flex-direction:column;gap:8px;max-height:55vh;overflow-y:auto;padding-right:2px"></div>`,
+    [
+      { label: 'Cancelar' },
+      {
+        label: 'Cargar al pedido', style: 'primary',
+        action: () => cargarRepetido(targetMesaId, nombreMesa, items)
+      }
+    ]);
+
+  const list = $('rep-list');
+  items.forEach((f) => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface-2);border:1px solid var(--border);border-radius:12px;transition:opacity .15s;opacity:.55';
+    row.innerHTML = `
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13.5px;font-weight:600">${escapeHtml(f.nombre)}</div>
+        <div style="font-size:11px;color:var(--muted);font-family:var(--mono)">${fmtEu(f.precio)}${f.nota ? ' · ' + escapeHtml(f.nota) : ''} <span style="opacity:.7">(prev: ${f.prevQty})</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px">
+        <button class="tk-qty-btn" data-act="dec">−</button>
+        <span class="tk-qty-num" data-qty>${f.qty}</span>
+        <button class="tk-qty-btn" data-act="inc">+</button>
+      </div>`;
+    row.querySelector('[data-act="dec"]').onclick = () => {
+      if (f.qty > 0) {
+        f.qty--;
+        row.querySelector('[data-qty]').textContent = f.qty;
+        row.style.opacity = f.qty > 0 ? '1' : '.55';
+      }
+    };
+    row.querySelector('[data-act="inc"]').onclick = () => {
+      f.qty++;
+      row.querySelector('[data-qty]').textContent = f.qty;
+      row.style.opacity = '1';
+    };
+    list.appendChild(row);
+  });
+
+  const btnTodoUno = $('btn-rep-todo-uno');
+  if (btnTodoUno) {
+    btnTodoUno.onclick = () => {
+      items.forEach((f, idx) => {
+        f.qty += 1;
+        const row = list.children[idx];
+        if (row) {
+          row.querySelector('[data-qty]').textContent = f.qty;
+          row.style.opacity = '1';
+        }
+      });
+    };
   }
 }
 
@@ -1115,7 +1249,7 @@ function cargarRepetido(targetMesaId, nombreMesa, filas) {
 
   seleccion.forEach((f, i) => {
     const baseArt = cartaData[f.artId];
-    const key = `rep_${targetMesaId}_${i}`;
+    const key = `rep_${targetMesaId}_${Date.now()}_${i}`;
     carrito[key] = {
       art: {
         nombre: f.nombre,
@@ -1131,19 +1265,29 @@ function cargarRepetido(targetMesaId, nombreMesa, filas) {
   updateCartaUI();
   cerrarDrawerSilencioso();
   haptic(25);
-  toast(`🔁 ${seleccion.reduce((s, f) => s + f.qty, 0)} artículos cargados — revisa y envía`, { duration: 3200 });
+  const totalUds = seleccion.reduce((s, f) => s + f.qty, 0);
+  toast(`🔁 ${totalUds} artículo(s) cargados — revisa y envía`, { duration: 3500 });
   logAuditoria('repetir_comanda', `Repetición cargada en mesa ${nombreMesa}`, { mesaId: targetMesaId, lineas: seleccion.length });
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // NAVEGACIÓN ENTRE VISTAS
-// ═══════════════════════════════════════════════════════════════════════════
 function show(vista) {
   $('view-mesas').hidden = vista !== 'mesas';
   $('view-carta').hidden = vista !== 'carta';
   $('view-ticket').hidden = vista !== 'ticket';
   $('carta-actionbar').hidden = vista !== 'carta';
   $('btn-cuenta-fab').classList.toggle('visible', vista === 'carta' && !!mesaId && mesaTieneConsumo());
+
+  const topbar = $('topbar');
+  if (topbar) {
+    topbar.classList.toggle('in-carta', vista === 'carta');
+  }
+
+  const isTablet = window.innerWidth >= 768;
+  $('view-carta').classList.toggle('tablet-active', vista === 'carta' && isTablet);
+  document.body.classList.toggle('plano-active', vista === 'mesas' && mesasViewMode === 'plano');
+
   if (vista === 'mesas') {
     $('mesas-grid').style.display = mesasViewMode === 'grid' ? '' : 'none';
     $('plano-contenedor').hidden = mesasViewMode !== 'plano';
@@ -1221,17 +1365,82 @@ function volverMesas(forzar = false) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// CARTA
+// CARTA & CATEGORÍAS
 // ═══════════════════════════════════════════════════════════════════════════
+window.toggleCatsPanel = () => {
+  const panel = $('cats-panel');
+  if (!panel) return;
+  const abierto = panel.style.display === 'block';
+  panel.style.display = abierto ? 'none' : 'block';
+};
+window.cerrarCatsPanel = () => {
+  const panel = $('cats-panel');
+  if (panel) panel.style.display = 'none';
+};
+document.addEventListener('click', e => {
+  if (!e.target.closest('#cats-panel') && !e.target.closest('#btn-cats')) {
+    window.cerrarCatsPanel();
+  }
+});
+$('btn-cats')?.addEventListener('click', e => {
+  e.stopPropagation();
+  window.toggleCatsPanel();
+});
+
+function cambiarChipCategoria(catId) {
+  filtroCat = catId;
+  
+  const btnLabel = $('btn-cats-label');
+  if (btnLabel) {
+    if (catId) {
+      const cat = categoriasData[catId];
+      btnLabel.textContent = cat ? cat.nombre : 'Categorías';
+    } else {
+      btnLabel.textContent = 'Categorías';
+    }
+  }
+
+  document.querySelectorAll('.category-chip').forEach(chip => {
+    chip.classList.toggle('active', chip.dataset.cat === catId);
+  });
+
+  document.querySelectorAll('.cats-panel-item').forEach(item => {
+    item.classList.toggle('activa', item.dataset.catId === catId || (!catId && !item.dataset.catId));
+  });
+
+  document.querySelectorAll('.tablet-cat-item').forEach(item => {
+    item.classList.toggle('activa', item.dataset.catId === catId || (!catId && !item.dataset.catId));
+  });
+
+  document.querySelectorAll('.cat-section').forEach(s => {
+    if (!catId) s.classList.add('tablet-visible');
+    else s.classList.toggle('tablet-visible', s.id === 'cat-' + catId);
+  });
+
+  aplicarFiltrosCarta();
+  renderFrecuentes();
+}
+window.cambiarChipCategoria = cambiarChipCategoria;
+
 function renderCarta() {
   const cats = Object.entries(categoriasData)
     .sort(([, a], [, b]) => (a.orden ?? 999) - (b.orden ?? 999) || String(a.nombre).localeCompare(String(b.nombre), 'es'));
   const body = $('carta-body');
-  if (!cats.length) { body.innerHTML = '<div class="loading">Sin categorías en la carta.</div>'; renderFrecuentes(); renderCatChips(cats); return; }
+  if (!cats.length) {
+    body.innerHTML = '<div class="loading">Sin categorías en la carta.</div>';
+    renderFrecuentes();
+    renderCatChips(cats);
+    renderCatsPanel(cats);
+    renderTabletCats(cats);
+    return;
+  }
 
-  // Chips de categoría
+  // Chips de categoría deslizables
   renderCatChips(cats);
-
+  // Panel emergente de categorías
+  renderCatsPanel(cats);
+  // Panel lateral para tablets
+  renderTabletCats(cats);
   // Frecuentes
   renderFrecuentes();
 
@@ -1290,19 +1499,18 @@ function renderFrecuentes() {
 }
 
 function renderCatChips(cats) {
-  const host = $('cat-chips');
+  const host = $('category-chips-scroll');
+  if (!host) return;
   host.innerHTML = '';
   const mk = (catId, nombre) => {
     const b = document.createElement('button');
-    b.className = 'cat-chip' + (filtroCat === catId ? ' active' : '');
+    b.type = 'button';
+    b.className = 'category-chip' + (filtroCat === catId ? ' active' : '');
     b.dataset.cat = catId;
     const count = qtyEnCategoria(catId);
-    b.innerHTML = `${escapeHtml(nombre)}${count ? `<span class="cnt">${count}</span>` : ''}`;
+    b.innerHTML = `<span>${escapeHtml(nombre)}</span>${count ? `<span class="cnt">${count}</span>` : ''}`;
     b.addEventListener('click', () => {
-      filtroCat = filtroCat === catId ? '' : catId;
-      renderCatChips(cats);
-      aplicarFiltrosCarta();
-      renderFrecuentes();
+      cambiarChipCategoria(filtroCat === catId ? '' : catId);
     });
     return b;
   };
@@ -1310,6 +1518,84 @@ function renderCatChips(cats) {
   cats.forEach(([catId, cat]) => {
     const n = Object.values(cartaData).filter(a => a.catId === catId).length;
     if (n) host.appendChild(mk(catId, cat.nombre));
+  });
+}
+
+function renderCatsPanel(cats) {
+  const panel = $('cats-panel');
+  if (!panel) return;
+  panel.innerHTML = '';
+  
+  const allItem = document.createElement('div');
+  allItem.className = 'cats-panel-item' + (!filtroCat ? ' activa' : '');
+  const totalCount = Object.values(carrito).reduce((s, { qty }) => s + qty, 0);
+  allItem.innerHTML = `<span>Todas</span>${totalCount > 0 ? `<span class="cnt">${totalCount}</span>` : ''}`;
+  allItem.addEventListener('click', () => {
+    cambiarChipCategoria('');
+    window.cerrarCatsPanel();
+  });
+  panel.appendChild(allItem);
+
+  cats.forEach(([catId, cat]) => {
+    const arts = Object.entries(cartaData).filter(([, a]) => a.catId === catId);
+    if (!arts.length) return;
+    const item = document.createElement('div');
+    item.className = 'cats-panel-item' + (filtroCat === catId ? ' activa' : '');
+    item.dataset.catId = catId;
+    const count = qtyEnCategoria(catId);
+    item.innerHTML = `<span>${escapeHtml(cat.nombre)}</span>${count > 0 ? `<span class="cnt">${count}</span>` : ''}`;
+    item.addEventListener('click', () => {
+      cambiarChipCategoria(catId);
+      window.cerrarCatsPanel();
+    });
+    panel.appendChild(item);
+  });
+}
+
+function renderTabletCats(cats) {
+  const tabletCats = $('tablet-cats');
+  if (!tabletCats) return;
+  if (window.innerWidth < 768) {
+    tabletCats.innerHTML = '';
+    return;
+  }
+  tabletCats.innerHTML = '';
+  const listDiv = document.createElement('div');
+  listDiv.className = 'tablet-cats-list';
+  
+  const allItem = document.createElement('div');
+  allItem.className = 'tablet-cat-item' + (!filtroCat ? ' activa' : '');
+  const totalCount = Object.values(carrito).reduce((s, { qty }) => s + qty, 0);
+  allItem.innerHTML = `<span>Todas</span>${totalCount > 0 ? `<span class="tablet-cat-count">${totalCount}</span>` : ''}`;
+  allItem.addEventListener('click', () => {
+    cambiarChipCategoria('');
+    document.querySelectorAll('.cat-section').forEach(s => s.classList.add('tablet-visible'));
+    const scrollEl = document.querySelector('.carta-scroll');
+    if (scrollEl) scrollEl.scrollTop = 0;
+  });
+  listDiv.appendChild(allItem);
+
+  cats.forEach(([catId, cat]) => {
+    const arts = Object.entries(cartaData).filter(([, a]) => a.catId === catId);
+    if (!arts.length) return;
+    const item = document.createElement('div');
+    item.className = 'tablet-cat-item' + (filtroCat === catId ? ' activa' : '');
+    item.dataset.catId = catId;
+    const count = qtyEnCategoria(catId);
+    item.innerHTML = `<span>${escapeHtml(cat.nombre)}</span>${count > 0 ? `<span class="tablet-cat-count">${count}</span>` : ''}`;
+    item.addEventListener('click', () => {
+      cambiarChipCategoria(catId);
+      document.querySelectorAll('.cat-section').forEach(s => s.classList.toggle('tablet-visible', s.id === 'cat-' + catId));
+      const scrollEl = document.querySelector('.carta-scroll');
+      if (scrollEl) scrollEl.scrollTop = 0;
+    });
+    listDiv.appendChild(item);
+  });
+  tabletCats.appendChild(listDiv);
+
+  document.querySelectorAll('.cat-section').forEach(s => {
+    if (!filtroCat) s.classList.add('tablet-visible');
+    else s.classList.toggle('tablet-visible', s.id === 'cat-' + filtroCat);
   });
 }
 
@@ -1321,7 +1607,35 @@ function qtyEnCategoria(catId) {
   }, 0);
 }
 
-// ── Fila de artículo ─────────────────────────────────────────────────────────
+// ── Fila de artículo con Long-Press para nueva línea ────────────────────────
+let agregarComoLineaNueva = false;
+
+function agregarArticuloLineaNueva(artId) {
+  const art = cartaData[artId];
+  if (!art || art.disponible === false) return;
+
+  const todas = [...(art.variantes || []), ...(categoriasData[art.catId]?.variantes || [])];
+  const tieneVariantes = todas.length > 0;
+
+  if (art.esCombo === true || tieneVariantes) {
+    agregarComoLineaNueva = true;
+    if (art.esCombo === true) {
+      abrirComboModal(artId, art);
+    } else {
+      abrirVarianteModal(artId, art);
+    }
+    return;
+  }
+
+  // Artículo simple: clave única con timestamp
+  const key = artId + '__line__' + Date.now();
+  carrito[key] = { art: { ...art }, qty: 1, nota: '' };
+  haptic(15);
+  updateCartaUI();
+  if ($('drawer').classList.contains('open')) renderDrawer();
+}
+window.agregarArticuloLineaNueva = agregarArticuloLineaNueva;
+
 function crearArtRow(artId, art) {
   const agotado = art.disponible === false;
   const wrap = document.createElement('div');
@@ -1357,12 +1671,52 @@ function crearArtRow(artId, art) {
     </div>
     ${art.alergenos?.length ? `<div class="alerg-panel" id="alerg-${artId}" hidden>⚠ Alérgenos: ${escapeHtml(art.alergenos.join(', '))}</div>` : ''}`;
 
-  // Tocar la zona de nombre/precio = +1 (más rápido que buscar el +)
-  wrap.querySelector('.art-info').addEventListener('click', () => {
-    if (agotado) return;
-    cambiarQty(artId, +1);
-    haptic(8);
-  });
+  const infoDiv = wrap.querySelector('.art-info');
+  if (infoDiv && !agotado) {
+    let timer = null;
+    let isLongPress = false;
+
+    const start = e => {
+      if (e.type === 'mousedown' && e.button !== 0) return;
+      isLongPress = false;
+      timer = setTimeout(() => {
+        isLongPress = true;
+        timer = null;
+        agregarArticuloLineaNueva(artId);
+      }, 750);
+    };
+
+    const cancel = () => {
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+    };
+
+    infoDiv.style.webkitTouchCallout = 'none';
+    infoDiv.style.userSelect = 'none';
+
+    infoDiv.addEventListener('mousedown', start);
+    infoDiv.addEventListener('touchstart', start, { passive: true });
+    infoDiv.addEventListener('click', e => {
+      if (isLongPress) {
+        e.preventDefault();
+        e.stopPropagation();
+        isLongPress = false;
+        return;
+      }
+      cancel();
+      if (agotado) return;
+      cambiarQty(artId, +1);
+      haptic(8);
+    });
+    infoDiv.addEventListener('mouseup', cancel);
+    infoDiv.addEventListener('touchend', cancel);
+    infoDiv.addEventListener('touchmove', cancel);
+    infoDiv.addEventListener('mouseleave', cancel);
+    infoDiv.addEventListener('contextmenu', e => e.preventDefault());
+  }
+
   wrap.querySelectorAll('.qty-btn').forEach(b => {
     b.addEventListener('click', e => {
       e.stopPropagation();
@@ -1453,11 +1807,25 @@ function cambiarQty(artId, delta) {
   }
 
   // Artículo simple
-  const prev = carrito[artId]?.qty || 0;
-  const next = Math.max(0, prev + delta);
-  if (next === 0) delete carrito[artId];
-  else if (!carrito[artId]) carrito[artId] = { art, qty: next, nota: '' };
-  else carrito[artId].qty = next;
+  if (delta > 0) {
+    const prev = carrito[artId]?.qty || 0;
+    if (!carrito[artId]) carrito[artId] = { art: { ...art }, qty: prev + delta, nota: '' };
+    else carrito[artId].qty = prev + delta;
+  } else {
+    if (carrito[artId]) {
+      const next = Math.max(0, carrito[artId].qty + delta);
+      if (next === 0) delete carrito[artId];
+      else carrito[artId].qty = next;
+    } else {
+      const lineKeys = Object.keys(carrito).filter(k => k.startsWith(artId + '__line__'));
+      if (lineKeys.length) {
+        const last = lineKeys[lineKeys.length - 1];
+        const next = Math.max(0, carrito[last].qty + delta);
+        if (next === 0) delete carrito[last];
+        else carrito[last].qty = next;
+      }
+    }
+  }
   updateCartaUI();
 }
 
@@ -1466,12 +1834,20 @@ function seleccionarVariante(artId, varIdx, qty) {
   const todas = [...(art.variantes || []), ...(categoriasData[art.catId]?.variantes || [])];
   const v = todas[varIdx];
   if (!v) return;
-  const key = `${artId}__v${varIdx}__${String(v.nombre).replace(/[^a-zA-Z0-9]/g, '')}`;
-  const prev = carrito[key]?.qty || 0;
+  let key = `${artId}__v${varIdx}__${String(v.nombre).replace(/[^a-zA-Z0-9]/g, '')}`;
+  let prev = 0;
+  let nota = '';
+  if (agregarComoLineaNueva) {
+    key += '__line__' + Date.now();
+    agregarComoLineaNueva = false;
+  } else {
+    prev = carrito[key]?.qty || 0;
+    nota = carrito[key]?.nota || '';
+  }
   carrito[key] = {
     art: { ...art, nombre: `${art.nombre} (${v.nombre})`, precio: Number(v.precio ?? art.precio) },
     qty: prev + qty,
-    nota: carrito[key]?.nota || ''
+    nota: nota || ''
   };
   haptic(10);
   updateCartaUI();
@@ -1501,10 +1877,10 @@ function abrirVarianteModal(artId, art) {
         </div>
       </div>`,
       [
-        { label: 'Cancelar' },
+        { label: 'Cancelar', action: () => { agregarComoLineaNueva = false; } },
         {
           label: selIdx === null ? 'Añadir' : `Añadir ${qty}`, style: 'primary',
-          action: () => { if (selIdx !== null) seleccionarVariante(artId, selIdx, qty); }
+          action: () => { if (selIdx !== null) seleccionarVariante(artId, selIdx, qty); else agregarComoLineaNueva = false; }
         }
       ]);
 
@@ -1522,8 +1898,14 @@ function abrirVarianteModal(artId, art) {
 function abrirComboModal(artId, art) {
   const comboGroups = art.combo || [];
   if (!comboGroups.length) {
-    const key = artId + '__combo__directo';
-    const prev = carrito[key]?.qty || 0;
+    let key = artId + '__combo__directo';
+    let prev = 0;
+    if (agregarComoLineaNueva) {
+      key += '__line__' + Date.now();
+      agregarComoLineaNueva = false;
+    } else {
+      prev = carrito[key]?.qty || 0;
+    }
     carrito[key] = { art: { ...art }, qty: prev + 1, nota: '', basePrecio: art.precio };
     updateCartaUI();
     return;
@@ -1534,7 +1916,7 @@ function abrirComboModal(artId, art) {
 
   function render() {
     const completos = selections.every(s => s !== null);
-    const botones = [{ label: 'Cancelar' }];
+    const botones = [{ label: 'Cancelar', action: () => { agregarComoLineaNueva = false; } }];
     if (completos) {
       botones.push({
         label: `Añadir ${qty}`, style: 'primary',
@@ -1602,15 +1984,23 @@ function abrirComboModal(artId, art) {
 
 function confirmarCombo(artId, art, selections, qty) {
   const selStr = selections.map(s => `${s.artId}:${s.variante || ''}`).join('|');
-  const key = artId + '__combo__' + selStr;
-  const prev = carrito[key]?.qty || 0;
+  let key = artId + '__combo__' + selStr;
+  let prev = 0;
+  let nota = '';
+  if (agregarComoLineaNueva) {
+    key += '__line__' + Date.now();
+    agregarComoLineaNueva = false;
+  } else {
+    prev = carrito[key]?.qty || 0;
+    nota = carrito[key]?.nota || '';
+  }
   const totalSupl = selections.reduce((s, i) => s + (i.suplemento || 0), 0);
   carrito[key] = {
     art: { ...art, precio: Number(art.precio) + totalSupl },
     selections: selections.map(s => ({ ...s })),
     basePrecio: art.precio,
     qty: prev + qty,
-    nota: carrito[key]?.nota || ''
+    nota: nota || ''
   };
   haptic(10);
   updateCartaUI();
@@ -1649,7 +2039,7 @@ function updateCartaUI() {
     }
   });
 
-  // Contadores por categoría (cabeceras + chips)
+  // Contadores por categoría (cabeceras + chips + popup + tablet)
   Object.entries(categoriasData).forEach(([catId]) => {
     const total = qtyEnCategoria(catId);
     const cc = $('catcount-' + catId);
@@ -1657,7 +2047,7 @@ function updateCartaUI() {
       cc.textContent = total > 0 ? total : '';
       cc.classList.toggle('visible', total > 0);
     }
-    const chip = document.querySelector(`.cat-chip[data-cat="${catId}"]`);
+    const chip = document.querySelector(`.category-chip[data-cat="${catId}"]`);
     if (chip) {
       let cnt = chip.querySelector('.cnt');
       if (total > 0) {
@@ -1665,14 +2055,46 @@ function updateCartaUI() {
         cnt.textContent = total;
       } else if (cnt) cnt.remove();
     }
+    const panelItem = document.querySelector(`.cats-panel-item[data-cat-id="${catId}"]`);
+    if (panelItem) {
+      let cnt = panelItem.querySelector('.cnt');
+      if (total > 0) {
+        if (!cnt) { cnt = document.createElement('span'); cnt.className = 'cnt'; panelItem.appendChild(cnt); }
+        cnt.textContent = total;
+      } else if (cnt) cnt.remove();
+    }
+    const tabItem = document.querySelector(`.tablet-cat-item[data-cat-id="${catId}"]`);
+    if (tabItem) {
+      let cnt = tabItem.querySelector('.tablet-cat-count');
+      if (total > 0) {
+        if (!cnt) { cnt = document.createElement('span'); cnt.className = 'tablet-cat-count'; tabItem.appendChild(cnt); }
+        cnt.textContent = total;
+      } else if (cnt) cnt.remove();
+    }
   });
   // Chip "Todas"
-  const chipTodas = document.querySelector('.cat-chip[data-cat=""]');
+  const totalUdsAll = Object.values(carrito).reduce((s, i) => s + i.qty, 0);
+  const chipTodas = document.querySelector('.category-chip[data-cat=""]');
   if (chipTodas) {
-    const totalUdsAll = Object.values(carrito).reduce((s, i) => s + i.qty, 0);
     let cnt = chipTodas.querySelector('.cnt');
     if (totalUdsAll > 0) {
       if (!cnt) { cnt = document.createElement('span'); cnt.className = 'cnt'; chipTodas.appendChild(cnt); }
+      cnt.textContent = totalUdsAll;
+    } else if (cnt) cnt.remove();
+  }
+  const panelTodas = document.querySelector('.cats-panel-item:not([data-cat-id])');
+  if (panelTodas) {
+    let cnt = panelTodas.querySelector('.cnt');
+    if (totalUdsAll > 0) {
+      if (!cnt) { cnt = document.createElement('span'); cnt.className = 'cnt'; panelTodas.appendChild(cnt); }
+      cnt.textContent = totalUdsAll;
+    } else if (cnt) cnt.remove();
+  }
+  const tabTodas = document.querySelector('.tablet-cat-item:not([data-cat-id])');
+  if (tabTodas) {
+    let cnt = tabTodas.querySelector('.tablet-cat-count');
+    if (totalUdsAll > 0) {
+      if (!cnt) { cnt = document.createElement('span'); cnt.className = 'tablet-cat-count'; tabTodas.appendChild(cnt); }
       cnt.textContent = totalUdsAll;
     } else if (cnt) cnt.remove();
   }
@@ -1682,7 +2104,7 @@ function updateCartaUI() {
 
 // ── Modal de nota por artículo ───────────────────────────────────────────────
 function abrirNotaModal(artId, nombreArt) {
-  const carritoKey = Object.keys(carrito).find(k => k === artId || k.startsWith(artId + '__v') || k.startsWith(artId + '__combo__')) || artId;
+  const carritoKey = Object.keys(carrito).find(k => k === artId || k.startsWith(artId + '__v') || k.startsWith(artId + '__combo__') || k.startsWith(artId + '__line__')) || artId;
   const qty = carrito[carritoKey]?.qty || 0;
   if (!qty) {
     showModal({ title: 'Cantidad requerida', body: 'Añade primero el artículo con + para poder ponerle una nota.', buttons: [{ label: 'Cerrar', style: 'primary' }] });
@@ -2323,22 +2745,33 @@ async function enviarTicketFinalAServicio(lineasServidas, total, cobro = null) {
 }
 
 // Guarda/sobreescribe la venta de la sesión activa en historial
-async function upsertHistorial(datos) {
-  if (!mesaId) return;
+async function upsertHistorial(datos, targetMesaId = null) {
+  const mId = targetMesaId || mesaId;
   try {
     if (!datos.pagoMetodo) {
-      const pmSnap = await get(ref(db, `pedidos/${mesaId}/_meta/pagoMetodo`));
-      datos.pagoMetodo = pmSnap.exists() ? pmSnap.val() : 'Efectivo';
+      if (mId) {
+        const pmSnap = await get(ref(db, `pedidos/${mId}/_meta/pagoMetodo`));
+        datos.pagoMetodo = pmSnap.exists() ? pmSnap.val() : 'Efectivo';
+      } else {
+        datos.pagoMetodo = 'Efectivo';
+      }
     }
-    const ventaKeySnap = await get(ref(db, `pedidos/${mesaId}/_meta/ventaKey`));
-    const ventaKey = ventaKeySnap.val();
+    let ventaKey = null;
+    if (mId) {
+      const ventaKeySnap = await get(ref(db, `pedidos/${mId}/_meta/ventaKey`));
+      ventaKey = ventaKeySnap.val();
+    }
     if (ventaKey) {
       await set(ref(db, 'historial/' + ventaKey), datos);
     } else {
       const newRef = await push(ref(db, 'historial'), datos);
-      await set(ref(db, `pedidos/${mesaId}/_meta/ventaKey`), newRef.key);
+      if (mId) {
+        await set(ref(db, `pedidos/${mId}/_meta/ventaKey`), newRef.key);
+      }
     }
-  } catch (_) { }
+  } catch (e) {
+    console.error('Error en upsertHistorial:', e);
+  }
 }
 
 async function limpiarPrintJobsCerradosDeMesa(mesaIdObjetivo) {
@@ -2647,15 +3080,16 @@ function showCobrarModal(total, lineasImprimir) {
         <label style="display:block;margin-bottom:6px;color:var(--muted);font-size:12px">Cantidad recibida (€)</label>
         <input id="cobrar-input" type="number" min="0" step="0.01" inputmode="decimal"
           style="width:100%;padding:11px;border:1px solid var(--border);border-radius:10px;font-size:17px;font-family:var(--mono);background:var(--surface-2);color:var(--text);outline:none"
-          placeholder="0,00">
+          placeholder="${total.toFixed(2)}">
         <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap" id="cobrar-quick"></div>
       </div>
-      <div id="cobrar-cambio" style="font-size:14px;color:var(--ok);display:none"></div>
+      <div id="cobrar-cambio" style="font-size:14px;color:var(--ok);font-weight:600;display:none"></div>
       <div id="cobrar-error" style="color:var(--danger);font-size:12px;display:none">La cantidad recibida debe ser mayor o igual al total.</div>
     </div>`,
     [
       { label: 'Cancelar' },
-      { label: 'Imprimir y cobrar', style: 'primary', id: 'btn-cobrar-ok' }
+      { label: '🖨️ Imprimir ticket', id: 'btn-cobrar-print' },
+      { label: '✓ Cobrar y Cerrar', style: 'primary', id: 'btn-cobrar-close' }
     ]);
 
   const btnEf = mb.querySelector('#btn-metodo-efectivo');
@@ -2683,7 +3117,7 @@ function showCobrarModal(total, lineasImprimir) {
     const recibido = parseFloat((inp.value || '').replace(',', '.'));
     if (!isNaN(recibido) && recibido >= total - 0.001) {
       const cambio = Math.round((recibido - total) * 100) / 100;
-      cambioEl.textContent = `Cambio: ${fmtEu(cambio)}`;
+      cambioEl.textContent = `Cambio a devolver: ${fmtEu(cambio)}`;
       cambioEl.style.display = 'block';
       errEl.style.display = 'none';
     } else {
@@ -2705,89 +3139,415 @@ function showCobrarModal(total, lineasImprimir) {
   btnEf.onclick = () => { metodo = 'Efectivo'; pintarMetodo(); };
   btnTj.onclick = () => { metodo = 'Tarjeta'; pintarMetodo(); };
 
-  const btnOk = [...document.querySelectorAll('#modal-actions .modal-btn')].pop();
-  btnOk.onclick = async () => {
-    const recibido = parseFloat((inp.value || '').replace(',', '.'));
+  const btnPrint = mb.querySelector('#btn-cobrar-print');
+  const btnClose = mb.querySelector('#btn-cobrar-close');
+
+  btnPrint.onclick = async () => {
+    const recibido = metodo === 'Tarjeta' ? total : parseFloat((inp.value || '').replace(',', '.'));
     if (isNaN(recibido) || recibido < total - 0.001) { errEl.style.display = 'block'; return; }
     const cambio = Math.round((recibido - total) * 100) / 100;
     closeModal();
     if (mesaId) await set(ref(db, `pedidos/${mesaId}/_meta/pagoMetodo`), metodo);
     await imprimirTicketFinal(lineasImprimir, total, { recibido, cambio, metodo });
   };
+
+  btnClose.onclick = async () => {
+    const recibido = metodo === 'Tarjeta' ? total : parseFloat((inp.value || '').replace(',', '.'));
+    if (isNaN(recibido) || recibido < total - 0.001) { errEl.style.display = 'block'; return; }
+    const cambio = Math.round((recibido - total) * 100) / 100;
+    closeModal();
+    await ejecutarCierreMesaConMetodo(mesaId, mesaNombre, metodo, cambio);
+  };
+
   setTimeout(() => inp.focus(), 100);
 }
 
-// ── Cerrar mesa (con historial) ──────────────────────────────────────────────
-function cerrarMesaEspecifica(targetMesaId, targetMesaNombre) {
-  showModal({
-    title: 'Cerrar mesa ' + targetMesaNombre,
-    body: 'Se guardará la venta en el historial y se borrarán los pedidos de esta mesa. ¿Continuar?',
-    buttons: [
-      { label: 'Cancelar' },
-      {
-        label: 'Cerrar mesa', style: 'danger', action: async () => {
-          const snap = await get(ref(db, 'pedidos/' + targetMesaId));
-          const pedidos = snap.val() || {};
+// ── TRANSFERIR MESA ───────────────────────────────────────────────────────────
+function abrirTransferirMesaModal(origenMesaId = null, origenMesaNombre = null) {
+  const origId = origenMesaId || mesaId;
+  const origNombre = origenMesaNombre || mesaNombre || mesasData[origId]?.nombre || origId;
+  if (!origId) return;
 
-          const todasLineas = aplanarPedidos(pedidos);
-          const agrupado = {};
-          const camareros = new Set();
-          todasLineas.forEach(l => {
-            const q = qtyEnCuenta(l);
-            if (q <= 0) return;
-            if (l.camarero && l.destino !== 'descuento') camareros.add(l.camarero);
-            const k = l.nombre + '||' + Number(l.precio).toFixed(2);
-            if (!agrupado[k]) agrupado[k] = { nombre: l.nombre, precio: Number(l.precio), qty: 0, nota: l.nota || '' };
-            agrupado[k].qty += q;
-          });
-          const lineas = Object.values(agrupado);
-          const total = lineas.reduce((s, l) => s + l.precio * l.qty, 0);
+  const mesasLibres = Object.entries(mesasData).filter(([id, m]) => m.estado === 'libre' && id !== origId && !m.nombre.startsWith('#'));
+  if (!mesasLibres.length) {
+    showModal({ title: 'Sin mesas libres', body: 'No hay mesas disponibles para transferir.', buttons: [{ label: 'Cerrar' }] });
+    return;
+  }
+  
+  showModalHTML(`Transferir · Mesa ${origNombre}`, `
+    <div style="font-size:12px;color:var(--muted);margin-bottom:10px">Elige la mesa destino (debe estar libre):</div>
+    <div id="transf-list" style="display:flex;flex-direction:column;gap:6px;max-height:50vh;overflow-y:auto">
+      ${mesasLibres.map(([id, m]) => `
+        <button type="button" data-mesadest="${id}" class="modal-btn"
+          style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:12px;width:100%;font-size:14px;text-align:left;cursor:pointer;background:var(--surface-2);border:1px solid var(--border)">
+          <span style="font-weight:600">Mesa ${escapeHtml(m.nombre)}</span>
+          <span>›</span>
+        </button>
+      `).join('')}
+    </div>
+  `, [
+    { label: 'Cancelar' }
+  ]);
 
-          // Guardar en historial (usando el contexto de la mesa objetivo)
-          const mesaIdPrev = mesaId, mesaNombrePrev = mesaNombre;
-          mesaId = targetMesaId; mesaNombre = targetMesaNombre;
-          if (lineas.length > 0) {
-            const ahora = new Date();
-            await upsertHistorial({
-              mesa: targetMesaNombre, camarero: [...camareros].join(', '),
-              ts: ahora.getTime(), fecha: ahora.toLocaleDateString('es-ES'),
-              hora: ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
-              total: Math.round(total * 100) / 100, lineas
-            });
-            logAuditoria('mesa_cerrada', `Total ${fmtEu(total)} · ${lineas.length} artículos`,
-              { total: Math.round(total * 100) / 100, articulos: lineas.length });
-          } else {
-            logAuditoria('mesa_cerrada', 'Mesa cerrada sin consumo', { total: 0 });
-          }
+  document.querySelectorAll('[data-mesadest]').forEach(btn => {
+    btn.onclick = async (e) => {
+      e.stopPropagation();
+      document.getElementById('modal-overlay').classList.remove('open');
+      await transferirMesa(origId, btn.dataset.mesadest);
+    };
+  });
+}
 
-          await remove(ref(db, 'pedidos/' + targetMesaId));
-          if (targetMesaId.startsWith('temp_')) {
-            await remove(ref(db, 'mesas/' + targetMesaId));
-          } else {
-            await update(ref(db, 'mesas/' + targetMesaId), { estado: 'libre', atendidaTs: null });
-          }
-          try {
-            const borrados = await limpiarPrintJobsCerradosDeMesa(targetMesaId);
-            if (borrados > 0) {
-              logAuditoria('print_jobs_limpiados', `Limpieza técnica al cerrar mesa (${borrados})`,
-                { mesaId: targetMesaId, mesa: targetMesaNombre, printJobs: borrados });
-            }
-          } catch (_) { }
-          mesaId = mesaIdPrev === targetMesaId ? null : mesaIdPrev;
-          mesaNombre = mesaIdPrev === targetMesaId ? null : mesaNombrePrev;
+async function transferirMesa(origenId, mesaDestId) {
+  const origId = origenId || mesaId;
+  if (!origId || !mesaDestId) return;
 
-          toast(`Mesa ${escapeHtml(targetMesaNombre)} cerrada · ${fmtEu(total)}`);
-          if (mesaIdPrev === targetMesaId) {
-            carrito = {};
-            actualizarCabecera();
-            cerrarDrawerSilencioso();
-            show('mesas');
-          } else {
-            renderVistaMesas();
-          }
-        }
+  const snapPedidos = await get(ref(db, 'pedidos/' + origId));
+  const pedidos = snapPedidos.val();
+  if (!pedidos) return;
+
+  const batchUpdates = {};
+  Object.entries(pedidos).forEach(([envioId, envio]) => {
+    batchUpdates[`pedidos/${mesaDestId}/${envioId}`] = envio;
+    batchUpdates[`pedidos/${origId}/${envioId}`] = null;
+  });
+  if (origId.startsWith('temp_')) {
+    batchUpdates[`mesas/${origId}`] = null;
+  } else {
+    batchUpdates[`mesas/${origId}/estado`] = 'libre';
+    batchUpdates[`mesas/${origId}/atendidaTs`] = null;
+  }
+  batchUpdates[`mesas/${mesaDestId}/estado`] = 'ocupada';
+
+  await update(ref(db), batchUpdates);
+
+  const mesaDestNombre = mesasData[mesaDestId]?.nombre || mesaDestId;
+  const mesaOrigenNombre = mesasData[origId]?.nombre || origId;
+
+  logAuditoria('mesa_transferida',
+    `${mesaOrigenNombre} → ${mesaDestNombre}`,
+    { mesaOrigenId: origId, mesaOrigen: mesaOrigenNombre, mesaDestId, mesaDest: mesaDestNombre }
+  );
+
+  haptic(20);
+  toast(`🔀 Mesa ${mesaOrigenNombre} transferida a Mesa ${mesaDestNombre}`);
+
+  if (mesaId === origId) {
+    mesaId = mesaDestId;
+    mesaNombre = mesaDestNombre;
+    actualizarCabecera();
+    if ($('view-ticket').hidden === false) {
+      await renderTicket();
+    }
+  } else {
+    renderVistaMesas();
+  }
+}
+
+// ── Cerrar mesa (con historial y método de cobro) ─────────────────────────────
+async function ejecutarCierreMesaConMetodo(targetMesaId, targetMesaNombre, metodo = 'Efectivo', cambio = 0, sinConsumo = false) {
+  try {
+    const snap = await get(ref(db, 'pedidos/' + targetMesaId));
+    const pedidos = snap.val() || {};
+
+    const todasLineas = aplanarPedidos(pedidos);
+    const agrupado = {};
+    const camareros = new Set();
+    todasLineas.forEach(l => {
+      const q = qtyEnCuenta(l);
+      if (q <= 0) return;
+      if (l.camarero && l.destino !== 'descuento') camareros.add(l.camarero);
+      const k = l.nombre + '||' + Number(l.precio).toFixed(2);
+      if (!agrupado[k]) agrupado[k] = { nombre: l.nombre, precio: Number(l.precio), qty: 0, nota: l.nota || '' };
+      agrupado[k].qty += q;
+    });
+    const lineas = Object.values(agrupado);
+    const total = lineas.reduce((s, l) => s + l.precio * l.qty, 0);
+
+    if (lineas.length > 0 && !sinConsumo) {
+      const ahora = new Date();
+      await upsertHistorial({
+        mesa: targetMesaNombre,
+        camarero: [...camareros].join(', ') || camareroActual || 'Camarero',
+        ts: ahora.getTime(),
+        fecha: ahora.toLocaleDateString('es-ES'),
+        hora: ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+        total: Math.round(total * 100) / 100,
+        pagoMetodo: metodo,
+        cambio: cambio > 0 ? cambio : null,
+        lineas
+      }, targetMesaId);
+
+      logAuditoria('mesa_cerrada',
+        `Mesa ${targetMesaNombre} cerrada · Total ${fmtEu(total)} (${metodo})`,
+        { mesaId: targetMesaId, mesa: targetMesaNombre, total: Math.round(total * 100) / 100, pagoMetodo: metodo, articulos: lineas.length }
+      );
+    } else {
+      logAuditoria('mesa_cerrada', `Mesa ${targetMesaNombre} cerrada sin consumo`, { mesaId: targetMesaId, mesa: targetMesaNombre, total: 0 });
+    }
+
+    await remove(ref(db, 'pedidos/' + targetMesaId));
+    if (targetMesaId.startsWith('temp_')) {
+      await remove(ref(db, 'mesas/' + targetMesaId));
+    } else {
+      await update(ref(db, 'mesas/' + targetMesaId), { estado: 'libre', atendidaTs: null });
+    }
+    try {
+      const borrados = await limpiarPrintJobsCerradosDeMesa(targetMesaId);
+      if (borrados > 0) {
+        logAuditoria('print_jobs_limpiados', `Limpieza técnica al cerrar mesa (${borrados})`,
+          { mesaId: targetMesaId, mesa: targetMesaNombre, printJobs: borrados });
       }
-    ]
+    } catch (_) { }
+
+    const msgCambio = cambio > 0 ? ` · Cambio: ${fmtEu(cambio)}` : '';
+    toast(`✓ Mesa ${escapeHtml(targetMesaNombre)} cerrada · ${fmtEu(total)} (${metodo})${msgCambio}`);
+
+    if (mesaId === targetMesaId) {
+      mesaId = null;
+      mesaNombre = null;
+      carrito = {};
+      actualizarCabecera();
+      cerrarDrawerSilencioso();
+      show('mesas');
+    } else {
+      renderVistaMesas();
+    }
+  } catch (e) {
+    console.error('Error al cerrar mesa:', e);
+    toast('No se pudo cerrar la mesa');
+  }
+}
+
+function cerrarMesaEspecifica(targetMesaId, targetMesaNombre) {
+  get(ref(db, 'pedidos/' + targetMesaId)).then(snap => {
+    const pedidos = snap.val() || {};
+    const todasLineas = aplanarPedidos(pedidos);
+    const agrupado = {};
+    todasLineas.forEach(l => {
+      const q = qtyEnCuenta(l);
+      if (q <= 0) return;
+      const k = l.nombre + '||' + Number(l.precio).toFixed(2);
+      if (!agrupado[k]) agrupado[k] = { nombre: l.nombre, precio: Number(l.precio), qty: 0 };
+      agrupado[k].qty += q;
+    });
+    const lineas = Object.values(agrupado);
+    const total = lineas.reduce((s, l) => s + l.precio * l.qty, 0);
+
+    if (!lineas.length || total <= 0) {
+      showModal({
+        title: 'Cerrar mesa ' + targetMesaNombre,
+        body: 'La mesa no tiene consumos registrados. ¿Deseas liberarla?',
+        buttons: [
+          { label: 'Cancelar' },
+          {
+            label: 'Liberar mesa', style: 'danger', action: async () => {
+              await ejecutarCierreMesaConMetodo(targetMesaId, targetMesaNombre, 'Efectivo', 0, true);
+            }
+          }
+        ]
+      });
+      return;
+    }
+
+    showModalHTML(`Cerrar · Mesa ${targetMesaNombre}`, `
+      <div style="font-size:13px;color:var(--text);margin-bottom:12px">
+        Total de la cuenta: <strong style="font-size:16px;font-family:var(--mono);color:var(--accent)">${fmtEu(total)}</strong> (${lineas.reduce((s, l) => s + l.qty, 0)} uds)<br>
+        <span style="font-size:12px;color:var(--muted);margin-top:4px;display:inline-block">Selecciona cómo se ha cobrado la mesa:</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <button type="button" class="modal-btn" data-cierre-pago="Efectivo"
+          style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:12px;width:100%;font-size:14px;cursor:pointer;background:var(--surface-2);border:1px solid var(--border)">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:18px">💵</span>
+            <div>
+              <div style="font-weight:600">Efectivo</div>
+              <div style="font-size:11px;color:var(--muted)">Cobrado en metálico</div>
+            </div>
+          </div>
+          <span>›</span>
+        </button>
+        <button type="button" class="modal-btn" data-cierre-pago="Tarjeta"
+          style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:12px;width:100%;font-size:14px;cursor:pointer;background:var(--surface-2);border:1px solid var(--border)">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:18px">💳</span>
+            <div>
+              <div style="font-weight:600">Tarjeta / TPV</div>
+              <div style="font-size:11px;color:var(--muted)">Cobrado con datáfono</div>
+            </div>
+          </div>
+          <span>›</span>
+        </button>
+      </div>
+    `, [
+      { label: 'Cancelar' }
+    ]);
+
+    document.querySelectorAll('[data-cierre-pago]').forEach(btn => {
+      btn.onclick = async (e) => {
+        e.stopPropagation();
+        const metodo = btn.dataset.cierrePago;
+        document.getElementById('modal-overlay').classList.remove('open');
+        await ejecutarCierreMesaConMetodo(targetMesaId, targetMesaNombre, metodo);
+      };
+    });
+  });
+}
+
+// ── Configuración y modal de ayuda contextual ❓ ──────────────────────────────
+let ayudaConfig = {};
+get(ref(db, 'config/ayuda')).then(snap => {
+  ayudaConfig = snap.val() || {};
+}).catch(() => { });
+
+function mostrarAyudaContextual() {
+  const isMesas = !$('view-mesas').hidden;
+  const isCarta = !$('view-carta').hidden;
+  const isTicket = !$('view-ticket').hidden;
+
+  let title = 'Ayuda';
+  let html = '';
+
+  if (isMesas) {
+    title = ayudaConfig.mesas_titulo || '❓ Ayuda: Pantalla de Mesas';
+    html = ayudaConfig.mesas_html || `
+      <div style="display:flex;flex-direction:column;gap:12px;font-family:var(--sans);font-size:13px;line-height:1.55;color:var(--text)">
+        <p>Estás en la pantalla de selección de mesas y pedidos.</p>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div>👉 <strong>Pulsar una mesa:</strong> Abre la mesa para empezar a tomar nota.</div>
+          <div>👉 <strong>Mantener pulsada una mesa:</strong> Abre el menú de acciones rápidas (cerrar mesa, traspasar, etc.).</div>
+          <div>👉 <strong>Botón 🛍️ Pedido:</strong> Despliega las opciones para crear un nuevo pedido temporal o ver los pedidos temporales activos.</div>
+        </div>
+      </div>
+    `;
+  } else if (isCarta) {
+    title = ayudaConfig.carta_titulo || '❓ Ayuda: Carta y Pedidos';
+    html = ayudaConfig.carta_html || `
+      <div style="display:flex;flex-direction:column;gap:12px;font-family:var(--sans);font-size:13px;line-height:1.55;color:var(--text)">
+        <p>Estás tomando nota para la mesa.</p>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div>👉 <strong>Botón + / − o pulsar el artículo:</strong> Añade o quita unidades del artículo.</div>
+          <div>👉 <strong>Mantener pulsado NOMBRE del artículo:</strong> Añade el artículo como una <strong>línea nueva independiente</strong>.</div>
+          <div>👉 <strong>Botón 📝:</strong> Añade notas personalizadas o notas rápidas.</div>
+          <div>👉 <strong>Botón 📂 Categorías / Chips:</strong> Filtra y salta a la categoría deseada al instante.</div>
+          <div>👉 <strong>Botón 🧾 Pedido (abajo):</strong> Abre el resumen de la comanda para enviar a barra/cocina.</div>
+        </div>
+      </div>
+    `;
+  } else if (isTicket) {
+    title = ayudaConfig.cuenta_titulo || '❓ Ayuda: Cuenta y Cobro';
+    html = ayudaConfig.cuenta_html || `
+      <div style="display:flex;flex-direction:column;gap:12px;font-family:var(--sans);font-size:13px;line-height:1.55;color:var(--text)">
+        <p>Estás visualizando la cuenta de la mesa.</p>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div>👉 <strong>Cobrar cuenta:</strong> Cobra y emite el ticket final.</div>
+          <div>👉 <strong>Dividir / Parcial:</strong> Permite cobrar solo artículos seleccionados.</div>
+          <div>👉 <strong>Editar cuenta:</strong> Modifica artículos o cantidades antes del cobro.</div>
+        </div>
+      </div>
+    `;
+  }
+
+  showModalHTML(title, html, [{ label: 'Entendido', style: 'primary' }]);
+}
+
+// ── Menú de Pedidos (2 opciones: Crear pedido / Ver pedidos temporales) ─────────
+function abrirMenuPedidos() {
+  const tempOrders = Object.entries(mesasData)
+    .filter(([id, m]) => id.startsWith('temp_') || m.temporal === true);
+
+  showModalHTML('🛍️ Pedidos', `
+    <div style="display:flex;flex-direction:column;gap:10px;padding:4px 0">
+      <button type="button" class="btn-primary" id="btn-menu-crear-pedido" style="width:100%;padding:14px;font-size:14px;border-radius:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+        🛍️ Crear nuevo pedido
+      </button>
+      <button type="button" class="modal-btn" id="btn-menu-ver-temp" style="width:100%;padding:14px;font-size:14px;border-radius:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--surface-2);border:1px solid var(--border)">
+        📋 Ver pedidos temporales ${tempOrders.length > 0 ? `<span style="background:var(--accent-soft);color:var(--accent);padding:2px 8px;border-radius:999px;font-family:var(--mono);font-size:11px;font-weight:700">${tempOrders.length}</span>` : ''}
+      </button>
+    </div>
+  `, [
+    { label: 'Cerrar' }
+  ]);
+
+  $('btn-menu-crear-pedido').onclick = () => {
+    closeModal();
+    abrirNuevoPedidoModal();
+  };
+  $('btn-menu-ver-temp').onclick = () => {
+    closeModal();
+    mostrarPedidosTemporalesFlotante();
+  };
+}
+
+function mostrarPedidosTemporalesFlotante() {
+  const tempOrders = Object.entries(mesasData)
+    .filter(([id, m]) => id.startsWith('temp_') || m.temporal === true)
+    .sort(([, a], [, b]) => {
+      const horaA = a.horaRecogida || '';
+      const horaB = b.horaRecogida || '';
+      if (horaA && horaB) return horaA.localeCompare(horaB);
+      if (!horaA && horaB) return -1;
+      if (horaA && !horaB) return 1;
+      return (a.creadoTs || 0) - (b.creadoTs || 0);
+    });
+
+  if (!tempOrders.length) {
+    showModal({
+      title: '🛍️ Pedidos Temporales',
+      body: 'No hay pedidos temporales activos en este momento.',
+      buttons: [{ label: 'Cerrar', style: 'primary' }]
+    });
+    return;
+  }
+
+  const itemsHtml = tempOrders.map(([id, m]) => {
+    const info = infoMesa(id, m);
+    const resumen = info.ocupada && info.tienePedidos
+      ? `${fmtEu(info.total)} · ⏱${fmtDur(info.minsAtencion)}`
+      : (info.ocupada ? 'ocupada' : 'sin consumo');
+
+    return `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border:1px solid var(--border);border-radius:14px;background:var(--surface-2);gap:10px">
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+          <span style="font-weight:600;font-size:14px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escapeHtml(m.nombre)}</span>
+          <span style="font-size:11.5px;color:var(--muted);font-family:var(--mono)">${resumen}</span>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button type="button" class="modal-btn" data-abrir-temp="${id}" style="padding:6px 12px;font-size:12px">Abrir</button>
+          <button type="button" class="modal-btn danger" data-cerrar-temp="${id}" style="padding:6px 12px;font-size:12px">Cerrar</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  showModalHTML('🛍️ Pedidos Temporales', `
+    <div style="display:flex;flex-direction:column;gap:8px;max-height:60vh;overflow-y:auto;padding-right:2px">
+      ${itemsHtml}
+    </div>
+  `, [
+    { label: 'Cerrar', style: 'primary' }
+  ]);
+
+  document.querySelectorAll('[data-abrir-temp]').forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.dataset.abrirTemp;
+      const m = mesasData[id];
+      if (m) {
+        closeModal();
+        abrirMesa(id, m.nombre, m.estado === 'ocupada');
+      }
+    };
+  });
+
+  document.querySelectorAll('[data-cerrar-temp]').forEach(btn => {
+    btn.onclick = () => {
+      const id = btn.dataset.cerrarTemp;
+      const m = mesasData[id];
+      if (m) {
+        closeModal();
+        cerrarMesaEspecifica(id, m.nombre);
+      }
+    };
   });
 }
 
@@ -2922,14 +3682,289 @@ $('btn-vista-plano').addEventListener('click', () => {
 
 // ── Mis mesas ──
 function pintarFiltroMias() {
-  $('btn-mias').classList.toggle('on', filtroMias);
+  $('btn-mias')?.classList.toggle('on', filtroMias);
 }
-$('btn-mias').addEventListener('click', () => {
+$('btn-mias')?.addEventListener('click', () => {
   filtroMias = !filtroMias;
   localStorage.setItem('cam2_mias', filtroMias ? '1' : '0');
   pintarFiltroMias();
   renderVistaMesas();
 });
+
+// ── Movimientos de Caja (Gastos / Ingresos) ──
+window.abrirModalMovimientoCaja = () => {
+  if (!camareroActual) {
+    toast('Debes iniciar sesión con tu PIN primero');
+    return;
+  }
+
+  showModalHTML(`💰 Movimiento de Caja`, `
+    <div style="font-family:var(--sans);font-size:13px;display:flex;flex-direction:column;gap:12px">
+      <div>
+        <label style="display:block;margin-bottom:6px;color:var(--muted);font-size:12px;font-weight:600">Tipo de movimiento</label>
+        <div style="display:flex;gap:8px">
+          <button id="btn-caja-tipo-gasto" type="button" class="modal-btn" style="flex:1;padding:10px;border-radius:8px;font-weight:bold;cursor:pointer;border:1px solid #ef4444;background:#ef4444;color:white;">🔴 Gasto / Salida</button>
+          <button id="btn-caja-tipo-ingreso" type="button" class="modal-btn" style="flex:1;padding:10px;border-radius:8px;font-weight:bold;cursor:pointer;border:1px solid var(--border);background:var(--surface-2);color:var(--text);">🟢 Entrada / Ingreso</button>
+        </div>
+      </div>
+
+      <div>
+        <label style="display:block;margin-bottom:6px;color:var(--muted);font-size:12px;font-weight:600">Sugerencias rápidas</label>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button type="button" class="modal-btn" data-caja-tag="Hielo" style="padding:5px 10px;font-size:12px;border-radius:6px;background:var(--surface-2);border:1px solid var(--border);cursor:pointer">🧊 Hielo</button>
+          <button type="button" class="modal-btn" data-caja-tag="Panadería" style="padding:5px 10px;font-size:12px;border-radius:6px;background:var(--surface-2);border:1px solid var(--border);cursor:pointer">🥖 Panadería</button>
+          <button type="button" class="modal-btn" data-caja-tag="Proveedor" style="padding:5px 10px;font-size:12px;border-radius:6px;background:var(--surface-2);border:1px solid var(--border);cursor:pointer">🚚 Proveedor</button>
+          <button type="button" class="modal-btn" data-caja-tag="Compra urgente" style="padding:5px 10px;font-size:12px;border-radius:6px;background:var(--surface-2);border:1px solid var(--border);cursor:pointer">🛒 Compra</button>
+          <button type="button" class="modal-btn" data-caja-tag="Cambio de caja" style="padding:5px 10px;font-size:12px;border-radius:6px;background:var(--surface-2);border:1px solid var(--border);cursor:pointer">🪙 Cambio caja</button>
+          <button type="button" class="modal-btn" data-caja-tag="Retirada caja" style="padding:5px 10px;font-size:12px;border-radius:6px;background:var(--surface-2);border:1px solid var(--border);cursor:pointer">📤 Retirada</button>
+        </div>
+      </div>
+
+      <div>
+        <label style="display:block;margin-bottom:6px;color:var(--muted);font-size:12px;font-weight:600">Concepto / Motivo</label>
+        <input id="caja-concepto" type="text"
+          style="width:100%;box-sizing:border-box;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:14px;background:var(--surface);color:var(--text);font-family:var(--sans)"
+          placeholder="Ej: Hielo gasolinera, Proveedor pan..." />
+      </div>
+
+      <div>
+        <label style="display:block;margin-bottom:6px;color:var(--muted);font-size:12px;font-weight:600">Importe (€)</label>
+        <input id="caja-importe" type="number" min="0.01" step="0.01" inputmode="decimal"
+          style="width:100%;box-sizing:border-box;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:18px;font-family:var(--mono);background:var(--surface);color:var(--text);font-weight:700"
+          placeholder="0,00" />
+      </div>
+
+      <div style="font-size:11.5px;color:var(--muted);padding:8px 10px;background:var(--surface-2);border-radius:6px">
+        👤 Registrado por: <strong style="color:var(--text)">${(camareroActual || 'Camarero')}</strong>
+      </div>
+
+      <div id="caja-error" style="color:#ef4444;font-size:12px;display:none;font-weight:600">Por favor introduce un concepto y un importe válido mayor que 0.</div>
+    </div>
+  `, [
+    { label: 'Cancelar' },
+    { label: 'Continuar ›', style: 'primary' }
+  ]);
+
+  let tipoSeleccionado = 'gasto';
+  const btnGasto = document.getElementById('btn-caja-tipo-gasto');
+  const btnIngreso = document.getElementById('btn-caja-tipo-ingreso');
+  const inpConcepto = document.getElementById('caja-concepto');
+  const inpImporte = document.getElementById('caja-importe');
+  const errEl = document.getElementById('caja-error');
+
+  if (btnGasto && btnIngreso) {
+    btnGasto.onclick = () => {
+      tipoSeleccionado = 'gasto';
+      btnGasto.style.background = '#ef4444';
+      btnGasto.style.borderColor = '#ef4444';
+      btnGasto.style.color = '#fff';
+      btnIngreso.style.background = 'var(--surface-2)';
+      btnIngreso.style.borderColor = 'var(--border)';
+      btnIngreso.style.color = 'var(--text)';
+    };
+
+    btnIngreso.onclick = () => {
+      tipoSeleccionado = 'ingreso';
+      btnIngreso.style.background = '#10b981';
+      btnIngreso.style.borderColor = '#10b981';
+      btnIngreso.style.color = '#fff';
+      btnGasto.style.background = 'var(--surface-2)';
+      btnGasto.style.borderColor = 'var(--border)';
+      btnGasto.style.color = 'var(--text)';
+    };
+  }
+
+  document.querySelectorAll('[data-caja-tag]').forEach(btnTag => {
+    btnTag.onclick = () => {
+      if (inpConcepto) inpConcepto.value = btnTag.dataset.cajaTag;
+      if (inpImporte) inpImporte.focus();
+    };
+  });
+
+  const acts = document.getElementById('modal-actions');
+  if (acts) {
+    acts.innerHTML = '';
+    const btnCancel = document.createElement('button');
+    btnCancel.className = 'modal-btn';
+    btnCancel.textContent = 'Cancelar';
+    btnCancel.onclick = () => closeModal();
+
+    const btnContinuar = document.createElement('button');
+    btnContinuar.className = 'modal-btn primary';
+    btnContinuar.textContent = 'Continuar ›';
+    btnContinuar.onclick = () => {
+      const concepto = (inpConcepto ? inpConcepto.value : '').trim();
+      const importeRaw = inpImporte ? inpImporte.value.replace(',', '.') : '';
+      const importe = parseFloat(importeRaw);
+
+      if (!concepto || isNaN(importe) || importe <= 0) {
+        if (errEl) errEl.style.display = 'block';
+        return;
+      }
+
+      closeModal();
+
+      const tipoTexto = tipoSeleccionado === 'gasto' ? 'Salida / Gasto' : 'Entrada / Ingreso';
+      const tipoColor = tipoSeleccionado === 'gasto' ? '#ef4444' : '#10b981';
+
+      async function imprimirReciboMovimientoCaja({ tipo, concepto, importe, camarero }) {
+        const paperCfg = { paper: (configLocal?.ticketPaper || '80mm'), fontSize: Number(configLocal?.ticketFontSize || 9), uppercase: configLocal?.ticketUppercase === true };
+        const serviceId = String(configLocal?.barraPrintServiceId || configLocal?.ticketPrintServiceId || 'local-print-service-1').trim() || 'local-print-service-1';
+        const tipoLabel = tipo === 'gasto' ? 'SALIDA / GASTO' : 'ENTRADA / INGRESO';
+
+        const payload = {
+          kind: 'ticket_final',
+          status: 'pending',
+          createdAt: Date.now(),
+          serviceId,
+          requestedBy: camarero || camareroActual || '',
+          mesaId: 'caja',
+          mesaNombre: `CAJA: ${tipoLabel}`,
+          local: {
+            nombre: configLocal?.nombre || '',
+            direccion: configLocal?.direccion || '',
+            telefono: configLocal?.telefono || '',
+            cif: configLocal?.cif || '',
+            footer: `Registrado por: ${camarero || camareroActual || 'Camarero'}\nFirma / Justificante de Caja`,
+            logoUrl: configLocal?.ticketLogoUrl || '',
+            ticketShowNotes: false,
+            headerNameFontSize: Number(configLocal?.ticketHeaderNameFontSize || 12),
+            headerSubFontSize: Number(configLocal?.ticketHeaderSubFontSize || 8)
+          },
+          format: {
+            paper: paperCfg.paper || '80mm',
+            fontSize: paperCfg.fontSize || 9,
+            uppercase: paperCfg.uppercase === true,
+            headerOffset: Number(configLocal?.ticketHeaderOffset ?? 0)
+          },
+          total: Math.round(Number(importe || 0) * 100) / 100,
+          lines: [
+            {
+              nombre: `[${tipo === 'gasto' ? 'GASTO' : 'INGRESO'}] ${concepto}`,
+              qty: 1,
+              precio: Math.round(Number(importe || 0) * 100) / 100,
+              nota: ''
+            }
+          ],
+          cobro: null,
+          verifactu: null
+        };
+
+        try {
+          await push(ref(db, 'print_jobs'), payload);
+        } catch (e) {
+          console.error('Error enviando recibo de caja a print_jobs:', e);
+        }
+      }
+
+      const guardarMovimiento = async (conImpresion = false) => {
+        const ts = Date.now();
+        const d = new Date(ts);
+        const fechaKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        const hora = d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const importeNum = Math.round(importe * 100) / 100;
+        const importeSigno = tipoSeleccionado === 'gasto' ? -importeNum : importeNum;
+
+        const movimiento = {
+          ts,
+          fechaKey,
+          hora,
+          camarero: camareroActual || '',
+          tipo: tipoSeleccionado,
+          concepto,
+          importe: importeNum
+        };
+
+        const registroVenta = {
+          mesa: `Caja (${tipoSeleccionado === 'gasto' ? 'Gasto' : 'Ingreso'})`,
+          camarero: camareroActual || '',
+          ts,
+          fechaKey,
+          total: importeSigno,
+          pagoMetodo: 'Efectivo',
+          tipoRegistro: 'movimiento_caja',
+          tipoMovimiento: tipoSeleccionado,
+          concepto,
+          lineas: [
+            {
+              nombre: `[${tipoSeleccionado === 'gasto' ? 'Gasto' : 'Ingreso'}] ${concepto}`,
+              precio: importeSigno,
+              qty: 1,
+              destino: 'barra'
+            }
+          ]
+        };
+
+        try {
+          // 1. Guardar en caja_movimientos
+          await push(ref(db, `caja_movimientos/${fechaKey}`), movimiento);
+          
+          // 2. Guardar en ventas / historial
+          await push(ref(db, 'historial'), registroVenta);
+
+          // 3. Guardar en auditoría
+          logAuditoria('movimiento_caja',
+            `${tipoSeleccionado === 'gasto' ? 'Gasto/Salida' : 'Ingreso/Entrada'}: ${fmtEu(importeNum)} · ${concepto}${conImpresion ? ' (Impreso en ticket)' : ''}`,
+            { tipo: tipoSeleccionado, concepto, importe: importeNum, camarero: camareroActual }
+          );
+
+          // 4. Imprimir si se solicitó
+          if (conImpresion) {
+            await imprimirReciboMovimientoCaja({ tipo: tipoSeleccionado, concepto, importe: importeNum, camarero: camareroActual });
+            toast(`✓ Registrado e impreso: ${tipoTexto} ${fmtEu(importeNum)}`);
+          } else {
+            toast(`✓ Registrado en caja y ventas: ${tipoTexto} ${fmtEu(importeNum)}`);
+          }
+        } catch (e) {
+          console.error('Error registrando movimiento de caja:', e);
+          toast('No se pudo guardar el movimiento de caja');
+        }
+      };
+
+      showModalHTML(`Confirmar ${tipoTexto}`, `
+        <div style="font-family:var(--sans);font-size:14px;display:flex;flex-direction:column;gap:12px;padding:4px 0">
+          <p style="color:var(--text);margin:0">¿Confirmas que deseas registrar el siguiente movimiento en la caja?</p>
+          <div style="background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px;font-size:13px">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="color:var(--muted)">Tipo:</span>
+              <span style="color:${tipoColor};font-weight:700">${tipoTexto}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="color:var(--muted)">Importe:</span>
+              <span style="font-size:18px;font-family:var(--mono);font-weight:800;color:var(--accent)">${fmtEu(importe)}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="color:var(--muted)">Concepto:</span>
+              <span style="font-weight:600;color:var(--text)">${concepto}</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;border-top:1px dashed var(--border);padding-top:6px;margin-top:2px">
+              <span style="color:var(--muted)">Registrado por:</span>
+              <span style="color:var(--text)">${(camareroActual || 'Camarero')}</span>
+            </div>
+          </div>
+        </div>
+      `, [
+        { label: 'Corregir', action: () => window.abrirModalMovimientoCaja() },
+        {
+          label: '✓ Solo Guardar',
+          action: () => guardarMovimiento(false)
+        },
+        {
+          label: '🖨️ Guardar e Imprimir',
+          style: tipoSeleccionado === 'gasto' ? 'danger' : 'primary',
+          action: () => guardarMovimiento(true)
+        }
+      ]);
+    };
+
+    acts.appendChild(btnCancel);
+    acts.appendChild(btnContinuar);
+  }
+
+  setTimeout(() => { if (inpConcepto) inpConcepto.focus(); }, 80);
+};
+
+$('btn-caja')?.addEventListener('click', window.abrirModalMovimientoCaja);
 
 // ── Orden por urgencia ──
 function pintarOrdenUrgencia() {
@@ -2943,8 +3978,11 @@ $('btn-urgentes')?.addEventListener('click', () => {
   renderVistaMesas();
 });
 
-// ── Nuevo pedido ──
-$('btn-nuevo-pedido').addEventListener('click', abrirNuevoPedidoModal);
+// ── Pedidos (Crear / Ver temporales) ──
+$('btn-nuevo-pedido').addEventListener('click', abrirMenuPedidos);
+
+// ── Ayuda contextual ❓ ──
+$('btn-ayuda')?.addEventListener('click', mostrarAyudaContextual);
 
 // ── Navegación carta/ticket ──
 $('btn-back-mesas').addEventListener('click', () => volverMesas());
@@ -2970,11 +4008,11 @@ async function activarWakeLock() {
 }
 function refrescarWakeLock() {
   const on = localStorage.getItem('cam2_wake') === '1';
-  $('tgl-wake').classList.toggle('on', on);
+  $('tgl-wake')?.classList.toggle('on', on);
   if (on) activarWakeLock();
   else if (wakeLock) { wakeLock.release().catch(() => { }); wakeLock = null; }
 }
-$('tgl-wake').addEventListener('click', () => {
+$('tgl-wake')?.addEventListener('click', () => {
   const on = localStorage.getItem('cam2_wake') === '1';
   localStorage.setItem('cam2_wake', on ? '0' : '1');
   refrescarWakeLock();
@@ -2985,16 +4023,16 @@ document.addEventListener('visibilitychange', () => {
 
 // ── Toggles TXT y Copia ──
 function refrescarToggles() {
-  $('tgl-txt').classList.toggle('on', localStorage.getItem('cam2_txt') === '1');
-  $('tgl-copia').classList.toggle('on', localStorage.getItem('cam2_copia') === '1');
+  $('tgl-txt')?.classList.toggle('on', localStorage.getItem('cam2_txt') === '1');
+  $('tgl-copia')?.classList.toggle('on', localStorage.getItem('cam2_copia') === '1');
 }
-$('tgl-txt').addEventListener('click', () => {
+$('tgl-txt')?.addEventListener('click', () => {
   const on = localStorage.getItem('cam2_txt') === '1';
   localStorage.setItem('cam2_txt', on ? '0' : '1');
   refrescarToggles();
   toast(on ? 'TXT de comanda desactivado' : 'TXT de comanda activado: se descargará al enviar', { duration: 2200 });
 });
-$('tgl-copia').addEventListener('click', () => {
+$('tgl-copia')?.addEventListener('click', () => {
   const on = localStorage.getItem('cam2_copia') === '1';
   localStorage.setItem('cam2_copia', on ? '0' : '1');
   refrescarToggles();
@@ -3017,6 +4055,17 @@ setTimeout(() => {
   const pLoad = $('pin-loading');
   if (pLoad) pLoad.style.display = 'none';
 }, 4000);
+
+// Redimensionamiento responsive
+window.addEventListener('resize', () => {
+  if (!$('view-carta').hidden) {
+    const isTablet = window.innerWidth >= 768;
+    $('view-carta').classList.toggle('tablet-active', isTablet);
+    if (isTablet && !$('tablet-cats').children.length && Object.keys(categoriasData).length) {
+      renderTabletCats(Object.entries(categoriasData).sort(([, a], [, b]) => (a.orden ?? 999) - (b.orden ?? 999) || String(a.nombre).localeCompare(String(b.nombre), 'es')));
+    }
+  }
+});
 
 // Service Worker (offline real del shell)
 if ('serviceWorker' in navigator) {

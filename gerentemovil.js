@@ -1,4 +1,5 @@
 import { db } from './firebase.js';
+import { iniciarAccesoCorreo } from './auth-email.js';
 import {
   ref, get, onValue, query, orderByChild, startAt, endAt,
   set as fbSet, push as fbPush, remove as fbRemove, update as fbUpdate
@@ -45,8 +46,6 @@ const update = (refVal, data) => {
 };
 
 // --- VARIABLES DE ESTADO ---
-let passwordCorrecta = "";
-let pinBuffer = "";
 let mesasData = {};
 let pedidosData = {};
 let categoriasData = {};
@@ -81,134 +80,48 @@ let sesionesCamarerosData = {};
 let configLocal = {};
 let ventasCache = [];
 let ventasSubtabActiva = 'tickets';
+let configVerifactuAeatMovil = {};
 
 function escapeHtml(str) {
   return String(str ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-const PIN_SESSION_KEY = "gerente_auth_session";
-
 // --- ELEMENTOS DEL DOM ---
 const pinScreen = document.getElementById("pin-screen");
 const appShell = document.getElementById("app-shell");
-const pinDots = [
-  document.getElementById("pd0"),
-  document.getElementById("pd1"),
-  document.getElementById("pd2"),
-  document.getElementById("pd3")
-];
-const pinErrorMsg = document.getElementById("pin-error");
+let cancelarPerfilAuth = null;
+let panelAutenticado = false;
 
-// --- INICIALIZACIÓN Y SEGURIDAD PIN ---
+// --- INICIALIZACIÓN Y SEGURIDAD POR FIREBASE AUTH ---
 async function init() {
-  // 1. Obtener la contraseña de Firebase o fallback
-  try {
-    const snap = await get(ref(db, "config/audit/password"));
-    passwordCorrecta = snap.val() ? String(snap.val()).trim() : "audit1234";
-  } catch (err) {
-    passwordCorrecta = "audit1234";
-  }
-
-  // 2. Comprobar sesión existente
-  if (sessionStorage.getItem(PIN_SESSION_KEY) === "1") {
-    desbloquearPanel();
-  } else {
-    // Determinar si mostramos teclado numérico o teclado de texto
-    // Si la contraseña es "audit1234" (default con letras), permitimos usar el PIN "1234" en teclado numérico,
-    // o escribir la contraseña alfanumérica completa.
-    const esNumerico4 = /^\d{4}$/.test(passwordCorrecta) || passwordCorrecta === "audit1234";
-
-    if (esNumerico4) {
-      document.querySelector(".pin-dots").style.display = "flex";
-      document.getElementById("pin-pad").style.display = "grid";
-      document.getElementById("text-login-container").style.display = "none";
-      configurarTecladoPin();
-    } else {
-      document.querySelector(".pin-dots").style.display = "none";
-      document.getElementById("pin-pad").style.display = "none";
-      document.getElementById("text-login-container").style.display = "flex";
-      configurarTecladoTexto();
-    }
-  }
-}
-
-function configurarTecladoPin() {
-  document.getElementById("pin-pad").addEventListener("click", (e) => {
-    const btn = e.target.closest("[data-k]");
-    if (!btn) return;
-    const k = btn.dataset.k;
-    
-    if (k === "del") {
-      pinBuffer = pinBuffer.slice(0, -1);
-      actualizarDots();
-    } else if (k !== "") {
-      if (pinBuffer.length >= 4) return;
-      pinBuffer += k;
-      actualizarDots();
-      
-      if (pinBuffer.length === 4) {
-        verificarPin();
-      }
+  iniciarAccesoCorreo({
+    contenedor: pinScreen,
+    titulo: 'Comandero · Gerencia',
+    subtitulo: 'Accede con la cuenta autorizada por el propietario del local.',
+    alSalir: () => {
+      panelAutenticado = false;
+      appShell.style.display = 'none';
+      if (cancelarPerfilAuth) { cancelarPerfilAuth(); cancelarPerfilAuth = null; }
+    },
+    alAutenticar: (user, mostrar) => {
+      if (cancelarPerfilAuth) cancelarPerfilAuth();
+      cancelarPerfilAuth = onValue(ref(db, `config/authUsuarios/${user.uid}`), snap => {
+        const perfil = snap.val() || {};
+        const rolesGerencia = ['desarrollador', 'administrador', 'gerente', 'dueno'];
+        if (perfil.activo !== true || !rolesGerencia.includes(perfil.rol)) {
+          panelAutenticado = false;
+          appShell.style.display = 'none';
+          mostrar('Esta cuenta no tiene permiso para acceder a Gerencia.');
+          return;
+        }
+        if (!panelAutenticado) {
+          panelAutenticado = true;
+          logAuditoria('login', `Inicio de sesión de Gerencia: ${perfil.nombre || user.email || user.uid}`);
+          desbloquearPanel();
+        }
+      }, () => mostrar('No se pudo comprobar el permiso de esta cuenta.'));
     }
   });
-}
-
-function configurarTecladoTexto() {
-  const btnEntrar = document.getElementById("btn-entrar-texto");
-  const inputTexto = document.getElementById("text-pin-input");
-
-  btnEntrar.onclick = () => {
-    const val = inputTexto.value.trim();
-    if (val === passwordCorrecta) {
-      iniciarSesionExitosa();
-    } else {
-      pinErrorMsg.textContent = "Contraseña Incorrecta";
-      inputTexto.value = "";
-      setTimeout(() => {
-        pinErrorMsg.textContent = "";
-      }, 1500);
-    }
-  };
-
-  // Permitir entrar pulsando Enter
-  inputTexto.onkeydown = (e) => {
-    if (e.key === "Enter") {
-      btnEntrar.click();
-    }
-  };
-}
-
-function actualizarDots(error = false) {
-  pinDots.forEach((dot, idx) => {
-    dot.className = "pin-dot" + (idx < pinBuffer.length ? (error ? " error" : " filled") : "");
-  });
-}
-
-async function verificarPin() {
-  const esCorrecto = (pinBuffer === passwordCorrecta) || (passwordCorrecta === "audit1234" && pinBuffer === "1234");
-  
-  if (esCorrecto) {
-    iniciarSesionExitosa();
-  } else {
-    // Feedback de error
-    actualizarDots(true);
-    pinErrorMsg.textContent = "PIN Incorrecto";
-    
-    setTimeout(() => {
-      pinBuffer = "";
-      actualizarDots(false);
-      pinErrorMsg.textContent = "";
-    }, 900);
-  }
-}
-
-function iniciarSesionExitosa() {
-  sessionStorage.setItem(PIN_SESSION_KEY, "1");
-  
-  // Registrar evento de login en auditoría
-  logAuditoria('login', 'Inicio de sesión (Gerente Móvil)');
-  
-  desbloquearPanel();
 }
 
 function desbloquearPanel() {
@@ -223,6 +136,8 @@ function desbloquearPanel() {
   document.getElementById("venta-desde").value = hoy;
   document.getElementById("venta-hasta").value = hoy;
   document.getElementById("audit-fecha").value = hoy;
+  document.getElementById("vf-movil-desde").value = hoy;
+  document.getElementById("vf-movil-hasta").value = hoy;
 }
 
 // --- LOGS DE AUDITORÍA ---
@@ -300,9 +215,12 @@ function iniciarSincronizacionDB() {
     seguridadData = snap.val() || {};
     actualizarAjustesSeguridadMovil();
   });
+  onValue(ref(db, "config/verifactuAeat"), (snap) => {
+    configVerifactuAeatMovil = snap.val() || {};
+  });
 
-  // Usuarios / Camareros
-  onValue(ref(db, "config/usuarios"), (snap) => {
+  // Perfiles de Firebase Auth. Las claves son UID, nunca PIN ni correo.
+  onValue(ref(db, "config/authUsuarios"), (snap) => {
     usuariosData = snap.val() || {};
     renderCamarerosListado();
     poblarExcepcionCamareroSelectorMovil();
@@ -341,6 +259,64 @@ window.navegarA = (tab) => {
   if (tab === 'plano') renderPlano();
   if (tab === 'carta') renderCarta();
   if (tab === 'camareros') renderCamarerosListado();
+};
+
+let registrosVerifactuMovil = {};
+
+window.cargarRegistrosVerifactuMovil = async () => {
+  const salida = document.getElementById('vf-movil-registros');
+  const desde = document.getElementById('vf-movil-desde')?.value;
+  const hasta = document.getElementById('vf-movil-hasta')?.value;
+  if (!desde || !hasta || desde > hasta) {
+    showToast('Selecciona un período válido.');
+    return;
+  }
+  salida.innerHTML = '<div class="plano-sinubicar" style="text-align:center;padding:24px;">Consultando registros…</div>';
+  try {
+    const inicio = new Date(`${desde}T00:00:00`).getTime();
+    const fin = new Date(`${hasta}T23:59:59.999`).getTime();
+    const snap = await get(query(ref(db, 'verifactu_aeat/registros'), orderByChild('ts'), startAt(inicio), endAt(fin)));
+    const registros = Object.entries(snap.val() || {})
+      .map(([id, item]) => ({ id, ...(item || {}) }))
+      .filter(item => !item.modo || item.modo === (configVerifactuAeatMovil.modo || 'pruebas'))
+      .sort((a, b) => Number(b.ts || 0) - Number(a.ts || 0));
+    if (!registros.length) {
+      salida.innerHTML = '<div class="plano-sinubicar" style="text-align:center;padding:24px;">No hay registros VERI*FACTU para este período.</div>';
+      return;
+    }
+    registrosVerifactuMovil = Object.fromEntries(registros.map(item => [item.uuid || item.id, item]));
+    salida.innerHTML = registros.map(item => {
+      const fecha = item.fecha || new Date(Number(item.ts || 0)).toLocaleString('es-ES');
+      const estado = item.estado === 'accepted' ? 'Aceptado AEAT' : (item.estado === 'rejected' ? 'Rechazado' : 'Pendiente AEAT');
+      const color = item.estado === 'accepted' ? 'var(--success)' : (item.estado === 'rejected' ? 'var(--danger)' : 'var(--warn)');
+      const uuid = escapeHtml(item.uuid || item.id);
+      const desglose = (item.lineasIva || []).map(x => `IVA ${x.tipo_impositivo}% · Base ${x.base_imponible} € · Cuota ${x.cuota_repercutida} €`).join('<br>') || 'Detalle fiscal pendiente de sincronizar.';
+      return `<div class="ticket-item"><div class="ticket-item-header"><strong>${escapeHtml(`${item.serie || ''}-${item.numero || ''}`)}</strong><span class="ticket-total">${Number(item.total || 0).toFixed(2).replace('.', ',')} €</span></div><div class="ticket-details" style="display:flex"><span>${escapeHtml(fecha)} · ${escapeHtml(item.tipo || '—')}</span><span style="color:${color}">${escapeHtml(estado)}</span><span>${escapeHtml(item.descripcion || 'Venta')}</span><span>${desglose}</span><div style="display:flex;gap:7px;margin-top:5px"><button class="btn-action" style="padding:7px 9px;font-size:11px" onclick="reimprimirRegistroVerifactuMovil('${uuid}')">Reimprimir</button><button class="btn-action" style="padding:7px 9px;font-size:11px;background:var(--warn)" onclick="rectificarTotalRegistroVerifactuMovil('${uuid}')">Rectificar total</button></div></div></div>`;
+    }).join('');
+  } catch (error) {
+    console.error('Consulta móvil VERI*FACTU', error);
+    salida.innerHTML = `<div class="plano-sinubicar" style="text-align:center;padding:24px;">No se pudieron consultar los registros: ${escapeHtml(error?.message || 'error desconocido')}</div>`;
+  }
+};
+
+window.reimprimirRegistroVerifactuMovil = async uuid => {
+  const r = registrosVerifactuMovil[uuid];
+  if (!r || !(await showCustomConfirm('Reimprimir factura', `Se imprimirá ${r.serie}-${r.numero} en el PC fiscal, sin crear una factura nueva.`))) return;
+  try {
+    await push(ref(db, 'print_jobs'), { kind: 'ticket_final', mesaNombre: `Reimpresión ${r.serie}-${r.numero}`, items: [], total: Number(r.total || 0), verifactuReprintUuid: uuid, status: 'pending', createdAt: Date.now() });
+    showToast('Reimpresión enviada al PC fiscal.');
+  } catch (error) { showToast(`No se pudo enviar: ${error?.message || 'error'}`); }
+};
+
+window.rectificarTotalRegistroVerifactuMovil = async uuid => {
+  const r = registrosVerifactuMovil[uuid];
+  if (!r || !(r.lineasIva || []).length) { showToast('El detalle aún no está sincronizado; reinicia psVF.exe actualizado.'); return; }
+  if (!(await showCustomConfirm('Rectificar total', `Se emitirá una rectificativa que anula el total de ${r.serie}-${r.numero}. La original no se modifica.`))) return;
+  const lineasIva = r.lineasIva.map(x => ({ base_imponible: (-Number(x.base_imponible || 0)).toFixed(2), tipo_impositivo: String(x.tipo_impositivo), cuota_repercutida: (-Number(x.cuota_repercutida || 0)).toFixed(2) }));
+  try {
+    await push(ref(db, 'print_jobs'), { kind: 'ticket_final', mesaNombre: `Rectificativa ${r.serie}-${r.numero}`, items: [], total: -Number(r.total || 0), status: 'pending', createdAt: Date.now(), verifactuAeat: { uid: `rect-total-${uuid}`, tipo: r.tipo === 'F2' ? 'R5' : 'R1', fecha: new Date().toLocaleDateString('es-ES').replaceAll('/', '-'), descripcion: `Rectificación total de ${r.serie}-${r.numero}`, lineasIva, destinatario: r.destinatario || null, facturasRef: [{ serie: r.serie, numero: r.numero, fecha_expedicion: r.fecha }], metodoRectificativa: 'I' } });
+    showToast('Rectificativa enviada al PC fiscal.');
+  } catch (error) { showToast(`No se pudo emitir: ${error?.message || 'error'}`); }
 };
 
 // --- RENDERIZADO PLANO DE MESAS ---
@@ -719,6 +695,7 @@ function renderCarta() {
       <div style="display:flex;gap:8px;align-items:center;">
         <button style="background:var(--panel-light);border:1px solid var(--border);color:var(--text);font-size:12px;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;" title="Subir" onclick="event.stopPropagation(); moverCat('${cid}', ${idx}, -1)" ${idx === 0 ? 'disabled style="opacity:0.35;cursor:not-allowed;"' : ''}>↑</button>
         <button style="background:var(--panel-light);border:1px solid var(--border);color:var(--text);font-size:12px;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;" title="Bajar" onclick="event.stopPropagation(); moverCat('${cid}', ${idx}, 1)" ${idx === cats.length - 1 ? 'disabled style="opacity:0.35;cursor:not-allowed;"' : ''}>↓</button>
+        <button style="background:var(--panel-light);border:1px solid var(--border);color:var(--text);font-size:12px;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;" title="${cat.visible === false ? 'Mostrar categoría al camarero' : 'Ocultar categoría al camarero'}" onclick="event.stopPropagation(); toggleVisibilidadCategoriaCarta('${cid}')">${cat.visible === false ? '🙈' : '👁️'}</button>
         <button style="background:var(--panel-light);border:1px solid var(--border);color:var(--text);font-size:12px;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;" onclick="event.stopPropagation(); abrirDrawerEditCat('${cid}')">⚙</button>
         <button style="background:var(--accent);border:none;color:#fff;font-size:13px;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;" onclick="event.stopPropagation(); abrirModalNuevoArticulo('${cid}')">+</button>
         <span class="nav-icon">▼</span>
@@ -753,6 +730,7 @@ function renderCarta() {
           <div style="display:flex;gap:4px;align-items:center;">
             <button class="btn-edit-art" title="Subir" onclick="event.stopPropagation(); moverArt('${aid}', '${cid}', ${idxArt}, -1)" ${idxArt === 0 ? 'disabled' : ''}>↑</button>
             <button class="btn-edit-art" title="Bajar" onclick="event.stopPropagation(); moverArt('${aid}', '${cid}', ${idxArt}, 1)" ${idxArt === articulos.length - 1 ? 'disabled' : ''}>↓</button>
+            <button class="btn-edit-art" title="${art.visible === false ? 'Mostrar artículo al camarero' : 'Ocultar artículo al camarero'}" onclick="event.stopPropagation(); toggleVisibilidadArticuloCarta('${aid}')">${art.visible === false ? '🙈' : '👁️'}</button>
             <button class="btn-edit-art" onclick="event.stopPropagation(); abrirDrawerEditArt('${cid}','${aid}')">Editar</button>
           </div>
         `;
@@ -771,7 +749,7 @@ window.abrirModalNuevaCategoria = async () => {
   if (!nombre || !nombre.trim()) return;
 
   const orden = Object.keys(categoriasData).length + 1;
-  push(ref(db, "categorias"), { nombre: nombre.trim(), orden }).then(() => {
+  push(ref(db, "categorias"), { nombre: nombre.trim(), orden, visible: true }).then(() => {
     showToast("Categoría añadida con éxito.");
   });
 };
@@ -788,12 +766,25 @@ window.abrirModalNuevoArticulo = async (cid) => {
     nombre: nombre.trim(),
     precio,
     disponible: true,
+    visible: true,
     destino: detalles.destino
   };
 
   push(ref(db, "carta"), newArt).then(() => {
     showToast("Artículo añadido.");
   });
+};
+
+window.toggleVisibilidadArticuloCarta = (aid) => {
+  const art = cartaData[aid];
+  if (!art) return;
+  set(ref(db, `carta/${aid}/visible`), art.visible === false);
+};
+
+window.toggleVisibilidadCategoriaCarta = (cid) => {
+  const cat = categoriasData[cid];
+  if (!cat) return;
+  set(ref(db, `categorias/${cid}/visible`), cat.visible === false);
 };
 
 // DRAWER EDICIÓN ARTÍCULO
@@ -807,6 +798,7 @@ window.abrirDrawerEditArt = (cid, aid) => {
   document.getElementById("edit-art-precio").value = Number(art.precio || 0).toFixed(2);
   document.getElementById("edit-art-destino").value = art.destino || "cocina";
   document.getElementById("edit-art-activo").checked = art.disponible !== false;
+  document.getElementById("edit-art-visible").checked = art.visible !== false;
   document.getElementById("edit-art-notas").value = art.notasPredefinidas || "";
   
   const esCombo = art.esCombo === true;
@@ -1025,6 +1017,7 @@ window.abrirDrawerEditCat = (cid) => {
   document.getElementById("edit-cat-id").value = cid;
   document.getElementById("edit-cat-nombre").value = cat.nombre || "";
   document.getElementById("edit-cat-notas").value = cat.notasPredefinidas || "";
+  document.getElementById("edit-cat-visible").checked = cat.visible !== false;
   
   document.getElementById("new-cat-var-nombre").value = "";
   document.getElementById("new-cat-var-precio").value = "";
@@ -1098,6 +1091,7 @@ window.guardarCategoriaCarta = () => {
   const nextCat = {
     nombre: name,
     orden: cat.orden || 1,
+    visible: document.getElementById("edit-cat-visible").checked,
     notasPredefinidas: notes,
     variantes: cat.variantes || null
   };
@@ -1130,6 +1124,7 @@ window.guardarArticuloCarta = () => {
   const price = parseFloat(document.getElementById("edit-art-precio").value) || 0;
   const dest = document.getElementById("edit-art-destino").value;
   const active = document.getElementById("edit-art-activo").checked;
+  const visible = document.getElementById("edit-art-visible").checked;
   const notes = document.getElementById("edit-art-notas").value.trim() || null;
   const esCombo = document.getElementById("edit-art-escombo").checked;
 
@@ -1142,6 +1137,7 @@ window.guardarArticuloCarta = () => {
     precio: price,
     destino: dest,
     disponible: active,
+    visible,
     notasPredefinidas: notes,
     variantes: art.variantes || null,
     esCombo: esCombo,
@@ -1592,6 +1588,25 @@ window.exportarCSVVentas = () => {
   showToast("CSV descargado.");
 };
 
+function extraerDiaKeyFiscalGM(op) {
+  const t = op?.ticket || {};
+  const f = op?.factura || {};
+  let fecha = t.fecha || f.fecha;
+  if (fecha && /^\d{4}-\d{2}-\d{2}$/.test(fecha)) return fecha;
+  if (fecha && /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(fecha)) {
+    const [d, m, y] = fecha.split('/');
+    return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+  }
+  const ts = Number(op?.ts || t.ts || t.createdAt || f.ts || 0);
+  if (ts) {
+    const dt = new Date(ts);
+    if (!isNaN(dt.getTime())) {
+      return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+    }
+  }
+  return 'Desconocida';
+}
+
 window.exportarPDFVentas = async () => {
   if (!ventasCache.length) {
     showToast("Sin ventas en el período para exportar.");
@@ -1608,7 +1623,15 @@ window.exportarPDFVentas = async () => {
     "¿Deseas incluir la relación de documentos fiscales?\n\n• Aceptar: añade el listado de tickets y facturas vinculadas\n• Cancelar: informe resumido (recomendado)"
   );
 
-  await generarDocumentoPDFVentas(incluirArticulos === true, incluirDocumentos === true);
+  let unificarTickets = true;
+  if (incluirDocumentos === true) {
+    unificarTickets = await showCustomConfirm(
+      "Agrupación de Tickets",
+      "¿Cómo deseas incluir los tickets en la relación fiscal?\n\n• Aceptar: UNIFICAR tickets por día (Recomendado: 1 fila por día con la suma de tickets + facturas desglosadas)\n• Cancelar: DETALLAR cada ticket individualmente (como hasta ahora)"
+    );
+  }
+
+  await generarDocumentoPDFVentas(incluirArticulos === true, incluirDocumentos === true, unificarTickets === true);
 };
 
 function formatFechaEsp(dateStr) {
@@ -1625,7 +1648,7 @@ function formatFechaEsp(dateStr) {
   return s;
 }
 
-async function generarDocumentoPDFVentas(incluirArticulos = false, incluirDocumentos = false) {
+async function generarDocumentoPDFVentas(incluirArticulos = false, incluirDocumentos = false, unificarTickets = true) {
   const desdeStr = document.getElementById("venta-desde").value;
   const hastaStr = document.getElementById("venta-hasta").value;
   const desdeFmt = formatFechaEsp(desdeStr);
@@ -1658,12 +1681,90 @@ async function generarDocumentoPDFVentas(incluirArticulos = false, incluirDocume
     } catch (error) {
       console.warn('No se pudieron cargar las facturas vinculadas:', error);
     }
+
+    let filasDocumentos = '';
+    let totalTicketsDoc = 0;
+    let totalFacturasDoc = 0;
+    let totalImporteDoc = 0;
+
+    if (unificarTickets) {
+      const mapaDiasFiscal = {};
+      operacionesConDocumento.forEach(op => {
+        const diaKey = extraerDiaKeyFiscalGM(op);
+        if (!mapaDiasFiscal[diaKey]) {
+          mapaDiasFiscal[diaKey] = { diaKey, tickets: [], facturas: [] };
+        }
+        if (op.factura) {
+          mapaDiasFiscal[diaKey].facturas.push(op);
+          totalFacturasDoc++;
+        } else {
+          mapaDiasFiscal[diaKey].tickets.push(op);
+          totalTicketsDoc++;
+        }
+        totalImporteDoc += Number(op.ticket?.total || op.factura?.totalNum || 0);
+      });
+
+      const diasOrdenados = Object.keys(mapaDiasFiscal).sort();
+      filasDocumentos = diasOrdenados.map(diaKey => {
+        const info = mapaDiasFiscal[diaKey];
+        const fechaFmt = formatFechaEsp(diaKey);
+        let htmlDia = '';
+
+        if (info.tickets.length > 0) {
+          const totT = info.tickets.reduce((sum, op) => sum + Number(op.ticket?.total || 0), 0);
+          htmlDia += `
+            <tr style="background:#f9fafb;">
+              <td><strong>${escapeHtml(fechaFmt)}</strong></td>
+              <td>Tickets del día (${info.tickets.length} operaciones)</td>
+              <td style="color:#6b7280; font-size:11px;">Resumen ventas simplificadas</td>
+              <td class="text-right mono"><strong>${totT.toFixed(2)} €</strong></td>
+            </tr>`;
+        }
+
+        if (info.facturas.length > 0) {
+          info.facturas.forEach(({ ticket, factura }) => {
+            const numDoc = `Factura ${escapeHtml(factura.serie || '')}-${escapeHtml(factura.numero || '')}`;
+            const destNombre = escapeHtml(factura.destinatario?.nombre || factura.tipo || '—');
+            const destNif = factura.destinatario?.nif ? ` · <span style="font-family:monospace;font-size:11px;color:#4b5563;">${escapeHtml(factura.destinatario.nif)}</span>` : '';
+            const imp = Number(ticket?.total || factura?.totalNum || 0);
+            htmlDia += `
+              <tr>
+                <td>${escapeHtml(fechaFmt)}</td>
+                <td><strong style="color:#2563eb;">${numDoc}</strong></td>
+                <td>${destNombre}${destNif}</td>
+                <td class="text-right mono" style="font-weight:700;">${imp.toFixed(2)} €</td>
+              </tr>`;
+          });
+        }
+
+        return htmlDia;
+      }).join('');
+    } else {
+      totalFacturasDoc = operacionesConDocumento.filter(op => Boolean(op.factura)).length;
+      totalTicketsDoc = operacionesConDocumento.length - totalFacturasDoc;
+      totalImporteDoc = operacionesConDocumento.reduce((s, op) => s + Number(op.ticket?.total || op.factura?.totalNum || 0), 0);
+
+      filasDocumentos = operacionesConDocumento.map(({ ticket, factura }) => {
+        const fecha = ticket.fecha || (ticket.ts ? new Date(ticket.ts).toLocaleDateString('es-ES') : '—');
+        const doc = factura ? `Factura ${escapeHtml(factura.serie || '')}-${escapeHtml(factura.numero || '')}` : 'Ticket';
+        const ref = factura ? escapeHtml(factura.destinatario?.nombre || factura.tipo || '—') : escapeHtml(ticket.mesa || ticket.mesaNombre || '—');
+        return `<tr><td>${escapeHtml(fecha)}</td><td>${doc}</td><td>${ref}</td><td class="text-right mono">${Number(ticket.total || factura?.totalNum || 0).toFixed(2)} €</td></tr>`;
+      }).join('');
+    }
+
     relacionDocumentosHTML = `
-      <h3 style="margin-top:20px;">${incluirArticulos ? '3. ' : '2. '}Relación de documentos fiscales</h3>
-      <div style="font-size:11px;color:#4b5563;margin:-4px 0 10px">Las operaciones facturadas se muestran por su factura vinculada; no se duplican como ticket.</div>
+      <h3 style="margin-top:20px;">${incluirArticulos ? '3. ' : '2. '}Relación de documentos fiscales ${unificarTickets ? '(Tickets unificados por día)' : '(Detalle individual)'}</h3>
+      <div style="font-size:11px;color:#4b5563;margin:-4px 0 10px">${unificarTickets ? 'Tickets ordinarios agrupados en asiento resumen diario. Las facturas nominales se detallan individualmente con su destinatario.' : 'Las operaciones facturadas se muestran por su factura vinculada; no se duplican como ticket.'}</div>
       <table><thead><tr><th>Fecha</th><th>Documento</th><th>Destinatario / Mesa</th><th class="text-right">Importe</th></tr></thead><tbody>
-        ${operacionesConDocumento.map(({ ticket, factura }) => `<tr><td>${escapeHtml(ticket.fecha || '—')}</td><td>${factura ? `Factura ${escapeHtml(factura.serie || '')}-${escapeHtml(factura.numero || '')}` : 'Ticket'}</td><td>${factura ? escapeHtml(factura.destinatario?.nombre || factura.tipo || '—') : escapeHtml(ticket.mesa || ticket.mesaNombre || '—')}</td><td class="text-right mono">${Number(ticket.total || 0).toFixed(2)} €</td></tr>`).join('')}
-      </tbody></table>`;
+        ${filasDocumentos || '<tr><td colspan="4">No hay documentos en el período.</td></tr>'}
+      </tbody>
+      <tfoot>
+        <tr class="t-foot">
+          <td colspan="3">TOTAL DOCUMENTOS (${totalTicketsDoc} tickets ${unificarTickets ? 'agrupados por día' : ''} · ${totalFacturasDoc} facturas)</td>
+          <td class="text-right mono">${totalImporteDoc.toFixed(2)} €</td>
+        </tr>
+      </tfoot>
+      </table>`;
   }
 
   let seccionArticulosHTML = '';
@@ -2558,7 +2659,7 @@ function actualizarAjustesSeguridadMovil() {
       const basePath = window.location.pathname;
       const lastSlash = basePath.lastIndexOf('/');
       const dir = lastSlash >= 0 ? basePath.substring(0, lastSlash + 1) : '/';
-      const camareroUrl = window.location.origin + dir + 'camarero.html';
+      const camareroUrl = window.location.origin + dir + 'comandero.html';
       const pairUrl = `${camareroUrl}?pair=${encodeURIComponent(tokenValMovil)}`;
       // Se genera en el propio navegador: no depende de un servicio QR externo.
       const qr = qrcode(0, 'M');
@@ -2579,7 +2680,7 @@ function poblarExcepcionCamareroSelectorMovil() {
   if (!select) return;
   const currentVal = seguridadData.excepcionCamarero || "";
   select.innerHTML = '<option value="">(Ninguno)</option>';
-  Object.entries(usuariosData || {}).forEach(([id, u]) => {
+  Object.entries(usuariosData || {}).filter(([, u]) => u.rol === 'camarero').forEach(([id, u]) => {
     const option = document.createElement("option");
     option.value = id;
     option.textContent = u.nombre;
@@ -2836,7 +2937,7 @@ function renderCamarerosListado() {
   const contenedor = document.getElementById("camareros-listado-movil");
   if (!contenedor) return;
 
-  const entries = Object.entries(usuariosData || {});
+  const entries = Object.entries(usuariosData || {}).filter(([, u]) => u.rol === 'camarero');
   if (entries.length === 0) {
     contenedor.innerHTML = `<p style="font-size:13px;color:var(--text-dim);text-align:center;padding:20px;">Sin camareros registrados.</p>`;
     return;
@@ -2912,7 +3013,7 @@ function calcularTiempoRelativo(timestamp) {
 async function toggleCamareroActivoMovil(id, activo) {
   if (!db) return;
   try {
-    await update(ref(db, `config/usuarios/${id}`), { activo });
+    await update(ref(db, `config/authUsuarios/${id}`), { activo });
     if (!activo) await remove(ref(db, `config/sesionesCamareros/${id}`));
     console.log(`Estado activo del camarero ${id} actualizado a:`, activo);
   } catch (error) {

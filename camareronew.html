@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirigiendo a Comandero...</title>
+  <script>
+    (() => {
+      const search = window.location.search;
+      const params = new URLSearchParams(search);
+      if (!params.has('modo')) params.set('modo', 'tpv');
+      window.location.replace('comandero.html?' + params.toString());
+    })();
+  </script>
+</head>
+<body style="font-family:system-ui,-apple-system,sans-serif;text-align:center;padding:40px;background:#eef2f8;color:#111a2e;">
+  <p>Cargando Comandero unificado...</p>
+  <p><a href="comandero.html?modo=tpv" style="color:#3d7aff;font-weight:600;">Haz clic aquí si no redirige automáticamente</a></p>
+</body>
+</html>

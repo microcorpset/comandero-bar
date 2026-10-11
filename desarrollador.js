@@ -60,11 +60,14 @@ let historialData = {};
 let seguridadData = {};
 let localConfig = {};
 let usuariosData = {};
+let authUsuariosData = {};
 let sesionesCamarerosData = {};
 let selectedEmojisDev = [];
 const EMOJI_LIST = ['🍔', '🍺', '🍕', '🍷', '☕', '🍰', '🍦', '🍟', '🌮', '🥗'];
 let printServiceData = {};
 let novedadesData = {};
+let verifactuAeatConfig = {};
+let verifactuAeatEstado = {};
 
 // Ventas (Historial) - Variables de Consulta y Paginación
 let ventasDataList = [];
@@ -126,6 +129,8 @@ document.addEventListener("DOMContentLoaded", () => {
   window.guardarProducto = guardarProducto;
   window.editarProducto = editarProducto;
   window.eliminarProducto = eliminarProducto;
+  window.toggleVisibilidadArticulo = toggleVisibilidadArticulo;
+  window.toggleVisibilidadCategoria = toggleVisibilidadCategoria;
   window.moverArt = moverArt;
   window.moverCat = moverCat;
   
@@ -146,7 +151,9 @@ document.addEventListener("DOMContentLoaded", () => {
   window.guardarPassEncargadoDev = guardarPassEncargadoDev;
   window.guardarPassAuditDev = guardarPassAuditDev;
   window.toggleCamareroActivoDev = toggleCamareroActivoDev;
+  window.toggleCamareroAuthDev = toggleCamareroAuthDev;
   window.cerrarSesionCamareroDev = cerrarSesionCamareroDev;
+  window.editarEtiquetaDispositivoDev = editarEtiquetaDispositivoDev;
   window.seleccionarEmojiDev = seleccionarEmojiDev;
   window.limpiarEmojisDev = limpiarEmojisDev;
   window.guardarEmojisDev = guardarEmojisDev;
@@ -158,9 +165,13 @@ document.addEventListener("DOMContentLoaded", () => {
   // Nuevas funciones expuestas
   window.addCamarero = addCamarero;
   window.deleteCamarero = deleteCamarero;
+  window.addAuthUsuario = addAuthUsuario;
+  window.deleteAuthUsuarioDev = deleteAuthUsuarioDev;
+  window.cambiarFormCamarero = cambiarFormCamarero;
   window.guardarDatosNegocio = guardarDatosNegocio;
   window.guardarAjustesTicket = guardarAjustesTicket;
   window.guardarConfigImpresoras = guardarConfigImpresoras;
+  window.guardarAutoupdateWorker = guardarAutoupdateWorker;
   window.togglePausaImpresion = togglePausaImpresion;
   window.checkAuditPassword = checkAuditPassword;
   window.bloquearAuditoria = bloquearAuditoria;
@@ -173,15 +184,36 @@ document.addEventListener("DOMContentLoaded", () => {
   window.mostrarDetalleTicketHistorico = mostrarDetalleTicketHistorico;
   window.guardarLimiteCuota = guardarLimiteCuota;
   window.guardarNovedadConfig = guardarNovedadConfig;
+  window.guardarConfigVerifactuAeat = guardarConfigVerifactuAeat;
+  window.consultarRegistrosVerifactuAeat = consultarRegistrosVerifactuAeat;
+  window.reimprimirRegistroVerifactuAeat = reimprimirRegistroVerifactuAeat;
+  window.verRegistroVerifactuAeat = verRegistroVerifactuAeat;
+  window.rectificarTotalRegistroVerifactuAeat = rectificarTotalRegistroVerifactuAeat;
+  window.vincularCertificadoVerifactuAeat = vincularCertificadoVerifactuAeat;
   window.resetearVistosNovedad = resetearVistosNovedad;
   window.limpiarNovedadForm = limpiarNovedadForm;
   window.cargarNovedadForm = cargarNovedadForm;
   window.eliminarNovedad = eliminarNovedad;
+  window.guardarAvisoTPV = guardarAvisoTPV;
+  window.retirarAvisoTPV = retirarAvisoTPV;
+  window.togglePanelAvisoTPV = togglePanelAvisoTPV;
+  montarPanelAvisoTPV();
 
   // Filtros y Paginación de Ventas
   window.aplicarFiltrosVentas = aplicarFiltrosVentas;
   window.resetFiltrosVentas = resetFiltrosVentas;
   window.cambiarPaginaVentas = cambiarPaginaVentas;
+  window.filtrarEstadoVentas = filtrarEstadoVentas;
+
+  // Reconciliación de Ventas desde Auditoría
+  window.abrirModalReconciliacion = abrirModalReconciliacion;
+  window.cerrarModalReconciliacion = cerrarModalReconciliacion;
+  window.ejecutarAnalisisReconciliacion = ejecutarAnalisisReconciliacion;
+  window.toggleDetalleDiaReconciliacion = toggleDetalleDiaReconciliacion;
+  window.toggleDiaReconciliacion = toggleDiaReconciliacion;
+  window.toggleTicketReconciliacion = toggleTicketReconciliacion;
+  window.marcarTodosReconciliacion = marcarTodosReconciliacion;
+  window.ejecutarUnificacionVentas = ejecutarUnificacionVentas;
 
   // Informe comercial para propietario
   window.consultarInformePropietario = consultarInformePropietario;
@@ -208,6 +240,7 @@ document.addEventListener("DOMContentLoaded", () => {
   window.seleccionarTodosTickets = seleccionarTodosTickets;
   window.borrarTicketsSeleccionados = borrarTicketsSeleccionados;
   window.eliminarTicketIndividualGestoria = eliminarTicketIndividualGestoria;
+  window.purgarAuditoriaDeTickets = purgarAuditoriaDeTickets;
   window.toggleAjustePanel = toggleAjustePanel;
   window.calcularPropuestasAjuste = calcularPropuestasAjuste;
   window.verDetallePropuesta = verDetallePropuesta;
@@ -222,6 +255,73 @@ document.addEventListener("DOMContentLoaded", () => {
   window.toggleSidebar = toggleSidebar;
   window.volverACategorias = volverACategorias;
 });
+
+function montarPanelAvisoTPV() {
+  if (document.getElementById('dev-tpv-aviso')) return;
+  const panel = document.createElement('section');
+  panel.id = 'dev-tpv-aviso';
+  panel.style.cssText = 'position:fixed;right:18px;bottom:18px;width:min(360px,calc(100vw - 36px));z-index:9000;background:var(--panel,#fff);border:1px solid var(--border,#ccd);border-radius:14px;padding:14px;box-shadow:0 10px 30px rgba(0,0,0,.18);display:none;flex-direction:column;gap:9px;transition:opacity .18s ease,background .18s ease,width .18s ease';
+  panel.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <strong style="font-size:13px">📣 Aviso persistente para TPV</strong>
+      <button id="dev-tpv-aviso-toggle" class="btn-icon" type="button" title="Ocultar panel de aviso" aria-expanded="true">⌄</button>
+    </div>
+    <div data-dev-tpv-aviso-contenido style="display:flex;flex-direction:column;gap:9px">
+      <span id="dev-tpv-aviso-destino" style="font-size:12px;color:var(--text-dim)"></span>
+      <textarea id="dev-tpv-aviso-texto" rows="3" placeholder="Ej.: Llámame cuando puedas" style="resize:vertical;width:100%;box-sizing:border-box;padding:9px;border:1px solid var(--border);border-radius:8px;font:13px var(--sans)"></textarea>
+      <select id="dev-tpv-aviso-tipo" style="padding:8px;border:1px solid var(--border);border-radius:8px"><option value="info">Información</option><option value="warning">Atención</option><option value="urgent">Urgente</option></select>
+      <div style="display:flex;gap:8px"><button class="btn" style="flex:1" onclick="guardarAvisoTPV()">Enviar al TPV</button><button class="btn btn-secondary" onclick="retirarAvisoTPV()">Retirar</button></div>
+    </div>`;
+  document.body.appendChild(panel);
+  document.getElementById('dev-tpv-aviso-toggle')?.addEventListener('click', () => togglePanelAvisoTPV());
+  panel.addEventListener('mouseenter', () => {
+    if (panel.dataset.colapsado === 'true') panel.style.opacity = '1';
+  });
+  panel.addEventListener('mouseleave', () => {
+    if (panel.dataset.colapsado === 'true') panel.style.opacity = '.35';
+  });
+  if (localStorage.getItem('dev-tpv-aviso-panel-colapsado') === 'true') togglePanelAvisoTPV(true);
+}
+
+function togglePanelAvisoTPV(forzarColapsado) {
+  const panel = document.getElementById('dev-tpv-aviso');
+  const contenido = panel?.querySelector('[data-dev-tpv-aviso-contenido]');
+  const boton = document.getElementById('dev-tpv-aviso-toggle');
+  if (!panel || !contenido || !boton) return;
+  const colapsado = typeof forzarColapsado === 'boolean'
+    ? forzarColapsado
+    : panel.dataset.colapsado !== 'true';
+  contenido.style.display = colapsado ? 'none' : 'flex';
+  panel.dataset.colapsado = String(colapsado);
+  panel.style.width = colapsado ? 'auto' : 'min(360px,calc(100vw - 36px))';
+  panel.style.background = colapsado ? 'color-mix(in srgb, var(--panel,#fff) 65%, transparent)' : 'var(--panel,#fff)';
+  panel.style.opacity = colapsado ? '.35' : '1';
+  boton.textContent = colapsado ? '⌃' : '⌄';
+  boton.title = colapsado ? 'Mostrar panel de aviso' : 'Ocultar panel de aviso';
+  boton.setAttribute('aria-expanded', String(!colapsado));
+  localStorage.setItem('dev-tpv-aviso-panel-colapsado', String(colapsado));
+}
+
+function actualizarPanelAvisoTPV(nombreLocal) {
+  const panel = document.getElementById('dev-tpv-aviso');
+  const destino = document.getElementById('dev-tpv-aviso-destino');
+  if (!panel || !destino) return;
+  destino.textContent = `Destino: TPV de ${nombreLocal}`;
+  panel.style.display = 'flex';
+}
+
+async function guardarAvisoTPV() {
+  if (!db) return showCustomAlert('Aviso TPV', 'Selecciona primero un local.');
+  const texto = document.getElementById('dev-tpv-aviso-texto')?.value.trim();
+  if (!texto) return showCustomAlert('Aviso TPV', 'Escribe el mensaje que verá el TPV.');
+  const tipo = document.getElementById('dev-tpv-aviso-tipo')?.value || 'info';
+  await set(ref(db, 'config/tpvAviso'), { activo:true, texto, tipo, actualizadoEn:Date.now() });
+}
+
+async function retirarAvisoTPV() {
+  if (!db) return;
+  await set(ref(db, 'config/tpvAviso'), { activo:false, texto:'', tipo:'info', actualizadoEn:Date.now() });
+}
 
 // --- GESTIÓN DE LOCALES (LOCALSTORAGE) ---
 function cargarLocales() {
@@ -313,6 +413,9 @@ async function seleccionarLocal(id) {
   ventasDataList = [];
   ventasPaginaActual = 1;
   historialData = {};
+  usuariosData = {};
+  authUsuariosData = {};
+  sesionesCamarerosData = {};
   const hoy = new Date().toISOString().split("T")[0];
   
   const vIni = document.getElementById("ventas-fecha-ini");
@@ -397,6 +500,7 @@ async function seleccionarLocal(id) {
     document.getElementById("label-nombre-local-activo").querySelector("span").textContent = local.nombre;
     document.getElementById("active-status-dot").className = "local-status-dot connected";
     document.getElementById(`dot-${local.id}`).className = "local-status-dot connected";
+    actualizarPanelAvisoTPV(local.nombre);
     
     // Activar escuchas en tiempo real
     suscribirseAFirebase();
@@ -470,11 +574,27 @@ function suscribirseAFirebase() {
     renderConfigImpresoras();
   });
 
-  // 7. Escuchar Camareros
+  // Reflejar el aviso que está activo para este local al abrir Desarrollo.
+  onValue(ref(db, "config/tpvAviso"), snap => {
+    const aviso = snap.val() || {};
+    const texto = document.getElementById('dev-tpv-aviso-texto');
+    const tipo = document.getElementById('dev-tpv-aviso-tipo');
+    if (texto && document.activeElement !== texto) texto.value = aviso.texto || '';
+    if (tipo) tipo.value = ['info', 'warning', 'urgent'].includes(aviso.tipo) ? aviso.tipo : 'info';
+  });
+
+  // 7. Escuchar Camareros (Sistema tradicional PIN y Nuevo sistema Auth)
   onValue(ref(db, "config/usuarios"), snap => {
     usuariosData = snap.val() || {};
     renderCamareros();
-    poblarCamarerosAuditoria(usuariosData);
+    poblarCamarerosAuditoria();
+    poblarExcepcionCamareroSelectorDev();
+  });
+  onValue(ref(db, "config/authUsuarios"), snap => {
+    authUsuariosData = snap.val() || {};
+    renderCamareros();
+    poblarCamarerosAuditoria();
+    poblarExcepcionCamareroSelectorDev();
   });
   onValue(ref(db, "config/sesionesCamareros"), snap => {
     sesionesCamarerosData = snap.val() || {};
@@ -512,6 +632,17 @@ function suscribirseAFirebase() {
   onValue(ref(db, "novedades"), snap => {
     novedadesData = snap.val() || {};
     renderNovedadesConfig();
+  });
+
+  // Sólo se escucha la configuración y el estado ligero del proveedor AEAT.
+  // Los registros fiscales se leen bajo demanda desde su pestaña.
+  onValue(ref(db, "config/verifactuAeat"), snap => {
+    verifactuAeatConfig = snap.val() || {};
+    renderVerifactuAeat();
+  });
+  onValue(ref(db, "verifactu_aeat/estado"), snap => {
+    verifactuAeatEstado = snap.val() || {};
+    renderVerifactuAeat();
   });
 }
 
@@ -974,6 +1105,7 @@ function renderCategorias() {
       <div class="local-actions">
         <button class="btn-icon" title="Subir" onclick="event.stopPropagation(); moverCat('${cid}', ${idx}, -1)" ${idx === 0 ? 'disabled' : ''}>↑</button>
         <button class="btn-icon" title="Bajar" onclick="event.stopPropagation(); moverCat('${cid}', ${idx}, 1)" ${idx === arr.length - 1 ? 'disabled' : ''}>↓</button>
+        <button class="btn-icon" title="${cat.visible === false ? 'Mostrar categoría al camarero' : 'Ocultar categoría al camarero'}" onclick="event.stopPropagation(); toggleVisibilidadCategoria('${cid}')">${cat.visible === false ? '🙈' : '👁️'}</button>
         <button class="btn-icon" onclick="event.stopPropagation(); abrirModalCategoria('${cid}', '${cat.nombre}')">✏️</button>
         <button class="btn-icon delete" onclick="event.stopPropagation(); eliminarCategoria('${cid}')">🗑️</button>
       </div>
@@ -1021,6 +1153,7 @@ function renderProductos(cid) {
       <td style="text-align: right;">
         <button class="btn-icon" title="Subir" onclick="moverArt('${pid}', '${cid}', ${idx}, -1)" ${idx === 0 ? 'disabled' : ''}>↑</button>
         <button class="btn-icon" title="Bajar" onclick="moverArt('${pid}', '${cid}', ${idx}, 1)" ${idx === productos.length - 1 ? 'disabled' : ''}>↓</button>
+        <button class="btn-icon" title="${p.visible === false ? 'Mostrar artículo al camarero' : 'Ocultar artículo al camarero'}" onclick="toggleVisibilidadArticulo('${pid}')">${p.visible === false ? '🙈' : '👁️'}</button>
         <button class="btn-icon" onclick="editarProducto('${pid}')" style="margin-right:8px;">✏️</button>
         <button class="btn-icon delete" onclick="eliminarProducto('${pid}')">🗑️</button>
       </td>
@@ -1042,6 +1175,18 @@ async function moverArt(id, catId, idx, dir) {
   updates['carta/' + arts[idx][0] + '/orden'] = idxDest;
   updates['carta/' + arts[idxDest][0] + '/orden'] = idx;
   await update(ref(db), updates);
+}
+
+async function toggleVisibilidadArticulo(id) {
+  const articulo = cartaData[id];
+  if (!articulo) return;
+  await set(ref(db, `carta/${id}/visible`), articulo.visible === false);
+}
+
+async function toggleVisibilidadCategoria(id) {
+  const categoria = categoriasData[id];
+  if (!categoria) return;
+  await set(ref(db, `categorias/${id}/visible`), categoria.visible === false);
 }
 
 async function moverCat(id, idx, dir) {
@@ -1111,6 +1256,33 @@ async function cargarVentasRango(fechaIni, fechaFin) {
 }
 
 
+let ventasFiltroEstado = 'todos'; // 'todos' | 'cobrados' | 'anulados'
+
+function filtrarEstadoVentas(estado) {
+  ventasFiltroEstado = estado;
+  const botones = [
+    { id: 'btn-filtro-ventas-todos', est: 'todos' },
+    { id: 'btn-filtro-ventas-cobrados', est: 'cobrados' },
+    { id: 'btn-filtro-ventas-anulados', est: 'anulados' }
+  ];
+  botones.forEach(b => {
+    const el = document.getElementById(b.id);
+    if (el) {
+      if (b.est === estado) {
+        el.style.borderColor = 'var(--accent)';
+        el.style.background = 'var(--surface2)';
+        el.style.fontWeight = 'bold';
+      } else {
+        el.style.borderColor = 'var(--border)';
+        el.style.background = 'transparent';
+        el.style.fontWeight = 'normal';
+      }
+    }
+  });
+  ventasPaginaActual = 1;
+  renderVentasPagina();
+}
+
 async function aplicarFiltrosVentas() {
   if (!db) return;
 
@@ -1125,9 +1297,9 @@ async function aplicarFiltrosVentas() {
   }
 
   const tbody = document.getElementById("ventas-tbody");
-  tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:30px;">Cargando ventas...</td></tr>`;
+  tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:30px;">Cargando ventas y auditoría...</td></tr>`;
 
-  // Realizar lectura bajo demanda única
+  // Realizar lectura bajo demanda única de historial
   historialData = await cargarVentasRango(fechaIni, fechaFin);
   
   // Transformar a lista para ordenamiento y paginación
@@ -1139,17 +1311,79 @@ async function aplicarFiltrosVentas() {
   // Ordenar cronológicamente descendiente
   ventasDataList.sort((a, b) => Number(b.ts || b.createdAt || 0) - Number(a.ts || a.createdAt || 0));
 
-  // Calcular y actualizar estadísticas globales para el período seleccionado
-  let recaudado = 0;
-  let conteo = 0;
+  // Separar cobrados reales vs anulados
+  let recaudadoCobrado = 0;
+  let conteoCobrados = 0;
+  let totalAnulado = 0;
+  let conteoAnulados = 0;
+
   ventasDataList.forEach(t => {
-    recaudado += Number(t.total || 0);
-    conteo++;
+    const total = Number(t.total || 0);
+    if (t.anulado) {
+      totalAnulado += total;
+      conteoAnulados++;
+    } else {
+      recaudadoCobrado += total;
+      conteoCobrados++;
+    }
   });
 
-  document.getElementById("venta-total-recaudado").textContent = `${recaudado.toFixed(2)} €`;
-  document.getElementById("venta-total-tickets").textContent = conteo;
-  document.getElementById("venta-ticket-medio").textContent = conteo ? `${(recaudado / conteo).toFixed(2)} €` : "0,00 €";
+  // Leer eventos de auditoría para calcular tickets impresos en el período
+  let totalImpreso = 0;
+  let conteoImpresos = 0;
+  try {
+    const evAudit = await leerEventosAuditoriaRango(fechaIni, fechaFin);
+    evAudit.forEach(ev => {
+      if (ev.accion === 'ticket_impreso' && !ev.reimpresionDe && !ev.esReimpresion) {
+        totalImpreso += Number(ev.total || 0);
+        conteoImpresos++;
+      }
+    });
+  } catch (errAudit) {
+    console.warn("No se pudo calcular tickets impresos desde auditoría:", errAudit);
+  }
+
+  const discrepancia = Math.max(0, Math.round((totalImpreso - recaudadoCobrado) * 100) / 100);
+
+  // Actualizar indicadores numéricos
+  document.getElementById("venta-total-recaudado").textContent = `${recaudadoCobrado.toFixed(2)} €`;
+  document.getElementById("venta-total-tickets").textContent = conteoCobrados;
+  document.getElementById("venta-ticket-medio").textContent = conteoCobrados ? `${(recaudadoCobrado / conteoCobrados).toFixed(2)} €` : "0,00 €";
+
+  const elImpreso = document.getElementById("venta-total-impreso");
+  if (elImpreso) {
+    elImpreso.textContent = `${totalImpreso.toFixed(2)} € (${conteoImpresos})`;
+  }
+
+  const elAnulado = document.getElementById("venta-total-anulado");
+  if (elAnulado) {
+    elAnulado.textContent = `${totalAnulado.toFixed(2)} € (${conteoAnulados})`;
+  }
+
+  const elDiscrepancia = document.getElementById("venta-total-discrepancia");
+  if (elDiscrepancia) {
+    elDiscrepancia.textContent = `${discrepancia.toFixed(2)} €`;
+    if (discrepancia > 0.01) {
+      elDiscrepancia.style.color = "#ef4444";
+      elDiscrepancia.title = `⚠️ Discrepancia detectada: se imprimieron ${totalImpreso.toFixed(2)} € pero solo se cobraron ${recaudadoCobrado.toFixed(2)} €`;
+    } else {
+      elDiscrepancia.style.color = "var(--accent)";
+      elDiscrepancia.title = "Todo coincide correctamente";
+    }
+  }
+
+  const alertaCont = document.getElementById("ventas-alerta-discrepancia-container");
+  const alertaTxt = document.getElementById("ventas-alerta-discrepancia-txt");
+  if (alertaCont) {
+    if (discrepancia > 0.01) {
+      alertaCont.style.display = 'flex';
+      if (alertaTxt) {
+        alertaTxt.textContent = `Se detectaron ${conteoImpresos} tickets impresos (${totalImpreso.toFixed(2)} €) frente a ${conteoCobrados} ventas cobradas (${recaudadoCobrado.toFixed(2)} €). Discrepancia: ${discrepancia.toFixed(2)} €. Pulsa para ver el desglose por día y recuperar las ventas.`;
+      }
+    } else {
+      alertaCont.style.display = 'none';
+    }
+  }
 
   ventasPaginaActual = 1;
   renderVentasPagina();
@@ -1159,15 +1393,22 @@ function renderVentasPagina() {
   const tbody = document.getElementById("ventas-tbody");
   tbody.innerHTML = "";
 
-  if (ventasDataList.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:30px;">No se registran ventas en el rango de fechas seleccionado.</td></tr>`;
+  // Filtrar según estado seleccionado
+  const ticketsFiltrados = ventasDataList.filter(t => {
+    if (ventasFiltroEstado === 'cobrados') return !t.anulado;
+    if (ventasFiltroEstado === 'anulados') return !!t.anulado;
+    return true;
+  });
+
+  if (ticketsFiltrados.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:30px;">No se registran ventas con el filtro seleccionado en este rango de fechas.</td></tr>`;
     document.getElementById("ventas-paginacion-info").textContent = "Página 1 de 1";
     document.getElementById("btn-ventas-prev").disabled = true;
     document.getElementById("btn-ventas-next").disabled = true;
     return;
   }
 
-  const totalPages = Math.ceil(ventasDataList.length / VENTAS_POR_PAGINA) || 1;
+  const totalPages = Math.ceil(ticketsFiltrados.length / VENTAS_POR_PAGINA) || 1;
   
   // Limitar página actual a rango válido
   if (ventasPaginaActual < 1) ventasPaginaActual = 1;
@@ -1175,24 +1416,32 @@ function renderVentasPagina() {
 
   const startIdx = (ventasPaginaActual - 1) * VENTAS_POR_PAGINA;
   const endIdx = startIdx + VENTAS_POR_PAGINA;
-  const pageTickets = ventasDataList.slice(startIdx, endIdx);
+  const pageTickets = ticketsFiltrados.slice(startIdx, endIdx);
 
   pageTickets.forEach(t => {
     const total = Number(t.total || 0);
     // Formatear Fecha
     const ts = Number(t.createdAt || t.ts || 0);
     const fechaTxt = ts ? new Date(ts).toLocaleString('es-ES', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '—';
-    const metodo = t.pagoMetodo || (t.cobro ? 'Efectivo' : '—');
+    const esAnulado = !!t.anulado;
+
+    let metodo = t.pagoMetodo || (t.cobro ? 'Efectivo' : '—');
+    if (esAnulado) {
+      metodo = `<span style="background:rgba(239,68,68,0.15);color:#ef4444;padding:2px 7px;border-radius:4px;font-weight:700;font-size:11px">⚠️ ANULADO / VACIADO</span>`;
+    }
 
     const tr = document.createElement("tr");
     tr.style.cursor = "pointer";
+    if (esAnulado) {
+      tr.style.background = "rgba(239,68,68,0.04)";
+    }
     tr.onclick = () => mostrarDetalleTicketHistorico(t.id);
     tr.innerHTML = `
       <td>${fechaTxt}</td>
       <td style="font-weight:600;">${t.mesaNombre || t.mesa || '—'}</td>
       <td>${t.camarero || '—'}</td>
       <td style="text-transform: capitalize;">${metodo}</td>
-      <td class="table-price" style="text-align: right; color: var(--accent); font-weight:600;">${total.toFixed(2)} €</td>
+      <td class="table-price" style="text-align: right; color: ${esAnulado ? '#ef4444; text-decoration: line-through;' : 'var(--accent); font-weight:600;'}">${total.toFixed(2)} €</td>
     `;
     tbody.appendChild(tr);
   });
@@ -1215,6 +1464,8 @@ function resetFiltrosVentas() {
   
   ventasDataList = [];
   historialData = {};
+  ventasFiltroEstado = 'todos';
+  filtrarEstadoVentas('todos');
   
   document.getElementById("ventas-tbody").innerHTML = `
     <tr>
@@ -1226,11 +1477,545 @@ function resetFiltrosVentas() {
   document.getElementById("venta-total-recaudado").textContent = "0,00 €";
   document.getElementById("venta-total-tickets").textContent = "0";
   document.getElementById("venta-ticket-medio").textContent = "0,00 €";
+  if (document.getElementById("venta-total-impreso")) document.getElementById("venta-total-impreso").textContent = "0,00 €";
+  if (document.getElementById("venta-total-anulado")) document.getElementById("venta-total-anulado").textContent = "0,00 €";
+  if (document.getElementById("venta-total-discrepancia")) {
+    document.getElementById("venta-total-discrepancia").textContent = "0,00 €";
+    document.getElementById("venta-total-discrepancia").style.color = "var(--text)";
+  }
+  const alertaCont = document.getElementById("ventas-alerta-discrepancia-container");
+  if (alertaCont) alertaCont.style.display = 'none';
   
   ventasPaginaActual = 1;
   document.getElementById("ventas-paginacion-info").textContent = "Página 1 de 1";
   document.getElementById("btn-ventas-prev").disabled = true;
   document.getElementById("btn-ventas-next").disabled = true;
+}
+
+// --- MÓDULO DE RECONCILIACIÓN Y RECUPERACIÓN DE VENTAS DESDE AUDITORÍA ---
+let recAnalisisActual = null;
+let recTicketsSeleccionados = new Set();
+
+function abrirModalReconciliacion() {
+  const modal = document.getElementById("modal-reconciliacion-ventas");
+  if (!modal) return;
+
+  const fIniInput = document.getElementById("ventas-fecha-ini");
+  const fFinInput = document.getElementById("ventas-fecha-fin");
+  const hoy = new Date().toISOString().split("T")[0];
+
+  const iniVal = fIniInput?.value || document.getElementById("audit-fecha-ini")?.value || hoy;
+  const finVal = fFinInput?.value || document.getElementById("audit-fecha-fin")?.value || hoy;
+
+  const recIni = document.getElementById("rec-fecha-ini");
+  const recFin = document.getElementById("rec-fecha-fin");
+  if (recIni) recIni.value = iniVal;
+  if (recFin) recFin.value = finVal;
+
+  modal.classList.add("open");
+  ejecutarAnalisisReconciliacion();
+}
+
+function cerrarModalReconciliacion() {
+  const modal = document.getElementById("modal-reconciliacion-ventas");
+  if (modal) modal.classList.remove("open");
+}
+
+function parsearLineasDeDetalleAuditoria(detalle, numLineas, total) {
+  if (!detalle || typeof detalle !== 'string') {
+    return [{ nombre: 'Consumición TPV', qty: Number(numLineas || 1), precio: Number(total || 0) }];
+  }
+  const partes = detalle.split(',').map(p => p.trim()).filter(Boolean);
+  if (!partes.length) {
+    return [{ nombre: 'Consumición TPV', qty: Number(numLineas || 1), precio: Number(total || 0) }];
+  }
+  const lineas = [];
+  partes.forEach(p => {
+    const m = p.match(/^(\d+)\s*[×x]\s*(.+)$/i);
+    if (m) {
+      const q = parseInt(m[1], 10) || 1;
+      lineas.push({ nombre: m[2].trim(), qty: q, precio: 0 });
+    } else {
+      lineas.push({ nombre: p, qty: 1, precio: 0 });
+    }
+  });
+
+  if (lineas.length === 1) {
+    lineas[0].precio = Math.round((Number(total || 0) / (lineas[0].qty || 1)) * 100) / 100;
+  }
+  return lineas;
+}
+
+async function ejecutarAnalisisReconciliacion() {
+  const ini = document.getElementById("rec-fecha-ini")?.value;
+  const fin = document.getElementById("rec-fecha-fin")?.value;
+  if (!ini || !fin) {
+    alert("Por favor selecciona un rango de fechas válido.");
+    return;
+  }
+
+  const contenedor = document.getElementById("rec-lista-dias");
+  if (contenedor) {
+    contenedor.innerHTML = `<div style="padding: 24px; text-align: center; color: var(--text-dim);">
+      <div style="font-size: 15px; margin-bottom: 6px;">⏳ Analizando auditoría y ventas...</div>
+      <div style="font-size: 12px;">Comparando tickets físicos impresos frente a ventas guardadas...</div>
+    </div>`;
+  }
+
+  const btnUnificar = document.getElementById("btn-ejecutar-unificacion");
+  if (btnUnificar) btnUnificar.disabled = true;
+
+  try {
+    const [historialObj, eventosAudit] = await Promise.all([
+      cargarVentasRango(ini, fin),
+      leerEventosAuditoriaRango(ini, fin)
+    ]);
+
+    const impresiones = eventosAudit.filter(ev => 
+      ev.accion === 'ticket_impreso' && 
+      !ev.reimpresionDe && 
+      !ev.esReimpresion && 
+      Number(ev.total || 0) > 0
+    );
+
+    const ventasPorDia = {};
+    const anuladosPorDia = {};
+    Object.entries(historialObj).forEach(([id, t]) => {
+      const ts = Number(t.ts || t.createdAt || 0);
+      if (!ts) return;
+      const d = new Date(ts);
+      const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      if (t.anulado) {
+        if (!anuladosPorDia[dateKey]) anuladosPorDia[dateKey] = [];
+        anuladosPorDia[dateKey].push({ id, ...t, matched: false });
+      } else {
+        if (!ventasPorDia[dateKey]) ventasPorDia[dateKey] = [];
+        ventasPorDia[dateKey].push({ id, ...t, matched: false });
+      }
+    });
+
+    const impresionesPorDia = {};
+    impresiones.forEach(ev => {
+      const dk = ev.dateKey || (ev.ts ? new Date(ev.ts).toISOString().split('T')[0] : 'desconocido');
+      if (!impresionesPorDia[dk]) impresionesPorDia[dk] = [];
+      impresionesPorDia[dk].push({
+        ...ev,
+        totalNum: Math.round(Number(ev.total || 0) * 100) / 100,
+        matched: false
+      });
+    });
+
+    const todasLasFechas = Array.from(new Set([
+      ...Object.keys(ventasPorDia),
+      ...Object.keys(impresionesPorDia),
+      ...Object.keys(anuladosPorDia)
+    ])).sort();
+
+    const resultadoDias = [];
+    let totalImpresoGlobal = 0;
+    let totalVentasGlobal = 0;
+    let totalFaltanteGlobal = 0;
+    const todosCandidatosFaltantes = [];
+
+    for (const dateKey of todasLasFechas) {
+      const ventasDelDia = ventasPorDia[dateKey] || [];
+      const impresionesDelDia = impresionesPorDia[dateKey] || [];
+      const anuladosDelDia = anuladosPorDia[dateKey] || [];
+
+      // Paso 0: Limpiar anulados huérfanos que ya tienen su ticket recuperado o cobrado equivalente
+      // (evita que sigan apareciendo ambos si ya se unificaron anteriormente)
+      for (const a of anuladosDelDia) {
+        const aTotal = Math.round(Number(a.total || 0) * 100) / 100;
+        const aTs = Number(a.ts || 0);
+        const yaExisteCobrado = ventasDelDia.find(v => {
+          const vTotal = Math.round(Number(v.total || 0) * 100) / 100;
+          const vTs = Number(v.ts || 0);
+          return Math.abs(vTotal - aTotal) < 0.02 && Math.abs(vTs - aTs) < 45 * 60 * 1000;
+        });
+        if (yaExisteCobrado) {
+          a.esRedundante = true;
+          try {
+            await remove(ref(db, 'historial/' + a.id));
+            console.log('Limpiado ticket anulado duplicado:', a.id);
+          } catch (_) {}
+        }
+      }
+
+      // Paso A: Emparejar si ya fue recuperado previamente con auditId
+      impresionesDelDia.forEach(ev => {
+        const matchExacto = ventasDelDia.find(v => !v.matched && (v.auditId === ev.id));
+        if (matchExacto) {
+          ev.matched = true;
+          matchExacto.matched = true;
+        }
+      });
+
+      // Paso B: Emparejar por importe idéntico y proximidad temporal con ventas activas
+      impresionesDelDia.forEach(ev => {
+        if (ev.matched) return;
+        const evTotal = ev.totalNum;
+        const evTs = Number(ev.ts || 0);
+
+        let mejorMatch = null;
+        let menorDifTiempo = Infinity;
+
+        ventasDelDia.forEach(v => {
+          if (v.matched) return;
+          const vTotal = Math.round(Number(v.total || 0) * 100) / 100;
+          if (Math.abs(vTotal - evTotal) < 0.02) {
+            const vTs = Number(v.ts || 0);
+            const difTiempo = Math.abs(vTs - evTs);
+            if (difTiempo < menorDifTiempo) {
+              menorDifTiempo = difTiempo;
+              mejorMatch = v;
+            }
+          }
+        });
+
+        if (mejorMatch) {
+          ev.matched = true;
+          mejorMatch.matched = true;
+        }
+      });
+
+      // Paso C: Para las impresiones NO cobradas, verificar si proceden de un ticket que estaba anulado
+      impresionesDelDia.forEach(ev => {
+        if (ev.matched) return;
+        const evTotal = ev.totalNum;
+        const evTs = Number(ev.ts || 0);
+
+        let mejorAnulado = null;
+        let menorDifTiempo = Infinity;
+
+        anuladosDelDia.forEach(a => {
+          if (a.matched || a.esRedundante) return;
+          const aTotal = Math.round(Number(a.total || 0) * 100) / 100;
+          if (Math.abs(aTotal - evTotal) < 0.02) {
+            const aTs = Number(a.ts || 0);
+            const difTiempo = Math.abs(aTs - evTs);
+            if (difTiempo < menorDifTiempo) {
+              menorDifTiempo = difTiempo;
+              mejorAnulado = a;
+            }
+          }
+        });
+
+        if (mejorAnulado) {
+          mejorAnulado.matched = true;
+          ev.ticketAnuladoId = mejorAnulado.id;
+          ev.esReactivacion = true;
+        } else {
+          ev.ticketAnuladoId = null;
+          ev.esReactivacion = false;
+        }
+      });
+
+      let sumaImpresoDia = 0;
+      impresionesDelDia.forEach(ev => { sumaImpresoDia += ev.totalNum; });
+
+      let sumaVentasDia = 0;
+      ventasDelDia.forEach(v => { sumaVentasDia += Number(v.total || 0); });
+
+      const faltantesDelDia = impresionesDelDia.filter(ev => !ev.matched);
+      let sumaFaltanteDia = 0;
+      faltantesDelDia.forEach(ev => { sumaFaltanteDia += ev.totalNum; });
+
+      totalImpresoGlobal += sumaImpresoDia;
+      totalVentasGlobal += sumaVentasDia;
+      totalFaltanteGlobal += sumaFaltanteDia;
+      todosCandidatosFaltantes.push(...faltantesDelDia);
+
+      resultadoDias.push({
+        dateKey,
+        sumaImpresoDia: Math.round(sumaImpresoDia * 100) / 100,
+        conteoImpresoDia: impresionesDelDia.length,
+        sumaVentasDia: Math.round(sumaVentasDia * 100) / 100,
+        conteoVentasDia: ventasDelDia.length,
+        sumaFaltanteDia: Math.round(sumaFaltanteDia * 100) / 100,
+        conteoFaltanteDia: faltantesDelDia.length,
+        faltantes: faltantesDelDia
+      });
+    }
+
+    recAnalisisActual = {
+      resultadoDias,
+      totalImpresoGlobal: Math.round(totalImpresoGlobal * 100) / 100,
+      totalVentasGlobal: Math.round(totalVentasGlobal * 100) / 100,
+      totalFaltanteGlobal: Math.round(totalFaltanteGlobal * 100) / 100,
+      todosCandidatosFaltantes
+    };
+
+    // Actualizar KPI Cards en el modal
+    document.getElementById("rec-total-impreso").textContent = `${recAnalisisActual.totalImpresoGlobal.toFixed(2)} € (${impresiones.length})`;
+    document.getElementById("rec-total-ventas").textContent = `${recAnalisisActual.totalVentasGlobal.toFixed(2)} €`;
+    const elFaltante = document.getElementById("rec-total-faltante");
+    elFaltante.textContent = `${recAnalisisActual.totalFaltanteGlobal.toFixed(2)} € (${todosCandidatosFaltantes.length})`;
+    elFaltante.style.color = recAnalisisActual.totalFaltanteGlobal > 0.01 ? "#ef4444" : "#10b981";
+
+    // Por defecto, pre-seleccionar todos los tickets faltantes detectados
+    recTicketsSeleccionados = new Set(todosCandidatosFaltantes.map(c => c.id));
+
+    renderizarDiasReconciliacion();
+    actualizarBotonUnificacion();
+
+  } catch (err) {
+    console.error("Error en reconciliación:", err);
+    if (contenedor) {
+      contenedor.innerHTML = `<div style="padding: 20px; color: #ef4444; text-align: center;">
+        Error al analizar el período: ${escapeHtml(err.message)}
+      </div>`;
+    }
+  }
+}
+
+function renderizarDiasReconciliacion() {
+  const contenedor = document.getElementById("rec-lista-dias");
+  if (!contenedor || !recAnalisisActual) return;
+
+  if (recAnalisisActual.resultadoDias.length === 0) {
+    contenedor.innerHTML = `<div style="padding: 24px; text-align: center; color: var(--text-dim);">
+      No se encontraron datos de impresiones ni de ventas en este rango de fechas.
+    </div>`;
+    return;
+  }
+
+  let html = `<div style="display: flex; flex-direction: column; gap: 8px; padding: 6px;">`;
+
+  recAnalisisActual.resultadoDias.forEach(dia => {
+    const hayFaltantes = dia.conteoFaltanteDia > 0;
+    const todosSeleccionados = hayFaltantes && dia.faltantes.every(f => recTicketsSeleccionados.has(f.id));
+
+    const partes = dia.dateKey.split('-');
+    const fechaLegible = partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : dia.dateKey;
+
+    html += `
+      <div style="background: var(--surface2); border: 1px solid ${hayFaltantes ? '#ef4444' : 'var(--border)'}; border-radius: 8px; overflow: hidden;">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; gap: 10px; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            ${hayFaltantes ? `
+              <input type="checkbox" ${todosSeleccionados ? 'checked' : ''} onchange="window.toggleDiaReconciliacion('${dia.dateKey}', this.checked)" style="width: 16px; height: 16px; cursor: pointer;" title="Seleccionar/Deseleccionar día">
+            ` : `<span style="width: 16px; text-align: center; color: #10b981; font-size: 14px;">✓</span>`}
+            <div>
+              <strong style="font-size: 13px; color: var(--text);">${fechaLegible}</strong>
+              <div style="font-size: 11px; color: var(--text-dim); margin-top: 1px;">
+                Impreso: <b>${dia.sumaImpresoDia.toFixed(2)} €</b> (${dia.conteoImpresoDia}) · Ventas: <b>${dia.sumaVentasDia.toFixed(2)} €</b> (${dia.conteoVentasDia})
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="text-align: right;">
+              <span style="font-size: 12px; font-weight: 700; color: ${hayFaltantes ? '#ef4444' : '#10b981'};">
+                ${hayFaltantes ? `+${dia.sumaFaltanteDia.toFixed(2)} € (${dia.conteoFaltanteDia} faltantes)` : 'Cuadrado (0,00 €)'}
+              </span>
+            </div>
+            ${hayFaltantes ? `
+              <button type="button" class="btn btn-secondary" onclick="window.toggleDetalleDiaReconciliacion('${dia.dateKey}')" style="padding: 4px 8px; font-size: 11px;">
+                Ver Tickets ▼
+              </button>
+            ` : ''}
+          </div>
+        </div>
+
+        ${hayFaltantes ? `
+          <div id="rec-detalle-${dia.dateKey}" style="display: none; border-top: 1px solid var(--border); background: var(--panel); padding: 8px 12px;">
+            <table class="app-table" style="font-size: 11.5px; width: 100%;">
+              <thead>
+                <tr>
+                  <th style="width: 28px;"></th>
+                  <th>Hora</th>
+                  <th>Mesa</th>
+                  <th>Camarero</th>
+                  <th>Detalle Artículos</th>
+                  <th style="text-align: right;">Importe</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${dia.faltantes.map(f => {
+                  const check = recTicketsSeleccionados.has(f.id) ? 'checked' : '';
+                  return `
+                    <tr>
+                      <td>
+                        <input type="checkbox" ${check} onchange="window.toggleTicketReconciliacion('${f.id}', this.checked)" style="cursor: pointer;">
+                      </td>
+                      <td style="font-family: var(--font-code);">${f.hora || '—'}</td>
+                      <td><b>${escapeHtml(f.mesa || 'TPV')}</b></td>
+                      <td>${escapeHtml(f.camarero || 'TPV')}</td>
+                      <td style="color: var(--text-dim); max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(f.detalle || '')}">
+                        ${f.esReactivacion ? `<span style="background: rgba(239,68,68,0.15); color: #ef4444; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-right: 4px;">REACTIVAR ANULADO</span>` : `<span style="background: rgba(96,165,250,0.15); color: #60a5fa; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; margin-right: 4px;">NUEVO</span>`}
+                        ${escapeHtml(f.detalle || 'Consumición')}
+                      </td>
+                      <td style="text-align: right; font-weight: 700; color: #ef4444; font-family: var(--font-code);">
+                        ${f.totalNum.toFixed(2)} €
+                      </td>
+                    </tr>
+                  `;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  });
+
+  html += `</div>`;
+  contenedor.innerHTML = html;
+}
+
+function toggleDetalleDiaReconciliacion(dateKey) {
+  const panel = document.getElementById(`rec-detalle-${dateKey}`);
+  if (panel) {
+    panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  }
+}
+
+function toggleDiaReconciliacion(dateKey, checked) {
+  if (!recAnalisisActual) return;
+  const dia = recAnalisisActual.resultadoDias.find(d => d.dateKey === dateKey);
+  if (!dia || !dia.faltantes) return;
+
+  dia.faltantes.forEach(f => {
+    if (checked) recTicketsSeleccionados.add(f.id);
+    else recTicketsSeleccionados.delete(f.id);
+  });
+
+  renderizarDiasReconciliacion();
+  actualizarBotonUnificacion();
+}
+
+function toggleTicketReconciliacion(ticketId, checked) {
+  if (checked) recTicketsSeleccionados.add(ticketId);
+  else recTicketsSeleccionados.delete(ticketId);
+  actualizarBotonUnificacion();
+}
+
+function marcarTodosReconciliacion(marcar) {
+  if (!recAnalisisActual) return;
+  if (marcar) {
+    recTicketsSeleccionados = new Set(recAnalisisActual.todosCandidatosFaltantes.map(c => c.id));
+  } else {
+    recTicketsSeleccionados.clear();
+  }
+  renderizarDiasReconciliacion();
+  actualizarBotonUnificacion();
+}
+
+function actualizarBotonUnificacion() {
+  const btn = document.getElementById("btn-ejecutar-unificacion");
+  if (!btn || !recAnalisisActual) return;
+
+  const cantidad = recTicketsSeleccionados.size;
+  let totalImporte = 0;
+  recAnalisisActual.todosCandidatosFaltantes.forEach(c => {
+    if (recTicketsSeleccionados.has(c.id)) {
+      totalImporte += c.totalNum;
+    }
+  });
+
+  btn.disabled = (cantidad === 0);
+  btn.textContent = `⚡ Unificar e Insertar en Ventas (${cantidad} tickets · ${totalImporte.toFixed(2)} €)`;
+}
+
+async function ejecutarUnificacionVentas() {
+  if (!recAnalisisActual || recTicketsSeleccionados.size === 0) return;
+
+  const ticketsAInsertar = recAnalisisActual.todosCandidatosFaltantes.filter(c => recTicketsSeleccionados.has(c.id));
+  const totalImporte = ticketsAInsertar.reduce((acc, c) => acc + c.totalNum, 0);
+
+  const nReactivar = ticketsAInsertar.filter(t => t.esReactivacion).length;
+  const nNuevos = ticketsAInsertar.filter(t => !t.esReactivacion).length;
+
+  let msgConfirma = `¿Deseas reconciliar ${ticketsAInsertar.length} tickets (${totalImporte.toFixed(2)} €) en el Historial de Ventas?\n\n`;
+  if (nReactivar > 0) {
+    msgConfirma += `• ${nReactivar} ticket(s) anulados/vaciados serán REACTIVADOS como cobrados (no se duplicarán).\n`;
+  }
+  if (nNuevos > 0) {
+    msgConfirma += `• ${nNuevos} ticket(s) no registrados serán insertados en el historial.\n`;
+  }
+
+  const confirma = confirm(msgConfirma);
+  if (!confirma) return;
+
+  const progBox = document.getElementById("rec-progreso-box");
+  const progTxt = document.getElementById("rec-progreso-txt");
+  const progBar = document.getElementById("rec-progreso-bar");
+  const btn = document.getElementById("btn-ejecutar-unificacion");
+
+  if (progBox) progBox.style.display = 'block';
+  if (btn) btn.disabled = true;
+
+  let procesados = 0;
+  for (let i = 0; i < ticketsAInsertar.length; i++) {
+    const ev = ticketsAInsertar[i];
+
+    if (ev.ticketAnuladoId) {
+      // 1. REACTIVAR TICKET EXISTENTE ANULADO (ELIMINA EL ESTADO ANULADO SIN DUPLICAR)
+      try {
+        await update(ref(db, 'historial/' + ev.ticketAnuladoId), {
+          anulado: false,
+          desanulado: true,
+          recuperadoDeAuditoria: true,
+          auditId: ev.id,
+          pagoMetodo: 'Efectivo',
+          cobradoFinal: true,
+          desanuladoTs: Date.now(),
+          desanuladoMotivo: 'Reactivado y desanulado desde reconciliación de auditoría'
+        });
+        procesados++;
+      } catch (e) {
+        console.error(`Error al reactivar ticket anulado ${ev.ticketAnuladoId}:`, e);
+      }
+    } else {
+      // 2. INSERTAR NUEVO TICKET HISTÓRICO
+      const fechaObj = new Date(ev.ts || `${ev.dateKey}T${ev.hora || '12:00:00'}`);
+      const dd = String(fechaObj.getDate()).padStart(2, '0');
+      const mm = String(fechaObj.getMonth() + 1).padStart(2, '0');
+      const yyyy = fechaObj.getFullYear();
+      const fechaStr = `${dd}/${mm}/${yyyy}`;
+      const horaStr = ev.hora ? String(ev.hora).slice(0, 5) : `${String(fechaObj.getHours()).padStart(2, '0')}:${String(fechaObj.getMinutes()).padStart(2, '0')}`;
+
+      const ventaData = {
+        mesa: ev.mesa || 'TPV',
+        mesaNombre: ev.mesa || 'TPV',
+        mesaId: ev.mesaId || 'recuperado_' + ev.id,
+        camarero: ev.camarero || 'TPV',
+        ts: Number(ev.ts || fechaObj.getTime()),
+        fecha: fechaStr,
+        hora: horaStr,
+        total: ev.totalNum,
+        pagoMetodo: 'Efectivo',
+        lineas: parsearLineasDeDetalleAuditoria(ev.detalle, ev.lineas, ev.totalNum),
+        tipoVenta: 'recuperado_auditoria',
+        recuperadoDeAuditoria: true,
+        auditId: ev.id,
+        auditDateKey: ev.dateKey || `${yyyy}-${mm}-${dd}`,
+        impreso: true,
+        impresoTs: Number(ev.ts || fechaObj.getTime()),
+        cobradoFinal: true,
+        anulado: false
+      };
+
+      try {
+        await push(ref(db, 'historial'), ventaData);
+        procesados++;
+      } catch (e) {
+        console.error(`Error al insertar ticket ${ev.id}:`, e);
+      }
+    }
+
+    const pct = Math.round(((i + 1) / ticketsAInsertar.length) * 100);
+    if (progBar) progBar.style.width = `${pct}%`;
+    if (progTxt) progTxt.textContent = `Procesando tickets: ${i + 1} de ${ticketsAInsertar.length} (${pct}%)...`;
+  }
+
+  if (progTxt) progTxt.textContent = `✅ ¡Completado! Se han procesado ${procesados} tickets correctamente.`;
+
+  setTimeout(async () => {
+    if (progBox) progBox.style.display = 'none';
+    await ejecutarAnalisisReconciliacion();
+    aplicarFiltrosVentas();
+    alert(`Se han reconciliado ${procesados} tickets por un valor de ${totalImporte.toFixed(2)} € en el historial de ventas.`);
+  }, 1000);
 }
 
 // --- INFORME COMERCIAL PARA PROPIETARIO ---
@@ -1637,7 +2422,7 @@ function actualizarAjustesSeguridad() {
       const basePath = window.location.pathname;
       const lastSlash = basePath.lastIndexOf('/');
       const dir = lastSlash >= 0 ? basePath.substring(0, lastSlash + 1) : '/';
-      const camareroUrl = window.location.origin + dir + 'camarero.html';
+      const camareroUrl = window.location.origin + dir + 'comandero.html';
       const pairUrl = `${camareroUrl}?pair=${encodeURIComponent(tokenVal)}`;
       // Se genera en el propio navegador: no depende de un servicio QR externo.
       const qr = qrcode(0, 'M');
@@ -1656,12 +2441,24 @@ function poblarExcepcionCamareroSelectorDev() {
   if (!select) return;
   const currentVal = seguridadData.excepcionCamarero || "";
   select.innerHTML = '<option value="">(Ninguno)</option>';
+
+  // Usuarios del nuevo sistema (Auth)
+  Object.entries(authUsuariosData || {}).forEach(([id, u]) => {
+    const rol = u.rol ? ` (${u.rol})` : '';
+    const option = document.createElement("option");
+    option.value = id;
+    option.textContent = `${u.nombre || id}${rol} [Auth]`;
+    select.appendChild(option);
+  });
+
+  // Usuarios tradicionales (PIN)
   Object.entries(usuariosData || {}).forEach(([id, u]) => {
     const option = document.createElement("option");
     option.value = id;
-    option.textContent = u.nombre;
+    option.textContent = `${u.nombre} (PIN: ${u.pin}) [PIN]`;
     select.appendChild(option);
   });
+
   select.value = currentVal;
 }
 
@@ -2125,6 +2922,7 @@ async function guardarCategoria() {
       await set(newRef, {
         nombre,
         orden: maxOrden + 1,
+        visible: true,
         notasPredefinidas: notasPredefinidas || null,
         variantes: currentCatVarsDev.length ? currentCatVarsDev : null
       });
@@ -2167,8 +2965,10 @@ function abrirModalProducto() {
   document.getElementById("form-prod-id").value = "";
   document.getElementById("form-prod-nombre").value = "";
   document.getElementById("form-prod-precio").value = "";
+  document.getElementById("form-prod-iva").value = "10";
   document.getElementById("form-prod-destino").value = "barra";
   document.getElementById("form-prod-notas").value = "";
+  document.getElementById("form-prod-visible").checked = true;
   
   document.getElementById("new-form-prod-var-nombre").value = "";
   document.getElementById("new-form-prod-var-precio").value = "";
@@ -2196,8 +2996,10 @@ function editarProducto(pid) {
   document.getElementById("form-prod-id").value = pid;
   document.getElementById("form-prod-nombre").value = p.nombre;
   document.getElementById("form-prod-precio").value = p.precio;
+  document.getElementById("form-prod-iva").value = p.iva ?? 10;
   document.getElementById("form-prod-destino").value = p.destino || "barra";
   document.getElementById("form-prod-notas").value = p.notasPredefinidas || "";
+  document.getElementById("form-prod-visible").checked = p.visible !== false;
   
   document.getElementById("new-form-prod-var-nombre").value = "";
   document.getElementById("new-form-prod-var-precio").value = "";
@@ -2366,11 +3168,13 @@ async function guardarProducto() {
   const id = document.getElementById("form-prod-id").value;
   const nombre = document.getElementById("form-prod-nombre").value.trim();
   const precio = parseFloat(document.getElementById("form-prod-precio").value);
+  const iva = parseFloat(document.getElementById("form-prod-iva").value);
   const destino = document.getElementById("form-prod-destino").value;
   const notasPredefinidas = document.getElementById("form-prod-notas").value.trim();
   const esCombo = document.getElementById("form-prod-escombo").checked;
+  const visible = document.getElementById("form-prod-visible").checked;
   
-  if (!nombre || isNaN(precio) || precio < 0) {
+  if (!nombre || isNaN(precio) || precio < 0 || isNaN(iva) || iva < 0 || iva > 100) {
     alert("Por favor, rellena todos los campos correctamente.");
     return;
   }
@@ -2379,10 +3183,12 @@ async function guardarProducto() {
     const payload = {
       nombre,
       precio,
+      iva,
       destino,
       notasPredefinidas: notasPredefinidas || null,
       variantes: currentProdVarsDev.length ? currentProdVarsDev : null,
       esCombo: esCombo,
+      visible,
       comboGroups: esCombo && currentProdComboGroupsDev.length ? currentProdComboGroupsDev : null
     };
 
@@ -2454,47 +3260,400 @@ function cambiarPestana(paneId) {
       dHasta.value = hoy;
     }
   }
+
+  if (paneId === "verifactu-aeat") {
+    const hoy = new Date().toISOString().slice(0, 10);
+    const desde = document.getElementById("vf-aeat-desde");
+    const hasta = document.getElementById("vf-aeat-hasta");
+    if (desde && !desde.value) desde.value = hoy;
+    if (hasta && !hasta.value) hasta.value = hoy;
+    renderVerifactuAeat();
+  }
 }
 
-// --- GESTIÓN DE CAMAREROS (CRUD) ---
+function renderVerifactuAeat() {
+  const config = verifactuAeatConfig || {};
+  const setValue = (id, value, fallback = '') => {
+    const el = document.getElementById(id);
+    if (el && document.activeElement !== el) el.value = value ?? fallback;
+  };
+  setValue('vf-aeat-modo', config.modo, 'pruebas');
+  const habilitado = document.getElementById('vf-aeat-habilitado');
+  if (habilitado && document.activeElement !== habilitado) habilitado.checked = config.habilitado === true;
+  setValue('vf-aeat-nif', config.nifEmisor, '');
+  setValue('vf-aeat-razon', config.razonSocialEmisor, '');
+  setValue('vf-aeat-dev-nif', config.desarrollador?.nif, '74937161X');
+  setValue('vf-aeat-dev-razon', config.desarrollador?.razonSocial, 'José González Ortega');
+  setValue('vf-aeat-dev-direccion', config.desarrollador?.direccion, 'El Mayorazgo, s/n');
+  setValue('vf-aeat-dev-cp', config.desarrollador?.codigoPostal, '11692');
+  setValue('vf-aeat-dev-municipio', config.desarrollador?.municipio, 'Setenil de las Bodegas');
+  setValue('vf-aeat-dev-provincia', config.desarrollador?.provincia, 'Cádiz');
+  setValue('vf-aeat-dev-email', config.desarrollador?.email, 'jongt23@gmail.com');
+  setValue('vf-aeat-declaracion-fecha', config.declaracionResponsable?.fechaFirma, '2026-09-26');
+  setValue('vf-aeat-declaracion-pdf-url', config.declaracionResponsable?.urlPdfFirmado, '');
+  setValue('vf-aeat-sif-nombre', config.sistemaInformatico?.nombre, 'Comandero');
+  setValue('vf-aeat-sif-id', config.sistemaInformatico?.id, '01');
+  setValue('vf-aeat-sif-version', config.sistemaInformatico?.version, '1.0.0');
+  setValue('vf-aeat-sif-instalacion', config.sistemaInformatico?.instalacion, '1');
+  setValue('vf-aeat-serie-f2', config.series?.F2, 'F2');
+  setValue('vf-aeat-serie-f1', config.series?.F1, 'F1');
+  setValue('vf-aeat-serie-f3', config.series?.F3, 'F3');
+  setValue('vf-aeat-serie-r', config.series?.R, 'R');
+  setValue('vf-aeat-digitos-numero', config.digitosNumero, '4');
+
+  const estado = verifactuAeatEstado || {};
+  const worker = document.getElementById('vf-aeat-worker-status');
+  const cert = document.getElementById('vf-aeat-cert-status');
+  if (worker) {
+    const conectado = estado.workerOnline === true;
+    worker.textContent = conectado ? `Servicio fiscal: conectado${estado.instalacion ? ` · ${estado.instalacion}` : ''}` : 'Servicio fiscal: sin conexión';
+    worker.style.color = conectado ? 'var(--success)' : 'var(--text-dim)';
+  }
+  if (cert) {
+    if (estado.certificado?.instalado) {
+      cert.innerHTML = '<strong style="color:var(--success)">Certificado vinculado en este PC</strong><br>El archivo y su contraseña permanecen fuera de Firebase.';
+    } else if (estado.certificado?.titular) {
+      cert.innerHTML = `<strong style="color:var(--success)">Certificado vinculado</strong><br>${escapeHtml(estado.certificado.titular)}${estado.certificado.nif ? ` · ${escapeHtml(estado.certificado.nif)}` : ''}${estado.certificado.caduca ? `<br>Caduca: ${escapeHtml(estado.certificado.caduca)}` : ''}`;
+    } else {
+      cert.textContent = 'Aún no hay certificado vinculado.';
+    }
+  }
+}
+
+async function vincularCertificadoVerifactuAeat() {
+  const file = document.getElementById('vf-aeat-cert-file')?.files?.[0];
+  const password = document.getElementById('vf-aeat-cert-password')?.value || '';
+  if (!file || !password) {
+    await showCustomAlert('VERI*FACTU AEAT', 'Selecciona el certificado PFX/P12 e indica su contraseña.');
+    return;
+  }
+  try {
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    let binary = '';
+    for (let i = 0; i < bytes.length; i += 0x8000) binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+    const response = await fetch('http://127.0.0.1:8765/verifactu/certificate', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pfxBase64: btoa(binary), password })
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'El servicio local rechazó el certificado');
+    document.getElementById('vf-aeat-cert-password').value = '';
+    document.getElementById('vf-aeat-cert-file').value = '';
+    await showCustomAlert('VERI*FACTU AEAT', 'Certificado validado y vinculado solo en este PC fiscal.');
+  } catch (error) {
+    await showCustomAlert('VERI*FACTU AEAT', `No se pudo vincular el certificado: ${error.message}. Comprueba que psVF.exe está activo en este ordenador.`);
+  }
+}
+
+async function guardarConfigVerifactuAeat() {
+  if (!db) return;
+  const value = id => (document.getElementById(id)?.value || '').trim();
+  const nifEmisor = value('vf-aeat-nif').toUpperCase();
+  const razonSocialEmisor = value('vf-aeat-razon');
+  const desarrollador = {
+    nif: value('vf-aeat-dev-nif').toUpperCase(),
+    razonSocial: value('vf-aeat-dev-razon'),
+    direccion: value('vf-aeat-dev-direccion'),
+    codigoPostal: value('vf-aeat-dev-cp'),
+    municipio: value('vf-aeat-dev-municipio'),
+    provincia: value('vf-aeat-dev-provincia'),
+    email: value('vf-aeat-dev-email')
+  };
+  const sistemaInformatico = {
+    nombre: value('vf-aeat-sif-nombre'),
+    id: value('vf-aeat-sif-id').toUpperCase(),
+    version: value('vf-aeat-sif-version'),
+    instalacion: value('vf-aeat-sif-instalacion')
+  };
+  const habilitado = document.getElementById('vf-aeat-habilitado')?.checked === true;
+  const declaracionResponsable = { fechaFirma: value('vf-aeat-declaracion-fecha'), urlPdfFirmado: value('vf-aeat-declaracion-pdf-url') };
+  const series = {
+    F2: value('vf-aeat-serie-f2').toUpperCase(),
+    F1: value('vf-aeat-serie-f1').toUpperCase(),
+    F3: value('vf-aeat-serie-f3').toUpperCase(),
+    R: value('vf-aeat-serie-r').toUpperCase()
+  };
+  const digitosNumero = Math.max(1, Math.min(12, Number(value('vf-aeat-digitos-numero')) || 4));
+  if (!nifEmisor || !razonSocialEmisor || !desarrollador.nif || !desarrollador.razonSocial || Object.values(sistemaInformatico).some(v => !v) || Object.values(series).some(v => !v)) {
+    await showCustomAlert('VERI*FACTU AEAT', 'Indica emisor, productor del SIF, identificación del sistema y todas las series antes de guardar.');
+    return;
+  }
+  await update(ref(db, 'config/verifactuAeat'), {
+    proveedor: 'aeat_direct',
+    habilitado,
+    modo: value('vf-aeat-modo') || 'pruebas',
+    nifEmisor,
+    razonSocialEmisor,
+    desarrollador,
+    sistemaInformatico,
+    declaracionResponsable,
+    series,
+    digitosNumero,
+    actualizadoEn: Date.now()
+  });
+  await showCustomAlert('VERI*FACTU AEAT', habilitado
+    ? 'Configuración activada. El PC fiscal debe tener un certificado vinculado y el servicio de impresión en marcha.'
+    : 'Configuración guardada sin activar. Verifacti heredado permanece sin cambios.');
+}
+
+async function consultarRegistrosVerifactuAeat() {
+  if (!db) return;
+  const panel = document.getElementById('vf-aeat-registros');
+  const desde = document.getElementById('vf-aeat-desde')?.value;
+  const hasta = document.getElementById('vf-aeat-hasta')?.value;
+  const estadoFiltro = document.getElementById('vf-aeat-estado')?.value || '';
+  if (!desde || !hasta || desde > hasta) {
+    await showCustomAlert('VERI*FACTU AEAT', 'Selecciona un rango de fechas válido.');
+    return;
+  }
+  const inicio = new Date(`${desde}T00:00:00`).getTime();
+  const fin = new Date(`${hasta}T23:59:59.999`).getTime();
+  panel.textContent = 'Consultando registros…';
+  try {
+    const snap = await get(query(ref(db, 'verifactu_aeat/registros'), orderByChild('ts'), startAt(inicio), endAt(fin)));
+    const registros = Object.entries(snap.val() || {}).map(([id, item]) => ({ id, ...(item || {}) }))
+      .filter(item => (!item.modo || item.modo === (verifactuAeatConfig?.modo || 'pruebas')) && (!estadoFiltro || item.estado === estadoFiltro))
+      .sort((a, b) => Number(b.ts || 0) - Number(a.ts || 0));
+    if (!registros.length) { panel.textContent = 'No hay registros para este filtro.'; return; }
+    const etiquetaEstado = estado => ({ accepted: 'Aceptado AEAT', pending: 'Pendiente AEAT', rejected: 'Rechazado AEAT' }[estado] || estado || 'Pendiente AEAT');
+    panel.innerHTML = `<div style="overflow:auto"><table class="app-table"><thead><tr><th>Fecha</th><th>Factura</th><th>Tipo</th><th>Estado</th><th style="text-align:right">Total</th><th>Acción</th></tr></thead><tbody>${registros.map(r => {
+      const id = escapeHtml(r.uuid || r.id);
+      const etiqueta = escapeHtml(`${r.serie || ''}-${r.numero || ''}`);
+      const retry = r.estado === 'pending' ? ` <button class="btn" type="button" style="padding:6px 8px;font-size:11px" onclick="reintentarRegistroVerifactuAeat('${id}')">Reintentar envío</button>` : '';
+      return `<tr><td>${escapeHtml(r.fecha || new Date(r.ts || 0).toLocaleString('es-ES'))}</td><td>${etiqueta}</td><td>${escapeHtml(r.tipo || '—')}</td><td>${escapeHtml(etiquetaEstado(r.estado))}</td><td style="text-align:right">${Number(r.total || 0).toFixed(2).replace('.', ',')} €</td><td style="white-space:nowrap"><button class="btn" type="button" style="padding:6px 8px;font-size:11px" onclick="verRegistroVerifactuAeat('${id}')">Ver</button> <button class="btn" type="button" style="padding:6px 8px;font-size:11px" onclick="reimprimirRegistroVerifactuAeat('${id}', '${etiqueta}', ${Number(r.total || 0)})">Reimprimir</button> <button class="btn" type="button" style="padding:6px 8px;font-size:11px" onclick="rectificarTotalRegistroVerifactuAeat('${id}')">Rectificar total</button>${retry}</td></tr>`;
+    }).join('')}</tbody></table></div>`;
+    window.__vfAeatRegistros = Object.fromEntries(registros.map(r => [r.uuid || r.id, r]));
+  } catch (error) {
+    console.error('Consulta VERI*FACTU AEAT', error);
+    const detail = error?.code || error?.message || 'error desconocido';
+    panel.textContent = `No se pudieron consultar los registros fiscales: ${detail}`;
+  }
+}
+
+function verRegistroVerifactuAeat(uuid) {
+  const r = window.__vfAeatRegistros?.[uuid];
+  if (!r) return;
+  const desglose = (r.lineasIva || []).map(x => `IVA ${x.tipo_impositivo}%: base ${x.base_imponible} €, cuota ${x.cuota_repercutida} €`).join(' · ') || 'Detalle pendiente de sincronizar';
+  const destino = r.destinatario ? `${r.destinatario.nif || ''} ${r.destinatario.nombre || ''}`.trim() : 'No aplica';
+  const estado = r.estado === 'accepted' ? 'Aceptado AEAT' : (r.estado === 'rejected' ? 'Rechazado AEAT' : 'Pendiente AEAT');
+  const reintento = r.proximoReintento ? `\nPróximo reintento automático: ${new Date(r.proximoReintento).toLocaleString('es-ES')}` : '';
+  const error = r.errorAeat ? `\nÚltimo error: ${r.errorAeat}` : '';
+  showCustomAlert('Detalle VERI*FACTU', `${r.serie}-${r.numero} · ${r.tipo}\n${r.descripcion || 'Venta'}\nTotal: ${r.total} €\nEstado: ${estado} · Intentos: ${Number(r.intentos || 0)}${reintento}${error}\n${desglose}\nDestinatario: ${destino}`);
+}
+
+async function reintentarRegistroVerifactuAeat(uuid) {
+  const r = window.__vfAeatRegistros?.[uuid];
+  if (!r || r.estado !== 'pending') {
+    await showCustomAlert('VERI*FACTU AEAT', 'Solo se pueden reintentar registros pendientes. Un rechazo debe revisarse antes de emitir una corrección fiscal.');
+    return;
+  }
+  const ok = await showCustomConfirm('Reintentar envío a AEAT', `Se reenviará ${r.serie}-${r.numero} usando exactamente el XML ya emitido. No se imprimirá ni se creará otra factura.`);
+  if (!ok) return;
+  try {
+    await push(ref(db, 'print_jobs'), { kind: 'verifactu_retry', verifactuRetryUuid: uuid, status: 'pending', createdAt: Date.now() });
+    await showCustomAlert('VERI*FACTU AEAT', 'Reintento enviado al PC fiscal. Consulta de nuevo el registro en unos segundos para ver el resultado.');
+  } catch (error) {
+    await showCustomAlert('VERI*FACTU AEAT', `No se pudo solicitar el reintento: ${error?.message || 'error desconocido'}`);
+  }
+}
+
+async function rectificarTotalRegistroVerifactuAeat(uuid) {
+  const r = window.__vfAeatRegistros?.[uuid];
+  if (!r || !(r.lineasIva || []).length) { await showCustomAlert('VERI*FACTU AEAT', 'El detalle fiscal de esta factura aún no se ha sincronizado. Reinicia psVF.exe actualizado y consulta de nuevo.'); return; }
+  const ok = await showCustomConfirm('Rectificar factura completa', `Se emitirá una rectificativa por el total de ${r.serie}-${r.numero}. La factura original no se modifica.`);
+  if (!ok) return;
+  const lineasIva = r.lineasIva.map(x => ({ base_imponible: (-Number(x.base_imponible || 0)).toFixed(2), tipo_impositivo: String(x.tipo_impositivo), cuota_repercutida: (-Number(x.cuota_repercutida || 0)).toFixed(2) }));
+  try {
+    await push(ref(db, 'print_jobs'), { kind: 'ticket_final', mesaNombre: `Rectificativa ${r.serie}-${r.numero}`, items: [], total: -Number(r.total || 0), status: 'pending', createdAt: Date.now(), verifactuAeat: { uid: `rect-total-${uuid}`, tipo: r.tipo === 'F2' ? 'R5' : 'R1', fecha: new Date().toLocaleDateString('es-ES').replaceAll('/', '-'), descripcion: `Rectificación total de ${r.serie}-${r.numero}`, lineasIva, destinatario: r.destinatario || null, facturasRef: [{ serie: r.serie, numero: r.numero, fecha_expedicion: r.fecha }], metodoRectificativa: 'I' } });
+    await showCustomAlert('VERI*FACTU AEAT', 'Rectificativa total enviada al PC fiscal. AEAT recibirá un registro nuevo que referencia la factura original.');
+  } catch (error) { await showCustomAlert('VERI*FACTU AEAT', `No se pudo emitir la rectificativa: ${error?.message || 'error desconocido'}`); }
+}
+
+async function reimprimirRegistroVerifactuAeat(uuid, etiqueta, total) {
+  if (!uuid || !db) return;
+  const confirmar = await showCustomConfirm('Reimprimir factura', `Se imprimirá de nuevo ${etiqueta}. No se creará ni se remitirá una factura nueva a AEAT.`);
+  if (!confirmar) return;
+  try {
+    await push(ref(db, 'print_jobs'), {
+      kind: 'ticket_final',
+      mesaNombre: `Reimpresión ${etiqueta}`,
+      items: [], total: Number(total || 0),
+      verifactuReprintUuid: uuid,
+      status: 'pending', createdAt: Date.now()
+    });
+    await showCustomAlert('VERI*FACTU AEAT', `Reimpresión enviada al PC fiscal para ${etiqueta}. No se ha creado ningún registro nuevo.`);
+  } catch (error) {
+    await showCustomAlert('VERI*FACTU AEAT', `No se pudo solicitar la reimpresión: ${error?.message || 'error desconocido'}`);
+  }
+}
+
+// --- GESTIÓN DE CAMAREROS (CRUD: NUEVO SISTEMA AUTH Y CLÁSICO PIN) ---
+function calcularTiempoRelativo(timestamp) {
+  if (!timestamp) return "Sin accesos registrados";
+  const difMs = Date.now() - timestamp;
+  const difSegundos = Math.floor(difMs / 1000);
+  const difMinutos = Math.floor(difSegundos / 60);
+  const difHoras = Math.floor(difMinutos / 60);
+  const difDias = Math.floor(difHoras / 24);
+
+  if (difSegundos < 60) return "Hace un momento";
+  if (difMinutos < 60) return `Hace ${difMinutos} min`;
+  if (difHoras < 24) {
+    const minsRestantes = difMinutos % 60;
+    if (minsRestantes === 0) return `Hace ${difHoras} h`;
+    return `Hace ${difHoras} h ${minsRestantes} min`;
+  }
+  return `Hace ${difDias} día${difDias > 1 ? 's' : ''}`;
+}
+
+function cambiarFormCamarero(tipo) {
+  const fAuth = document.getElementById('form-camarero-auth');
+  const fPin = document.getElementById('form-camarero-pin');
+  const bAuth = document.getElementById('btn-tab-form-auth');
+  const bPin = document.getElementById('btn-tab-form-pin');
+  if (tipo === 'pin') {
+    if (fAuth) fAuth.style.display = 'none';
+    if (fPin) fPin.style.display = 'block';
+    if (bAuth) { bAuth.style.background = 'var(--panel-light)'; bAuth.style.color = 'var(--text)'; bAuth.style.border = '1px solid var(--border)'; }
+    if (bPin) { bPin.style.background = 'var(--accent)'; bPin.style.color = '#000'; bPin.style.border = 'none'; }
+  } else {
+    if (fAuth) fAuth.style.display = 'block';
+    if (fPin) fPin.style.display = 'none';
+    if (bAuth) { bAuth.style.background = 'var(--accent)'; bAuth.style.color = '#000'; bAuth.style.border = 'none'; }
+    if (bPin) { bPin.style.background = 'var(--panel-light)'; bPin.style.color = 'var(--text)'; bPin.style.border = '1px solid var(--border)'; }
+  }
+}
+
 function renderCamareros() {
   const lista = document.getElementById("usuarios-lista");
   if (!lista) return;
 
-  const entries = Object.entries(usuariosData || {});
-  if (entries.length === 0) {
-    lista.innerHTML = `<p style="font-size:13px;color:var(--text-dim);text-align:center;padding:20px;">Sin camareros registrados. Añade uno a la izquierda.</p>`;
+  const authEntries = Object.entries(authUsuariosData || {});
+  const pinEntries = Object.entries(usuariosData || {});
+
+  if (authEntries.length === 0 && pinEntries.length === 0) {
+    lista.innerHTML = `<p style="font-size:13px;color:var(--text-dim);text-align:center;padding:25px;">Sin camareros registrados en ningún sistema. Añade uno en el panel izquierdo.</p>`;
     return;
   }
 
-  lista.innerHTML = "";
-  entries.forEach(([id, u]) => {
-    const card = document.createElement("div");
-    card.className = "camarero-card";
-    const isActive = u.activo !== false;
-    const sesion = sesionesCamarerosData[id];
-    const sesionActiva = Boolean(sesion?.sessionId);
-    const presencia = sesion?.estado === 'desconectado'
-      ? 'DESCONECTADO'
-      : (sesion?.estado === 'segundo_plano' ? 'EN SEGUNDO PLANO' : 'EN USO');
-    const ultimaActividad = sesion?.ultimaActividad ? new Date(sesion.ultimaActividad).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : '';
-    card.innerHTML = `
-      <div class="camarero-card-info">
-        <span class="camarero-card-name">${u.nombre}</span>
-        <span class="camarero-card-pin">PIN: ${u.pin}</span>
-        <span style="font-size:11px;color:${sesionActiva ? (sesion?.estado === 'desconectado' ? '#f59e0b' : '#22c55e') : 'var(--text-dim)'};font-weight:700;">${sesionActiva ? `● ${presencia}${ultimaActividad ? ` · ${ultimaActividad}` : ''}` : '○ SIN SESIÓN'}</span>
+  // Ordenar alfabéticamente
+  authEntries.sort(([, a], [, b]) => (a.nombre || '').localeCompare(b.nombre || '', 'es'));
+  pinEntries.sort(([, a], [, b]) => (a.nombre || '').localeCompare(b.nombre || '', 'es'));
+
+  let html = '';
+
+  // 1. SECCIÓN: NUEVO SISTEMA (AUTH / ROLES)
+  html += `
+    <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-bottom:8px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <strong style="font-size:13px;color:var(--accent);">Nuevo Sistema (Auth / Roles)</strong>
+        <span style="font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(59,130,246,0.15);color:#3b82f6;font-weight:700;">FIREBASE AUTH</span>
       </div>
-      <div style="display: flex; align-items: center; gap: 12px;">
-        <label class="switch" style="transform: scale(0.85); margin: 0; display: inline-block;">
-          <input type="checkbox" ${isActive ? "checked" : ""} onchange="window.toggleCamareroActivoDev('${id}', this.checked)">
-          <span class="slider"></span>
-        </label>
-        ${sesionActiva ? `<button class="btn-icon" onclick="cerrarSesionCamareroDev('${id}')" title="Cerrar sesión remota">⏏</button>` : ''}
-        <button class="btn-icon delete" onclick="deleteCamarero('${id}')" title="Eliminar Camarero">🗑️</button>
+      <span style="font-size:11px;color:var(--text-dim);">${authEntries.length} registrados</span>
+    </div>
+  `;
+
+  if (authEntries.length === 0) {
+    html += `<div style="font-size:12px;color:var(--text-dim);padding:8px 12px;font-style:italic;background:var(--panel-light);border:1px dashed var(--border);border-radius:8px;margin-bottom:12px;">No hay camareros en el nuevo sistema de autenticación.</div>`;
+  } else {
+    html += `<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">`;
+    authEntries.forEach(([id, u]) => {
+      const isActive = u.activo !== false;
+      const sesion = sesionesCamarerosData[id];
+      const sesionActiva = Boolean(sesion?.sessionId);
+      const presencia = sesion?.estado === 'desconectado'
+        ? 'DESCONECTADO'
+        : (sesion?.estado === 'segundo_plano' ? 'EN SEGUNDO PLANO' : 'EN USO');
+      const ultimaActividad = sesion?.ultimaActividad ? new Date(sesion.ultimaActividad).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : '';
+      const dispositivo = escapeHtml(sesion?.deviceLabel || 'Sin etiqueta');
+      const tiempoRelativo = calcularTiempoRelativo(u.ultimoLogin);
+      const rolLabel = String(u.rol || 'camarero').toUpperCase();
+
+      html += `
+        <div class="camarero-card">
+          <div class="camarero-card-info" style="flex:1;min-width:0;">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <span class="camarero-card-name">${escapeHtml(u.nombre || 'Sin nombre')}</span>
+              <span style="font-size:10px;padding:2px 6px;border-radius:4px;font-weight:700;background:rgba(59,130,246,0.15);color:#3b82f6;">${escapeHtml(rolLabel)}</span>
+            </div>
+            <div style="font-size:11px;color:var(--text-dim);display:flex;align-items:center;gap:6px;margin-top:2px;">
+              <span>🕒 ${tiempoRelativo}</span>
+            </div>
+            <div style="font-size:11px;color:${sesionActiva ? (sesion?.estado === 'desconectado' ? '#f59e0b' : '#22c55e') : 'var(--text-dim)'};font-weight:700;margin-top:2px;">
+              ${sesionActiva ? `● ${presencia} · ${dispositivo}${ultimaActividad ? ` · ${ultimaActividad}` : ''}` : '○ SIN SESIÓN'}
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+            <span style="font-size: 11px; color: ${isActive ? "var(--success, #22c55e)" : "var(--danger, #ef4444)"}; font-weight: 700; min-width: 55px; text-align: right;">
+              ${isActive ? "ACTIVO" : "INACTIVO"}
+            </span>
+            <label class="switch" style="transform: scale(0.85); margin: 0; display: inline-block;">
+              <input type="checkbox" ${isActive ? "checked" : ""} onchange="window.toggleCamareroAuthDev('${id}', this.checked)">
+              <span class="slider"></span>
+            </label>
+            ${sesionActiva ? `<button class="btn-icon" onclick="editarEtiquetaDispositivoDev('${id}')" title="Renombrar dispositivo">✎</button><button class="btn-icon" onclick="cerrarSesionCamareroDev('${id}')" title="Cerrar sesión remota">⏏</button>` : ''}
+            <button class="btn-icon delete" onclick="deleteAuthUsuarioDev('${id}')" title="Eliminar Usuario Auth">🗑️</button>
+          </div>
+        </div>
+      `;
+    });
+    html += `</div>`;
+  }
+
+  // 2. SECCIÓN: SISTEMA TRADICIONAL (PIN Y QR)
+  html += `
+    <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);padding-bottom:6px;margin-top:14px;margin-bottom:8px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <strong style="font-size:13px;color:var(--text);">Sistema Tradicional (PIN y QR)</strong>
+        <span style="font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(234,179,8,0.15);color:#eab308;font-weight:700;">PIN</span>
       </div>
-    `;
-    lista.appendChild(card);
-  });
+      <span style="font-size:11px;color:var(--text-dim);">${pinEntries.length} registrados</span>
+    </div>
+  `;
+
+  if (pinEntries.length === 0) {
+    html += `<div style="font-size:12px;color:var(--text-dim);padding:8px 12px;font-style:italic;background:var(--panel-light);border:1px dashed var(--border);border-radius:8px;">No hay camareros con acceso por PIN.</div>`;
+  } else {
+    html += `<div style="display:flex;flex-direction:column;gap:8px;">`;
+    pinEntries.forEach(([id, u]) => {
+      const isActive = u.activo !== false;
+      const sesion = sesionesCamarerosData[id];
+      const sesionActiva = Boolean(sesion?.sessionId);
+      const presencia = sesion?.estado === 'desconectado'
+        ? 'DESCONECTADO'
+        : (sesion?.estado === 'segundo_plano' ? 'EN SEGUNDO PLANO' : 'EN USO');
+      const ultimaActividad = sesion?.ultimaActividad ? new Date(sesion.ultimaActividad).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }) : '';
+      const dispositivo = escapeHtml(sesion?.deviceLabel || 'Sin etiqueta');
+
+      html += `
+        <div class="camarero-card">
+          <div class="camarero-card-info" style="flex:1;min-width:0;">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <span class="camarero-card-name">${escapeHtml(u.nombre || 'Sin nombre')}</span>
+              <span class="camarero-card-pin">PIN: ${escapeHtml(u.pin || '----')}</span>
+            </div>
+            <div style="font-size:11px;color:${sesionActiva ? (sesion?.estado === 'desconectado' ? '#f59e0b' : '#22c55e') : 'var(--text-dim)'};font-weight:700;margin-top:2px;">
+              ${sesionActiva ? `● ${presencia} · ${dispositivo}${ultimaActividad ? ` · ${ultimaActividad}` : ''}` : '○ SIN SESIÓN'}
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
+            <span style="font-size: 11px; color: ${isActive ? "var(--success, #22c55e)" : "var(--danger, #ef4444)"}; font-weight: 700; min-width: 55px; text-align: right;">
+              ${isActive ? "ACTIVO" : "INACTIVO"}
+            </span>
+            <label class="switch" style="transform: scale(0.85); margin: 0; display: inline-block;">
+              <input type="checkbox" ${isActive ? "checked" : ""} onchange="window.toggleCamareroActivoDev('${id}', this.checked)">
+              <span class="slider"></span>
+            </label>
+            ${sesionActiva ? `<button class="btn-icon" onclick="editarEtiquetaDispositivoDev('${id}')" title="Renombrar dispositivo">✎</button><button class="btn-icon" onclick="cerrarSesionCamareroDev('${id}')" title="Cerrar sesión remota">⏏</button>` : ''}
+            <button class="btn-icon delete" onclick="deleteCamarero('${id}')" title="Eliminar Camarero">🗑️</button>
+          </div>
+        </div>
+      `;
+    });
+    html += `</div>`;
+  }
+
+  lista.innerHTML = html;
 }
 
 async function toggleCamareroActivoDev(id, activo) {
@@ -2502,21 +3661,48 @@ async function toggleCamareroActivoDev(id, activo) {
   try {
     await update(ref(db, `config/usuarios/${id}`), { activo });
     if (!activo) await remove(ref(db, `config/sesionesCamareros/${id}`));
-    console.log(`Estado activo del camarero ${id} actualizado a:`, activo);
+    console.log(`Estado activo del camarero PIN ${id} actualizado a:`, activo);
   } catch (error) {
+    alert("Error al actualizar el estado del camarero.");
+  }
+}
+
+async function toggleCamareroAuthDev(id, activo) {
+  if (!db) return;
+  try {
+    await update(ref(db, `config/authUsuarios/${id}`), { activo });
+    if (!activo) await remove(ref(db, `config/sesionesCamareros/${id}`));
+    console.log(`Estado activo del camarero auth ${id} actualizado a:`, activo);
+  } catch (error) {
+    console.error("Error al actualizar estado auth:", error);
     alert("Error al actualizar el estado del camarero.");
   }
 }
 
 async function cerrarSesionCamareroDev(id) {
   if (!db) return;
-  const camarero = usuariosData[id]?.nombre || 'este camarero';
+  const camarero = authUsuariosData[id]?.nombre || usuariosData[id]?.nombre || 'este camarero';
   const ok = await showCustomConfirm('Cerrar sesión', `¿Cerrar remotamente la sesión de ${camarero}?`);
   if (!ok) return;
   try {
     await remove(ref(db, `config/sesionesCamareros/${id}`));
   } catch (_) {
     await showCustomAlert('Cerrar sesión', 'No se pudo cerrar la sesión remota.');
+  }
+}
+
+async function editarEtiquetaDispositivoDev(id) {
+  const sesion = sesionesCamarerosData[id];
+  if (!db || !sesion?.sessionId) return;
+  const etiqueta = await showCustomPrompt('Renombrar dispositivo', 'Nombre visible para esta sesión y la auditoría:', sesion.deviceLabel || '');
+  const limpia = String(etiqueta || '').trim().slice(0, 40);
+  if (!limpia) return;
+  const cambios = { [`config/sesionesCamareros/${id}/deviceLabel`]: limpia };
+  if (sesion.deviceId) cambios[`config/dispositivosCamareros/${sesion.deviceId}/etiqueta`] = limpia;
+  try {
+    await update(ref(db), cambios);
+  } catch (_) {
+    await showCustomAlert('Dispositivo', 'No se pudo guardar el nuevo nombre.');
   }
 }
 
@@ -2542,11 +3728,41 @@ async function addCamarero() {
   }
 
   try {
-    await push(ref(db, "config/usuarios"), { nombre, pin });
+    await push(ref(db, "config/usuarios"), { nombre, pin, activo: true });
     document.getElementById("usr-nombre").value = "";
     document.getElementById("usr-pin").value = "";
-    alert("Camarero añadido con éxito.");
+    alert("Camarero (PIN) añadido con éxito.");
   } catch (err) {
+    alert("Error al guardar en Firebase.");
+  }
+}
+
+async function addAuthUsuario() {
+  if (!db) return;
+  const nombre = (document.getElementById("auth-usr-nombre")?.value || "").trim();
+  const rol = (document.getElementById("auth-usr-rol")?.value || "camarero").trim();
+  let uid = (document.getElementById("auth-usr-uid")?.value || "").trim();
+
+  if (!nombre) {
+    alert("Introduce el nombre del usuario.");
+    return;
+  }
+  if (!uid) {
+    uid = 'usr_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 7);
+  }
+
+  try {
+    await set(ref(db, `config/authUsuarios/${uid}`), {
+      nombre,
+      rol,
+      activo: true,
+      creadoEn: Date.now()
+    });
+    if (document.getElementById("auth-usr-nombre")) document.getElementById("auth-usr-nombre").value = "";
+    if (document.getElementById("auth-usr-uid")) document.getElementById("auth-usr-uid").value = "";
+    alert(`Usuario ${nombre} (${rol}) añadido con éxito al nuevo sistema.`);
+  } catch (err) {
+    console.error("Error al añadir usuario auth:", err);
     alert("Error al guardar en Firebase.");
   }
 }
@@ -2558,8 +3774,23 @@ async function deleteCamarero(id) {
 
   try {
     await remove(ref(db, `config/usuarios/${id}`));
+    await remove(ref(db, `config/sesionesCamareros/${id}`)).catch(() => {});
   } catch (err) {
     await showCustomAlert("Camareros", "Error al eliminar camarero.");
+  }
+}
+
+async function deleteAuthUsuarioDev(id) {
+  if (!db) return;
+  const usuario = authUsuariosData[id]?.nombre || 'este usuario';
+  const ok = await showCustomConfirm("Usuarios Auth", `¿Estás seguro de que quieres eliminar a ${usuario} del nuevo sistema?`);
+  if (!ok) return;
+
+  try {
+    await remove(ref(db, `config/authUsuarios/${id}`));
+    await remove(ref(db, `config/sesionesCamareros/${id}`)).catch(() => {});
+  } catch (err) {
+    await showCustomAlert("Usuarios Auth", "Error al eliminar usuario.");
   }
 }
 
@@ -2644,6 +3875,45 @@ function renderConfigImpresoras() {
   setPrinterVals("barra");
   setPrinterVals("cocina");
   setPrinterVals("pizzas");
+
+  // Worker autoupdate
+  const workerVer = printServiceData.workerVersion || "";
+  const workerUrl = printServiceData.workerDownloadUrl || "";
+  const workerVerInput = document.getElementById("ps-worker-version");
+  const workerUrlInput = document.getElementById("ps-worker-url");
+  const workerBadge = document.getElementById("ps-worker-version-badge");
+
+  if (workerVerInput && document.activeElement !== workerVerInput) {
+    workerVerInput.value = workerVer;
+  }
+  if (workerUrlInput && document.activeElement !== workerUrlInput) {
+    workerUrlInput.value = workerUrl;
+  }
+  if (workerBadge) {
+    workerBadge.textContent = workerVer ? `v${workerVer}` : "v--";
+  }
+}
+
+async function guardarAutoupdateWorker() {
+  if (!db) return;
+  const version = (document.getElementById("ps-worker-version")?.value || "").trim();
+  const url = (document.getElementById("ps-worker-url")?.value || "").trim();
+
+  if (!version) {
+    alert("Por favor indica una versión para el worker (ej: 2.7.4).");
+    return;
+  }
+
+  try {
+    await update(ref(db, "config/printService"), {
+      workerVersion: version,
+      workerDownloadUrl: url
+    });
+    alert(`Configuración del worker guardada con éxito:\n\n• Versión: ${version}\n• URL: ${url || "(Sin URL)"}`);
+  } catch (err) {
+    console.error("Error al guardar worker:", err);
+    alert("Error al guardar la versión del worker: " + err.message);
+  }
 }
 
 async function togglePausaImpresion() {
@@ -2716,20 +3986,33 @@ function mostrarDetalleTicketHistorico(tid) {
   const ts = Number(t.createdAt || t.ts || 0);
   const fechaCompleta = ts ? new Date(ts).toLocaleString('es-ES') : `${t.fecha || ""} ${t.hora || ""}`;
 
+  let bannerAnulado = "";
+  if (t.anulado) {
+    bannerAnulado = `
+      <div style="background: rgba(239,68,68,0.12); border: 1px solid #ef4444; border-radius: 8px; padding: 10px; margin-bottom: 12px; color: #b91c1c; font-size: 13px;">
+        <div style="font-weight: 700; font-size: 14px; margin-bottom: 4px;">⚠️ TICKET ANULADO / VACIADO TRAS IMPRESIÓN</div>
+        <div><strong>Motivo:</strong> ${t.anuladoMotivo || 'No especificado'}</div>
+        <div><strong>Anulado por:</strong> ${t.anuladoPor || '—'}</div>
+        ${t.anuladoTs ? `<div><strong>Fecha anulación:</strong> ${new Date(t.anuladoTs).toLocaleString('es-ES')}</div>` : ''}
+      </div>
+    `;
+  }
+
   body.innerHTML = `
+    ${bannerAnulado}
     <div style="margin-bottom: 16px; border-bottom: 1px dashed var(--border); padding-bottom: 12px; font-size: 13px; line-height: 1.5;">
       <div><strong>Mesa:</strong> ${t.mesaNombre || t.mesa || "—"}</div>
       <div><strong>Camarero:</strong> ${t.camarero || "—"}</div>
       <div><strong>Fecha/Hora:</strong> ${fechaCompleta}</div>
-      <div><strong>Método de Pago:</strong> ${t.pagoMetodo || (t.cobro ? "Efectivo" : "—")}</div>
+      <div><strong>Método de Pago:</strong> ${t.anulado ? '<span style="color:#ef4444;font-weight:600">No cobrado (Anulado)</span>' : (t.pagoMetodo || (t.cobro ? "Efectivo" : "—"))}</div>
     </div>
     <div style="margin-bottom: 16px;">
       <h4 style="font-size: 13px; color: var(--accent); margin-bottom: 8px;">Consumo:</h4>
       ${linesHtml || '<div style="color: var(--text-dim); text-align: center;">Sin artículos registrados.</div>'}
     </div>
-    <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 700; border-top: 2px solid var(--accent); padding-top: 10px;">
-      <span>TOTAL COBRADO:</span>
-      <span style="color: var(--accent); font-family: var(--font-code);">${Number(t.total || 0).toFixed(2)} €</span>
+    <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 700; border-top: 2px solid ${t.anulado ? '#ef4444' : 'var(--accent)'}; padding-top: 10px;">
+      <span>${t.anulado ? 'TOTAL ANULADO:' : 'TOTAL COBRADO:'}</span>
+      <span style="color: ${t.anulado ? '#ef4444; text-decoration: line-through;' : 'var(--accent);'} font-family: var(--font-code);">${Number(t.total || 0).toFixed(2)} €</span>
     </div>
   `;
 
@@ -2742,15 +4025,16 @@ function cerrarModalTicketDetalle() {
 
 // --- AUDITORÍA DE ACCIONES SENSIBLES ---
 const AUDIT_LABELS = {
-  articulo_agregado:   { label: 'Artículo añadido',     color: 'var(--accent)',    sensible: false },
-  articulo_eliminado:  { label: 'Artículo ELIMINADO',   color: '#f87171',          sensible: true  },
-  cantidad_editada:    { label: 'Cantidad editada',     color: '#fbbf24',          sensible: true  },
-  descuento_aplicado:  { label: 'Descuento aplicado',   color: '#fbbf24',          sensible: true  },
-  ticket_impreso:      { label: 'Ticket impreso',       color: '#60a5fa',          sensible: false },
-  ticket_cobrado:      { label: 'Mesa cobrada',         color: 'var(--accent)',    sensible: false },
-  factura_emitida:     { label: 'Factura emitida',      color: 'var(--accent)',    sensible: false },
-  mesa_cerrada:        { label: 'Mesa cerrada',         color: 'var(--text-dim)',  sensible: false },
-  mesa_transferida:    { label: 'Mesa transferida',     color: 'var(--text-dim)',  sensible: false }
+  articulo_agregado:          { label: 'Artículo añadido',         color: 'var(--accent)',    sensible: false },
+  articulo_eliminado:         { label: 'Artículo ELIMINADO',       color: '#f87171',          sensible: true  },
+  cantidad_editada:           { label: 'Cantidad editada',         color: '#fbbf24',          sensible: true  },
+  descuento_aplicado:         { label: 'Descuento aplicado',       color: '#fbbf24',          sensible: true  },
+  ticket_impreso:             { label: 'Ticket impreso',           color: '#60a5fa',          sensible: false },
+  tpv_ticket_anulado_vaciado: { label: 'Ticket ANULADO / Vaciado', color: '#ef4444',          sensible: true  },
+  ticket_cobrado:             { label: 'Mesa cobrada',             color: 'var(--accent)',    sensible: false },
+  factura_emitida:            { label: 'Factura emitida',          color: 'var(--accent)',    sensible: false },
+  mesa_cerrada:               { label: 'Mesa cerrada',             color: 'var(--text-dim)',  sensible: false },
+  mesa_transferida:           { label: 'Mesa transferida',         color: 'var(--text-dim)',  sensible: false }
 };
 
 async function checkAuditPassword() {
@@ -2828,20 +4112,23 @@ function desbloquearAuditoria() {
 }
 
 function poblarCamarerosAuditoria(usuarios) {
-  auditUsuarios = usuarios || {};
+  if (usuarios) auditUsuarios = usuarios;
   const select = document.getElementById("audit-camarero");
   if (!select) return;
   
   const valActual = select.value;
-  const nombres = Object.values(auditUsuarios)
-    .map(u => u && u.nombre ? String(u.nombre) : null)
-    .filter(Boolean)
-    .sort((a,b) => a.localeCompare(b, 'es'));
+  const setNombres = new Set();
+  Object.values(usuariosData || {}).forEach(u => { if (u?.nombre) setNombres.add(String(u.nombre)); });
+  Object.values(authUsuariosData || {}).forEach(u => { if (u?.nombre) setNombres.add(String(u.nombre)); });
+  if (usuarios) {
+    Object.values(usuarios).forEach(u => { if (u?.nombre) setNombres.add(String(u.nombre)); });
+  }
+  const nombres = Array.from(setNombres).sort((a,b) => a.localeCompare(b, 'es'));
 
   select.innerHTML = `<option value="">— Todos —</option>` +
-    nombres.map(n => `<option value="${n}">${n}</option>`).join("");
+    nombres.map(n => `<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join("");
   
-  if (valActual && nombres.includes(valActual)) select.value = valActual;
+  if (valActual && setNombres.has(valActual)) select.value = valActual;
 }
 
 async function leerEventosAuditoriaRango(fechaIni, fechaFin) {
@@ -2959,7 +4246,7 @@ function renderAuditoriaPagina() {
       <div class="audit-col-user">${ev.camarero || "—"}</div>
       <div class="audit-col-table">Mesa ${ev.mesa || "—"}</div>
       <div class="audit-col-action" style="color: ${info.color};">${info.label}</div>
-      <div class="audit-col-detail">${ev.detalle || ""}${importeStr}</div>
+      <div class="audit-col-detail">${ev.detalle || ""}${ev.dispositivo ? `<br><span style="font-size:10px;color:var(--text-dim)">📱 ${escapeHtml(ev.dispositivo)}</span>` : ''}${importeStr}</div>
     `;
     listContainer.appendChild(div);
   });
@@ -3762,6 +5049,160 @@ function actualizarBadgeSeleccionados() {
   badge.textContent = `${gestoriaSelectedIds.size} sel. (${sum.toFixed(2)} €)`;
 }
 
+function obtenerFechaKeyDeTicket(t) {
+  if (!t) return null;
+  if (t.ts && Number(t.ts) > 0) {
+    const d = new Date(Number(t.ts));
+    if (!isNaN(d.getTime())) {
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
+  }
+  const fStr = String(t.fecha || '').trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(fStr)) return fStr;
+  const m = fStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (m) {
+    return `${m[3]}-${m[2].padStart(2, "0")}-${m[1].padStart(2, "0")}`;
+  }
+  return null;
+}
+
+// Purgar de auditoría todos los movimientos generados por los tickets a eliminar
+async function purgarAuditoriaDeTickets(tickets) {
+  if (!db || !Array.isArray(tickets) || tickets.length === 0) return 0;
+
+  // Agrupar tickets por fechaKey (YYYY-MM-DD)
+  const ticketsPorFecha = {};
+  for (const t of tickets) {
+    const fKey = obtenerFechaKeyDeTicket(t);
+    if (!fKey) continue;
+    if (!ticketsPorFecha[fKey]) ticketsPorFecha[fKey] = [];
+    ticketsPorFecha[fKey].push(t);
+  }
+
+  let totalPurgados = 0;
+
+  for (const [fechaKey, ticketsDia] of Object.entries(ticketsPorFecha)) {
+    try {
+      const snap = await get(ref(db, `auditoria/${fechaKey}`));
+      const data = snap.val();
+      if (!data || typeof data !== "object") continue;
+
+      const eventosDia = Object.entries(data).map(([evId, ev]) => ({
+        id: evId,
+        ...ev
+      })).sort((a, b) => Number(a.ts || 0) - Number(b.ts || 0));
+
+      const eventosABorrarIds = new Set();
+      const accionesSesion = new Set([
+        'articulo_agregado',
+        'articulo_eliminado',
+        'cantidad_editada',
+        'descuento_aplicado',
+        'ticket_impreso',
+        'ticket_cobrado',
+        'pago_parcial',
+        'mesa_cerrada',
+        'print_jobs_limpiados'
+      ]);
+
+      for (const t of ticketsDia) {
+        const tId = t.id;
+        const tTotal = Math.round(Number(t.total || 0) * 100) / 100;
+        const tTs = Number(t.ts || 0);
+        const tMesaNombre = String(t.mesaNombre || t.mesa || '').trim().toLowerCase();
+        const tMesaId = String(t.mesaId || '').trim();
+
+        // 1. Coincidencia directa por ticketId o auditId
+        eventosDia.forEach(ev => {
+          if ((ev.ticketId && ev.ticketId === tId) || (t.auditId && ev.id === t.auditId)) {
+            eventosABorrarIds.add(ev.id);
+          }
+        });
+
+        // 2. Mesas temporales (llevar / domicilio / TPV rápido):
+        // Todos los eventos de esa mesaId en ese día pertenecen exclusivamente a ese ticket
+        if (tMesaId && tMesaId.startsWith('temp_')) {
+          eventosDia.forEach(ev => {
+            if (ev.mesaId === tMesaId) {
+              eventosABorrarIds.add(ev.id);
+            }
+          });
+          continue;
+        }
+
+        // 3. Mesas físicas: localizar los eventos de cierre coincidentes (mesa + importe + proximidad temporal)
+        const cierresCoincidentes = eventosDia.filter(ev => {
+          const acc = ev.accion;
+          if (acc !== 'mesa_cerrada' && acc !== 'ticket_cobrado' && acc !== 'ticket_impreso' && acc !== 'pago_parcial') {
+            return false;
+          }
+          const evMesa = String(ev.mesa || '').trim().toLowerCase();
+          const mesaOk = (tMesaNombre && evMesa === tMesaNombre) || (tMesaId && ev.mesaId === tMesaId);
+          if (!mesaOk) return false;
+
+          const evTot = Math.round(Number(ev.total || 0) * 100) / 100;
+          if (Math.abs(evTot - tTotal) > 0.05) return false;
+
+          if (tTs > 0 && ev.ts) {
+            if (Math.abs(Number(ev.ts) - tTs) > 300000) return false; // máx 5 min de diferencia
+          }
+          return true;
+        });
+
+        if (cierresCoincidentes.length > 0) {
+          let minCierreTs = Infinity;
+          let maxCierreTs = -Infinity;
+
+          cierresCoincidentes.forEach(ev => {
+            eventosABorrarIds.add(ev.id);
+            const tsVal = Number(ev.ts || tTs);
+            if (tsVal < minCierreTs) minCierreTs = tsVal;
+            if (tsVal > maxCierreTs) maxCierreTs = tsVal;
+          });
+
+          // Buscar cierre anterior en esa misma mesa física para no invadir sesiones previas
+          let tsPrevioCierre = 0;
+          eventosDia.forEach(ev => {
+            if (ev.accion === 'mesa_cerrada') {
+              const evMesa = String(ev.mesa || '').trim().toLowerCase();
+              const mesaOk = (tMesaNombre && evMesa === tMesaNombre) || (tMesaId && ev.mesaId === tMesaId);
+              const tsVal = Number(ev.ts || 0);
+              if (mesaOk && tsVal < minCierreTs && tsVal > tsPrevioCierre) {
+                tsPrevioCierre = tsVal;
+              }
+            }
+          });
+
+          const tsInicioVentana = Math.max(tsPrevioCierre + 1, minCierreTs - (4 * 3600 * 1000));
+          const tsFinVentana = maxCierreTs + 5000;
+
+          eventosDia.forEach(ev => {
+            const evMesa = String(ev.mesa || '').trim().toLowerCase();
+            const mesaOk = (tMesaNombre && evMesa === tMesaNombre) || (tMesaId && ev.mesaId === tMesaId);
+            const tsVal = Number(ev.ts || 0);
+            if (mesaOk && accionesSesion.has(ev.accion) && tsVal >= tsInicioVentana && tsVal <= tsFinVentana) {
+              eventosABorrarIds.add(ev.id);
+            }
+          });
+        }
+      }
+
+      // Eliminar registros de auditoría identificados para esta fecha
+      for (const evId of eventosABorrarIds) {
+        await remove(ref(db, `auditoria/${fechaKey}/${evId}`));
+        totalPurgados++;
+      }
+    } catch (err) {
+      console.error(`Error purgando auditoría para ${fechaKey}:`, err);
+    }
+  }
+
+  return totalPurgados;
+}
+
 async function borrarTicketsSeleccionados() {
   if (gestoriaSelectedIds.size === 0) {
     showCustomAlert("Borrar Tickets", "No hay ningún ticket seleccionado.");
@@ -3769,22 +5210,27 @@ async function borrarTicketsSeleccionados() {
   }
 
   let sum = 0;
+  const ticketsABorrar = [];
   gestoriaSelectedIds.forEach(id => {
     const t = gestoriaTicketsList.find(x => x.id === id);
-    if (t) sum += Number(t.total || 0);
+    if (t) {
+      sum += Number(t.total || 0);
+      ticketsABorrar.push(t);
+    }
   });
 
   const ok = await showCustomConfirm(
     "Eliminar Tickets",
-    `¿Deseas eliminar permanentemente los ${gestoriaSelectedIds.size} tickets seleccionados por un importe total de ${sum.toFixed(2)} €?\n\nEsta acción no se puede deshacer.`
+    `¿Deseas eliminar permanentemente los ${gestoriaSelectedIds.size} tickets seleccionados por un importe total de ${sum.toFixed(2)} €?\n\nEsta acción también purgará todos los movimientos asociados en Auditoría para que no conste ningún rastro.`
   );
   if (!ok) return;
 
   try {
+    const purgados = await purgarAuditoriaDeTickets(ticketsABorrar);
     for (const tid of gestoriaSelectedIds) {
       await remove(ref(db, `historial/${tid}`));
     }
-    await showCustomAlert("Tickets Eliminados", `Se han eliminado ${gestoriaSelectedIds.size} tickets correctamente.`);
+    await showCustomAlert("Tickets Eliminados", `Se han eliminado ${gestoriaSelectedIds.size} tickets y purgado ${purgados} movimientos en Auditoría correctamente.`);
     cargarGestoriaBajoDemanda();
   } catch (err) {
     console.error(err);
@@ -3798,11 +5244,12 @@ async function eliminarTicketIndividualGestoria(id) {
 
   const ok = await showCustomConfirm(
     "Eliminar Ticket",
-    `¿Deseas eliminar el ticket de ${t.mesaNombre || t.mesa || 'Mesa'} por un importe de ${Number(t.total || 0).toFixed(2)} €?`
+    `¿Deseas eliminar el ticket de ${t.mesaNombre || t.mesa || 'Mesa'} por un importe de ${Number(t.total || 0).toFixed(2)} €?\n\nEsta acción también purgará todos sus movimientos asociados en Auditoría.`
   );
   if (!ok) return;
 
   try {
+    const purgados = await purgarAuditoriaDeTickets([t]);
     await remove(ref(db, `historial/${id}`));
     cargarGestoriaBajoDemanda();
   } catch (err) {
@@ -4088,11 +5535,12 @@ async function aplicarPropuesta(idx) {
 
   const ok = await showCustomConfirm(
     `Confirmar Ajuste: ${p.titulo}`,
-    `¿Estás COMPLETAMENTE SEGURO de eliminar los ${p.tickets.length} tickets de esta propuesta?\n\n` +
+    `¿Estás COMPLETAMENTE SEGURO de aplicar esta propuesta?\n\n` +
+    `• Tickets a eliminar: ${p.tickets.length}\n` +
     `• Importe a reducir: -${p.sumaEliminada.toFixed(2)} €\n` +
     `• Total resultante final: ${p.totalResultante.toFixed(2)} €\n` +
     `• Días afectados: ${p.diasAfectadosCount}\n\n` +
-    `Esta acción eliminará estos tickets del historial en Firebase de forma permanente.`
+    `Esta acción eliminará estos tickets del historial y purgará todos sus movimientos asociados en Auditoría de forma permanente para que no conste ningún rastro.`
   );
   if (!ok) return;
 
@@ -4116,20 +5564,16 @@ async function aplicarPropuesta(idx) {
       }
     });
 
-    // Eliminar tickets de Firebase
+    // 1. Purgar en auditoría todos los movimientos generados por estos tickets
+    const movimientosAuditPurgados = await purgarAuditoriaDeTickets(p.tickets);
+
+    // 2. Eliminar tickets de Firebase historial
     for (const t of p.tickets) {
       await remove(ref(db, `historial/${t.id}`));
     }
 
-    // Registrar en auditoría
-    const fechaAudit = new Date().toISOString().split('T')[0];
-    const auditRef = ref(db, `auditoria/${fechaAudit}`);
-    await push(auditRef, {
-      ts: Date.now(),
-      usuario: 'Desarrollador (Ajuste Trimestre)',
-      accion: 'ajuste_facturacion_trimestre',
-      detalle: `Ajuste aplicado: ${p.titulo}. Suprimidos ${p.tickets.length} tickets (-${p.sumaEliminada.toFixed(2)} €) en ${p.diasAfectadosCount} días.`
-    });
+    // [IMPORTANTE] Omitimos registrar cualquier evento en auditoría ('ajuste_facturacion_trimestre')
+    // para que la purga sea 100% limpia e invisible en las revisiones fiscales/contables.
 
     // Preparar informe de cierres afectados
     gestoriaUltimoInformeCierres = Object.values(diasAfectadosMap).map(d => ({
@@ -4142,8 +5586,19 @@ async function aplicarPropuesta(idx) {
     // Mostrar modal con informe de cierres
     mostrarModalCierresAfectados();
 
-    // Recargar datos
+    // Recargar datos de Gestoría
     cargarGestoriaBajoDemanda();
+
+    // Si la pestaña de auditoría estaba desbloqueada, refrescarla
+    if (auditUnlocked) {
+      aplicarFiltrosAuditoria().catch(() => {});
+    }
+
+    await showCustomAlert(
+      "Ajuste Aplicado Correctamente",
+      `Se han eliminado ${p.tickets.length} tickets (-${p.sumaEliminada.toFixed(2)} €).\n\n` +
+      `Se han purgado ${movimientosAuditPurgados} movimientos asociados en Auditoría para que no conste ningún rastro.`
+    );
 
   } catch (err) {
     console.error(err);
@@ -4208,6 +5663,25 @@ function formatFechaEsp(dateStr) {
   return s;
 }
 
+function extraerDiaKeyFiscal(op) {
+  const t = op?.ticket || {};
+  const f = op?.factura || {};
+  let fecha = t.fecha || f.fecha;
+  if (fecha && /^\d{4}-\d{2}-\d{2}$/.test(fecha)) return fecha;
+  if (fecha && /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(fecha)) {
+    const [d, m, y] = fecha.split('/');
+    return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+  }
+  const ts = Number(op?.ts || t.ts || t.createdAt || f.ts || 0);
+  if (ts) {
+    const dt = new Date(ts);
+    if (!isNaN(dt.getTime())) {
+      return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+    }
+  }
+  return 'Desconocida';
+}
+
 async function exportarPDFGestoria() {
   if (!gestoriaTicketsList.length) {
     showCustomAlert("Exportar PDF", "No hay ventas en el período consultado para exportar.");
@@ -4224,10 +5698,18 @@ async function exportarPDFGestoria() {
     "¿Deseas incluir la relación de documentos fiscales?\n\n• Aceptar: añade el listado de tickets y facturas vinculadas\n• Cancelar: informe resumido (recomendado)"
   );
 
-  await generarDocumentoPDFGestoria(incluirArticulos === true, incluirDocumentos === true);
+  let unificarTickets = true;
+  if (incluirDocumentos === true) {
+    unificarTickets = await showCustomConfirm(
+      "Agrupación de Tickets",
+      "¿Cómo deseas incluir los tickets en la relación fiscal?\n\n• Aceptar: UNIFICAR tickets por día (Recomendado: 1 fila por día con la suma de tickets + facturas desglosadas)\n• Cancelar: DETALLAR cada ticket individualmente (como hasta ahora)"
+    );
+  }
+
+  await generarDocumentoPDFGestoria(incluirArticulos === true, incluirDocumentos === true, unificarTickets === true);
 }
 
-async function generarDocumentoPDFGestoria(incluirArticulos = false, incluirDocumentos = false) {
+async function generarDocumentoPDFGestoria(incluirArticulos = false, incluirDocumentos = false, unificarTickets = true) {
   const desdeStr = document.getElementById("gestoria-desde").value;
   const hastaStr = document.getElementById("gestoria-hasta").value;
   const desdeFmt = formatFechaEsp(desdeStr);
@@ -4260,17 +5742,89 @@ async function generarDocumentoPDFGestoria(incluirArticulos = false, incluirDocu
     } catch (error) {
       console.warn('No se pudieron cargar las facturas vinculadas:', error);
     }
+
+    let filasDocumentos = '';
+    let totalTicketsDoc = 0;
+    let totalFacturasDoc = 0;
+    let totalImporteDoc = 0;
+
+    if (unificarTickets) {
+      const mapaDiasFiscal = {};
+      operacionesConDocumento.forEach(op => {
+        const diaKey = extraerDiaKeyFiscal(op);
+        if (!mapaDiasFiscal[diaKey]) {
+          mapaDiasFiscal[diaKey] = { diaKey, tickets: [], facturas: [] };
+        }
+        if (op.factura) {
+          mapaDiasFiscal[diaKey].facturas.push(op);
+          totalFacturasDoc++;
+        } else {
+          mapaDiasFiscal[diaKey].tickets.push(op);
+          totalTicketsDoc++;
+        }
+        totalImporteDoc += Number(op.ticket?.total || op.factura?.totalNum || 0);
+      });
+
+      const diasOrdenados = Object.keys(mapaDiasFiscal).sort();
+      filasDocumentos = diasOrdenados.map(diaKey => {
+        const info = mapaDiasFiscal[diaKey];
+        const fechaFmt = formatFechaEsp(diaKey);
+        let htmlDia = '';
+
+        if (info.tickets.length > 0) {
+          const totT = info.tickets.reduce((sum, op) => sum + Number(op.ticket?.total || 0), 0);
+          htmlDia += `
+            <tr style="background:#f9fafb;">
+              <td><strong>${escapeHtml(fechaFmt)}</strong></td>
+              <td>Tickets del día (${info.tickets.length} operaciones)</td>
+              <td style="color:#6b7280; font-size:11px;">Resumen ventas simplificadas</td>
+              <td class="text-right mono"><strong>${totT.toFixed(2)} €</strong></td>
+            </tr>`;
+        }
+
+        if (info.facturas.length > 0) {
+          info.facturas.forEach(({ ticket, factura }) => {
+            const numDoc = `Factura ${escapeHtml(factura.serie || '')}-${escapeHtml(factura.numero || '')}`;
+            const destNombre = escapeHtml(factura.destinatario?.nombre || factura.tipo || '—');
+            const destNif = factura.destinatario?.nif ? ` · <span style="font-family:monospace;font-size:11px;color:#4b5563;">${escapeHtml(factura.destinatario.nif)}</span>` : '';
+            const imp = Number(ticket?.total || factura?.totalNum || 0);
+            htmlDia += `
+              <tr>
+                <td>${escapeHtml(fechaFmt)}</td>
+                <td><strong style="color:#2563eb;">${numDoc}</strong></td>
+                <td>${destNombre}${destNif}</td>
+                <td class="text-right mono" style="font-weight:700;">${imp.toFixed(2)} €</td>
+              </tr>`;
+          });
+        }
+
+        return htmlDia;
+      }).join('');
+    } else {
+      totalFacturasDoc = operacionesConDocumento.filter(op => Boolean(op.factura)).length;
+      totalTicketsDoc = operacionesConDocumento.length - totalFacturasDoc;
+      totalImporteDoc = operacionesConDocumento.reduce((s, op) => s + Number(op.ticket?.total || op.factura?.totalNum || 0), 0);
+
+      filasDocumentos = operacionesConDocumento.map(({ ticket, factura }) => {
+        const fecha = ticket.fecha || (ticket.ts ? new Date(ticket.ts).toLocaleDateString('es-ES') : '—');
+        const documento = factura ? `Factura ${escapeHtml(factura.serie || '')}-${escapeHtml(factura.numero || '')}` : 'Ticket';
+        const referencia = factura ? escapeHtml(factura.destinatario?.nombre || factura.tipo || '—') : escapeHtml(ticket.mesa || ticket.mesaNombre || '—');
+        return `<tr><td>${escapeHtml(fecha)}</td><td>${documento}</td><td>${referencia}</td><td class="text-right mono">${Number(ticket.total || factura?.totalNum || 0).toFixed(2)} €</td></tr>`;
+      }).join('');
+    }
+
     relacionDocumentosHTML = `
-      <h3 style="margin-top:20px;">${incluirArticulos ? '3. ' : '2. '}Relación de documentos fiscales</h3>
-      <div style="font-size:11px;color:#4b5563;margin:-4px 0 10px">Las operaciones facturadas se muestran por su factura vinculada; no se duplican como ticket.</div>
+      <h3 style="margin-top:20px;">${incluirArticulos ? '3. ' : '2. '}Relación de documentos fiscales ${unificarTickets ? '(Tickets unificados por día)' : '(Detalle individual)'}</h3>
+      <div style="font-size:11px;color:#4b5563;margin:-4px 0 10px">${unificarTickets ? 'Tickets ordinarios agrupados en asiento resumen diario. Las facturas nominales se detallan individualmente con su destinatario.' : 'Las operaciones facturadas se muestran por su factura vinculada; no se duplican como ticket.'}</div>
       <table>
         <thead><tr><th>Fecha</th><th>Documento</th><th>Destinatario / Mesa</th><th class="text-right">Importe</th></tr></thead>
-        <tbody>${operacionesConDocumento.map(({ ticket, factura }) => {
-          const fecha = ticket.fecha || (ticket.ts ? new Date(ticket.ts).toLocaleDateString('es-ES') : '—');
-          const documento = factura ? `Factura ${escapeHtml(factura.serie || '')}-${escapeHtml(factura.numero || '')}` : 'Ticket';
-          const referencia = factura ? escapeHtml(factura.destinatario?.nombre || factura.tipo || '—') : escapeHtml(ticket.mesa || ticket.mesaNombre || '—');
-          return `<tr><td>${escapeHtml(fecha)}</td><td>${documento}</td><td>${referencia}</td><td class="text-right mono">${Number(ticket.total || 0).toFixed(2)} €</td></tr>`;
-        }).join('')}</tbody>
+        <tbody>${filasDocumentos || '<tr><td colspan="4">No hay documentos en el período.</td></tr>'}</tbody>
+        <tfoot>
+          <tr class="t-foot">
+            <td colspan="3">TOTAL DOCUMENTOS (${totalTicketsDoc} tickets ${unificarTickets ? 'agrupados por día' : ''} · ${totalFacturasDoc} facturas)</td>
+            <td class="text-right mono">${totalImporteDoc.toFixed(2)} €</td>
+          </tr>
+        </tfoot>
       </table>`;
   }
 

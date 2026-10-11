@@ -96,15 +96,7 @@
       <small id="topbar-sub">Cargando…</small>
     </div>
     <div class="topbar-actions">
-      <label class="toggle-pill" id="tgl-wake" title="Pantalla siempre encendida">
-        <div class="dot"></div><span class="lbl">Wake</span>
-      </label>
-      <label class="toggle-pill" id="tgl-txt" title="Descargar TXT de comanda al enviar">
-        <div class="dot"></div><span class="lbl">TXT</span>
-      </label>
-      <label class="toggle-pill" id="tgl-copia" title="Abrir copia visual del ticket al cobrar">
-        <div class="dot"></div><span class="lbl">Copia</span>
-      </label>
+      <button class="icon-btn" id="btn-ayuda" title="Ayuda de esta pantalla">❓</button>
       <button class="icon-btn" id="btn-theme" title="Cambiar tema claro/oscuro">🌙</button>
     </div>
   </header>
@@ -118,6 +110,7 @@
         <button id="btn-vista-plano">⌂ Plano</button>
       </div>
       <button class="chip-btn" id="btn-mias">👤 Mis mesas</button>
+      <button class="chip-btn" id="btn-caja" title="Movimientos de caja (gastos / ingresos)">💰 Caja</button>
       <button class="chip-btn" id="btn-urgentes" title="Ordenar mesas por tiempo sin atender">⏱ Urgentes</button>
       <div style="flex:1"></div>
       <button class="chip-btn primary" id="btn-nuevo-pedido">🛍️ Pedido</button>
@@ -128,21 +121,30 @@
 
   <!-- ── Vista: CARTA ──────────────────────────────────────────────────── -->
   <main id="view-carta" class="vista" hidden>
-    <div class="carta-head">
-      <button class="icon-btn" id="btn-back-mesas" title="Volver a mesas">←</button>
-      <span class="mesa-pill" id="carta-mesa-pill">Mesa</span>
-      <div class="search-wrap">
-        <span class="s-ico">🔍</span>
-        <input type="text" id="carta-search" placeholder="Buscar artículo…" autocomplete="off">
-        <button class="s-clear" id="btn-clear-search" hidden>✕</button>
+    <div class="tablet-cats" id="tablet-cats"></div>
+    <div class="carta-col-main">
+      <div class="carta-head" id="carta-search-bar">
+        <button class="icon-btn" id="btn-back-mesas" title="Volver a mesas">←</button>
+        <span class="mesa-pill" id="carta-mesa-pill">Mesa</span>
+        <div class="search-wrap">
+          <span class="s-ico">🔍</span>
+          <input type="text" id="carta-search" placeholder="Buscar artículo…" autocomplete="off">
+          <button class="s-clear" id="btn-clear-search" hidden>✕</button>
+        </div>
+        <div class="cats-dropdown-wrap">
+          <button type="button" class="btn-cats" id="btn-cats" title="Seleccionar categoría">
+            📂 <span id="btn-cats-label">Categorías</span>
+          </button>
+          <div class="cats-panel" id="cats-panel"></div>
+        </div>
       </div>
+      <div class="frecuentes" id="frecuentes" hidden>
+        <div class="sec-label">⚡ Frecuentes</div>
+        <div class="freq-scroll" id="freq-scroll"></div>
+      </div>
+      <div class="category-chips-scroll" id="category-chips-scroll"></div>
+      <div class="carta-scroll" id="carta-body"><div class="loading">Cargando carta…</div></div>
     </div>
-    <div class="frecuentes" id="frecuentes" hidden>
-      <div class="sec-label">⚡ Frecuentes</div>
-      <div class="freq-scroll" id="freq-scroll"></div>
-    </div>
-    <div class="cat-chips" id="cat-chips"></div>
-    <div id="carta-body"><div class="loading">Cargando carta…</div></div>
   </main>
 
   <!-- ── Vista: TICKET / CUENTA ────────────────────────────────────────── -->

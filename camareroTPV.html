@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#111a2e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="TPV Bar">
+  <link rel="manifest" href="manifest-tpv.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/camarero-192.png">
+  <title>Comandero TPV</title>
+  <script>
+    (() => {
+      const search = window.location.search;
+      const params = new URLSearchParams(search);
+      params.set('modo', 'tpv');
+      window.location.replace('comandero.html?' + params.toString());
+    })();
+  </script>
+</head>
+<body style="font-family:system-ui,-apple-system,sans-serif;text-align:center;padding:40px;background:#eef2f8;color:#111a2e;">
+  <h2>Comandero TPV</h2>
+  <p style="color:#5e687b;margin-top:10px;">Cargando versión unificada...</p>
+  <p style="margin-top:20px;"><a href="comandero.html?modo=tpv" style="color:#3d7aff;font-weight:600;">Haz clic aquí si no redirige automáticamente</a></p>
+</body>
+</html>

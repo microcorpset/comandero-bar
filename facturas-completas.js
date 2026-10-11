@@ -18,6 +18,21 @@ function fechaEnRango(factura, desde, hasta) {
   return (!desde || ts >= desde) && (!hasta || ts <= hasta);
 }
 
+function normalizarLineaArticulo(l) {
+  const nombre = escapeHtml(l.nombre || l.articulo || l.concepto || l.descripcion || 'Artículo');
+  const cant = Number(l.qty ?? l.qtyCuenta ?? l.cantidad ?? 1);
+  const precioUnit = Number(l.precio || l.precioUnitario || 0);
+  const totalLinea = Math.round((Number(l.total ?? (cant * precioUnit))) * 100) / 100;
+  const nota = l.nota ? `<div class="muted" style="font-size:11px">${escapeHtml(l.nota)}</div>` : '';
+  return {
+    nombre,
+    cant,
+    precioUnit,
+    totalLinea,
+    nota
+  };
+}
+
 function plantillaFactura(factura, local) {
   const destinatario = factura.destinatario || {};
   const lineasIva = Array.isArray(factura.lineasIva) ? factura.lineasIva : [];
@@ -25,6 +40,34 @@ function plantillaFactura(factura, local) {
   const qr = factura.qr
     ? `<img class="qr" src="data:image/png;base64,${escapeHtml(factura.qr)}" alt="Código QR de verificación">`
     : '';
+
+  const lineasArticulos = Array.isArray(factura.lineas) && factura.lineas.length
+    ? factura.lineas.map(normalizarLineaArticulo)
+    : null;
+
+  let filasConceptos = '';
+  if (lineasArticulos && lineasArticulos.length > 0) {
+    filasConceptos = lineasArticulos.map(l => `
+      <tr>
+        <td>${l.nombre}${l.nota}</td>
+        <td>${l.cant}</td>
+        <td>${fmtEu(l.precioUnit)}</td>
+        <td>${fmtEu(l.totalLinea)}</td>
+      </tr>`).join('');
+  } else {
+    const baseTotal = lineasIva.length
+      ? lineasIva.reduce((sum, li) => sum + Number(li.base_imponible || 0), 0)
+      : Math.round((Number(factura.total || 0) / 1.10) * 100) / 100;
+    const desc = escapeHtml(factura.descripcion || 'Servicio de hostelería / Consumición en local');
+    filasConceptos = `
+      <tr>
+        <td>${desc}</td>
+        <td>1</td>
+        <td>${fmtEu(factura.total || baseTotal)}</td>
+        <td>${fmtEu(factura.total || baseTotal)}</td>
+      </tr>`;
+  }
+
   const filasIva = lineasIva.map(linea => `
     <tr>
       <td>IVA ${escapeHtml(linea.tipo_impositivo || 0)}%</td>
@@ -35,7 +78,8 @@ function plantillaFactura(factura, local) {
   return `<main class="invoice"><header><div><div class="title">FACTURA</div><div class="muted">${escapeHtml(empresa.nombre || '')}<br>${escapeHtml(empresa.direccion || '')}<br>${empresa.cif ? `CIF/NIF: ${escapeHtml(empresa.cif)}` : ''}</div></div>
     <div style="text-align:right"><strong>N.º ${escapeHtml(factura.serie || '')}-${escapeHtml(factura.numero || '')}</strong><br><span class="muted">Fecha: ${escapeHtml(factura.fecha || '')}<br>Tipo: ${escapeHtml(factura.tipo || '')}</span></div></header>
     <section class="block"><div class="label">Destinatario</div><div class="recipient"><strong>${escapeHtml(destinatario.nombre || '—')}</strong><br><span class="muted">NIF/CIF: ${escapeHtml(destinatario.nif || '—')}<br>${escapeHtml(destinatario.direccion || '')}</span></div></section>
-    <section class="block"><div class="label">Desglose de impuestos</div><table><thead><tr><th>Concepto</th><th>Base imponible</th><th>Cuota IVA</th></tr></thead><tbody>${filasIva}</tbody></table><div class="total"><span>Total</span><span>${fmtEu(factura.total)}</span></div></section>
+    <section class="block"><div class="label">Detalle de conceptos</div><table><thead><tr><th>Concepto / Artículo</th><th>Cant.</th><th>Precio</th><th>Importe</th></tr></thead><tbody>${filasConceptos}</tbody></table></section>
+    <section class="block"><div class="label">Desglose de impuestos</div><table><thead><tr><th>Tipo IVA</th><th>Base imponible</th><th>Cuota IVA</th></tr></thead><tbody>${filasIva}</tbody></table><div class="total"><span>Total</span><span>${fmtEu(factura.total)}</span></div></section>
     ${qr || factura.uuid ? `<section class="verification">${qr}<div class="muted">${factura.uuid ? `<strong>Identificador de verificación:</strong> ${escapeHtml(factura.uuid)}` : ''}</div></section>` : ''}
     </main>`;
 }
@@ -56,6 +100,7 @@ function abrirDocumento(titulo, contenido) {
       header{display:flex;justify-content:space-between;gap:20px;border-bottom:2px solid #182033;padding-bottom:14px}.title{font-size:25px;font-weight:800}.muted{color:#5e687b;font-size:12px;line-height:1.5}
       .block{margin-top:20px}.recipient{border:1px solid #d8dde7;padding:12px;border-radius:8px;max-width:310px}.label{font-size:11px;text-transform:uppercase;color:#5e687b;font-weight:700;letter-spacing:.04em}
       table{width:100%;border-collapse:collapse;margin-top:10px}th,td{padding:10px;border-bottom:1px solid #d8dde7;text-align:left}th{background:#f3f5f8;font-size:12px}td:nth-child(n+2),th:nth-child(n+2){text-align:right}
+      table.tabla-gestoria td:nth-child(2),table.tabla-gestoria th:nth-child(2){text-align:left!important}
       .total{margin-top:18px;margin-left:auto;width:260px;display:flex;justify-content:space-between;border-top:2px solid #182033;padding:12px 0;font-size:20px;font-weight:800}.qr{width:110px;height:110px}.verification{margin-top:26px;display:flex;align-items:center;gap:16px;border-top:1px solid #d8dde7;padding-top:16px}
       @media print{body{background:#fff}.bar{display:none}.invoice{box-shadow:none;margin:0;width:auto;min-height:0;padding:0;break-after:page;page-break-after:always}.invoice:last-child{break-after:auto;page-break-after:auto}}
     </style></head><body><div class="bar"><button onclick="window.print()">Imprimir / Guardar como PDF</button></div>
@@ -71,87 +116,272 @@ function abrirFacturasLote(facturas, local) {
   abrirDocumento(`Facturas ${facturas.length} seleccionadas`, facturas.map(factura => plantillaFactura(factura, local)).join(''));
 }
 
+function normalizarFechaADia(fechaOts) {
+  if (!fechaOts) return '';
+  if (typeof fechaOts === 'number') {
+    const d = new Date(fechaOts);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+  const s = String(fechaOts).trim();
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
+  const m = s.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
+  if (m) {
+    return `${m[3]}-${String(m[2]).padStart(2, '0')}-${String(m[1]).padStart(2, '0')}`;
+  }
+  return '';
+}
+
+function parseFechaGenericaTs(fecha, hora = '12:00', tsFallback = 0) {
+  const tsNum = Number(tsFallback);
+  if (Number.isFinite(tsNum) && tsNum > 0) return tsNum;
+  if (!fecha) return 0;
+  const str = String(fecha).trim();
+  const horaTxt = String(hora || '12:00').slice(0, 5);
+  if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
+    return new Date(`${str.slice(0, 10)}T${horaTxt}:00`).getTime() || 0;
+  }
+  const m = str.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
+  if (m) {
+    const [, dia, mes, anyo] = m;
+    return new Date(`${anyo}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}T${horaTxt}:00`).getTime() || 0;
+  }
+  return 0;
+}
+
 function fechaVentaTs(venta) {
-  const ts = Number(venta?.ts || venta?.createdAt || 0);
-  if (ts) return ts;
-  const match = String(venta?.fecha || '').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-  if (!match) return 0;
-  const [, dia, mes, anyo] = match;
-  return new Date(`${anyo}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}T${venta?.hora || '00:00'}:00`).getTime();
+  return parseFechaGenericaTs(venta?.fecha, venta?.hora || '00:00', venta?.ts || venta?.createdAt);
 }
 
 function fechaFacturaTs(factura) {
-  const ts = Number(factura?.ts || 0);
-  if (ts) return ts;
-  const match = String(factura?.fecha || '').match(/(\d{1,2})-(\d{1,2})-(\d{4})/);
-  if (!match) return 0;
-  const [, dia, mes, anyo] = match;
-  return new Date(`${anyo}-${String(mes).padStart(2, '0')}-${String(dia).padStart(2, '0')}T12:00:00`).getTime();
+  return parseFechaGenericaTs(factura?.fecha, factura?.hora || '12:00', factura?.ts);
 }
 
-// Las ventas nuevas llevan fbKey. Para facturas antiguas cuyo cierre sobrescribió
-// esa referencia, se recupera de forma conservadora por fecha, mesa y total.
+// Resuelve de forma estricta si una venta tiene factura vinculada, garantizando que coincidan en fecha
 export function resolverFacturaVenta(venta, facturasPorClave = {}) {
   const fbKey = venta?.verifactu?.fbKey;
   if (fbKey && facturasPorClave[fbKey]) return facturasPorClave[fbKey];
+  const serie = venta?.verifactu?.serie;
+  const numero = venta?.verifactu?.numero;
+  if (serie && numero !== undefined && numero !== null) {
+    const porSerieNum = Object.values(facturasPorClave).find(f => f.serie === serie && String(f.numero) === String(numero));
+    if (porSerieNum) return porSerieNum;
+  }
   const tsVenta = fechaVentaTs(venta);
-  const diaVenta = tsVenta ? new Date(tsVenta).toISOString().slice(0, 10) : '';
-  const mesa = String(venta?.mesa || venta?.mesaNombre || '').trim();
-  const total = Number(venta?.total || 0);
+  const diaVenta = normalizarFechaADia(venta?.fecha || tsVenta);
+  if (!diaVenta) return null;
+  const total = Math.round(Number(venta?.total || 0) * 100) / 100;
+  const mesa = String(venta?.mesa || venta?.mesaNombre || '').trim().toLowerCase();
+
   const porFechaYTotal = Object.values(facturasPorClave).filter(factura => {
-    const tsFactura = fechaFacturaTs(factura);
-    const diaFactura = tsFactura ? new Date(tsFactura).toISOString().slice(0, 10) : '';
-    return Number(factura?.total || 0) === total
-      && diaFactura && diaFactura === diaVenta;
+    const diaFactura = normalizarFechaADia(factura?.fecha || factura?.ts);
+    return diaFactura === diaVenta && Math.abs(Math.round(Number(factura?.total || 0) * 100) / 100 - total) < 0.02;
   });
-  const candidatasMesa = porFechaYTotal.filter(factura => String(factura?.mesa || '').trim() === mesa);
-  if (candidatasMesa.length === 1) return candidatasMesa[0];
-  // Facturas estándar antiguas pueden no guardar la mesa. Solo se relaja el
-  // criterio cuando fecha e importe identifican una única factura.
+
   if (porFechaYTotal.length === 1) return porFechaYTotal[0];
-  // Último respaldo para historiales migrados cuyo formato de fecha difiere:
-  // se acepta solo si ese importe identifica una única factura en todo el local.
-  const porImporte = Object.values(facturasPorClave)
-    .filter(factura => Number(factura?.total || 0) === total);
-  return porImporte.length === 1 ? porImporte[0] : null;
+  if (porFechaYTotal.length > 1 && mesa) {
+    const porMesa = porFechaYTotal.filter(f => String(f.mesa || '').trim().toLowerCase() === mesa);
+    if (porMesa.length === 1) return porMesa[0];
+  }
+  return null;
 }
 
-// Fuente única para cualquier informe: vuelve a leer el historial y las
-// facturas del período en el momento de exportar, evitando resúmenes en memoria
-// desactualizados o con campos transformados por otra pantalla.
+// Fuente única para cualquier informe: lee el historial y las facturas del período,
+// empareja 1 a 1 sin duplicados y devuelve las operaciones estrictamente ordenadas cronológicamente.
 export async function cargarOperacionesFiscales(db, desde, hasta) {
   const ventasQuery = query(ref(db, 'historial'), orderByChild('ts'), startAt(desde), endAt(hasta));
   const [ventasSnap, facturasSnap] = await Promise.all([
     get(ventasQuery), get(ref(db, 'verifactu/facturas'))
   ]);
   const facturasPorClave = facturasSnap.val() || {};
-  const ventas = Object.values(ventasSnap.val() || {})
-    .filter(venta => {
-      const ts = fechaVentaTs(venta);
+
+  // 1. Obtener todas las ventas del rango ordenadas cronológicamente
+  const ventas = Object.entries(ventasSnap.val() || {})
+    .map(([id, t]) => ({ id, ...t }))
+    .filter(v => {
+      if (v.anulado) return false;
+      const ts = fechaVentaTs(v);
       return ts >= desde && ts <= hasta;
+    })
+    .sort((a, b) => fechaVentaTs(a) - fechaVentaTs(b));
+
+  // 2. Facturas disponibles (con su clave para seguimiento)
+  const facturasList = Object.entries(facturasPorClave).map(([fbKey, f]) => ({
+    fbKey,
+    ...f,
+    ts: fechaFacturaTs(f),
+    diaKey: normalizarFechaADia(f.fecha || f.ts),
+    totalNum: Math.round(Number(f.total || 0) * 100) / 100,
+    asignada: false
+  }));
+
+  const operaciones = [];
+
+  // 3. Emparejamiento estricto 1 a 1 de ventas con facturas
+  for (const ticket of ventas) {
+    const tsV = fechaVentaTs(ticket);
+    const diaV = normalizarFechaADia(ticket.fecha || tsV);
+    const totalV = Math.round(Number(ticket.total || 0) * 100) / 100;
+    const mesaV = String(ticket.mesa || ticket.mesaNombre || '').trim().toLowerCase();
+    const fbKeyV = ticket?.verifactu?.fbKey;
+    const serieV = ticket?.verifactu?.serie;
+    const numeroV = ticket?.verifactu?.numero;
+
+    let factura = null;
+
+    // A. Vínculo directo por fbKey
+    if (fbKeyV) {
+      factura = facturasList.find(f => !f.asignada && f.fbKey === fbKeyV);
+    }
+
+    // B. Vínculo por Serie y Número exactos
+    if (!factura && serieV && numeroV !== undefined && numeroV !== null) {
+      factura = facturasList.find(f => !f.asignada && f.serie === serieV && String(f.numero) === String(numeroV));
+    }
+
+    // C. Vínculo estricto: MISMO DÍA y MISMO IMPORTE (tolerancia 2 céntimos)
+    // ¡Nunca se vincula si el día es diferente!
+    if (!factura && diaV && totalV > 0) {
+      const candidatas = facturasList.filter(f => !f.asignada && f.diaKey === diaV && Math.abs(f.totalNum - totalV) < 0.02);
+      if (candidatas.length === 1) {
+        factura = candidatas[0];
+      } else if (candidatas.length > 1 && mesaV) {
+        const porMesa = candidatas.filter(f => String(f.mesa || '').trim().toLowerCase() === mesaV);
+        if (porMesa.length === 1) {
+          factura = porMesa[0];
+        } else {
+          candidatas.sort((a, b) => Math.abs(a.ts - tsV) - Math.abs(b.ts - tsV));
+          factura = candidatas[0];
+        }
+      }
+    }
+
+    if (factura) {
+      factura.asignada = true; // Consumida: nunca se repetirá en otro ticket
+      if ((!factura.lineas || !factura.lineas.length) && Array.isArray(ticket.lineas) && ticket.lineas.length) {
+        factura.lineas = ticket.lineas.map(l => ({
+          nombre: l.nombre || l.articulo || l.concepto || 'Artículo',
+          qty: Number(l.qty ?? l.qtyCuenta ?? l.cantidad ?? 1),
+          precio: Number(l.precio || 0),
+          nota: l.nota || ''
+        }));
+      }
+    }
+
+    operaciones.push({
+      ticket,
+      factura: factura || null,
+      ts: tsV
     });
+  }
+
+  // 4. Si hay facturas emitidas en el período que no tenían ticket en historial, las añadimos
+  const facturasNoAsignadasEnRango = facturasList.filter(f => 
+    !f.asignada && 
+    f.ts >= desde && 
+    f.ts <= hasta
+  );
+
+  for (const f of facturasNoAsignadasEnRango) {
+    operaciones.push({
+      ticket: {
+        ts: f.ts,
+        fecha: f.fecha || (f.ts ? new Date(f.ts).toLocaleDateString('es-ES') : '—'),
+        total: f.totalNum,
+        mesa: f.mesa || 'Factura directa'
+      },
+      factura: f,
+      ts: f.ts
+    });
+  }
+
+  // 5. Ordenar todas las operaciones de forma estrictamente cronológica ascendente
+  operaciones.sort((a, b) => (a.ts || 0) - (b.ts || 0));
+
   return {
     facturasPorClave,
-    operaciones: ventas.map(ticket => ({ ticket, factura: resolverFacturaVenta(ticket, facturasPorClave) }))
+    operaciones
   };
 }
 
-function plantillaInformeGestoria({ ventas, facturasPorClave, local, desdeTexto, hastaTexto }) {
-  const filas = ventas.map(venta => {
-    const factura = resolverFacturaVenta(venta, facturasPorClave);
-    const documento = factura
-      ? `Factura ${escapeHtml(factura.serie || '')}-${escapeHtml(factura.numero || '')} · ${escapeHtml(factura.destinatario?.nombre || factura.tipo || '')}`
-      : `Ticket · ${escapeHtml(venta.mesa || venta.mesaNombre || '—')}`;
-    return `<tr><td>${escapeHtml(venta.fecha || new Date(fechaVentaTs(venta)).toLocaleDateString('es-ES'))}</td><td>${documento}</td><td>${fmtEu(venta.total)}</td></tr>`;
-  }).join('');
-  const total = ventas.reduce((suma, venta) => suma + Number(venta.total || 0), 0);
-  const facturadas = ventas.filter(venta => resolverFacturaVenta(venta, facturasPorClave));
+function formatFechaEspFC(dateStr) {
+  if (!dateStr || dateStr === 'Desconocida') return dateStr || '—';
+  const s = String(dateStr).trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) {
+    const [y, m, d] = s.split('-');
+    return `${d}/${m}/${y}`;
+  }
+  return s;
+}
+
+function plantillaInformeGestoria({ operaciones, local, desdeTexto, hastaTexto, ventas, facturasPorClave, unificarTickets = true }) {
+  const ops = Array.isArray(operaciones) && operaciones.length
+    ? operaciones
+    : (Array.isArray(ventas) ? ventas.map(v => ({ ticket: v, factura: resolverFacturaVenta(v, facturasPorClave) })) : []);
+
+  // Asegurar orden cronológico ascendente (de más antiguo a más reciente)
+  ops.sort((a, b) => (a.ts || fechaVentaTs(a.ticket)) - (b.ts || fechaVentaTs(b.ticket)));
+
+  let filas = '';
+  if (unificarTickets) {
+    const mapaDias = {};
+    ops.forEach(op => {
+      const diaKey = normalizarFechaADia(op.ticket?.fecha || op.factura?.fecha || op.ts || fechaVentaTs(op.ticket)) || 'Desconocida';
+      if (!mapaDias[diaKey]) mapaDias[diaKey] = { diaKey, tickets: [], facturas: [] };
+      if (op.factura) {
+        mapaDias[diaKey].facturas.push(op);
+      } else {
+        mapaDias[diaKey].tickets.push(op);
+      }
+    });
+
+    const diasOrdenados = Object.keys(mapaDias).sort();
+    filas = diasOrdenados.map(diaKey => {
+      const info = mapaDias[diaKey];
+      const fechaFmt = formatFechaEspFC(diaKey);
+      let htmlDia = '';
+
+      if (info.tickets.length > 0) {
+        const totalTickets = info.tickets.reduce((s, op) => s + Number(op.ticket?.total || 0), 0);
+        htmlDia += `
+          <tr style="background:#f9fafb;">
+            <td><strong>${escapeHtml(fechaFmt)}</strong></td>
+            <td>Tickets de venta (${info.tickets.length} operaciones)</td>
+            <td style="text-align:right;"><strong>${fmtEu(totalTickets)}</strong></td>
+          </tr>`;
+      }
+
+      if (info.facturas.length > 0) {
+        info.facturas.forEach(({ ticket, factura }) => {
+          const doc = `Factura ${escapeHtml(factura.serie || '')}-${escapeHtml(factura.numero || '')} · ${escapeHtml(factura.destinatario?.nombre || factura.tipo || '')}${factura.destinatario?.nif ? ` (${escapeHtml(factura.destinatario.nif)})` : ''}`;
+          htmlDia += `
+            <tr>
+              <td>${escapeHtml(fechaFmt)}</td>
+              <td><strong style="color:#2563eb;">${doc}</strong></td>
+              <td style="text-align:right; font-weight:700;">${fmtEu(ticket?.total || factura.totalNum || 0)}</td>
+            </tr>`;
+        });
+      }
+      return htmlDia;
+    }).join('');
+  } else {
+    filas = ops.map(({ ticket, factura }) => {
+      const documento = factura
+        ? `Factura ${escapeHtml(factura.serie || '')}-${escapeHtml(factura.numero || '')} · ${escapeHtml(factura.destinatario?.nombre || factura.tipo || '')}`
+        : `Ticket · ${escapeHtml(ticket.mesa || ticket.mesaNombre || '—')}`;
+      const fecha = ticket.fecha || (ticket.ts ? new Date(ticket.ts).toLocaleDateString('es-ES') : '—');
+      return `<tr><td>${escapeHtml(fecha)}</td><td>${documento}</td><td style="text-align:right;">${fmtEu(ticket.total)}</td></tr>`;
+    }).join('');
+  }
+
+  const total = ops.reduce((suma, op) => suma + Number(op.ticket?.total || op.factura?.totalNum || 0), 0);
+  const facturadas = ops.filter(op => Boolean(op.factura));
+  const ticketsCount = ops.length - facturadas.length;
   const empresa = local?.datosNegocio || local || {};
   return `
     <main class="invoice"><header><div><div class="title">INFORME PARA GESTORÍA</div><div class="muted">${escapeHtml(empresa.nombre || '')}<br>Período: ${escapeHtml(desdeTexto || 'Inicio')} — ${escapeHtml(hastaTexto || 'Fin')}</div></div>
-    <div style="text-align:right"><strong>${ventas.length} operaciones</strong><br><span class="muted">${facturadas.length} facturadas · ${ventas.length - facturadas.length} tickets</span></div></header>
-    <section class="block"><div class="label">Relación única de operaciones</div><div class="muted" style="margin-top:6px">Las ventas con factura se muestran por su número de factura; no se duplican como ticket.</div>
-    <table><thead><tr><th>Fecha</th><th>Documento</th><th>Total</th></tr></thead><tbody>${filas || '<tr><td colspan="3">No hay ventas en el período.</td></tr>'}</tbody></table><div class="total"><span>Total período</span><span>${fmtEu(total)}</span></div></section></main>`;
+    <div style="text-align:right"><strong>${ops.length} operaciones</strong><br><span class="muted">${facturadas.length} facturadas · ${ticketsCount} tickets ${unificarTickets ? '(unificados por día)' : ''}</span></div></header>
+    <section class="block"><div class="label">Relación única de operaciones ${unificarTickets ? '(Tickets agrupados por día)' : ''}</div><div class="muted" style="margin-top:6px">${unificarTickets ? 'Tickets de venta ordinarios agrupados en asiento resumen por día. Las facturas completas se detallan individualmente con su destinatario.' : 'Las ventas con factura se muestran por su número de factura; no se duplican como ticket.'}</div>
+    <table class="tabla-gestoria"><thead><tr><th>Fecha</th><th class="col-doc">Documento</th><th style="text-align:right;">Total</th></tr></thead><tbody>${filas || '<tr><td colspan="3">No hay ventas en el período.</td></tr>'}</tbody></table><div class="total"><span>Total período</span><span>${fmtEu(total)}</span></div></section></main>`;
 }
 
 async function generarPdfGestoria({ getDb, resultado }) {
@@ -166,14 +396,105 @@ async function generarPdfGestoria({ getDb, resultado }) {
     const [{ operaciones, facturasPorClave }, localSnap] = await Promise.all([
       cargarOperacionesFiscales(db, desde, hasta), get(ref(db, 'config/local'))
     ]);
-    const ventas = operaciones.map(item => item.ticket).sort((a, b) => fechaVentaTs(a) - fechaVentaTs(b));
-    if (!ventas.length) { resultado.textContent = 'No hay ventas en el período seleccionado.'; return; }
-    const contenido = plantillaInformeGestoria({ ventas, facturasPorClave, local: localSnap.val() || {}, desdeTexto: desdeInput?.value, hastaTexto: hastaInput?.value });
+    if (!operaciones.length) { resultado.textContent = 'No hay ventas en el período seleccionado.'; return; }
+
+    let unificarTickets = true;
+    if (typeof window.showCustomConfirm === 'function') {
+      unificarTickets = await window.showCustomConfirm(
+        '📄 PDF Gestoría Consolidado',
+        '¿Cómo deseas mostrar los tickets en el informe?\n\n• Aceptar: UNIFICAR tickets por día (Recomendado: 1 fila por día con la suma de tickets + facturas nominativas desglosadas)\n• Cancelar: DETALLAR cada ticket individualmente (como hasta ahora)'
+      );
+    } else if (typeof window.confirm === 'function') {
+      unificarTickets = window.confirm(
+        '¿Deseas unificar los tickets por día en el informe para la gestoría?\n\nAceptar: Sí, agrupar tickets por día (resumen diario + facturas)\nCancelar: No, detallar cada ticket individualmente'
+      );
+    }
+
+    const contenido = plantillaInformeGestoria({
+      operaciones,
+      facturasPorClave,
+      local: localSnap.val() || {},
+      desdeTexto: desdeInput?.value,
+      hastaTexto: hastaInput?.value,
+      unificarTickets: unificarTickets === true
+    });
     abrirDocumento(`Gestoría ${desdeInput?.value || ''} ${hastaInput?.value || ''}`, contenido);
     resultado.textContent = 'PDF consolidado abierto en una nueva pestaña.';
   } catch (error) {
     console.error('No se pudo generar el PDF de gestoría:', error);
     resultado.textContent = 'No se pudo generar el PDF consolidado. Comprueba la conexión.';
+  }
+}
+
+export function vincularLineasAFacturas(facturas, ticketsRaw) {
+  if (!Array.isArray(facturas) || !ticketsRaw) return;
+  const tickets = Object.entries(ticketsRaw).map(([id, t]) => ({ id, ...t }));
+  const ticketsDisponibles = tickets.slice();
+
+  for (const f of facturas) {
+    if (Array.isArray(f.lineas) && f.lineas.length > 0) continue;
+
+    let matchedTicket = null;
+
+    // 1. Por fbKey
+    if (f.fbKey) {
+      matchedTicket = ticketsDisponibles.find(t => t.verifactu?.fbKey === f.fbKey);
+    }
+
+    // 2. Por Serie y Número exactos
+    if (!matchedTicket && f.serie && f.numero !== undefined && f.numero !== null) {
+      matchedTicket = ticketsDisponibles.find(t =>
+        t.verifactu?.serie === f.serie && String(t.verifactu?.numero) === String(f.numero)
+      );
+    }
+
+    // 3. Por UUID
+    if (!matchedTicket && f.uuid) {
+      matchedTicket = ticketsDisponibles.find(t => t.verifactu?.uuid === f.uuid);
+    }
+
+    // 4. Por mismo día e importe exacto (tolerancia 2 céntimos)
+    if (!matchedTicket) {
+      const diaF = normalizarFechaADia(f.fecha || f.ts);
+      const totalF = Math.round(Number(f.total || 0) * 100) / 100;
+      const mesaF = String(f.mesa || '').trim().toLowerCase();
+
+      if (diaF && totalF > 0) {
+        const candidatas = ticketsDisponibles.filter(t => {
+          const diaT = normalizarFechaADia(t.fecha || t.ts);
+          const totalT = Math.round(Number(t.total || 0) * 100) / 100;
+          return diaT === diaF && Math.abs(totalT - totalF) < 0.02;
+        });
+
+        if (candidatas.length === 1) {
+          matchedTicket = candidatas[0];
+        } else if (candidatas.length > 1 && mesaF) {
+          const porMesa = candidatas.filter(t => String(t.mesa || t.mesaNombre || '').trim().toLowerCase() === mesaF);
+          if (porMesa.length === 1) {
+            matchedTicket = porMesa[0];
+          } else {
+            const tsF = Number(f.ts || fechaFacturaTs(f));
+            candidatas.sort((a, b) => Math.abs((a.ts || fechaVentaTs(a)) - tsF) - Math.abs((b.ts || fechaVentaTs(b)) - tsF));
+            matchedTicket = candidatas[0];
+          }
+        } else if (candidatas.length > 1) {
+          const tsF = Number(f.ts || fechaFacturaTs(f));
+          candidatas.sort((a, b) => Math.abs((a.ts || fechaVentaTs(a)) - tsF) - Math.abs((b.ts || fechaVentaTs(b)) - tsF));
+          matchedTicket = candidatas[0];
+        }
+      }
+    }
+
+    if (matchedTicket && Array.isArray(matchedTicket.lineas) && matchedTicket.lineas.length > 0) {
+      f.lineas = matchedTicket.lineas.map(l => ({
+        nombre: l.nombre || l.articulo || l.concepto || 'Artículo',
+        qty: Number(l.qty ?? l.qtyCuenta ?? l.cantidad ?? 1),
+        precio: Number(l.precio || 0),
+        nota: l.nota || ''
+      }));
+      const idx = ticketsDisponibles.indexOf(matchedTicket);
+      if (idx !== -1) ticketsDisponibles.splice(idx, 1);
+    }
   }
 }
 
@@ -198,19 +519,40 @@ export function montarConsultaFacturas({ getDb, elementId }) {
     if (!db) { resultado.textContent = 'Selecciona primero un local.'; return; }
     resultado.textContent = 'Cargando facturas…';
     try {
-      const [facturasSnap, localSnap] = await Promise.all([
-        get(ref(db, 'verifactu/facturas')),
-        get(ref(db, 'config/local'))
-      ]);
       const desdeInput = document.getElementById('venta-desde') || document.getElementById('ventas-fecha-ini');
       const hastaInput = document.getElementById('venta-hasta') || document.getElementById('ventas-fecha-fin');
       const desde = desdeInput?.value ? new Date(`${desdeInput.value}T00:00:00`).getTime() : 0;
       const hasta = hastaInput?.value ? new Date(`${hastaInput.value}T23:59:59.999`).getTime() : 0;
+
+      let historialSnap = null;
+      try {
+        if (desde && hasta) {
+          historialSnap = await get(query(ref(db, 'historial'), orderByChild('ts'), startAt(desde - 172800000), endAt(hasta + 172800000)));
+        } else {
+          historialSnap = await get(ref(db, 'historial'));
+        }
+      } catch (_) {
+        try {
+          historialSnap = await get(ref(db, 'historial'));
+        } catch (e) {
+          console.warn('No se pudo cargar historial para vincular líneas:', e);
+        }
+      }
+
+      const [facturasSnap, localSnap] = await Promise.all([
+        get(ref(db, 'verifactu/facturas')),
+        get(ref(db, 'config/local'))
+      ]);
+
       const local = localSnap.val() || {};
-      const facturas = Object.values(facturasSnap.val() || {})
+      const facturasDict = facturasSnap.val() || {};
+      const facturas = Object.entries(facturasDict).map(([fbKey, f]) => ({ fbKey, ...f }))
         .filter(esFacturaCompleta)
         .filter(factura => fechaEnRango(factura, desde, hasta))
         .sort((a, b) => Number(b.ts || 0) - Number(a.ts || 0));
+
+      const ticketsObj = historialSnap?.val?.() || {};
+      vincularLineasAFacturas(facturas, ticketsObj);
 
       if (!facturas.length) { resultado.textContent = 'No hay facturas completas en el período seleccionado.'; return; }
       resultado.innerHTML = `
