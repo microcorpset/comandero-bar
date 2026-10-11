@@ -152,7 +152,15 @@
 
   /* Cuenta lateral en modo pantalla ancha (tanto en TPV como en Mesas). */
   @media (min-width:768px) {
-    body.tpv-cuenta-derecha #view-carta.tablet-active #carta-body{margin-right:clamp(300px,25vw,370px);padding-bottom:24px}
+    body.tpv-cuenta-derecha .app-shell {
+      width: calc(100% - 20px) !important;
+      max-width: none !important;
+      margin: 10px auto 0 !important;
+    }
+    body.tpv-cuenta-derecha #view-carta.tablet-active #carta-body {
+      margin-right: calc(clamp(290px, 24vw, 360px) + 12px) !important;
+      padding-bottom: 24px;
+    }
     body.tpv-cuenta-derecha #grid-order-tray{left:auto;right:10px;top:10px;bottom:10px;width:clamp(290px,24vw,360px);height:calc(100vh - 20px);max-height:none;box-sizing:border-box;display:flex;flex-direction:column;border-radius:14px}
     body.tpv-cuenta-derecha .grid-order-tray__head{flex-shrink:0;flex-wrap:wrap}
     body.tpv-cuenta-derecha .grid-order-tray__items{flex:1;height:0;min-height:0;overflow-y:auto}
@@ -1842,7 +1850,7 @@
   <span class="fm-badge" id="fm-badge" style="display:none">0</span>
 </button>
 
-<script type="module" src="comandero.js?v=unificado-20260930-04"></script>
+<script type="module" src="comandero.js?v=unificado-20261011-02"></script>
 <script>
   /* Bandeja visual: cuenta lateral y cuadrícula configurable (unificado). */
   (() => {

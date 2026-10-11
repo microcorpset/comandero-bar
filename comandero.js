@@ -5461,74 +5461,83 @@ window.ajustarLineaCuentaTPV = (key, delta) => {
   updateUI();
 };
 
+let tpvImprimiendoTicketLock = false;
 window.imprimirTicketTPV = async () => {
   if (!window.__camareroNewTpvActive) return;
-  const lineas = Object.values(carrito).map(item => ({
-    nombre: item.art?.nombre || 'Artículo',
-    qtyCuenta: Number(item.qty || 0),
-    precio: Number(item.art?.precio || 0),
-    nota: item.nota || ''
-  })).filter(linea => linea.qtyCuenta > 0);
-  if (!lineas.length) return;
-  const total = Math.round(lineas.reduce((sum, linea) => sum + linea.qtyCuenta * linea.precio, 0) * 100) / 100;
-
-  const signature = lineas.map(l => `${l.nombre}:${l.qtyCuenta}:${Number(l.precio).toFixed(2)}`).join('|');
-  const esReimpresion = (tpvUltimaFirmaImpresa === signature && tpvVentaKey && tpvTicketImpresoTs);
-
-  if (esReimpresion) {
-    // Si es exactamente el mismo ticket e importe ya impreso, se envía como reimpresión/copia sin duplicar venta
-    await imprimirTicketFinal(lineas, total, null, null, {
-      esReimpresion: true,
-      fechaVentaOriginal: new Date(tpvTicketImpresoTs).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
-    });
-    toast('Copia de ticket impresa (no duplica venta)');
-    return;
-  }
-
-  // Si es un ticket nuevo o la comanda cambió, se registra inmediatamente la venta en historial de forma preventiva
-  const ahora = new Date();
-  const ventaData = {
-    mesa: 'TPV',
-    mesaNombre: mesaNombre || 'TPV',
-    mesaId: mesaId || 'temp_tpv_' + ahora.getTime(),
-    camarero: camareroActual || 'TPV',
-    ts: ahora.getTime(),
-    fecha: ahora.toLocaleDateString('es-ES'),
-    hora: ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
-    total,
-    pagoMetodo: 'Efectivo',
-    lineas: lineas.map(l => ({ nombre: l.nombre, precio: Number(l.precio), qty: l.qtyCuenta, nota: l.nota || '' })),
-    tipoVenta: 'tpv_directo',
-    impreso: true,
-    impresoTs: ahora.getTime(),
-    anulado: false
-  };
-
+  if (tpvImprimiendoTicketLock) return;
+  tpvImprimiendoTicketLock = true;
   try {
-    if (tpvVentaKey) {
-      await update(ref(db, 'historial/' + tpvVentaKey), ventaData);
-    } else {
-      const newRef = await push(ref(db, 'historial'), ventaData);
-      tpvVentaKey = newRef.key;
-    }
-    tpvUltimaFirmaImpresa = signature;
-    tpvTicketImpresoTs = ahora.getTime();
-    tpvUltimoTotalImpreso = total;
+    const lineas = Object.values(carrito).map(item => ({
+      nombre: item.art?.nombre || 'Artículo',
+      qtyCuenta: Number(item.qty || 0),
+      precio: Number(item.art?.precio || 0),
+      nota: item.nota || ''
+    })).filter(linea => linea.qtyCuenta > 0);
+    if (!lineas.length) return;
+    const total = Math.round(lineas.reduce((sum, linea) => sum + linea.qtyCuenta * linea.precio, 0) * 100) / 100;
 
-    if (mesaId) {
-      await update(ref(db, `pedidos/${mesaId}/_meta`), {
-        ventaKey: tpvVentaKey,
-        ticketImpresoTs: tpvTicketImpresoTs,
-        ultimaFirmaImpresa: tpvUltimaFirmaImpresa,
-        ultimoTotalImpreso: tpvUltimoTotalImpreso
+    const signature = lineas.map(l => `${l.nombre}:${l.qtyCuenta}:${Number(l.precio).toFixed(2)}`).join('|');
+    const esReimpresion = (tpvUltimaFirmaImpresa === signature && tpvVentaKey && tpvTicketImpresoTs);
+
+    if (esReimpresion) {
+      // Si es exactamente el mismo ticket e importe ya impreso, se envía como reimpresión/copia sin duplicar venta
+      await imprimirTicketFinal(lineas, total, null, null, {
+        esReimpresion: true,
+        fechaVentaOriginal: new Date(tpvTicketImpresoTs).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
       });
+      toast('Copia de ticket impresa (no duplica venta)');
+      return;
     }
-  } catch (errReg) {
-    console.error('Error registrando venta TPV al imprimir:', errReg);
-  }
 
-  // Imprimir no cobra ni vacía: la cuenta continúa visible y editable en TPV.
-  await imprimirTicketFinal(lineas, total);
+    // Si es un ticket nuevo o la comanda cambió, se registra inmediatamente la venta en historial de forma preventiva
+    const ahora = new Date();
+    const ventaData = {
+      mesa: 'TPV',
+      mesaNombre: mesaNombre || 'TPV',
+      mesaId: mesaId || 'temp_tpv_' + ahora.getTime(),
+      camarero: camareroActual || 'TPV',
+      ts: ahora.getTime(),
+      fecha: ahora.toLocaleDateString('es-ES'),
+      hora: ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+      total,
+      pagoMetodo: 'Efectivo',
+      lineas: lineas.map(l => ({ nombre: l.nombre, precio: Number(l.precio), qty: l.qtyCuenta, nota: l.nota || '' })),
+      tipoVenta: 'tpv_directo',
+      impreso: true,
+      impresoTs: ahora.getTime(),
+      anulado: false
+    };
+
+    try {
+      if (tpvVentaKey) {
+        await update(ref(db, 'historial/' + tpvVentaKey), ventaData);
+      } else {
+        const newRef = await push(ref(db, 'historial'), ventaData);
+        tpvVentaKey = newRef.key;
+      }
+      tpvUltimaFirmaImpresa = signature;
+      tpvTicketImpresoTs = ahora.getTime();
+      tpvUltimoTotalImpreso = total;
+
+      if (mesaId) {
+        await update(ref(db, `pedidos/${mesaId}/_meta`), {
+          ventaKey: tpvVentaKey,
+          ticketImpresoTs: tpvTicketImpresoTs,
+          ultimaFirmaImpresa: tpvUltimaFirmaImpresa,
+          ultimoTotalImpreso: tpvUltimoTotalImpreso
+        });
+      }
+    } catch (errReg) {
+      console.error('Error registrando venta TPV al imprimir:', errReg);
+    }
+
+    // Imprimir no cobra ni vacía: la cuenta continúa visible y editable en TPV.
+    await imprimirTicketFinal(lineas, total);
+  } finally {
+    setTimeout(() => {
+      tpvImprimiendoTicketLock = false;
+    }, 1500);
+  }
 };
 
 window.aparcarCuentaTPV = async () => {
@@ -5995,7 +6004,8 @@ async function intentarImpresionDirectaLocal(payload) {
   for (const baseUrl of candidatos) {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 1200);
+      // Las impresoras de Windows pueden tardar entre 1 y 3 segundos en abrir el spooler y enviar el buffer
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
       const resp = await fetch(`${baseUrl}/print/ticket`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -6078,44 +6088,36 @@ async function enviarTicketFinalAServicio(lineasServidas, total, cobro = null, v
     }
   }
 
-  // 1. Si no hay conexión o se está en modo TPV local, intentar impresión directa al servicio local de Windows
-  const usarDefaultPrinter = Boolean(window.__camareroNewTpvActive || !navigator.onLine || !targetPrinter);
-  const payloadLocal = {
-    ...payload,
-    printerName: targetPrinter,
-    use_default_printer: usarDefaultPrinter
-  };
-
-  let impresoDirecto = false;
+  // Envío directo y natural a la cola de Firebase (como en las versiones estables originales).
+  // Firebase gestiona la reconexión automática aunque la pestaña haya estado inactiva.
   try {
-    impresoDirecto = await intentarImpresionDirectaLocal(payloadLocal);
-  } catch (_) {
-    impresoDirecto = false;
-  }
-
-  if (impresoDirecto) {
-    console.log('[Impresión] Ticket impreso localmente por bucle 127.0.0.1 (Windows)');
-    if (navigator.onLine) {
-      try {
-        await push(ref(db, 'print_jobs'), {
-          ...payload,
-          status: 'printed',
-          printedAt: Date.now(),
-          printedByDirectLocal: true
-        });
-      } catch (_) {}
-    }
-    return { directLocal: true };
-  }
-
-  // 2. Si no se pudo por loopback local pero hay internet, enviar a la cola de Firebase
-  if (navigator.onLine) {
     await push(ref(db, 'print_jobs'), payload);
     return { cloudJob: true };
-  }
+  } catch (errFirebase) {
+    console.warn('[Impresión] Error enviando a Firebase, probando fallback offline:', errFirebase);
 
-  // 3. Si no hay internet y no respondió el servicio local
-  throw new Error('Sin conexión a Internet y el servicio local de impresión en 127.0.0.1 no está disponible.');
+    // Fallback de emergencia solo si la llamada a Firebase falla físicamente:
+    const usarDefaultPrinter = Boolean(window.__camareroNewTpvActive || !targetPrinter);
+    const payloadLocal = {
+      ...payload,
+      printerName: targetPrinter,
+      use_default_printer: usarDefaultPrinter
+    };
+
+    let impresoDirecto = false;
+    try {
+      impresoDirecto = await intentarImpresionDirectaLocal(payloadLocal);
+    } catch (_) {
+      impresoDirecto = false;
+    }
+
+    if (impresoDirecto) {
+      console.log('[Impresión Offline] Ticket impreso por bucle local 127.0.0.1');
+      return { directLocal: true };
+    }
+
+    throw errFirebase;
+  }
 }
 
 function usarMiniAppImpresion() {
@@ -7595,6 +7597,23 @@ async function transferirMesa(origenId, mesaDestId) {
 
   await update(ref(db), batchUpdates);
 
+  // Sincronizar estado local en memoria inmediatamente sin esperar onValue
+  if (!pedidosData[mesaDestId]) pedidosData[mesaDestId] = {};
+  Object.assign(pedidosData[mesaDestId], pedidos);
+  delete pedidosData[origId];
+
+  if (origId.startsWith('temp_')) {
+    delete mesasData[origId];
+  } else if (mesasData[origId]) {
+    mesasData[origId].estado = 'libre';
+    mesasData[origId].atendidaTs = null;
+  }
+  if (mesasData[mesaDestId]) {
+    mesasData[mesaDestId].estado = 'ocupada';
+  }
+  localOcupada.delete(origId);
+  localOcupada.add(mesaDestId);
+
   const mesaDestNombre = mesasData[mesaDestId]?.nombre || mesaDestId;
   const mesaOrigenNombre = mesasData[origId]?.nombre || origId;
   
@@ -7608,14 +7627,20 @@ async function transferirMesa(origenId, mesaDestId) {
   if (mesaId === origId) {
     mesaId = mesaDestId;
     mesaNombre = mesaDestNombre;
-    document.getElementById('topbar-mesa').textContent = 'Mesa ' + mesaDestNombre;
+    const topMesa = document.getElementById('topbar-mesa');
+    if (topMesa) topMesa.textContent = 'Mesa ' + mesaDestNombre;
     actualizarCabecera();
     if (document.getElementById('view-ticket').style.display !== 'none') {
       await cargarTicketActual();
     }
-  } else {
-    if (mesasViewMode === 'grid') renderMesas(); else renderPlano();
+    if (cartaReady && catsReady) {
+      renderCarta();
+    }
   }
+
+  if (mesasViewMode === 'grid') renderMesas(); else renderPlano();
+  actualizarCabecera();
+  document.dispatchEvent(new CustomEvent('camareronew:tpv-account-updated'));
 }
 
 // ── CERRAR MESA ───────────────────────────────────────────────────────────────
