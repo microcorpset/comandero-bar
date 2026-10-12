@@ -8908,3 +8908,206 @@ async function emitirFacturaEstandarCompleta(lineas, total, destinatario) {
   await imprimirTicketFinal(lineas, total, null, factData);
   await cargarTicketActual();
 }
+
+// ── CONTROL AUTOMÁTICO DE MESAS OLVIDADAS (CIERRE NOCTURNO DESATENDIDO) ────────
+let __ultimaLimpiezaNocturnaFecha = localStorage.getItem('comandero_ultima_limpieza_nocturna') || '';
+let __autoCierreEnProgreso = false;
+
+async function autoCerrarMesasOlvidadas() {
+  if (__autoCierreEnProgreso) return;
+  if (!isFirebaseConnected || !navigator.onLine) return;
+
+  const ahora = new Date();
+  const fechaHoyStr = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-${String(ahora.getDate()).padStart(2, '0')}`;
+  const horaActual = ahora.getHours();
+  const minutosActuales = ahora.getMinutes();
+
+  // Ventana de corte nocturno: entre 05:30 y 07:00 AM, o cualquier hora si es una jornada nueva no comprobada hoy
+  const enVentanaMadrugada = (horaActual === 5 && minutosActuales >= 30) || (horaActual === 6);
+  const yaEjecutadoHoy = __ultimaLimpiezaNocturnaFecha === fechaHoyStr;
+
+  if (yaEjecutadoHoy && !enVentanaMadrugada) return;
+
+  // Optimización de cuota: comprobar primero la memoria RAM (mesasData y pedidosData ya sincronizados)
+  // Si en memoria no hay mesas ocupadas ni pedidos pendientes, no consumimos ni 1 byte de red.
+  const tieneCandidatosEnMemoria = Object.keys(pedidosData || {}).length > 0 ||
+    Object.keys(mesasData || {}).some(id => mesasData[id]?.estado === 'ocupada' || id.startsWith('temp_'));
+
+  if (!tieneCandidatosEnMemoria) {
+    if (enVentanaMadrugada) {
+      __ultimaLimpiezaNocturnaFecha = fechaHoyStr;
+      localStorage.setItem('comandero_ultima_limpieza_nocturna', fechaHoyStr);
+    }
+    return;
+  }
+
+  __autoCierreEnProgreso = true;
+
+  try {
+    const snapPedidos = await get(ref(db, 'pedidos'));
+    const todosPedidos = snapPedidos.val() || {};
+
+    const snapMesas = await get(ref(db, 'mesas'));
+    const todasMesas = snapMesas.val() || {};
+
+    // Obtener conjunto de todos los mesaIds presentes en pedidos o marcadas ocupadas en mesas
+    const idsCandidatos = new Set([
+      ...Object.keys(todosPedidos),
+      ...Object.keys(todasMesas).filter(id => todasMesas[id]?.estado === 'ocupada' || id.startsWith('temp_'))
+    ]);
+
+    if (!idsCandidatos.size) {
+      if (enVentanaMadrugada) {
+        __ultimaLimpiezaNocturnaFecha = fechaHoyStr;
+        localStorage.setItem('comandero_ultima_limpieza_nocturna', fechaHoyStr);
+      }
+      __autoCierreEnProgreso = false;
+      return;
+    }
+
+    const ahoraMs = Date.now();
+    const SEIS_HORAS_MS = 6 * 60 * 60 * 1000;
+    let cerradasCount = 0;
+    let huboMesaActivaCerrada = false;
+
+    for (const mId of idsCandidatos) {
+      const pedidoMesa = todosPedidos[mId] || null;
+      const mesaInfo = todasMesas[mId] || mesasData[mId] || {};
+
+      // Si no hay pedidos pero la mesa está marcada ocupada
+      if (!pedidoMesa || !Object.keys(pedidoMesa).length) {
+        if (mesaInfo.estado === 'ocupada' || mId.startsWith('temp_')) {
+          // Si es de madrugada o una mesa temporal abandonada
+          if (enVentanaMadrugada || mId.startsWith('temp_tpv_') || (mesaInfo.atendidaTs && (ahoraMs - mesaInfo.atendidaTs) > SEIS_HORAS_MS)) {
+            if (mId.startsWith('temp_')) {
+              await remove(ref(db, 'mesas/' + mId));
+            } else {
+              await set(ref(db, 'mesas/' + mId + '/estado'), 'libre');
+              await update(ref(db, 'mesas/' + mId), { atendidaTs: null });
+            }
+            if (mesaId === mId) huboMesaActivaCerrada = true;
+            cerradasCount++;
+          }
+        }
+        continue;
+      }
+
+      // Tiene pedidos: comprobamos antigüedad del último envío
+      let ultimoTs = 0;
+      Object.values(pedidoMesa).forEach(envio => {
+        if (envio && typeof envio === 'object' && envio.ts && Number(envio.ts) > ultimoTs) {
+          ultimoTs = Number(envio.ts);
+        }
+      });
+
+      // Si no tuviera ts en los envíos, fallback a atendidaTs
+      if (!ultimoTs && mesaInfo.atendidaTs) {
+        ultimoTs = Number(mesaInfo.atendidaTs);
+      }
+
+      const esAntiguo = ultimoTs > 0 ? ((ahoraMs - ultimoTs) > SEIS_HORAS_MS) : true;
+      const fechaPedido = ultimoTs > 0 ? new Date(ultimoTs) : new Date(ahoraMs - SEIS_HORAS_MS);
+      const esDeJornadaAnterior = fechaPedido.toDateString() !== ahora.toDateString();
+
+      // Criterio de cierre: tiene más de 6 horas Y (es de jornada anterior O estamos en corte nocturno)
+      if (esAntiguo && (esDeJornadaAnterior || enVentanaMadrugada)) {
+        const lineasAplanadas = aplanarPedidos(pedidoMesa);
+        const agrupado = {};
+        const camareros = new Set();
+        let total = 0;
+
+        lineasAplanadas.forEach(l => {
+          const qty = qtyEnCuenta(l);
+          if (qty <= 0) return;
+          if (l.camarero && l.destino !== 'descuento') camareros.add(l.camarero);
+          const k = l.nombre + '||' + Number(l.precio).toFixed(2);
+          if (!agrupado[k]) agrupado[k] = { nombre: l.nombre, precio: Number(l.precio), qty: 0 };
+          agrupado[k].qty += qty;
+          total += Number(l.precio) * qty;
+        });
+
+        const lineasFinales = Object.values(agrupado);
+        const mesaNombreStr = mesaInfo.nombre || (mId.startsWith('temp_tpv_') ? 'TPV Bar' : mId);
+
+        // Archivar comanda en historial con la fecha de la comanda original (sin inventar efectivo en la caja de hoy)
+        if (lineasFinales.length > 0 && total > 0) {
+          const camStr = [...camareros].join(', ') || 'Cierre Auto Nocturno';
+          await push(ref(db, 'historial'), {
+            mesa: mesaNombreStr,
+            camarero: camStr,
+            ts: ultimoTs || ahoraMs,
+            fecha: fechaPedido.toLocaleDateString('es-ES'),
+            hora: fechaPedido.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+            total: Math.round(total * 100) / 100,
+            pagoMetodo: 'Auto / Olvidada',
+            lineas: lineasFinales,
+            autoCerrada: true,
+            cierreMotivo: 'Cierre automático por cambio de jornada'
+          });
+
+          logAuditoria('mesa_auto_cerrada',
+            `Mesa ${mesaNombreStr} auto-cerrada por jornada anterior (${fmtEu(total)})`,
+            { mesaId: mId, mesa: mesaNombreStr, total: Math.round(total * 100) / 100, articulos: lineasFinales.length }
+          );
+        }
+
+        // Liberar mesa y borrar pedidos en Firebase
+        await remove(ref(db, 'pedidos/' + mId));
+        if (mId.startsWith('temp_')) {
+          await remove(ref(db, 'mesas/' + mId));
+        } else {
+          await set(ref(db, 'mesas/' + mId + '/estado'), 'libre');
+          await update(ref(db, 'mesas/' + mId), { atendidaTs: null });
+        }
+
+        // Limpiar print jobs antiguos si existían asociados a esta mesa
+        try {
+          if (typeof limpiarPrintJobsCerradosDeMesa === 'function') {
+            await limpiarPrintJobsCerradosDeMesa(mId);
+          }
+        } catch (_) {}
+
+        if (mesaId === mId) huboMesaActivaCerrada = true;
+        cerradasCount++;
+      }
+    }
+
+    if (cerradasCount > 0) {
+      console.log(`[AutoCierre] Se han cerrado y archivado ${cerradasCount} mesas olvidadas.`);
+      
+      // Si la mesa que estaba activa en pantalla fue una de las cerradas (o una cuenta TPV temporal)
+      if (huboMesaActivaCerrada || (window.__camareroNewTpvActive && String(mesaId || '').startsWith('temp_tpv_'))) {
+        carrito = {};
+        mesaId = null;
+        mesaNombre = null;
+        if (window.__camareroNewTpvActive && typeof window.iniciarModoTPV === 'function') {
+          await window.iniciarModoTPV();
+        } else if (typeof show === 'function') {
+          show('mesas');
+        }
+      }
+
+      if (typeof renderMesas === 'function') {
+        if (mesasViewMode === 'grid') renderMesas(); else renderPlano();
+      }
+    }
+
+    __ultimaLimpiezaNocturnaFecha = fechaHoyStr;
+    localStorage.setItem('comandero_ultima_limpieza_nocturna', fechaHoyStr);
+  } catch (err) {
+    console.warn('[AutoCierre] Error durante la comprobación de mesas olvidadas:', err);
+  } finally {
+    __autoCierreEnProgreso = false;
+  }
+}
+
+// Watchdog desatendido: comprueba cada 15 minutos en segundo plano
+setInterval(autoCerrarMesasOlvidadas, 15 * 60 * 1000);
+
+// Comprobación inicial pasados 6 segundos desde el arranque (para dar tiempo a que Firebase conecte)
+setTimeout(autoCerrarMesasOlvidadas, 6000);
+
+// Comprobación reactiva cuando la pestaña vuelve a primer plano
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') autoCerrarMesasOlvidadas();
+});
